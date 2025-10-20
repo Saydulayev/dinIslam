@@ -81,7 +81,7 @@
 "stats.questionsStudied" = "Изучено вопросов";
 "stats.correctAnswers" = "Правильных ответов";
 "stats.incorrectAnswers" = "Неправильных";
-"stats.accuracy" = "Точность";
+"stats.correctedMistakes" = "Исправлено ошибок";
 "stats.progress" = "Прогресс";
 "stats.quizzesCompleted" = "Завершено викторин";
 "stats.lastQuiz" = "Последняя викторина:";

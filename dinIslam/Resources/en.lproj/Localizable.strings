@@ -81,7 +81,7 @@
 "stats.questionsStudied" = "Questions Studied";
 "stats.correctAnswers" = "Correct Answers";
 "stats.incorrectAnswers" = "Incorrect";
-"stats.accuracy" = "Accuracy";
+"stats.correctedMistakes" = "Mistakes Corrected";
 "stats.progress" = "Progress";
 "stats.quizzesCompleted" = "Quizzes Completed";
 "stats.lastQuiz" = "Last Quiz:";

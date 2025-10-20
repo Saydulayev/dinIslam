@@ -11,6 +11,7 @@ struct UserStats: Codable {
     var totalQuestionsStudied: Int = 0
     var correctAnswers: Int = 0
     var incorrectAnswers: Int = 0
+    var correctedMistakes: Int = 0  // Новое поле для исправленных ошибок
     var wrongQuestionIds: Set<String> = []
     var lastQuizDate: Date?
     var totalQuizzesCompleted: Int = 0
@@ -43,6 +44,8 @@ struct UserStats: Codable {
     }
     
     mutating func removeWrongQuestion(_ questionId: String) {
-        wrongQuestionIds.remove(questionId)
+        if wrongQuestionIds.remove(questionId) != nil {
+            correctedMistakes += 1
+        }
     }
 }

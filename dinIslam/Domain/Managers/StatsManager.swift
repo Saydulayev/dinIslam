@@ -58,4 +58,8 @@ class StatsManager: ObservableObject {
         stats = UserStats()
         saveStats()
     }
+    
+    func getCorrectedMistakesCount() -> Int {
+        return stats.correctedMistakes
+    }
 }

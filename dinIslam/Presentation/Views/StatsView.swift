@@ -55,9 +55,9 @@ struct StatsView: View {
                         )
                         
                         StatCard(
-                            title: LocalizationManager.shared.localizedString(for: "stats.accuracy"),
-                            value: String(format: "%.1f%%", statsManager.stats.accuracyPercentage),
-                            icon: "target",
+                            title: LocalizationManager.shared.localizedString(for: "stats.correctedMistakes"),
+                            value: "\(statsManager.stats.correctedMistakes)",
+                            icon: "checkmark.circle.badge.xmark",
                             color: .orange
                         )
                     }
