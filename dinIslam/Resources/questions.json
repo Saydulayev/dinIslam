@@ -1,30 +1,366 @@
 [
-  { "id": "q1", "text": "Сколько столпов ислама?", "answers": [ { "id": "a1", "text": "Пять" }, { "id": "a2", "text": "Шесть" }, { "id": "a3", "text": "Четыре" }, { "id": "a4", "text": "Три" } ], "correctIndex": 0, "category": "Ислам", "difficulty": "easy" },
-  { "id": "q2", "text": "Как называется вера в единственность Аллаха?", "answers": [ { "id": "a1", "text": "Таухид" }, { "id": "a2", "text": "Фикх" }, { "id": "a3", "text": "Сира" }, { "id": "a4", "text": "Хадис" } ], "correctIndex": 0, "category": "Акыда", "difficulty": "easy" },
-  { "id": "q3", "text": "Сколько обязательных намазов в день?", "answers": [ { "id": "a1", "text": "Три" }, { "id": "a2", "text": "Четыре" }, { "id": "a3", "text": "Пять" }, { "id": "a4", "text": "Шесть" } ], "correctIndex": 2, "category": "Фикх", "difficulty": "easy" },
-  { "id": "q4", "text": "Как называется пост в месяце Рамадан?", "answers": [ { "id": "a1", "text": "Закят" }, { "id": "a2", "text": "Саум" }, { "id": "a3", "text": "Хадж" }, { "id": "a4", "text": "Садака" } ], "correctIndex": 1, "category": "Фикх", "difficulty": "easy" },
-  { "id": "q5", "text": "Как называется обязательная милостыня в исламе?", "answers": [ { "id": "a1", "text": "Закят" }, { "id": "a2", "text": "Садака" }, { "id": "a3", "text": "Вакф" }, { "id": "a4", "text": "Фидья" } ], "correctIndex": 0, "category": "Фикх", "difficulty": "easy" },
-  { "id": "q6", "text": "Как называется паломничество в Мекку?", "answers": [ { "id": "a1", "text": "Умра" }, { "id": "a2", "text": "Хадж" }, { "id": "a3", "text": "Итикаф" }, { "id": "a4", "text": "Таравих" } ], "correctIndex": 1, "category": "Фикх", "difficulty": "easy" },
-  { "id": "q7", "text": "Как называется жизнь и биография Пророка Мухаммада (мир ему и благословение)?", "answers": [ { "id": "a1", "text": "Сира" }, { "id": "a2", "text": "Фикх" }, { "id": "a3", "text": "Тафсир" }, { "id": "a4", "text": "Калам" } ], "correctIndex": 0, "category": "Сира", "difficulty": "easy" },
-  { "id": "q8", "text": "Сколько сур в Коране?", "answers": [ { "id": "a1", "text": "112" }, { "id": "a2", "text": "113" }, { "id": "a3", "text": "114" }, { "id": "a4", "text": "115" } ], "correctIndex": 2, "category": "Коран", "difficulty": "medium" },
-  { "id": "q9", "text": "Как называется толкование Корана?", "answers": [ { "id": "a1", "text": "Тафсир" }, { "id": "a2", "text": "Хадис" }, { "id": "a3", "text": "Фикх" }, { "id": "a4", "text": "Сира" } ], "correctIndex": 0, "category": "Коран", "difficulty": "easy" },
-  { "id": "q10", "text": "Кто был первым халифом после Пророка Мухаммада (мир ему и благословение)?", "answers": [ { "id": "a1", "text": "Али ибн Абу Талиб" }, { "id": "a2", "text": "Абу Бакр ас-Сиддик" }, { "id": "a3", "text": "Умар ибн Хаттаб" }, { "id": "a4", "text": "Усман ибн Аффан" } ], "correctIndex": 1, "category": "История ислама", "difficulty": "medium" },
-  { "id": "q11", "text": "Сколько ракаатов в обязательном намазе Фаджр?", "answers": [ { "id": "a1", "text": "4" }, { "id": "a2", "text": "3" }, { "id": "a3", "text": "2" }, { "id": "a4", "text": "1" } ], "correctIndex": 2, "category": "Фикх", "difficulty": "easy" },
-  { "id": "q12", "text": "Как называется дополнительное ночное поклонение в Рамадан?", "answers": [ { "id": "a1", "text": "Витр" }, { "id": "a2", "text": "Киямуль-лейль" }, { "id": "a3", "text": "Таравих" }, { "id": "a4", "text": "Духа" } ], "correctIndex": 2, "category": "Фикх", "difficulty": "medium" },
-  { "id": "q13", "text": "Как называется свидетельство веры в исламе?", "answers": [ { "id": "a1", "text": "Шахада" }, { "id": "a2", "text": "Сунна" }, { "id": "a3", "text": "Иджма" }, { "id": "a4", "text": "Кыяс" } ], "correctIndex": 0, "category": "Акыда", "difficulty": "easy" },
-  { "id": "q14", "text": "Как называется достоверное изречение Пророка (мир ему и благословение)?", "answers": [ { "id": "a1", "text": "Сахих хадис" }, { "id": "a2", "text": "Даиф хадис" }, { "id": "a3", "text": "Мауду хадис" }, { "id": "a4", "text": "Хасан хадис" } ], "correctIndex": 0, "category": "Хадисы", "difficulty": "medium" },
-  { "id": "q15", "text": "Как называется обязательная милостыня, связанная с постом Рамадана?", "answers": [ { "id": "a1", "text": "Фидья" }, { "id": "a2", "text": "Закят-уль-фитр" }, { "id": "a3", "text": "Садака" }, { "id": "a4", "text": "Кафара" } ], "correctIndex": 1, "category": "Фикх", "difficulty": "medium" },
-  { "id": "q16", "text": "Как называется пятничная коллективная молитва мусульман?", "answers": [ { "id": "a1", "text": "Джума" }, { "id": "a2", "text": "Курбан" }, { "id": "a3", "text": "Ид" }, { "id": "a4", "text": "Истиска" } ], "correctIndex": 0, "category": "Фикх", "difficulty": "easy" },
-  { "id": "q17", "text": "Кто был третьим праведным халифом?", "answers": [ { "id": "a1", "text": "Умар ибн Хаттаб" }, { "id": "a2", "text": "Абу Бакр ас-Сиддик" }, { "id": "a3", "text": "Усман ибн Аффан" }, { "id": "a4", "text": "Али ибн Абу Талиб" } ], "correctIndex": 2, "category": "История ислама", "difficulty": "medium" },
-  { "id": "q18", "text": "Как называется направление на Каабу при молитве?", "answers": [ { "id": "a1", "text": "Кибла" }, { "id": "a2", "text": "Минбар" }, { "id": "a3", "text": "Михраб" }, { "id": "a4", "text": "Хутба" } ], "correctIndex": 0, "category": "Фикх", "difficulty": "easy" },
-  { "id": "q19", "text": "Сколько ракаатов в обязательном намазе Магриб?", "answers": [ { "id": "a1", "text": "2" }, { "id": "a2", "text": "3" }, { "id": "a3", "text": "4" }, { "id": "a4", "text": "5" } ], "correctIndex": 1, "category": "Фикх", "difficulty": "easy" },
-  { "id": "q20", "text": "Как называется один из двух праздников в исламе после хаджа?", "answers": [ { "id": "a1", "text": "Ид аль-Фитр" }, { "id": "a2", "text": "Ид аль-Адха" }, { "id": "a3", "text": "Маулид" }, { "id": "a4", "text": "Ашура" } ], "correctIndex": 1, "category": "Праздники", "difficulty": "easy" },
-  { "id": "q21", "text": "Как называется искупительный пост/милостыня при нарушении поста?", "answers": [ { "id": "a1", "text": "Кафара" }, { "id": "a2", "text": "Фидья" }, { "id": "a3", "text": "Закят" }, { "id": "a4", "text": "Курбан" } ], "correctIndex": 0, "category": "Фикх", "difficulty": "hard" },
-  { "id": "q22", "text": "Как называется согласие учёных как источник фикха?", "answers": [ { "id": "a1", "text": "Иджма" }, { "id": "a2", "text": "Кыяс" }, { "id": "a3", "text": "Сунна" }, { "id": "a4", "text": "Истихсан" } ], "correctIndex": 0, "category": "Фикх", "difficulty": "hard" },
-  { "id": "q23", "text": "Как называется месяц поста у мусульман?", "answers": [ { "id": "a1", "text": "Рамадан" }, { "id": "a2", "text": "Шавваль" }, { "id": "a3", "text": "Зуль-хиджа" }, { "id": "a4", "text": "Мухаррам" } ], "correctIndex": 0, "category": "Ислам", "difficulty": "easy" },
-  { "id": "q24", "text": "Как называется вечерняя молитва после Иша?", "answers": [ { "id": "a1", "text": "Таравих" }, { "id": "a2", "text": "Киямуль-лейль" }, { "id": "a3", "text": "Витр" }, { "id": "a4", "text": "Духа" } ], "correctIndex": 2, "category": "Фикх", "difficulty": "medium" },
-  { "id": "q25", "text": "Как называется богобоязненность на арабском?", "answers": [ { "id": "a1", "text": "Таква" }, { "id": "a2", "text": "Ихсан" }, { "id": "a3", "text": "Иманда" }, { "id": "a4", "text": "Хикма" } ], "correctIndex": 0, "category": "Нравственность", "difficulty": "medium" },
-  { "id": "q26", "text": "Как называется совершение малого паломничества?", "answers": [ { "id": "a1", "text": "Хадж" }, { "id": "a2", "text": "Умра" }, { "id": "a3", "text": "Итикаф" }, { "id": "a4", "text": "Курбан" } ], "correctIndex": 1, "category": "Фикх", "difficulty": "easy" },
-  { "id": "q27", "text": "Как называется пророческая традиция?", "answers": [ { "id": "a1", "text": "Сунна" }, { "id": "a2", "text": "Кыяс" }, { "id": "a3", "text": "Иджтихад" }, { "id": "a4", "text": "Иджма" } ], "correctIndex": 0, "category": "Хадисы", "difficulty": "easy" },
-  { "id": "q28", "text": "Как называется благотворительное пожертвование сверх обязательного?", "answers": [ { "id": "a1", "text": "Садака" }, { "id": "a2", "text": "Закят" }, { "id": "a3", "text": "Фидья" }, { "id": "a4", "text": "Кафара" } ], "correctIndex": 0, "category": "Нравственность", "difficulty": "easy" }
+  {
+    "id": "q1",
+    "text": "Сколько столпов ислама?",
+    "answers": [
+      { "id": "a1", "text": "Пять" },
+      { "id": "a2", "text": "Шесть" },
+      { "id": "a3", "text": "Четыре" },
+      { "id": "a4", "text": "Три" }
+    ],
+    "correctIndex": 0,
+    "category": "Ислам",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q2",
+    "text": "Как называется вера в единственность Аллаха?",
+    "answers": [
+      { "id": "a1", "text": "Таухид" },
+      { "id": "a2", "text": "Фикх" },
+      { "id": "a3", "text": "Сира" },
+      { "id": "a4", "text": "Хадис" }
+    ],
+    "correctIndex": 0,
+    "category": "Акыда",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q3",
+    "text": "Сколько обязательных намазов в день?",
+    "answers": [
+      { "id": "a1", "text": "Три" },
+      { "id": "a2", "text": "Четыре" },
+      { "id": "a3", "text": "Пять" },
+      { "id": "a4", "text": "Шесть" }
+    ],
+    "correctIndex": 2,
+    "category": "Фикх",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q4",
+    "text": "Как называется пост в месяце Рамадан?",
+    "answers": [
+      { "id": "a1", "text": "Закят" },
+      { "id": "a2", "text": "Саум" },
+      { "id": "a3", "text": "Хадж" },
+      { "id": "a4", "text": "Садака" }
+    ],
+    "correctIndex": 1,
+    "category": "Фикх",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q5",
+    "text": "Как называется обязательная милостыня в исламе?",
+    "answers": [
+      { "id": "a1", "text": "Закят" },
+      { "id": "a2", "text": "Садака" },
+      { "id": "a3", "text": "Вакф" },
+      { "id": "a4", "text": "Фидья" }
+    ],
+    "correctIndex": 0,
+    "category": "Фикх",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q6",
+    "text": "Как называется паломничество в Мекку?",
+    "answers": [
+      { "id": "a1", "text": "Умра" },
+      { "id": "a2", "text": "Хадж" },
+      { "id": "a3", "text": "Итикаф" },
+      { "id": "a4", "text": "Таравих" }
+    ],
+    "correctIndex": 1,
+    "category": "Фикх",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q7",
+    "text": "Как называется жизнь и биография Пророка Мухаммада (мир ему и благословение)?",
+    "answers": [
+      { "id": "a1", "text": "Сира" },
+      { "id": "a2", "text": "Фикх" },
+      { "id": "a3", "text": "Тафсир" },
+      { "id": "a4", "text": "Калам" }
+    ],
+    "correctIndex": 0,
+    "category": "Сира",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q8",
+    "text": "Сколько сур в Коране?",
+    "answers": [
+      { "id": "a1", "text": "112" },
+      { "id": "a2", "text": "113" },
+      { "id": "a3", "text": "114" },
+      { "id": "a4", "text": "115" }
+    ],
+    "correctIndex": 2,
+    "category": "Коран",
+    "difficulty": "medium"
+  },
+  {
+    "id": "q9",
+    "text": "Как называется толкование Корана?",
+    "answers": [
+      { "id": "a1", "text": "Тафсир" },
+      { "id": "a2", "text": "Хадис" },
+      { "id": "a3", "text": "Фикх" },
+      { "id": "a4", "text": "Сира" }
+    ],
+    "correctIndex": 0,
+    "category": "Коран",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q10",
+    "text": "Кто был первым халифом после Пророка Мухаммада (мир ему и благословение)?",
+    "answers": [
+      { "id": "a1", "text": "Али ибн Абу Талиб" },
+      { "id": "a2", "text": "Абу Бакр ас-Сиддик" },
+      { "id": "a3", "text": "Умар ибн Хаттаб" },
+      { "id": "a4", "text": "Усман ибн Аффан" }
+    ],
+    "correctIndex": 1,
+    "category": "История ислама",
+    "difficulty": "medium"
+  },
+  {
+    "id": "q11",
+    "text": "Сколько ракаатов в обязательном намазе Фаджр?",
+    "answers": [
+      { "id": "a1", "text": "4" },
+      { "id": "a2", "text": "3" },
+      { "id": "a3", "text": "2" },
+      { "id": "a4", "text": "1" }
+    ],
+    "correctIndex": 2,
+    "category": "Фикх",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q12",
+    "text": "Как называется дополнительное ночное поклонение в Рамадан?",
+    "answers": [
+      { "id": "a1", "text": "Витр" },
+      { "id": "a2", "text": "Киямуль-лейль" },
+      { "id": "a3", "text": "Таравих" },
+      { "id": "a4", "text": "Духа" }
+    ],
+    "correctIndex": 2,
+    "category": "Фикх",
+    "difficulty": "medium"
+  },
+  {
+    "id": "q13",
+    "text": "Как называется свидетельство веры в исламе?",
+    "answers": [
+      { "id": "a1", "text": "Шахада" },
+      { "id": "a2", "text": "Сунна" },
+      { "id": "a3", "text": "Иджма" },
+      { "id": "a4", "text": "Кыяс" }
+    ],
+    "correctIndex": 0,
+    "category": "Акыда",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q14",
+    "text": "Как называется достоверное изречение Пророка (мир ему и благословение)?",
+    "answers": [
+      { "id": "a1", "text": "Сахих хадис" },
+      { "id": "a2", "text": "Даиф хадис" },
+      { "id": "a3", "text": "Мауду хадис" },
+      { "id": "a4", "text": "Хасан хадис" }
+    ],
+    "correctIndex": 0,
+    "category": "Хадисы",
+    "difficulty": "medium"
+  },
+  {
+    "id": "q15",
+    "text": "Как называется обязательная милостыня, связанная с постом Рамадана?",
+    "answers": [
+      { "id": "a1", "text": "Фидья" },
+      { "id": "a2", "text": "Закят-уль-фитр" },
+      { "id": "a3", "text": "Садака" },
+      { "id": "a4", "text": "Кафара" }
+    ],
+    "correctIndex": 1,
+    "category": "Фикх",
+    "difficulty": "medium"
+  },
+  {
+    "id": "q16",
+    "text": "Как называется пятничная коллективная молитва мусульман?",
+    "answers": [
+      { "id": "a1", "text": "Джума" },
+      { "id": "a2", "text": "Курбан" },
+      { "id": "a3", "text": "Ид" },
+      { "id": "a4", "text": "Истиска" }
+    ],
+    "correctIndex": 0,
+    "category": "Фикх",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q17",
+    "text": "Кто был третьим праведным халифом?",
+    "answers": [
+      { "id": "a1", "text": "Умар ибн Хаттаб" },
+      { "id": "a2", "text": "Абу Бакр ас-Сиддик" },
+      { "id": "a3", "text": "Усман ибн Аффан" },
+      { "id": "a4", "text": "Али ибн Абу Талиб" }
+    ],
+    "correctIndex": 2,
+    "category": "История ислама",
+    "difficulty": "medium"
+  },
+  {
+    "id": "q18",
+    "text": "Как называется направление на Каабу при молитве?",
+    "answers": [
+      { "id": "a1", "text": "Кибла" },
+      { "id": "a2", "text": "Минбар" },
+      { "id": "a3", "text": "Михраб" },
+      { "id": "a4", "text": "Хутба" }
+    ],
+    "correctIndex": 0,
+    "category": "Фикх",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q19",
+    "text": "Сколько ракаатов в обязательном намазе Магриб?",
+    "answers": [
+      { "id": "a1", "text": "2" },
+      { "id": "a2", "text": "3" },
+      { "id": "a3", "text": "4" },
+      { "id": "a4", "text": "5" }
+    ],
+    "correctIndex": 1,
+    "category": "Фикх",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q20",
+    "text": "Как называется один из двух праздников в исламе после хаджа?",
+    "answers": [
+      { "id": "a1", "text": "Ид аль-Фитр" },
+      { "id": "a2", "text": "Ид аль-Адха" },
+      { "id": "a3", "text": "Маулид" },
+      { "id": "a4", "text": "Ашура" }
+    ],
+    "correctIndex": 1,
+    "category": "Праздники",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q21",
+    "text": "Как называется искупительный пост/милостыня при нарушении поста?",
+    "answers": [
+      { "id": "a1", "text": "Кафара" },
+      { "id": "a2", "text": "Фидья" },
+      { "id": "a3", "text": "Закят" },
+      { "id": "a4", "text": "Курбан" }
+    ],
+    "correctIndex": 0,
+    "category": "Фикх",
+    "difficulty": "hard"
+  },
+  {
+    "id": "q22",
+    "text": "Как называется согласие учёных как источник фикха?",
+    "answers": [
+      { "id": "a1", "text": "Иджма" },
+      { "id": "a2", "text": "Кыяс" },
+      { "id": "a3", "text": "Сунна" },
+      { "id": "a4", "text": "Истихсан" }
+    ],
+    "correctIndex": 0,
+    "category": "Фикх",
+    "difficulty": "hard"
+  },
+  {
+    "id": "q23",
+    "text": "Как называется месяц поста у мусульман?",
+    "answers": [
+      { "id": "a1", "text": "Рамадан" },
+      { "id": "a2", "text": "Шавваль" },
+      { "id": "a3", "text": "Зуль-хиджа" },
+      { "id": "a4", "text": "Мухаррам" }
+    ],
+    "correctIndex": 0,
+    "category": "Ислам",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q24",
+    "text": "Как называется вечерняя молитва после Иша?",
+    "answers": [
+      { "id": "a1", "text": "Таравих" },
+      { "id": "a2", "text": "Киямуль-лейль" },
+      { "id": "a3", "text": "Витр" },
+      { "id": "a4", "text": "Духа" }
+    ],
+    "correctIndex": 2,
+    "category": "Фикх",
+    "difficulty": "medium"
+  },
+  {
+    "id": "q25",
+    "text": "Как называется богобоязненность на арабском?",
+    "answers": [
+      { "id": "a1", "text": "Таква" },
+      { "id": "a2", "text": "Ихсан" },
+      { "id": "a3", "text": "Иманда" },
+      { "id": "a4", "text": "Хикма" }
+    ],
+    "correctIndex": 0,
+    "category": "Нравственность",
+    "difficulty": "medium"
+  },
+  {
+    "id": "q26",
+    "text": "Как называется совершение малого паломничества?",
+    "answers": [
+      { "id": "a1", "text": "Хадж" },
+      { "id": "a2", "text": "Умра" },
+      { "id": "a3", "text": "Итикаф" },
+      { "id": "a4", "text": "Курбан" }
+    ],
+    "correctIndex": 1,
+    "category": "Фикх",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q27",
+    "text": "Как называется пророческая традиция?",
+    "answers": [
+      { "id": "a1", "text": "Сунна" },
+      { "id": "a2", "text": "Кыяс" },
+      { "id": "a3", "text": "Иджтихад" },
+      { "id": "a4", "text": "Иджма" }
+    ],
+    "correctIndex": 0,
+    "category": "Хадисы",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q28",
+    "text": "Как называется благотворительное пожертвование сверх обязательного?",
+    "answers": [
+      { "id": "a1", "text": "Садака" },
+      { "id": "a2", "text": "Закят" },
+      { "id": "a3", "text": "Фидья" },
+      { "id": "a4", "text": "Кафара" }
+    ],
+    "correctIndex": 0,
+    "category": "Нравственность",
+    "difficulty": "easy"
+  }
 ]
