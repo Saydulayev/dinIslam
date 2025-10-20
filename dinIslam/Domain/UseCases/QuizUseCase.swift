@@ -53,8 +53,7 @@ class QuizUseCase: QuizUseCaseProtocol {
             answers: shuffledAnswers,
             correctIndex: newCorrectIndex,
             category: question.category,
-            difficulty: question.difficulty,
-            language: question.language
+            difficulty: question.difficulty
         )
     }
     

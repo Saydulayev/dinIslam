@@ -19,20 +19,19 @@ class QuestionsRepository: QuestionsRepositoryProtocol {
     }
     
     func loadQuestions(language: String) async throws -> [Question] {
-        guard let url = bundle.url(forResource: "questions", withExtension: "json") else {
+        let fileName = language == "en" ? "questions_en" : "questions"
+        guard let url = bundle.url(forResource: fileName, withExtension: "json") else {
             throw QuestionsError.fileNotFound
         }
         
         let data = try Data(contentsOf: url)
-        let allQuestions = try JSONDecoder().decode([Question].self, from: data)
+        let questions = try JSONDecoder().decode([Question].self, from: data)
         
-        let filteredQuestions = allQuestions.filter { $0.language == language }
-        
-        guard !filteredQuestions.isEmpty else {
+        guard !questions.isEmpty else {
             throw QuestionsError.emptyData
         }
         
-        return filteredQuestions
+        return questions
     }
 }
 
