@@ -29,7 +29,7 @@ struct StartView: View {
                         .font(.system(size: 80))
                         .foregroundStyle(.blue.gradient)
                     
-                    Text("dinIslam Quiz")
+                    Text("Tabiin Academy")
                         .font(.largeTitle)
                         .fontWeight(.bold)
                         .foregroundStyle(.primary)
