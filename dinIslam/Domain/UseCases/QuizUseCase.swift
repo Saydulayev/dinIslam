@@ -23,7 +23,7 @@ class QuizUseCase: QuizUseCaseProtocol {
     
     func startQuiz() async throws -> [Question] {
         let allQuestions = try await questionsRepository.loadQuestions()
-        var progress = QuestionPoolProgress(version: questionPoolVersion)
+        let progress = QuestionPoolProgress(version: questionPoolVersion)
         let used = progress.usedIds
         var available = allQuestions.filter { !used.contains($0.id) }
         
