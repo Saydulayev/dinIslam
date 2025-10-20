@@ -5,8 +5,8 @@
 */
 
 // Start View
-"start.description" = "Проверьте свои знания в увлекательной викторине!";
-"start.begin" = "Начать викторину";
+"start.description" = "Изучайте исламские знания через увлекательную викторину!";
+"start.begin" = "Начать изучение";
 "start.loading" = "Загрузка...";
 "start.bestScore" = "Лучший результат";
 
@@ -20,7 +20,7 @@
 "result.totalQuestions" = "Всего вопросов:";
 "result.timeSpent" = "Время:";
 "result.newRecord" = "Новый рекорд!";
-"result.playAgain" = "Играть снова";
+"result.playAgain" = "Продолжить изучение";
 "result.backToStart" = "В главное меню";
 
 // Difficulty
@@ -55,7 +55,7 @@
 "settings.rate.later" = "Напомнить позже";
 "settings.share.title" = "Поделиться";
 "settings.share.subtitle" = "Расскажите друзьям";
-"settings.share.text" = "Попробуйте это увлекательное приложение-квиз!";
+"settings.share.text" = "Изучайте исламские знания с Tabiin Academy!";
 
 // About
 "settings.about" = "О приложении";
