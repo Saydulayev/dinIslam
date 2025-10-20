@@ -74,3 +74,17 @@
 "quiz.stop.confirm.message" = "Прогресс будет потерян.";
 "quiz.stop.confirm.ok" = "Выйти";
 "quiz.stop.confirm.cancel" = "Отмена";
+
+// Stats View
+"stats.title" = "Статистика";
+"stats.done" = "Готово";
+"stats.questionsStudied" = "Изучено вопросов";
+"stats.correctAnswers" = "Правильных ответов";
+"stats.incorrectAnswers" = "Неправильных";
+"stats.accuracy" = "Точность";
+"stats.progress" = "Прогресс";
+"stats.quizzesCompleted" = "Завершено викторин";
+"stats.lastQuiz" = "Последняя викторина:";
+"stats.wrongQuestions" = "Вопросы для повторения";
+"stats.wrongQuestionsCount" = "Неправильных вопросов:";
+"stats.repeatMistakes" = "Повторить ошибки";

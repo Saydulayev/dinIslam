@@ -21,7 +21,7 @@ struct StatsView: View {
                             .font(.system(size: 60))
                             .foregroundStyle(.blue.gradient)
                         
-                        Text("Статистика")
+                        Text(LocalizationManager.shared.localizedString(for: "stats.title"))
                             .font(.largeTitle)
                             .fontWeight(.bold)
                     }
@@ -33,28 +33,28 @@ struct StatsView: View {
                         GridItem(.flexible())
                     ], spacing: 16) {
                         StatCard(
-                            title: "Изучено вопросов",
+                            title: LocalizationManager.shared.localizedString(for: "stats.questionsStudied"),
                             value: "\(statsManager.stats.totalQuestionsStudied)",
                             icon: "questionmark.circle.fill",
                             color: .blue
                         )
                         
                         StatCard(
-                            title: "Правильных ответов",
+                            title: LocalizationManager.shared.localizedString(for: "stats.correctAnswers"),
                             value: "\(statsManager.stats.correctAnswers)",
                             icon: "checkmark.circle.fill",
                             color: .green
                         )
                         
                         StatCard(
-                            title: "Неправильных",
+                            title: LocalizationManager.shared.localizedString(for: "stats.incorrectAnswers"),
                             value: "\(statsManager.stats.incorrectAnswers)",
                             icon: "xmark.circle.fill",
                             color: .red
                         )
                         
                         StatCard(
-                            title: "Точность",
+                            title: LocalizationManager.shared.localizedString(for: "stats.accuracy"),
                             value: String(format: "%.1f%%", statsManager.stats.accuracyPercentage),
                             icon: "target",
                             color: .orange
@@ -63,20 +63,20 @@ struct StatsView: View {
                     
                     // Progress Section
                     VStack(alignment: .leading, spacing: 16) {
-                        Text("Прогресс")
+                        Text(LocalizationManager.shared.localizedString(for: "stats.progress"))
                             .font(.title2)
                             .fontWeight(.semibold)
                         
                         VStack(spacing: 12) {
                             ProgressRow(
-                                title: "Завершено викторин",
+                                title: LocalizationManager.shared.localizedString(for: "stats.quizzesCompleted"),
                                 value: statsManager.stats.totalQuizzesCompleted,
                                 color: .blue
                             )
                             
                             if let lastQuiz = statsManager.stats.lastQuizDate {
                                 HStack {
-                                    Text("Последняя викторина:")
+                                    Text(LocalizationManager.shared.localizedString(for: "stats.lastQuiz"))
                                         .foregroundColor(.secondary)
                                     Spacer()
                                     Text(lastQuiz, style: .date)
@@ -91,13 +91,13 @@ struct StatsView: View {
                     // Wrong Questions Section
                     if !statsManager.stats.wrongQuestionIds.isEmpty {
                         VStack(alignment: .leading, spacing: 16) {
-                            Text("Вопросы для повторения")
+                            Text(LocalizationManager.shared.localizedString(for: "stats.wrongQuestions"))
                                 .font(.title2)
                                 .fontWeight(.semibold)
                             
                             VStack(spacing: 12) {
                                 HStack {
-                                    Text("Неправильных вопросов:")
+                                    Text(LocalizationManager.shared.localizedString(for: "stats.wrongQuestionsCount"))
                                         .foregroundColor(.secondary)
                                     Spacer()
                                     Text("\(statsManager.stats.wrongQuestionsCount)")
@@ -110,7 +110,7 @@ struct StatsView: View {
                                 }) {
                                     HStack {
                                         Image(systemName: "arrow.clockwise")
-                                        Text("Повторить ошибки")
+                                        Text(LocalizationManager.shared.localizedString(for: "stats.repeatMistakes"))
                                     }
                                     .foregroundColor(.white)
                                     .frame(maxWidth: .infinity)
@@ -130,7 +130,7 @@ struct StatsView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Готово") {
+                    Button(LocalizationManager.shared.localizedString(for: "stats.done")) {
                         dismiss()
                     }
                 }

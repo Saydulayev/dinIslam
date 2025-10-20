@@ -74,3 +74,17 @@
 "quiz.stop.confirm.message" = "Progress will be lost.";
 "quiz.stop.confirm.ok" = "Quit";
 "quiz.stop.confirm.cancel" = "Cancel";
+
+// Stats View
+"stats.title" = "Statistics";
+"stats.done" = "Done";
+"stats.questionsStudied" = "Questions Studied";
+"stats.correctAnswers" = "Correct Answers";
+"stats.incorrectAnswers" = "Incorrect";
+"stats.accuracy" = "Accuracy";
+"stats.progress" = "Progress";
+"stats.quizzesCompleted" = "Quizzes Completed";
+"stats.lastQuiz" = "Last Quiz:";
+"stats.wrongQuestions" = "Questions to Review";
+"stats.wrongQuestionsCount" = "Wrong Questions:";
+"stats.repeatMistakes" = "Repeat Mistakes";
