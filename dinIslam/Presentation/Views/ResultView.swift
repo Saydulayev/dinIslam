@@ -193,6 +193,6 @@ struct StatRow: View {
 }
 
 #Preview {
-    let viewModel = QuizViewModel(quizUseCase: QuizUseCase(questionsRepository: QuestionsRepository()))
-    return ResultView(viewModel: viewModel, bestScore: .constant(85.0))
+    let viewModel = QuizViewModel(quizUseCase: QuizUseCase(questionsRepository: QuestionsRepository()), statsManager: StatsManager())
+    ResultView(viewModel: viewModel, bestScore: .constant(85.0))
 }

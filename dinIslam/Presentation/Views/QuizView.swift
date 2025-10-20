@@ -208,6 +208,6 @@ struct AnswerButtonStyle: ButtonStyle {
 }
 
 #Preview {
-    let viewModel = QuizViewModel(quizUseCase: QuizUseCase(questionsRepository: QuestionsRepository()))
-    return QuizView(viewModel: viewModel)
+    let viewModel = QuizViewModel(quizUseCase: QuizUseCase(questionsRepository: QuestionsRepository()), statsManager: StatsManager())
+    QuizView(viewModel: viewModel)
 }
