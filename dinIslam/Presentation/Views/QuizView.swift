@@ -9,6 +9,7 @@ import SwiftUI
 
 struct QuizView: View {
     @State private var viewModel: QuizViewModel
+    @State private var showingStopConfirm: Bool = false
     
     init(viewModel: QuizViewModel) {
         self.viewModel = viewModel
@@ -101,6 +102,36 @@ struct QuizView: View {
         }
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
+        .safeAreaInset(edge: .bottom) {
+            Button(action: {
+                showingStopConfirm = true
+            }) {
+                HStack {
+                    Image(systemName: "stop.fill")
+                    Text(LocalizationManager.shared.localizedString(for: "quiz.stop"))
+                        .fontWeight(.semibold)
+                }
+                .foregroundColor(.white)
+                .frame(maxWidth: .infinity)
+                .frame(height: 52)
+                .background(Color.red.gradient, in: RoundedRectangle(cornerRadius: 14))
+                .padding(.horizontal)
+                .padding(.bottom, 8)
+            }
+        }
+        .alert(
+            LocalizationManager.shared.localizedString(for: "quiz.stop.confirm.title"),
+            isPresented: $showingStopConfirm
+        ) {
+            Button(LocalizationManager.shared.localizedString(for: "quiz.stop.confirm.cancel"), role: .cancel) {
+                showingStopConfirm = false
+            }
+            Button(LocalizationManager.shared.localizedString(for: "quiz.stop.confirm.ok"), role: .destructive) {
+                viewModel.restartQuiz()
+            }
+        } message: {
+            Text(LocalizationManager.shared.localizedString(for: "quiz.stop.confirm.message"))
+        }
     }
 }
 

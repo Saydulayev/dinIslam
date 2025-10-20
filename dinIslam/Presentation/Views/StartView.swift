@@ -88,10 +88,28 @@ struct StartView: View {
                 Spacer()
             }
             .padding()
-            .navigationDestination(isPresented: .constant(viewModel.state == .playing)) {
+            .navigationDestination(
+                isPresented: Binding(
+                    get: { viewModel.state == .playing },
+                    set: { isPresented in
+                        if !isPresented {
+                            viewModel.restartQuiz()
+                        }
+                    }
+                )
+            ) {
                 QuizView(viewModel: viewModel)
             }
-            .navigationDestination(isPresented: .constant(viewModel.state == .finished)) {
+            .navigationDestination(
+                isPresented: Binding(
+                    get: { viewModel.state == .finished },
+                    set: { isPresented in
+                        if !isPresented {
+                            viewModel.restartQuiz()
+                        }
+                    }
+                )
+            ) {
                 ResultView(viewModel: viewModel, bestScore: $bestScore)
             }
             .sheet(isPresented: $showingSettings) {

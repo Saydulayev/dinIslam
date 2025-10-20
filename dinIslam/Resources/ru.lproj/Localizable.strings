@@ -67,3 +67,10 @@
 "settings.dangerZone" = "Опасная зона";
 "settings.reset.title" = "Сбросить настройки";
 "settings.reset.footer" = "Это действие сбросит все настройки к значениям по умолчанию";
+
+// Quiz Stop
+"quiz.stop" = "Стоп";
+"quiz.stop.confirm.title" = "Выйти из викторины?";
+"quiz.stop.confirm.message" = "Прогресс будет потерян.";
+"quiz.stop.confirm.ok" = "Выйти";
+"quiz.stop.confirm.cancel" = "Отмена";

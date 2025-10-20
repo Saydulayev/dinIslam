@@ -67,3 +67,10 @@
 "settings.dangerZone" = "Danger Zone";
 "settings.reset.title" = "Reset Settings";
 "settings.reset.footer" = "This will reset all settings to default values";
+
+// Quiz Stop
+"quiz.stop" = "Stop";
+"quiz.stop.confirm.title" = "Quit Quiz?";
+"quiz.stop.confirm.message" = "Progress will be lost.";
+"quiz.stop.confirm.ok" = "Quit";
+"quiz.stop.confirm.cancel" = "Cancel";
