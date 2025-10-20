@@ -10,7 +10,22 @@
     ],
     "correctIndex": 2,
     "category": "Фикх",
-    "difficulty": "medium"
+    "difficulty": "medium",
+    "language": "ru"
+  },
+  {
+    "id": "q1",
+    "text": "Among the obligatory prayers, which prayer is considered the most valuable?",
+    "answers": [
+      { "id": "a1", "text": "Dhuhr" },
+      { "id": "a2", "text": "Asr" },
+      { "id": "a3", "text": "Fajr" },
+      { "id": "a4", "text": "Isha" }
+    ],
+    "correctIndex": 2,
+    "category": "Fiqh",
+    "difficulty": "medium",
+    "language": "en"
   },
   {
     "id": "q2",
@@ -23,7 +38,22 @@
     ],
     "correctIndex": 1,
     "category": "Коран",
-    "difficulty": "medium"
+    "difficulty": "medium",
+    "language": "ru"
+  },
+  {
+    "id": "q2",
+    "text": "How many hizb are in the Quran? (Part of the Quran)",
+    "answers": [
+      { "id": "a1", "text": "30" },
+      { "id": "a2", "text": "60" },
+      { "id": "a3", "text": "90" },
+      { "id": "a4", "text": "114" }
+    ],
+    "correctIndex": 1,
+    "category": "Quran",
+    "difficulty": "medium",
+    "language": "en"
   },
   {
     "id": "q3",
@@ -36,7 +66,22 @@
     ],
     "correctIndex": 2,
     "category": "Хадисы",
-    "difficulty": "easy"
+    "difficulty": "easy",
+    "language": "ru"
+  },
+  {
+    "id": "q3",
+    "text": "The informative part of a hadith is called",
+    "answers": [
+      { "id": "a1", "text": "Isnad" },
+      { "id": "a2", "text": "Muhaddith" },
+      { "id": "a3", "text": "Matn" },
+      { "id": "a4", "text": "Iftirash" }
+    ],
+    "correctIndex": 2,
+    "category": "Hadith",
+    "difficulty": "easy",
+    "language": "en"
   },
   {
     "id": "q4",
@@ -49,7 +94,22 @@
     ],
     "correctIndex": 2,
     "category": "Фикх",
-    "difficulty": "medium"
+    "difficulty": "medium",
+    "language": "ru"
+  },
+  {
+    "id": "q4",
+    "text": "Jews, Christians, and Sabians living in Muslim territory and under their protection are called...",
+    "answers": [
+      { "id": "a1", "text": "Ahl al-Bayt" },
+      { "id": "a2", "text": "Ahl al-Kitab" },
+      { "id": "a3", "text": "Ahl al-Dhimma" },
+      { "id": "a4", "text": "Ahl as-Sunnah wa al-Jama'ah" }
+    ],
+    "correctIndex": 2,
+    "category": "Fiqh",
+    "difficulty": "medium",
+    "language": "en"
   },
   {
     "id": "q5",
@@ -62,7 +122,22 @@
     ],
     "correctIndex": 3,
     "category": "Хадисы",
-    "difficulty": "medium"
+    "difficulty": "medium",
+    "language": "ru"
+  },
+  {
+    "id": "q5",
+    "text": "What is the hadith that begins with the words: 'Ya ibn Adam' called?",
+    "answers": [
+      { "id": "a1", "text": "Marfu'" },
+      { "id": "a2", "text": "Sahih" },
+      { "id": "a3", "text": "Mu'allaq" },
+      { "id": "a4", "text": "Qudsi" }
+    ],
+    "correctIndex": 3,
+    "category": "Hadith",
+    "difficulty": "medium",
+    "language": "en"
   },
   {
     "id": "q6",
@@ -75,7 +150,22 @@
     ],
     "correctIndex": 2,
     "category": "Фикх",
-    "difficulty": "easy"
+    "difficulty": "easy",
+    "language": "ru"
+  },
+  {
+    "id": "q6",
+    "text": "Makruh in Islam is",
+    "answers": [
+      { "id": "a1", "text": "Article 105 of the Criminal Code, for murder" },
+      { "id": "a2", "text": "Soaking clothes" },
+      { "id": "a3", "text": "Disliked actions" },
+      { "id": "a4", "text": "Recommended actions" }
+    ],
+    "correctIndex": 2,
+    "category": "Fiqh",
+    "difficulty": "easy",
+    "language": "en"
   },
   {
     "id": "q7",
@@ -88,7 +178,22 @@
     ],
     "correctIndex": 1,
     "category": "Акыда",
-    "difficulty": "medium"
+    "difficulty": "medium",
+    "language": "ru"
+  },
+  {
+    "id": "q7",
+    "text": "The saved sect in Islam is",
+    "answers": [
+      { "id": "a1", "text": "The entire Islamic ummah" },
+      { "id": "a2", "text": "1 group out of 73 groups" },
+      { "id": "a3", "text": "1 group out of 72 Christian groups" },
+      { "id": "a4", "text": "1 group out of 71 Jewish groups" }
+    ],
+    "correctIndex": 1,
+    "category": "Aqeedah",
+    "difficulty": "medium",
+    "language": "en"
   },
   {
     "id": "q8",
@@ -101,7 +206,22 @@
     ],
     "correctIndex": 2,
     "category": "Хадисы",
-    "difficulty": "medium"
+    "difficulty": "medium",
+    "language": "ru"
+  },
+  {
+    "id": "q8",
+    "text": "Abu ad-Darda reported: '... are the central door to Paradise.' Who is being referred to?",
+    "answers": [
+      { "id": "a1", "text": "Deceased children" },
+      { "id": "a2", "text": "Husbands with 4 wives" },
+      { "id": "a3", "text": "Parents" },
+      { "id": "a4", "text": "Pious neighbors" }
+    ],
+    "correctIndex": 2,
+    "category": "Hadith",
+    "difficulty": "medium",
+    "language": "en"
   },
   {
     "id": "q9",
@@ -114,7 +234,22 @@
     ],
     "correctIndex": 2,
     "category": "Фикх",
-    "difficulty": "easy"
+    "difficulty": "easy",
+    "language": "ru"
+  },
+  {
+    "id": "q9",
+    "text": "In which animal's pen is it forbidden to pray?",
+    "answers": [
+      { "id": "a1", "text": "Sheep" },
+      { "id": "a2", "text": "Cows" },
+      { "id": "a3", "text": "Camels" },
+      { "id": "a4", "text": "All of them are forbidden for prayer" }
+    ],
+    "correctIndex": 2,
+    "category": "Fiqh",
+    "difficulty": "easy",
+    "language": "en"
   },
   {
     "id": "q10",
@@ -127,7 +262,22 @@
     ],
     "correctIndex": 0,
     "category": "История ислама",
-    "difficulty": "medium"
+    "difficulty": "medium",
+    "language": "ru"
+  },
+  {
+    "id": "q10",
+    "text": "In which year of Hijrah was the adhan legalized?",
+    "answers": [
+      { "id": "a1", "text": "1" },
+      { "id": "a2", "text": "2" },
+      { "id": "a3", "text": "3" },
+      { "id": "a4", "text": "1446" }
+    ],
+    "correctIndex": 0,
+    "category": "Islamic History",
+    "difficulty": "medium",
+    "language": "en"
   },
   {
     "id": "q11",
@@ -140,255 +290,553 @@
     ],
     "correctIndex": 1,
     "category": "Сира",
-    "difficulty": "medium"
+    "difficulty": "medium",
+    "language": "ru"
   },
   {
-      "id": "q12",
-      "text": "Пророк (с.а.с.) сказал, что из жён после его смерти первой присоединится к нему жена с длинными руками. Кто она?",
-      "answers": [
-        { "id": "a1", "text": "Умм Саляма" },
-        { "id": "a2", "text": "Зайнаб бинт Джахш" },
-        { "id": "a3", "text": "Джувайрия" },
-        { "id": "a4", "text": "Рамля бинт Абу Суфьян" }
-      ],
-      "correctIndex": 1,
-      "category": "Сира",
-      "difficulty": "medium"
-    },
-    {
-      "id": "q13",
-      "text": "Он сказал: «В судный день я первым опущусь на колени перед Аллахом для суда из нашей уммы». Кто он?",
-      "answers": [
-        { "id": "a1", "text": "Абу Бакр" },
-        { "id": "a2", "text": "Умар" },
-        { "id": "a3", "text": "Али" },
-        { "id": "a4", "text": "Абу Убайда" }
-      ],
-      "correctIndex": 2,
-      "category": "Сахабы",
-      "difficulty": "medium"
-    },
-    {
-      "id": "q14",
-      "text": "Какую еду подадут первому вошедшему в Рай?",
-      "answers": [
-        { "id": "a1", "text": "Запечённое мясо буйвола, пасшегося на окраине Рая" },
-        { "id": "a2", "text": "Запечённая баранья лопатка из пастбищ обитателей Рая" },
-        { "id": "a3", "text": "Печень трески" },
-        { "id": "a4", "text": "Печень кита" }
-      ],
-      "correctIndex": 0,
-      "category": "Акыда",
-      "difficulty": "medium"
-    },
-    {
-      "id": "q15",
-      "text": "Билькис начала читать придворным: «Пришло письмо от Сулаймана и начинается оно со словами…» Иннаху мин Сулаймана, ва иннаху…",
-      "answers": [
-        { "id": "a1", "text": "Ассаламу алайкум" },
-        { "id": "a2", "text": "Послушай, женщина" },
-        { "id": "a3", "text": "От пророка Аллаха" },
-        { "id": "a4", "text": "Бисмилляхир-рахманир-рахим" }
-      ],
-      "correctIndex": 3,
-      "category": "Коран",
-      "difficulty": "medium"
-    },
-    {
-      "id": "q16",
-      "text": "Длина тени предмета превышает длину предмета. Какое время намаза наступило?",
-      "answers": [
-        { "id": "a1", "text": "Зухр" },
-        { "id": "a2", "text": "Духа" },
-        { "id": "a3", "text": "Аср" },
-        { "id": "a4", "text": "Тахаджуд" }
-      ],
-      "correctIndex": 2,
-      "category": "Фикх",
-      "difficulty": "medium"
-    },
-    {
-      "id": "q17",
-      "text": "В скольких чтениях был ниспослан Коран?",
-      "answers": [
-        { "id": "a1", "text": "7" },
-        { "id": "a2", "text": "10" },
-        { "id": "a3", "text": "1" },
-        { "id": "a4", "text": "30" }
-      ],
-      "correctIndex": 0,
-      "category": "Коран",
-      "difficulty": "easy"
-    },
-    {
-        "id": "q18",
-        "text": "Ат-Тасвиб в азане — это:",
-        "answers": [
-          { "id": "a1", "text": "Хаййа алас-салях" },
-          { "id": "a2", "text": "Хаййа алаль-фалах" },
-          { "id": "a3", "text": "Ас-саляту хайрум минан-наум" },
-          { "id": "a4", "text": "Такого вообще нет" }
-        ],
-        "correctIndex": 2,
-        "category": "Фикх",
-        "difficulty": "medium"
-      },
-      {
-        "id": "q19",
-        "text": "Согласно хадисам, какую из этих наград получает муэдзин за азан?",
-        "answers": [
-          { "id": "a1", "text": "Ему записывается награда за совершение 30 добрых дел" },
-          { "id": "a2", "text": "Награда за намаз всех людей в джамаате" },
-          { "id": "a3", "text": "В Судный день их шеи будут длинные — в знак их почитания" },
-          { "id": "a4", "text": "Всё вышеперечисленное входит в их награду" }
-        ],
-        "correctIndex": 3,
-        "category": "Хадисы",
-        "difficulty": "medium"
-      },
-      {
-        "id": "q20",
-        "text": "До того как узаконили азан, как людей собирали на джамаат-намаз?",
-        "answers": [
-          { "id": "a1", "text": "С помощью колокола" },
-          { "id": "a2", "text": "Дули в рог" },
-          { "id": "a3", "text": "Били барабан" },
-          { "id": "a4", "text": "Говорили: «Приходите на намаз»" }
-        ],
-        "correctIndex": 3,
-        "category": "История ислама",
-        "difficulty": "medium"
-      },
-      {
-        "id": "q21",
-        "text": "Изменение каких свойств делает чистую воду для омовения нечистой?",
-        "answers": [
-          { "id": "a1", "text": "Цвет" },
-          { "id": "a2", "text": "Запах" },
-          { "id": "a3", "text": "Вкус" },
-          { "id": "a4", "text": "Любой из перечисленных" }
-        ],
-        "correctIndex": 3,
-        "category": "Фикх",
-        "difficulty": "easy"
-      },
-      {
-        "id": "q22",
-        "text": "Дозволено ли читать Коран в руку’ и сажда?",
-        "answers": [
-          { "id": "a1", "text": "Нет, не дозволено" },
-          { "id": "a2", "text": "Дозволено" },
-          { "id": "a3", "text": "Дозволено с условием, что это аяты, содержащие дуа" },
-          { "id": "a4", "text": "Только Пророку (с.а.с.) было дозволено" }
-        ],
-        "correctIndex": 2,
-        "category": "Фикх",
-        "difficulty": "medium"
-      },
-      {
-        "id": "q23",
-        "text": "Условно нисаб составляет 7000 евро. У меня лежали нетронутые в течение года 10000 евро. Какова сумма закята?",
-        "answers": [
-          { "id": "a1", "text": "2,5% от 7000 = 175 евро" },
-          { "id": "a2", "text": "2,5% от 10000 = 250 евро" },
-          { "id": "a3", "text": "2,5% от 3000 (10000−7000) = 75 евро" },
-          { "id": "a4", "text": "2,5% от 17000 (7000+10000) = 425 евро" }
-        ],
-        "correctIndex": 1,
-        "category": "Фикх",
-        "difficulty": "easy"
-      },
-      {
-        "id": "q24",
-        "text": "Муж умер. Женщина в сносах (считанные дни до рождения ребёнка). Каков срок выжидания (идда)?",
-        "answers": [
-          { "id": "a1", "text": "4 месяца и 10 дней" },
-          { "id": "a2", "text": "До рождения ребёнка" },
-          { "id": "a3", "text": "После рождения ребёнка 4 мес. 10 дней" },
-          { "id": "a4", "text": "Никаких сроков — как только, так сразу" }
-        ],
-        "correctIndex": 1,
-        "category": "Фикх",
-        "difficulty": "medium"
-      },
-      {
-          "id": "q25",
-          "text": "Согласно хадису, каждая вещь имеет свою возвышенность, а возвышенностью Корана является сура…",
-          "answers": [
-            { "id": "a1", "text": "Йасин" },
-            { "id": "a2", "text": "Фатиха" },
-            { "id": "a3", "text": "Тауба" },
-            { "id": "a4", "text": "Бакъара" }
-          ],
-          "correctIndex": 3,
-          "category": "Коран",
-          "difficulty": "easy"
-        },
-        {
-          "id": "q26",
-          "text": "Последние два аята (лакъджаакум) знал только Хузейфа. А хадис о чуме знал только он (она).",
-          "answers": [
-            { "id": "a1", "text": "Умар ибн Хаттаб" },
-            { "id": "a2", "text": "Аиша бинт Абу Бакр" },
-            { "id": "a3", "text": "Амр ибн аль-Ас" },
-            { "id": "a4", "text": "Абдуррахман бин Ауф" }
-          ],
-          "correctIndex": 3,
-          "category": "Сахабы",
-          "difficulty": "medium"
-        },
-        {
-          "id": "q27",
-          "text": "Мутаватир — хадис, передаваемый множеством передатчиков. Например, когда Джибриль спрашивал про ислам, иман и ихсан, присутствовало 8 сподвижников. Гариб хадис — 1 передатчик. Определите хадис: «Дела оцениваются по намерениям».",
-          "answers": [
-            { "id": "a1", "text": "Мутаватир" },
-            { "id": "a2", "text": "Гариб" },
-            { "id": "a3", "text": "Первый раз слышу" },
-            { "id": "a4", "text": "Запомню на будущее" }
-          ],
-          "correctIndex": 1,
-          "category": "Хадисы",
-          "difficulty": "medium"
-        },
-        {
-          "id": "q28",
-          "text": "Извлечение норм шариата из Корана и Сунны называется…",
-          "answers": [
-            { "id": "a1", "text": "Иджтихад" },
-            { "id": "a2", "text": "Иджма" },
-            { "id": "a3", "text": "Истинбат" },
-            { "id": "a4", "text": "Кыяс" }
-          ],
-          "correctIndex": 2,
-          "category": "Фикх",
-          "difficulty": "medium"
-        },
-        {
-          "id": "q29",
-          "text": "Извлечение норм шариата не из Корана и Сунны называется…",
-          "answers": [
-            { "id": "a1", "text": "Иджтихад" },
-            { "id": "a2", "text": "Иджма" },
-            { "id": "a3", "text": "Истинбат" },
-            { "id": "a4", "text": "Кыяс" }
-          ],
-          "correctIndex": 0,
-          "category": "Фикх",
-          "difficulty": "medium"
-        },
-        {
-          "id": "q30",
-          "text": "Первый сборник хадисов «Муватта» написан…",
-          "answers": [
-            { "id": "a1", "text": "Аль-Бухари" },
-            { "id": "a2", "text": "Муслим" },
-            { "id": "a3", "text": "Анас ибн Малик" },
-            { "id": "a4", "text": "Аз-Зухри" }
-          ],
-          "correctIndex": 2,
-          "category": "Хадисы",
-          "difficulty": "medium"
-        }
+    "id": "q11",
+    "text": "Who recited the adhan for Fajr (morning prayer)?",
+    "answers": [
+      { "id": "a1", "text": "Abu Bilal" },
+      { "id": "a2", "text": "Ibn Umm Maktum" },
+      { "id": "a3", "text": "Umar ibn al-Khattab" },
+      { "id": "a4", "text": "Uthman ibn Affan" }
+    ],
+    "correctIndex": 1,
+    "category": "Seerah",
+    "difficulty": "medium",
+    "language": "en"
+  },
+  {
+    "id": "q12",
+    "text": "Пророк (с.а.с.) сказал, что из жён после его смерти первой присоединится к нему жена с длинными руками. Кто она?",
+    "answers": [
+      { "id": "a1", "text": "Умм Саляма" },
+      { "id": "a2", "text": "Зайнаб бинт Джахш" },
+      { "id": "a3", "text": "Джувайрия" },
+      { "id": "a4", "text": "Рамля бинт Абу Суфьян" }
+    ],
+    "correctIndex": 1,
+    "category": "Сира",
+    "difficulty": "medium",
+    "language": "ru"
+  },
+  {
+    "id": "q12",
+    "text": "The Prophet (peace be upon him) said that among his wives, the first to join him after his death would be the wife with long arms. Who is she?",
+    "answers": [
+      { "id": "a1", "text": "Umm Salama" },
+      { "id": "a2", "text": "Zaynab bint Jahsh" },
+      { "id": "a3", "text": "Juwayriyya" },
+      { "id": "a4", "text": "Ramla bint Abi Sufyan" }
+    ],
+    "correctIndex": 1,
+    "category": "Seerah",
+    "difficulty": "medium",
+    "language": "en"
+  },
+  {
+    "id": "q13",
+    "text": "Он сказал: «В судный день я первым опущусь на колени перед Аллахом для суда из нашей уммы». Кто он?",
+    "answers": [
+      { "id": "a1", "text": "Абу Бакр" },
+      { "id": "a2", "text": "Умар" },
+      { "id": "a3", "text": "Али" },
+      { "id": "a4", "text": "Абу Убайда" }
+    ],
+    "correctIndex": 2,
+    "category": "Сахабы",
+    "difficulty": "medium",
+    "language": "ru"
+  },
+  {
+    "id": "q13",
+    "text": "He said: 'On the Day of Judgment, I will be the first to kneel before Allah for judgment from our ummah.' Who is he?",
+    "answers": [
+      { "id": "a1", "text": "Abu Bakr" },
+      { "id": "a2", "text": "Umar" },
+      { "id": "a3", "text": "Ali" },
+      { "id": "a4", "text": "Abu Ubayda" }
+    ],
+    "correctIndex": 2,
+    "category": "Companions",
+    "difficulty": "medium",
+    "language": "en"
+  },
+  {
+    "id": "q14",
+    "text": "Какую еду подадут первому вошедшему в Рай?",
+    "answers": [
+      { "id": "a1", "text": "Запечённое мясо буйвола, пасшегося на окраине Рая" },
+      { "id": "a2", "text": "Запечённая баранья лопатка из пастбищ обитателей Рая" },
+      { "id": "a3", "text": "Печень трески" },
+      { "id": "a4", "text": "Печень кита" }
+    ],
+    "correctIndex": 0,
+    "category": "Акыда",
+    "difficulty": "medium",
+    "language": "ru"
+  },
+  {
+    "id": "q14",
+    "text": "What food will be served to the first person to enter Paradise?",
+    "answers": [
+      { "id": "a1", "text": "Roasted meat of a buffalo that grazed on the outskirts of Paradise" },
+      { "id": "a2", "text": "Roasted lamb shoulder from the pastures of Paradise dwellers" },
+      { "id": "a3", "text": "Cod liver" },
+      { "id": "a4", "text": "Whale liver" }
+    ],
+    "correctIndex": 0,
+    "category": "Aqeedah",
+    "difficulty": "medium",
+    "language": "en"
+  },
+  {
+    "id": "q15",
+    "text": "Билькис начала читать придворным: «Пришло письмо от Сулаймана и начинается оно со словами…» Иннаху мин Сулаймана, ва иннаху…",
+    "answers": [
+      { "id": "a1", "text": "Ассаламу алайкум" },
+      { "id": "a2", "text": "Послушай, женщина" },
+      { "id": "a3", "text": "От пророка Аллаха" },
+      { "id": "a4", "text": "Бисмилляхир-рахманир-рахим" }
+    ],
+    "correctIndex": 3,
+    "category": "Коран",
+    "difficulty": "medium",
+    "language": "ru"
+  },
+  {
+    "id": "q15",
+    "text": "Bilqis began reading to her courtiers: 'A letter has come from Sulayman and it begins with the words...' Innahu min Sulayman, wa innahu...",
+    "answers": [
+      { "id": "a1", "text": "As-salamu alaykum" },
+      { "id": "a2", "text": "Listen, woman" },
+      { "id": "a3", "text": "From Allah's prophet" },
+      { "id": "a4", "text": "Bismillahir-rahmanir-rahim" }
+    ],
+    "correctIndex": 3,
+    "category": "Quran",
+    "difficulty": "medium",
+    "language": "en"
+  },
+  {
+    "id": "q16",
+    "text": "Длина тени предмета превышает длину предмета. Какое время намаза наступило?",
+    "answers": [
+      { "id": "a1", "text": "Зухр" },
+      { "id": "a2", "text": "Духа" },
+      { "id": "a3", "text": "Аср" },
+      { "id": "a4", "text": "Тахаджуд" }
+    ],
+    "correctIndex": 2,
+    "category": "Фикх",
+    "difficulty": "medium",
+    "language": "ru"
+  },
+  {
+    "id": "q16",
+    "text": "The length of an object's shadow exceeds the length of the object. What prayer time has arrived?",
+    "answers": [
+      { "id": "a1", "text": "Dhuhr" },
+      { "id": "a2", "text": "Duha" },
+      { "id": "a3", "text": "Asr" },
+      { "id": "a4", "text": "Tahajjud" }
+    ],
+    "correctIndex": 2,
+    "category": "Fiqh",
+    "difficulty": "medium",
+    "language": "en"
+  },
+  {
+    "id": "q17",
+    "text": "В скольких чтениях был ниспослан Коран?",
+    "answers": [
+      { "id": "a1", "text": "7" },
+      { "id": "a2", "text": "10" },
+      { "id": "a3", "text": "1" },
+      { "id": "a4", "text": "30" }
+    ],
+    "correctIndex": 0,
+    "category": "Коран",
+    "difficulty": "easy",
+    "language": "ru"
+  },
+  {
+    "id": "q17",
+    "text": "In how many recitations was the Quran revealed?",
+    "answers": [
+      { "id": "a1", "text": "7" },
+      { "id": "a2", "text": "10" },
+      { "id": "a3", "text": "1" },
+      { "id": "a4", "text": "30" }
+    ],
+    "correctIndex": 0,
+    "category": "Quran",
+    "difficulty": "easy",
+    "language": "en"
+  },
+  {
+    "id": "q18",
+    "text": "Ат-Тасвиб в азане — это:",
+    "answers": [
+      { "id": "a1", "text": "Хаййа алас-салях" },
+      { "id": "a2", "text": "Хаййа алаль-фалах" },
+      { "id": "a3", "text": "Ас-саляту хайрум минан-наум" },
+      { "id": "a4", "text": "Такого вообще нет" }
+    ],
+    "correctIndex": 2,
+    "category": "Фикх",
+    "difficulty": "medium",
+    "language": "ru"
+  },
+  {
+    "id": "q18",
+    "text": "At-Taswib in the adhan is:",
+    "answers": [
+      { "id": "a1", "text": "Hayya alas-salah" },
+      { "id": "a2", "text": "Hayya alal-falah" },
+      { "id": "a3", "text": "As-salatu khayrun minan-nawm" },
+      { "id": "a4", "text": "There is no such thing" }
+    ],
+    "correctIndex": 2,
+    "category": "Fiqh",
+    "difficulty": "medium",
+    "language": "en"
+  },
+  {
+    "id": "q19",
+    "text": "Согласно хадисам, какую из этих наград получает муэдзин за азан?",
+    "answers": [
+      { "id": "a1", "text": "Ему записывается награда за совершение 30 добрых дел" },
+      { "id": "a2", "text": "Награда за намаз всех людей в джамаате" },
+      { "id": "a3", "text": "В Судный день их шеи будут длинные — в знак их почитания" },
+      { "id": "a4", "text": "Всё вышеперечисленное входит в их награду" }
+    ],
+    "correctIndex": 3,
+    "category": "Хадисы",
+    "difficulty": "medium",
+    "language": "ru"
+  },
+  {
+    "id": "q19",
+    "text": "According to hadiths, which of these rewards does a muadhin receive for the adhan?",
+    "answers": [
+      { "id": "a1", "text": "He is credited with the reward of performing 30 good deeds" },
+      { "id": "a2", "text": "Reward for the prayer of all people in the congregation" },
+      { "id": "a3", "text": "On the Day of Judgment, their necks will be long - as a sign of their honor" },
+      { "id": "a4", "text": "All of the above are included in their reward" }
+    ],
+    "correctIndex": 3,
+    "category": "Hadith",
+    "difficulty": "medium",
+    "language": "en"
+  },
+  {
+    "id": "q20",
+    "text": "До того как узаконили азан, как людей собирали на джамаат-намаз?",
+    "answers": [
+      { "id": "a1", "text": "С помощью колокола" },
+      { "id": "a2", "text": "Дули в рог" },
+      { "id": "a3", "text": "Били барабан" },
+      { "id": "a4", "text": "Говорили: «Приходите на намаз»" }
+    ],
+    "correctIndex": 3,
+    "category": "История ислама",
+    "difficulty": "medium",
+    "language": "ru"
+  },
+  {
+    "id": "q20",
+    "text": "Before the adhan was legalized, how were people gathered for congregational prayer?",
+    "answers": [
+      { "id": "a1", "text": "With a bell" },
+      { "id": "a2", "text": "Blowing a horn" },
+      { "id": "a3", "text": "Beating a drum" },
+      { "id": "a4", "text": "Saying: 'Come to prayer'" }
+    ],
+    "correctIndex": 3,
+    "category": "Islamic History",
+    "difficulty": "medium",
+    "language": "en"
+  },
+  {
+    "id": "q21",
+    "text": "Изменение каких свойств делает чистую воду для омовения нечистой?",
+    "answers": [
+      { "id": "a1", "text": "Цвет" },
+      { "id": "a2", "text": "Запах" },
+      { "id": "a3", "text": "Вкус" },
+      { "id": "a4", "text": "Любой из перечисленных" }
+    ],
+    "correctIndex": 3,
+    "category": "Фикх",
+    "difficulty": "easy",
+    "language": "ru"
+  },
+  {
+    "id": "q21",
+    "text": "Changing which properties makes pure water for ablution impure?",
+    "answers": [
+      { "id": "a1", "text": "Color" },
+      { "id": "a2", "text": "Smell" },
+      { "id": "a3", "text": "Taste" },
+      { "id": "a4", "text": "Any of the above" }
+    ],
+    "correctIndex": 3,
+    "category": "Fiqh",
+    "difficulty": "easy",
+    "language": "en"
+  },
+  {
+    "id": "q22",
+    "text": "Дозволено ли читать Коран в руку' и сажда?",
+    "answers": [
+      { "id": "a1", "text": "Нет, не дозволено" },
+      { "id": "a2", "text": "Дозволено" },
+      { "id": "a3", "text": "Дозволено с условием, что это аяты, содержащие дуа" },
+      { "id": "a4", "text": "Только Пророку (с.а.с.) было дозволено" }
+    ],
+    "correctIndex": 2,
+    "category": "Фикх",
+    "difficulty": "medium",
+    "language": "ru"
+  },
+  {
+    "id": "q22",
+    "text": "Is it permissible to recite the Quran in ruku' and sajdah?",
+    "answers": [
+      { "id": "a1", "text": "No, it is not permissible" },
+      { "id": "a2", "text": "It is permissible" },
+      { "id": "a3", "text": "It is permissible with the condition that they are verses containing supplications" },
+      { "id": "a4", "text": "Only the Prophet (peace be upon him) was allowed" }
+    ],
+    "correctIndex": 2,
+    "category": "Fiqh",
+    "difficulty": "medium",
+    "language": "en"
+  },
+  {
+    "id": "q23",
+    "text": "Условно нисаб составляет 7000 евро. У меня лежали нетронутые в течение года 10000 евро. Какова сумма закята?",
+    "answers": [
+      { "id": "a1", "text": "2,5% от 7000 = 175 евро" },
+      { "id": "a2", "text": "2,5% от 10000 = 250 евро" },
+      { "id": "a3", "text": "2,5% от 3000 (10000−7000) = 75 евро" },
+      { "id": "a4", "text": "2,5% от 17000 (7000+10000) = 425 евро" }
+    ],
+    "correctIndex": 1,
+    "category": "Фикх",
+    "difficulty": "easy",
+    "language": "ru"
+  },
+  {
+    "id": "q23",
+    "text": "The conditional nisab is 7000 euros. I had 10000 euros untouched for a year. What is the zakat amount?",
+    "answers": [
+      { "id": "a1", "text": "2.5% of 7000 = 175 euros" },
+      { "id": "a2", "text": "2.5% of 10000 = 250 euros" },
+      { "id": "a3", "text": "2.5% of 3000 (10000-7000) = 75 euros" },
+      { "id": "a4", "text": "2.5% of 17000 (7000+10000) = 425 euros" }
+    ],
+    "correctIndex": 1,
+    "category": "Fiqh",
+    "difficulty": "easy",
+    "language": "en"
+  },
+  {
+    "id": "q24",
+    "text": "Муж умер. Женщина в сносах (считанные дни до рождения ребёнка). Каков срок выжидания (идда)?",
+    "answers": [
+      { "id": "a1", "text": "4 месяца и 10 дней" },
+      { "id": "a2", "text": "До рождения ребёнка" },
+      { "id": "a3", "text": "После рождения ребёнка 4 мес. 10 дней" },
+      { "id": "a4", "text": "Никаких сроков — как только, так сразу" }
+    ],
+    "correctIndex": 1,
+    "category": "Фикх",
+    "difficulty": "medium",
+    "language": "ru"
+  },
+  {
+    "id": "q24",
+    "text": "The husband died. The woman is in labor (counted days until childbirth). What is the waiting period (iddah)?",
+    "answers": [
+      { "id": "a1", "text": "4 months and 10 days" },
+      { "id": "a2", "text": "Until childbirth" },
+      { "id": "a3", "text": "After childbirth 4 months 10 days" },
+      { "id": "a4", "text": "No periods - as soon as possible" }
+    ],
+    "correctIndex": 1,
+    "category": "Fiqh",
+    "difficulty": "medium",
+    "language": "en"
+  },
+  {
+    "id": "q25",
+    "text": "Согласно хадису, каждая вещь имеет свою возвышенность, а возвышенностью Корана является сура…",
+    "answers": [
+      { "id": "a1", "text": "Йасин" },
+      { "id": "a2", "text": "Фатиха" },
+      { "id": "a3", "text": "Тауба" },
+      { "id": "a4", "text": "Бакъара" }
+    ],
+    "correctIndex": 3,
+    "category": "Коран",
+    "difficulty": "easy",
+    "language": "ru"
+  },
+  {
+    "id": "q25",
+    "text": "According to the hadith, everything has its elevation, and the elevation of the Quran is the surah...",
+    "answers": [
+      { "id": "a1", "text": "Yasin" },
+      { "id": "a2", "text": "Fatiha" },
+      { "id": "a3", "text": "Tawba" },
+      { "id": "a4", "text": "Baqarah" }
+    ],
+    "correctIndex": 3,
+    "category": "Quran",
+    "difficulty": "easy",
+    "language": "en"
+  },
+  {
+    "id": "q26",
+    "text": "Последние два аята (лакъджаакум) знал только Хузейфа. А хадис о чуме знал только он (она).",
+    "answers": [
+      { "id": "a1", "text": "Умар ибн Хаттаб" },
+      { "id": "a2", "text": "Аиша бинт Абу Бакр" },
+      { "id": "a3", "text": "Амр ибн аль-Ас" },
+      { "id": "a4", "text": "Абдуррахман бин Ауф" }
+    ],
+    "correctIndex": 3,
+    "category": "Сахабы",
+    "difficulty": "medium",
+    "language": "ru"
+  },
+  {
+    "id": "q26",
+    "text": "The last two verses (laqad ja'akum) were known only to Hudhayfa. And the hadith about the plague was known only to him (her).",
+    "answers": [
+      { "id": "a1", "text": "Umar ibn al-Khattab" },
+      { "id": "a2", "text": "Aisha bint Abi Bakr" },
+      { "id": "a3", "text": "Amr ibn al-As" },
+      { "id": "a4", "text": "Abdurrahman ibn Awf" }
+    ],
+    "correctIndex": 3,
+    "category": "Companions",
+    "difficulty": "medium",
+    "language": "en"
+  },
+  {
+    "id": "q27",
+    "text": "Мутаватир — хадис, передаваемый множеством передатчиков. Например, когда Джибриль спрашивал про ислам, иман и ихсан, присутствовало 8 сподвижников. Гариб хадис — 1 передатчик. Определите хадис: «Дела оцениваются по намерениям».",
+    "answers": [
+      { "id": "a1", "text": "Мутаватир" },
+      { "id": "a2", "text": "Гариб" },
+      { "id": "a3", "text": "Первый раз слышу" },
+      { "id": "a4", "text": "Запомню на будущее" }
+    ],
+    "correctIndex": 1,
+    "category": "Хадисы",
+    "difficulty": "medium",
+    "language": "ru"
+  },
+  {
+    "id": "q27",
+    "text": "Mutawatir - a hadith transmitted by many transmitters. For example, when Jibril asked about Islam, iman and ihsan, 8 companions were present. Gharib hadith - 1 transmitter. Determine the hadith: 'Actions are judged by intentions.'",
+    "answers": [
+      { "id": "a1", "text": "Mutawatir" },
+      { "id": "a2", "text": "Gharib" },
+      { "id": "a3", "text": "I hear this for the first time" },
+      { "id": "a4", "text": "I'll remember for the future" }
+    ],
+    "correctIndex": 1,
+    "category": "Hadith",
+    "difficulty": "medium",
+    "language": "en"
+  },
+  {
+    "id": "q28",
+    "text": "Извлечение норм шариата из Корана и Сунны называется…",
+    "answers": [
+      { "id": "a1", "text": "Иджтихад" },
+      { "id": "a2", "text": "Иджма" },
+      { "id": "a3", "text": "Истинбат" },
+      { "id": "a4", "text": "Кыяс" }
+    ],
+    "correctIndex": 2,
+    "category": "Фикх",
+    "difficulty": "medium",
+    "language": "ru"
+  },
+  {
+    "id": "q28",
+    "text": "Extracting Sharia norms from the Quran and Sunnah is called...",
+    "answers": [
+      { "id": "a1", "text": "Ijtihad" },
+      { "id": "a2", "text": "Ijma" },
+      { "id": "a3", "text": "Istinbat" },
+      { "id": "a4", "text": "Qiyas" }
+    ],
+    "correctIndex": 2,
+    "category": "Fiqh",
+    "difficulty": "medium",
+    "language": "en"
+  },
+  {
+    "id": "q29",
+    "text": "Извлечение норм шариата не из Корана и Сунны называется…",
+    "answers": [
+      { "id": "a1", "text": "Иджтихад" },
+      { "id": "a2", "text": "Иджма" },
+      { "id": "a3", "text": "Истинбат" },
+      { "id": "a4", "text": "Кыяс" }
+    ],
+    "correctIndex": 0,
+    "category": "Фикх",
+    "difficulty": "medium",
+    "language": "ru"
+  },
+  {
+    "id": "q29",
+    "text": "Extracting Sharia norms not from the Quran and Sunnah is called...",
+    "answers": [
+      { "id": "a1", "text": "Ijtihad" },
+      { "id": "a2", "text": "Ijma" },
+      { "id": "a3", "text": "Istinbat" },
+      { "id": "a4", "text": "Qiyas" }
+    ],
+    "correctIndex": 0,
+    "category": "Fiqh",
+    "difficulty": "medium",
+    "language": "en"
+  },
+  {
+    "id": "q30",
+    "text": "Первый сборник хадисов «Муватта» написан…",
+    "answers": [
+      { "id": "a1", "text": "Аль-Бухари" },
+      { "id": "a2", "text": "Муслим" },
+      { "id": "a3", "text": "Анас ибн Малик" },
+      { "id": "a4", "text": "Аз-Зухри" }
+    ],
+    "correctIndex": 2,
+    "category": "Хадисы",
+    "difficulty": "medium",
+    "language": "ru"
+  },
+  {
+    "id": "q30",
+    "text": "The first hadith collection 'Muwatta' was written by...",
+    "answers": [
+      { "id": "a1", "text": "Al-Bukhari" },
+      { "id": "a2", "text": "Muslim" },
+      { "id": "a3", "text": "Anas ibn Malik" },
+      { "id": "a4", "text": "Az-Zuhri" }
+    ],
+    "correctIndex": 2,
+    "category": "Hadith",
+    "difficulty": "medium",
+    "language": "en"
+  }
 ]
- 
- 

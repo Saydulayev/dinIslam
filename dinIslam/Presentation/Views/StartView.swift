@@ -62,7 +62,8 @@ struct StartView: View {
                 // Start Button
                 Button(action: {
                     Task {
-                        await viewModel.startQuiz()
+                        let languageCode = settingsManager.settings.language.locale?.language.languageCode?.identifier ?? "ru"
+                        await viewModel.startQuiz(language: languageCode)
                     }
                 }) {
                     HStack {

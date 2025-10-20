@@ -14,9 +14,10 @@ struct Question: Codable, Identifiable, Equatable {
     let correctIndex: Int
     let category: String
     let difficulty: Difficulty
+    let language: String
     
     enum CodingKeys: String, CodingKey {
-        case id, text, answers, correctIndex, category, difficulty
+        case id, text, answers, correctIndex, category, difficulty, language
     }
 }
 

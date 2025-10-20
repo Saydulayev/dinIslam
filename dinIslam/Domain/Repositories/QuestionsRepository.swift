@@ -8,7 +8,7 @@
 import Foundation
 
 protocol QuestionsRepositoryProtocol {
-    func loadQuestions() async throws -> [Question]
+    func loadQuestions(language: String) async throws -> [Question]
 }
 
 class QuestionsRepository: QuestionsRepositoryProtocol {
@@ -18,19 +18,21 @@ class QuestionsRepository: QuestionsRepositoryProtocol {
         self.bundle = bundle
     }
     
-    func loadQuestions() async throws -> [Question] {
+    func loadQuestions(language: String) async throws -> [Question] {
         guard let url = bundle.url(forResource: "questions", withExtension: "json") else {
             throw QuestionsError.fileNotFound
         }
         
         let data = try Data(contentsOf: url)
-        let questions = try JSONDecoder().decode([Question].self, from: data)
+        let allQuestions = try JSONDecoder().decode([Question].self, from: data)
         
-        guard !questions.isEmpty else {
+        let filteredQuestions = allQuestions.filter { $0.language == language }
+        
+        guard !filteredQuestions.isEmpty else {
             throw QuestionsError.emptyData
         }
         
-        return questions
+        return filteredQuestions
     }
 }
 

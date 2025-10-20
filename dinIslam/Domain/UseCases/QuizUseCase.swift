@@ -8,7 +8,7 @@
 import Foundation
 
 protocol QuizUseCaseProtocol {
-    func startQuiz() async throws -> [Question]
+    func startQuiz(language: String) async throws -> [Question]
     func shuffleAnswers(for question: Question) -> Question
     func calculateResult(correctAnswers: Int, totalQuestions: Int, timeSpent: TimeInterval) -> QuizResult
 }
@@ -21,8 +21,8 @@ class QuizUseCase: QuizUseCaseProtocol {
         self.questionsRepository = questionsRepository
     }
     
-    func startQuiz() async throws -> [Question] {
-        let allQuestions = try await questionsRepository.loadQuestions()
+    func startQuiz(language: String) async throws -> [Question] {
+        let allQuestions = try await questionsRepository.loadQuestions(language: language)
         let progress = QuestionPoolProgress(version: questionPoolVersion)
         let used = progress.usedIds
         var available = allQuestions.filter { !used.contains($0.id) }
@@ -53,7 +53,8 @@ class QuizUseCase: QuizUseCaseProtocol {
             answers: shuffledAnswers,
             correctIndex: newCorrectIndex,
             category: question.category,
-            difficulty: question.difficulty
+            difficulty: question.difficulty,
+            language: question.language
         )
     }
     

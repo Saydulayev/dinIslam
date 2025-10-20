@@ -50,13 +50,13 @@ class QuizViewModel {
     
     // MARK: - Public Methods
     @MainActor
-    func startQuiz() async {
+    func startQuiz(language: String) async {
         state = .loading
         isLoading = true
         errorMessage = nil
         
         do {
-            let loadedQuestions = try await quizUseCase.startQuiz()
+            let loadedQuestions = try await quizUseCase.startQuiz(language: language)
             questions = loadedQuestions.map { quizUseCase.shuffleAnswers(for: $0) }
             currentQuestionIndex = 0
             correctAnswers = 0
