@@ -15,14 +15,27 @@ protocol QuizUseCaseProtocol {
 
 class QuizUseCase: QuizUseCaseProtocol {
     private let questionsRepository: QuestionsRepositoryProtocol
+    private let questionPoolVersion = 1
     
     init(questionsRepository: QuestionsRepositoryProtocol) {
         self.questionsRepository = questionsRepository
     }
     
     func startQuiz() async throws -> [Question] {
-        let questions = try await questionsRepository.loadQuestions()
-        return questions.shuffled()
+        let allQuestions = try await questionsRepository.loadQuestions()
+        var progress = QuestionPoolProgress(version: questionPoolVersion)
+        let used = progress.usedIds
+        var available = allQuestions.filter { !used.contains($0.id) }
+        
+        let sessionCount = 20
+        if available.count < sessionCount {
+            progress.reset(for: questionPoolVersion)
+            available = allQuestions
+        }
+        
+        let selected = Array(available.shuffled().prefix(sessionCount))
+        progress.markUsed(selected.map { $0.id })
+        return selected
     }
     
     func shuffleAnswers(for question: Question) -> Question {
