@@ -123,7 +123,7 @@ struct StartView: View {
             .sheet(isPresented: $showingSettings) {
                 SettingsView(viewModel: SettingsViewModel(settingsManager: settingsManager))
             }
-            .sheet(isPresented: $showingStats) {
+            .navigationDestination(isPresented: $showingStats) {
                 StatsView(statsManager: statsManager)
             }
             .toolbar {

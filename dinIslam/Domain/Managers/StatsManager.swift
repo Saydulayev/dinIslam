@@ -37,7 +37,10 @@ class StatsManager: ObservableObject {
     }
     
     func removeWrongQuestion(_ questionId: String) {
+        print("DEBUG: StatsManager.removeWrongQuestion called with ID: \(questionId)")
+        print("DEBUG: Wrong questions before removal: \(stats.wrongQuestionIds.count)")
         stats.removeWrongQuestion(questionId)
+        print("DEBUG: Wrong questions after removal: \(stats.wrongQuestionIds.count)")
         saveStats()
     }
     

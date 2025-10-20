@@ -88,3 +88,27 @@
 "stats.wrongQuestions" = "Questions to Review";
 "stats.wrongQuestionsCount" = "Wrong Questions:";
 "stats.repeatMistakes" = "Repeat Mistakes";
+
+// Mistakes Review
+"mistakes.title" = "Review";
+"mistakes.score" = "Score";
+"mistakes.reviewTitle" = "Mistakes Review";
+"mistakes.wrongAnswer" = "Wrong Answer";
+"mistakes.stop" = "Stop";
+"mistakes.stop.confirm.title" = "Stop Review?";
+"mistakes.stop.confirm.message" = "Your progress will not be saved";
+"mistakes.stop.confirm.cancel" = "Cancel";
+"mistakes.stop.confirm.ok" = "Stop";
+"mistakes.noWrongQuestions" = "No wrong answers to review";
+"mistakes.result.title" = "Review Result";
+"mistakes.result.correctAnswers" = "correct answers";
+"mistakes.result.totalQuestions" = "Total Questions:";
+"mistakes.result.timeSpent" = "Time:";
+"mistakes.result.improvement" = "Improvement!";
+"mistakes.result.needMorePractice" = "Need More Practice";
+"mistakes.result.repeatAgain" = "Repeat Again";
+"mistakes.result.backToStart" = "Back to Start";
+"mistakes.loading" = "Loading...";
+"mistakes.error" = "An error occurred";
+"mistakes.back" = "Back";
+"mistakes.close" = "Close";

@@ -10,10 +10,11 @@ import SwiftUI
 struct StatsView: View {
     @ObservedObject var statsManager: StatsManager
     @Environment(\.dismiss) private var dismiss
+    @State private var mistakesViewModel: QuizViewModel?
+    @State private var showingMistakesReview = false
     
     var body: some View {
-        NavigationView {
-            ScrollView {
+        ScrollView {
                 VStack(spacing: 24) {
                     // Header
                     VStack(spacing: 16) {
@@ -106,7 +107,7 @@ struct StatsView: View {
                                 }
                                 
                                 Button(action: {
-                                    // TODO: Start review mode
+                                    startMistakesReview()
                                 }) {
                                     HStack {
                                         Image(systemName: "arrow.clockwise")
@@ -127,7 +128,8 @@ struct StatsView: View {
                 }
                 .padding()
             }
-            .navigationBarTitleDisplayMode(.inline)
+            .navigationTitle(LocalizationManager.shared.localizedString(for: "stats.title"))
+            .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(LocalizationManager.shared.localizedString(for: "stats.done")) {
@@ -135,6 +137,27 @@ struct StatsView: View {
                     }
                 }
             }
+            .navigationDestination(isPresented: $showingMistakesReview) {
+                if let viewModel = mistakesViewModel {
+                    MistakesReviewNavigationView(viewModel: viewModel)
+                }
+            }
+    }
+    
+    private func startMistakesReview() {
+        print("DEBUG: Starting mistakes review...")
+        print("DEBUG: Wrong questions count: \(statsManager.stats.wrongQuestionIds.count)")
+        
+        let quizUseCase = QuizUseCase(questionsRepository: QuestionsRepository())
+        let viewModel = QuizViewModel(quizUseCase: quizUseCase, statsManager: statsManager)
+        
+        mistakesViewModel = viewModel
+        showingMistakesReview = true
+        
+        Task {
+            print("DEBUG: Starting async mistakes review...")
+            await viewModel.startMistakesReview()
+            print("DEBUG: Mistakes review completed. State: \(viewModel.state)")
         }
     }
 }

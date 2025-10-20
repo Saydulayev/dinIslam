@@ -88,3 +88,27 @@
 "stats.wrongQuestions" = "Вопросы для повторения";
 "stats.wrongQuestionsCount" = "Неправильных вопросов:";
 "stats.repeatMistakes" = "Повторить ошибки";
+
+// Mistakes Review
+"mistakes.title" = "Повторение";
+"mistakes.score" = "Счёт";
+"mistakes.reviewTitle" = "Повторение ошибок";
+"mistakes.wrongAnswer" = "Неправильный ответ";
+"mistakes.stop" = "Остановить";
+"mistakes.stop.confirm.title" = "Остановить повторение?";
+"mistakes.stop.confirm.message" = "Ваш прогресс не будет сохранён";
+"mistakes.stop.confirm.cancel" = "Отмена";
+"mistakes.stop.confirm.ok" = "Остановить";
+"mistakes.noWrongQuestions" = "Нет неправильных ответов для повторения";
+"mistakes.result.title" = "Результат повторения";
+"mistakes.result.correctAnswers" = "правильных ответов";
+"mistakes.result.totalQuestions" = "Всего вопросов:";
+"mistakes.result.timeSpent" = "Время:";
+"mistakes.result.improvement" = "Улучшение!";
+"mistakes.result.needMorePractice" = "Нужно больше практики";
+"mistakes.result.repeatAgain" = "Повторить снова";
+"mistakes.result.backToStart" = "В главное меню";
+"mistakes.loading" = "Загрузка...";
+"mistakes.error" = "Произошла ошибка";
+"mistakes.back" = "Назад";
+"mistakes.close" = "Закрыть";

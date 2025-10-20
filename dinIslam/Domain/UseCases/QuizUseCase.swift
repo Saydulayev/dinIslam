@@ -9,6 +9,7 @@ import Foundation
 
 protocol QuizUseCaseProtocol {
     func startQuiz(language: String) async throws -> [Question]
+    func loadAllQuestions(language: String) async throws -> [Question]
     func shuffleAnswers(for question: Question) -> Question
     func calculateResult(correctAnswers: Int, totalQuestions: Int, timeSpent: TimeInterval) -> QuizResult
 }
@@ -55,6 +56,10 @@ class QuizUseCase: QuizUseCaseProtocol {
             category: question.category,
             difficulty: question.difficulty
         )
+    }
+    
+    func loadAllQuestions(language: String) async throws -> [Question] {
+        return try await questionsRepository.loadQuestions(language: language)
     }
     
     func calculateResult(correctAnswers: Int, totalQuestions: Int, timeSpent: TimeInterval) -> QuizResult {

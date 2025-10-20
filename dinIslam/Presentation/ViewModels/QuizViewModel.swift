@@ -91,6 +91,8 @@ class QuizViewModel {
             let isCorrect = index == currentQuestion.correctIndex
             questionResults[currentQuestion.id] = isCorrect
             
+            print("DEBUG: Question \(currentQuestion.id) answered \(isCorrect ? "correctly" : "incorrectly")")
+            
             if isCorrect {
                 correctAnswers += 1
                 hapticManager.success()
@@ -108,7 +110,11 @@ class QuizViewModel {
     @MainActor
     func nextQuestion() {
         if isLastQuestion {
-            finishQuiz()
+            if state == .playing {
+                finishQuiz()
+            } else if state == .mistakesReview {
+                finishMistakesReview()
+            }
         } else {
             currentQuestionIndex += 1
             selectedAnswerIndex = nil
@@ -151,6 +157,81 @@ class QuizViewModel {
         quizResult = nil
         errorMessage = nil
         questionResults.removeAll()
+    }
+    
+    // MARK: - Mistakes Review Methods
+    @MainActor
+    func startMistakesReview() async {
+        print("DEBUG: QuizViewModel.startMistakesReview() called")
+        state = .loading
+        isLoading = true
+        errorMessage = nil
+        
+        do {
+            // Get all questions to find the wrong ones
+            let languageCode = LocalizationManager.shared.currentLanguage
+            print("DEBUG: Loading questions for language: \(languageCode)")
+            let allQuestions = try await quizUseCase.loadAllQuestions(language: languageCode)
+            print("DEBUG: Loaded \(allQuestions.count) total questions")
+            
+            // Filter only wrong questions
+            let wrongQuestions = statsManager.getWrongQuestions(from: allQuestions)
+            print("DEBUG: Found \(wrongQuestions.count) wrong questions")
+            
+            guard !wrongQuestions.isEmpty else {
+                print("DEBUG: No wrong questions found")
+                errorMessage = LocalizationManager.shared.localizedString(for: "mistakes.noWrongQuestions")
+                state = .idle
+                isLoading = false
+                return
+            }
+            
+            // Shuffle wrong questions
+            questions = wrongQuestions.shuffled().map { quizUseCase.shuffleAnswers(for: $0) }
+            currentQuestionIndex = 0
+            correctAnswers = 0
+            selectedAnswerIndex = nil
+            isAnswerSelected = false
+            showResult = false
+            startTime = Date()
+            state = .mistakesReview
+            print("DEBUG: Set state to mistakesReview with \(questions.count) questions")
+        } catch {
+            print("DEBUG: Error loading questions: \(error)")
+            errorMessage = error.localizedDescription
+            state = .idle
+        }
+        
+        isLoading = false
+        print("DEBUG: QuizViewModel.startMistakesReview() completed. State: \(state)")
+    }
+    
+    @MainActor
+    func finishMistakesReview() {
+        let timeSpent = Date().timeIntervalSince(startTime ?? Date())
+        quizResult = quizUseCase.calculateResult(
+            correctAnswers: correctAnswers,
+            totalQuestions: questions.count,
+            timeSpent: timeSpent
+        )
+        
+        // Update stats - remove correctly answered questions from wrong list
+        let correctlyAnsweredIds = questionResults.compactMap { (questionId, isCorrect) in
+            return isCorrect ? questionId : nil
+        }
+        
+        print("DEBUG: Correctly answered question IDs: \(correctlyAnsweredIds)")
+        print("DEBUG: Total question results: \(questionResults)")
+        
+        // Remove correctly answered questions from wrong questions list
+        for questionId in correctlyAnsweredIds {
+            print("DEBUG: Removing question \(questionId) from wrong questions list")
+            statsManager.removeWrongQuestion(questionId)
+        }
+        
+        print("DEBUG: Wrong questions after removal: \(statsManager.stats.wrongQuestionIds.count)")
+        
+        state = .mistakesFinished
     }
 }
 

@@ -47,6 +47,8 @@ enum QuizState {
     case loading
     case playing
     case finished
+    case mistakesReview
+    case mistakesFinished
 }
 
 struct QuizResult {
