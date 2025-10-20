@@ -10,12 +10,19 @@ import SwiftUI
 struct StartView: View {
     @State private var viewModel: QuizViewModel
     @EnvironmentObject private var settingsManager: SettingsManager
+    @StateObject private var statsManager = StatsManager()
     @State private var showingSettings = false
+    @State private var showingStats = false
     @AppStorage("bestScore") private var bestScore: Double = 0
     @ObservedObject private var localizationManager = LocalizationManager.shared
     
     init(viewModel: QuizViewModel) {
         self.viewModel = viewModel
+    }
+    
+    init(quizUseCase: QuizUseCaseProtocol, statsManager: StatsManager) {
+        self.viewModel = QuizViewModel(quizUseCase: quizUseCase, statsManager: statsManager)
+        self.statsManager = statsManager
     }
     
     var body: some View {
@@ -116,7 +123,19 @@ struct StartView: View {
             .sheet(isPresented: $showingSettings) {
                 SettingsView(viewModel: SettingsViewModel(settingsManager: settingsManager))
             }
+            .sheet(isPresented: $showingStats) {
+                StatsView(statsManager: statsManager)
+            }
             .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(action: {
+                        showingStats = true
+                    }) {
+                        Image(systemName: "chart.bar.fill")
+                            .foregroundColor(.blue)
+                    }
+                }
+                
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: {
                         showingSettings = true
