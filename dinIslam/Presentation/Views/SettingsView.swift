@@ -188,7 +188,7 @@ struct SettingsView: View {
                                 .foregroundColor(.red)
                                 .frame(width: 24)
                             
-                            Text("settings.reset.title")
+                            LocalizedText("settings.reset.title")
                                 .font(.body)
                                 .foregroundColor(.red)
                             
