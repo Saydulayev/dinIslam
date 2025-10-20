@@ -1,0 +1,69 @@
+/* 
+  Localizable.strings (Russian)
+  dinIslam
+  Created by Saydulayev on 20.10.25.
+*/
+
+// Start View
+"start.description" = "Проверьте свои знания в увлекательной викторине!";
+"start.begin" = "Начать викторину";
+"start.loading" = "Загрузка...";
+"start.bestScore" = "Лучший результат";
+
+// Quiz View
+"quiz.question" = "Вопрос";
+"quiz.score" = "Счёт";
+
+// Result View
+"result.title" = "Результат";
+"result.correctAnswers" = "правильных ответов";
+"result.totalQuestions" = "Всего вопросов:";
+"result.timeSpent" = "Время:";
+"result.newRecord" = "Новый рекорд!";
+"result.playAgain" = "Играть снова";
+"result.backToStart" = "В главное меню";
+
+// Difficulty
+"difficulty.easy" = "Лёгкий";
+"difficulty.medium" = "Средний";
+"difficulty.hard" = "Сложный";
+
+// Settings
+"settings.title" = "Настройки";
+"settings.done" = "Готово";
+"settings.cancel" = "Отмена";
+
+// App Settings
+"settings.appSettings" = "Настройки приложения";
+"settings.language.title" = "Язык";
+"settings.language.system" = "Системный";
+"settings.sound.title" = "Звук";
+"settings.haptic.title" = "Тактильная обратная связь";
+"settings.notifications.title" = "Уведомления";
+
+// Support
+"settings.support" = "Поддержка";
+"settings.feedback.title" = "Обратная связь";
+"settings.feedback.subtitle" = "Поделитесь своими мыслями";
+"settings.feedback.message" = "Выберите способ отправки отзыва";
+"settings.feedback.email" = "Отправить email";
+"settings.feedback.appStore" = "Оценить в App Store";
+"settings.rate.title" = "Оценить приложение";
+"settings.rate.subtitle" = "Помогите нам стать лучше";
+"settings.rate.message" = "Ваша оценка поможет нам улучшить приложение";
+"settings.rate.now" = "Оценить сейчас";
+"settings.rate.later" = "Напомнить позже";
+"settings.share.title" = "Поделиться";
+"settings.share.subtitle" = "Расскажите друзьям";
+"settings.share.text" = "Попробуйте это увлекательное приложение-квиз!";
+
+// About
+"settings.about" = "О приложении";
+"settings.version.title" = "Версия";
+"settings.privacy.title" = "Политика конфиденциальности";
+"settings.terms.title" = "Условия использования";
+
+// Danger Zone
+"settings.dangerZone" = "Опасная зона";
+"settings.reset.title" = "Сбросить настройки";
+"settings.reset.footer" = "Это действие сбросит все настройки к значениям по умолчанию";

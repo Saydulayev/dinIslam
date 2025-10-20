@@ -1,0 +1,69 @@
+/* 
+  Localizable.strings (English)
+  dinIslam
+  Created by Saydulayev on 20.10.25.
+*/
+
+// Start View
+"start.description" = "Test your knowledge in an exciting quiz!";
+"start.begin" = "Start Quiz";
+"start.loading" = "Loading...";
+"start.bestScore" = "Best Score";
+
+// Quiz View
+"quiz.question" = "Question";
+"quiz.score" = "Score";
+
+// Result View
+"result.title" = "Result";
+"result.correctAnswers" = "correct answers";
+"result.totalQuestions" = "Total Questions:";
+"result.timeSpent" = "Time:";
+"result.newRecord" = "New Record!";
+"result.playAgain" = "Play Again";
+"result.backToStart" = "Back to Start";
+
+// Difficulty
+"difficulty.easy" = "Easy";
+"difficulty.medium" = "Medium";
+"difficulty.hard" = "Hard";
+
+// Settings
+"settings.title" = "Settings";
+"settings.done" = "Done";
+"settings.cancel" = "Cancel";
+
+// App Settings
+"settings.appSettings" = "App Settings";
+"settings.language.title" = "Language";
+"settings.language.system" = "System";
+"settings.sound.title" = "Sound";
+"settings.haptic.title" = "Haptic Feedback";
+"settings.notifications.title" = "Notifications";
+
+// Support
+"settings.support" = "Support";
+"settings.feedback.title" = "Send Feedback";
+"settings.feedback.subtitle" = "Share your thoughts";
+"settings.feedback.message" = "Choose how to send your feedback";
+"settings.feedback.email" = "Send Email";
+"settings.feedback.appStore" = "Rate in App Store";
+"settings.rate.title" = "Rate App";
+"settings.rate.subtitle" = "Help us improve";
+"settings.rate.message" = "Your rating helps us improve the app";
+"settings.rate.now" = "Rate Now";
+"settings.rate.later" = "Remind Later";
+"settings.share.title" = "Share";
+"settings.share.subtitle" = "Tell your friends";
+"settings.share.text" = "Try this exciting quiz app!";
+
+// About
+"settings.about" = "About";
+"settings.version.title" = "Version";
+"settings.privacy.title" = "Privacy Policy";
+"settings.terms.title" = "Terms of Service";
+
+// Danger Zone
+"settings.dangerZone" = "Danger Zone";
+"settings.reset.title" = "Reset Settings";
+"settings.reset.footer" = "This will reset all settings to default values";

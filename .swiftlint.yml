@@ -1,0 +1,279 @@
+# SwiftLint Configuration for dinIslam Quiz
+
+# Paths to include/exclude
+included:
+  - dinIslam
+
+excluded:
+  - dinIslam.xcodeproj
+  - Pods
+  - .build
+
+# Rules to disable
+disabled_rules:
+  - trailing_whitespace
+  - line_length
+  - todo
+  - force_cast
+  - force_try
+
+# Rules to enable
+opt_in_rules:
+  - empty_count
+  - empty_string
+  - explicit_init
+  - extension_access_modifier
+  - fatal_error_message
+  - file_header
+  - first_where
+  - force_unwrapping
+  - function_default_parameter_at_end
+  - implicit_return
+  - last_where
+  - literal_expression_end_indentation
+  - multiline_arguments
+  - multiline_function_chains
+  - multiline_literal_brackets
+  - multiline_parameters
+  - multiline_parameters_brackets
+  - operator_usage_whitespace
+  - overridden_super_call
+  - pattern_matching_keywords
+  - prefer_self_type_over_type_of_self
+  - redundant_nil_coalescing
+  - redundant_type_annotation
+  - sorted_first_last
+  - static_operator
+  - switch_case_on_newline
+  - toggle_bool
+  - unneeded_parentheses_in_closure_argument
+  - vertical_parameter_alignment_on_call
+  - vertical_whitespace_closing_braces
+  - vertical_whitespace_opening_braces
+  - yoda_condition
+
+# Custom rules
+custom_rules:
+  # Custom rule for file headers
+  file_header:
+    name: "File Header"
+    regex: '^//\s*Created by.*on.*\.$'
+    message: "File should have proper header comment"
+    severity: warning
+
+# Analyzer rules
+analyzer_rules:
+  - explicit_self
+  - unused_declaration
+  - unused_import
+
+# Reporter
+reporter: "xcode"
+
+# Line length
+line_length:
+  warning: 120
+  error: 150
+  ignores_urls: true
+  ignores_function_declarations: true
+  ignores_comments: true
+
+# File length
+file_length:
+  warning: 500
+  error: 1000
+
+# Function length
+function_length:
+  warning: 50
+  error: 100
+
+# Type body length
+type_body_length:
+  warning: 300
+  error: 500
+
+# Cyclomatic complexity
+cyclomatic_complexity:
+  warning: 10
+  error: 20
+
+# Nesting
+nesting:
+  type_level:
+    warning: 3
+    error: 6
+  statement_level:
+    warning: 5
+    error: 10
+
+# Identifier name
+identifier_name:
+  min_length:
+    warning: 2
+    error: 1
+  max_length:
+    warning: 40
+    error: 60
+  excluded:
+    - id
+    - url
+    - urlRequest
+    - urlSession
+
+# Type name
+type_name:
+  min_length:
+    warning: 3
+    error: 1
+  max_length:
+    warning: 40
+    error: 60
+
+# Large tuple
+large_tuple:
+  warning: 3
+  error: 4
+
+# Force unwrapping
+force_unwrapping:
+  severity: warning
+
+# Force cast
+force_cast:
+  severity: warning
+
+# Force try
+force_try:
+  severity: warning
+
+# Empty count
+empty_count:
+  severity: warning
+
+# Empty string
+empty_string:
+  severity: warning
+
+# Explicit init
+explicit_init:
+  severity: warning
+
+# Extension access modifier
+extension_access_modifier:
+  severity: warning
+
+# Fatal error message
+fatal_error_message:
+  severity: warning
+
+# File header
+file_header:
+  required_pattern: |
+                    \/\/
+                    \/\/  .*\.swift
+                    \/\/  dinIslam
+                    \/\/
+                    \/\/  Created by .* on \d{2}\.\d{2}\.\d{2}\.
+                    \/\/
+  severity: warning
+
+# First where
+first_where:
+  severity: warning
+
+# Function default parameter at end
+function_default_parameter_at_end:
+  severity: warning
+
+# Implicit return
+implicit_return:
+  severity: warning
+
+# Last where
+last_where:
+  severity: warning
+
+# Literal expression end indentation
+literal_expression_end_indentation:
+  severity: warning
+
+# Multiline arguments
+multiline_arguments:
+  severity: warning
+
+# Multiline function chains
+multiline_function_chains:
+  severity: warning
+
+# Multiline literal brackets
+multiline_literal_brackets:
+  severity: warning
+
+# Multiline parameters
+multiline_parameters:
+  severity: warning
+
+# Multiline parameters brackets
+multiline_parameters_brackets:
+  severity: warning
+
+# Operator usage whitespace
+operator_usage_whitespace:
+  severity: warning
+
+# Overridden super call
+overridden_super_call:
+  severity: warning
+
+# Pattern matching keywords
+pattern_matching_keywords:
+  severity: warning
+
+# Prefer self type over type of self
+prefer_self_type_over_type_of_self:
+  severity: warning
+
+# Redundant nil coalescing
+redundant_nil_coalescing:
+  severity: warning
+
+# Redundant type annotation
+redundant_type_annotation:
+  severity: warning
+
+# Sorted first last
+sorted_first_last:
+  severity: warning
+
+# Static operator
+static_operator:
+  severity: warning
+
+# Switch case on newline
+switch_case_on_newline:
+  severity: warning
+
+# Toggle bool
+toggle_bool:
+  severity: warning
+
+# Unneeded parentheses in closure argument
+unneeded_parentheses_in_closure_argument:
+  severity: warning
+
+# Vertical parameter alignment on call
+vertical_parameter_alignment_on_call:
+  severity: warning
+
+# Vertical whitespace closing braces
+vertical_whitespace_closing_braces:
+  severity: warning
+
+# Vertical whitespace opening braces
+vertical_whitespace_opening_braces:
+  severity: warning
+
+# Yoda condition
+yoda_condition:
+  severity: warning

@@ -1,0 +1,158 @@
+[
+  {
+    "id": "q1",
+    "text": "Столица Франции?",
+    "answers": [
+      { "id": "a1", "text": "Париж" },
+      { "id": "a2", "text": "Марсель" },
+      { "id": "a3", "text": "Лион" },
+      { "id": "a4", "text": "Ницца" }
+    ],
+    "correctIndex": 0,
+    "category": "География",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q2",
+    "text": "Какая планета ближе всего к Солнцу?",
+    "answers": [
+      { "id": "a1", "text": "Венера" },
+      { "id": "a2", "text": "Меркурий" },
+      { "id": "a3", "text": "Земля" },
+      { "id": "a4", "text": "Марс" }
+    ],
+    "correctIndex": 1,
+    "category": "Астрономия",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q3",
+    "text": "Кто написал роман 'Война и мир'?",
+    "answers": [
+      { "id": "a1", "text": "Фёдор Достоевский" },
+      { "id": "a2", "text": "Лев Толстой" },
+      { "id": "a3", "text": "Антон Чехов" },
+      { "id": "a4", "text": "Иван Тургенев" }
+    ],
+    "correctIndex": 1,
+    "category": "Литература",
+    "difficulty": "medium"
+  },
+  {
+    "id": "q4",
+    "text": "Какая формула воды?",
+    "answers": [
+      { "id": "a1", "text": "H2O" },
+      { "id": "a2", "text": "CO2" },
+      { "id": "a3", "text": "O2" },
+      { "id": "a4", "text": "H2SO4" }
+    ],
+    "correctIndex": 0,
+    "category": "Химия",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q5",
+    "text": "В каком году был основан Санкт-Петербург?",
+    "answers": [
+      { "id": "a1", "text": "1703" },
+      { "id": "a2", "text": "1712" },
+      { "id": "a3", "text": "1721" },
+      { "id": "a4", "text": "1698" }
+    ],
+    "correctIndex": 0,
+    "category": "История",
+    "difficulty": "medium"
+  },
+  {
+    "id": "q6",
+    "text": "Какая самая большая планета в Солнечной системе?",
+    "answers": [
+      { "id": "a1", "text": "Сатурн" },
+      { "id": "a2", "text": "Юпитер" },
+      { "id": "a3", "text": "Нептун" },
+      { "id": "a4", "text": "Уран" }
+    ],
+    "correctIndex": 1,
+    "category": "Астрономия",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q7",
+    "text": "Кто изобрёл телефон?",
+    "answers": [
+      { "id": "a1", "text": "Томас Эдисон" },
+      { "id": "a2", "text": "Александр Белл" },
+      { "id": "a3", "text": "Никола Тесла" },
+      { "id": "a4", "text": "Генри Форд" }
+    ],
+    "correctIndex": 1,
+    "category": "История",
+    "difficulty": "medium"
+  },
+  {
+    "id": "q8",
+    "text": "Какая температура кипения воды при нормальном атмосферном давлении?",
+    "answers": [
+      { "id": "a1", "text": "90°C" },
+      { "id": "a2", "text": "100°C" },
+      { "id": "a3", "text": "110°C" },
+      { "id": "a4", "text": "80°C" }
+    ],
+    "correctIndex": 1,
+    "category": "Физика",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q9",
+    "text": "Сколько костей в теле взрослого человека?",
+    "answers": [
+      { "id": "a1", "text": "206" },
+      { "id": "a2", "text": "208" },
+      { "id": "a3", "text": "204" },
+      { "id": "a4", "text": "210" }
+    ],
+    "correctIndex": 0,
+    "category": "Биология",
+    "difficulty": "hard"
+  },
+  {
+    "id": "q10",
+    "text": "Какая самая длинная река в мире?",
+    "answers": [
+      { "id": "a1", "text": "Нил" },
+      { "id": "a2", "text": "Амазонка" },
+      { "id": "a3", "text": "Янцзы" },
+      { "id": "a4", "text": "Миссисипи" }
+    ],
+    "correctIndex": 0,
+    "category": "География",
+    "difficulty": "medium"
+  },
+  {
+    "id": "q11",
+    "text": "В каком году произошла Октябрьская революция в России?",
+    "answers": [
+      { "id": "a1", "text": "1916" },
+      { "id": "a2", "text": "1917" },
+      { "id": "a3", "text": "1918" },
+      { "id": "a4", "text": "1919" }
+    ],
+    "correctIndex": 1,
+    "category": "История",
+    "difficulty": "medium"
+  },
+  {
+    "id": "q12",
+    "text": "Какая скорость света в вакууме?",
+    "answers": [
+      { "id": "a1", "text": "300,000 км/с" },
+      { "id": "a2", "text": "299,792,458 м/с" },
+      { "id": "a3", "text": "3×10⁸ м/с" },
+      { "id": "a4", "text": "Все варианты верны" }
+    ],
+    "correctIndex": 3,
+    "category": "Физика",
+    "difficulty": "hard"
+  }
+]

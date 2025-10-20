@@ -1,0 +1,326 @@
+//
+//  SettingsView.swift
+//  dinIslam
+//
+//  Created by Saydulayev on 20.10.25.
+//
+
+import SwiftUI
+import MessageUI
+
+struct SettingsView: View {
+    @State private var viewModel: SettingsViewModel
+    @Environment(\.dismiss) private var dismiss
+    @ObservedObject private var localizationManager = LocalizationManager.shared
+    
+    init(viewModel: SettingsViewModel) {
+        self.viewModel = viewModel
+    }
+    
+    var body: some View {
+        NavigationStack {
+            List {
+                // MARK: - App Settings Section
+                Section {
+                    // Language Setting
+                    HStack {
+                        Image(systemName: "globe")
+                            .foregroundColor(.blue)
+                            .frame(width: 24)
+                        
+                        VStack(alignment: .leading, spacing: 2) {
+                            LocalizedText("settings.language.title")
+                                .font(.body)
+                            Text(viewModel.settings.language.displayName)
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        
+                        Spacer()
+                        
+                        Image(systemName: "chevron.right")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        viewModel.showingLanguagePicker = true
+                    }
+                    
+                    // Sound Setting
+                    HStack {
+                        Image(systemName: "speaker.wave.2")
+                            .foregroundColor(.green)
+                            .frame(width: 24)
+                        
+                        LocalizedText("settings.sound.title")
+                            .font(.body)
+                        
+                        Spacer()
+                        
+                        Toggle("", isOn: Binding(
+                            get: { viewModel.settings.soundEnabled },
+                            set: { viewModel.updateSoundEnabled($0) }
+                        ))
+                    }
+                    
+                    // Haptic Feedback Setting
+                    HStack {
+                        Image(systemName: "iphone.radiowaves.left.and.right")
+                            .foregroundColor(.orange)
+                            .frame(width: 24)
+                        
+                        LocalizedText("settings.haptic.title")
+                            .font(.body)
+                        
+                        Spacer()
+                        
+                        Toggle("", isOn: Binding(
+                            get: { viewModel.settings.hapticEnabled },
+                            set: { viewModel.updateHapticEnabled($0) }
+                        ))
+                    }
+                    
+                    // Notifications Setting
+                    HStack {
+                        Image(systemName: "bell")
+                            .foregroundColor(.purple)
+                            .frame(width: 24)
+                        
+                        LocalizedText("settings.notifications.title")
+                            .font(.body)
+                        
+                        Spacer()
+                        
+                        Toggle("", isOn: Binding(
+                            get: { viewModel.settings.notificationsEnabled },
+                            set: { viewModel.updateNotificationsEnabled($0) }
+                        ))
+                    }
+                } header: {
+                    LocalizedText("settings.appSettings")
+                }
+                
+                // MARK: - Support Section
+                Section {
+                    // Send Feedback
+                    SettingsRow(
+                        icon: "envelope",
+                        iconColor: .blue,
+                        title: "settings.feedback.title",
+                        subtitle: "settings.feedback.subtitle"
+                    ) {
+                        viewModel.sendFeedback()
+                    }
+                    
+                    // Rate App
+                    SettingsRow(
+                        icon: "star",
+                        iconColor: .yellow,
+                        title: "settings.rate.title",
+                        subtitle: "settings.rate.subtitle"
+                    ) {
+                        viewModel.rateApp()
+                    }
+                    
+                    // Share App
+                    SettingsRow(
+                        icon: "square.and.arrow.up",
+                        iconColor: .green,
+                        title: "settings.share.title",
+                        subtitle: "settings.share.subtitle"
+                    ) {
+                        viewModel.shareApp()
+                    }
+                } header: {
+                    LocalizedText("settings.support")
+                }
+                
+                // MARK: - About Section
+                Section {
+                    // App Version
+                    HStack {
+                        Image(systemName: "info.circle")
+                            .foregroundColor(.blue)
+                            .frame(width: 24)
+                        
+                        VStack(alignment: .leading, spacing: 2) {
+                            LocalizedText("settings.version.title")
+                                .font(.body)
+                            Text(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        
+                        Spacer()
+                    }
+                    
+                    // Privacy Policy
+                    SettingsRow(
+                        icon: "hand.raised",
+                        iconColor: .red,
+                        title: "settings.privacy.title",
+                        subtitle: nil
+                    ) {
+                        viewModel.openPrivacyPolicy()
+                    }
+                    
+                    // Terms of Service
+                    SettingsRow(
+                        icon: "doc.text",
+                        iconColor: .gray,
+                        title: "settings.terms.title",
+                        subtitle: nil
+                    ) {
+                        viewModel.openTermsOfService()
+                    }
+                } header: {
+                    LocalizedText("settings.about")
+                }
+                
+                // MARK: - Reset Section
+                Section {
+                    Button(action: {
+                        viewModel.resetSettings()
+                    }) {
+                        HStack {
+                            Image(systemName: "arrow.clockwise")
+                                .foregroundColor(.red)
+                                .frame(width: 24)
+                            
+                            Text("settings.reset.title")
+                                .font(.body)
+                                .foregroundColor(.red)
+                            
+                            Spacer()
+                        }
+                    }
+                } header: {
+                    LocalizedText("settings.dangerZone")
+                } footer: {
+                    LocalizedText("settings.reset.footer")
+                }
+            }
+            .id(viewModel.refreshTrigger)
+            .navigationTitle(LocalizationManager.shared.localizedString(for: "settings.title"))
+            .navigationBarTitleDisplayMode(.large)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(LocalizationManager.shared.localizedString(for: "settings.done")) {
+                        dismiss()
+                    }
+                }
+            }
+        }
+        .sheet(isPresented: $viewModel.showingLanguagePicker) {
+            LanguagePickerView(viewModel: viewModel)
+        }
+        .alert(LocalizationManager.shared.localizedString(for: "settings.feedback.title"), isPresented: $viewModel.showingFeedbackAlert) {
+            Button(LocalizationManager.shared.localizedString(for: "settings.feedback.email")) {
+                // Open email client
+                if let url = URL(string: "mailto:support@dinislam.com?subject=Feedback&body=") {
+                    UIApplication.shared.open(url)
+                }
+            }
+            Button(LocalizationManager.shared.localizedString(for: "settings.feedback.appStore")) {
+                viewModel.requestAppReview()
+            }
+            Button(LocalizationManager.shared.localizedString(for: "settings.cancel"), role: .cancel) { }
+        } message: {
+            Text(LocalizationManager.shared.localizedString(for: "settings.feedback.message"))
+        }
+        .alert(LocalizationManager.shared.localizedString(for: "settings.rate.title"), isPresented: $viewModel.showingRateAlert) {
+            Button(LocalizationManager.shared.localizedString(for: "settings.rate.now")) {
+                viewModel.requestAppReview()
+            }
+            Button(LocalizationManager.shared.localizedString(for: "settings.rate.later")) { }
+            Button(LocalizationManager.shared.localizedString(for: "settings.cancel"), role: .cancel) { }
+        } message: {
+            Text(LocalizationManager.shared.localizedString(for: "settings.rate.message"))
+        }
+    }
+}
+
+struct SettingsRow: View {
+    let icon: String
+    let iconColor: Color
+    let title: String
+    let subtitle: String?
+    let action: () -> Void
+    
+    var body: some View {
+        HStack {
+            Image(systemName: icon)
+                .foregroundColor(iconColor)
+                .frame(width: 24)
+            
+            VStack(alignment: .leading, spacing: 2) {
+                LocalizedText(title)
+                    .font(.body)
+                
+                if let subtitle = subtitle {
+                    LocalizedText(subtitle)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+            }
+            
+            Spacer()
+            
+            Image(systemName: "chevron.right")
+                .font(.caption)
+                .foregroundColor(.secondary)
+        }
+        .contentShape(Rectangle())
+        .onTapGesture {
+            action()
+        }
+    }
+}
+
+struct LanguagePickerView: View {
+    @State private var viewModel: SettingsViewModel
+    @Environment(\.dismiss) private var dismiss
+    
+    init(viewModel: SettingsViewModel) {
+        self.viewModel = viewModel
+    }
+    
+    var body: some View {
+        NavigationStack {
+            List {
+                ForEach(AppLanguage.allCases, id: \.self) { language in
+                    HStack {
+                        Text(language.displayName)
+                            .font(.body)
+                        
+                        Spacer()
+                        
+                        if viewModel.settings.language == language {
+                            Image(systemName: "checkmark")
+                                .foregroundColor(.blue)
+                        }
+                    }
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        viewModel.updateLanguage(language)
+                        dismiss()
+                    }
+                }
+            }
+            .navigationTitle(LocalizationManager.shared.localizedString(for: "settings.language.title"))
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(LocalizationManager.shared.localizedString(for: "settings.done")) {
+                        dismiss()
+                    }
+                }
+            }
+        }
+    }
+}
+
+#Preview {
+    SettingsView(viewModel: SettingsViewModel(settingsManager: SettingsManager()))
+}
