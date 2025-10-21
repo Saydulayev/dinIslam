@@ -141,6 +141,9 @@ struct ResultView: View {
         .onAppear {
             checkForNewAchievements()
             updateBestScore()
+            
+            // Clear app badge when results are shown
+            UIApplication.shared.applicationIconBadgeNumber = 0
         }
     }
     

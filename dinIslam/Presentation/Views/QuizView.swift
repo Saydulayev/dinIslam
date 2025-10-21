@@ -146,6 +146,10 @@ struct QuizView: View {
         } message: {
             Text(LocalizationManager.shared.localizedString(for: "quiz.stop.confirm.message"))
         }
+        .onAppear {
+            // Clear app badge when quiz starts
+            UIApplication.shared.applicationIconBadgeNumber = 0
+        }
     }
 }
 

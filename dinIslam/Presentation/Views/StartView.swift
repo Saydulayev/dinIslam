@@ -169,6 +169,9 @@ struct StartView: View {
                 Text(viewModel.errorMessage ?? "")
             }
             .onAppear {
+                // Clear app badge when app is opened
+                UIApplication.shared.applicationIconBadgeNumber = 0
+                
                 // Request notification permission on first launch
                 if !notificationManager.hasPermission {
                     Task {

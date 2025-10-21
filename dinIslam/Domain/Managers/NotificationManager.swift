@@ -60,7 +60,7 @@ class NotificationManager: ObservableObject {
         content.title = LocalizationManager.shared.localizedString(for: "notification.title")
         content.body = LocalizationManager.shared.localizedString(for: "notification.body")
         content.sound = .default
-        content.badge = 1
+        // Don't set badge for daily reminders to avoid persistent badges
         
         // Create date components for the reminder time
         let calendar = Calendar.current
@@ -137,7 +137,7 @@ class NotificationManager: ObservableObject {
         content.title = LocalizationManager.shared.localizedString(for: "achievement.notification.title")
         content.body = "\(LocalizationManager.shared.localizedString(for: "achievement.notification.body")) \(achievement.title)"
         content.sound = .default
-        content.badge = 1
+        // Don't set badge for achievement notifications
         
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
         
