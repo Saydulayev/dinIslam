@@ -8,12 +8,14 @@
 import Foundation
 import Observation
 import UIKit
+import AudioToolbox
 
 @Observable
 class QuizViewModel {
     // MARK: - Properties
     private let quizUseCase: QuizUseCaseProtocol
     private let hapticManager: HapticManager
+    private let soundManager: SoundManager
     private let statsManager: StatsManager
     
     var state: QuizState = .idle
@@ -50,6 +52,7 @@ class QuizViewModel {
         self.quizUseCase = quizUseCase
         self.statsManager = statsManager
         self.hapticManager = HapticManager(settingsManager: settingsManager)
+        self.soundManager = SoundManager(settingsManager: settingsManager)
     }
     
     // MARK: - Public Methods
@@ -84,8 +87,9 @@ class QuizViewModel {
         selectedAnswerIndex = index
         isAnswerSelected = true
         
-        // Provide haptic feedback
+        // Provide haptic and sound feedback
         hapticManager.selectionChanged()
+        soundManager.playSelectionSound()
         
         // Check if answer is correct
         if let currentQuestion = currentQuestion {
@@ -97,8 +101,10 @@ class QuizViewModel {
             if isCorrect {
                 correctAnswers += 1
                 hapticManager.success()
+                soundManager.playSuccessSound()
             } else {
                 hapticManager.error()
+                soundManager.playErrorSound()
             }
         }
         
@@ -268,5 +274,41 @@ class HapticManager {
         guard isHapticEnabled() else { return }
         let notificationFeedback = UINotificationFeedbackGenerator()
         notificationFeedback.notificationOccurred(.error)
+    }
+}
+
+// MARK: - Sound Manager
+class SoundManager {
+    private var settingsManager: SettingsManager?
+    
+    init(settingsManager: SettingsManager? = nil) {
+        self.settingsManager = settingsManager
+    }
+    
+    func setSettingsManager(_ settingsManager: SettingsManager) {
+        self.settingsManager = settingsManager
+    }
+    
+    private func isSoundEnabled() -> Bool {
+        return settingsManager?.settings.soundEnabled ?? true
+    }
+    
+    func playSuccessSound() {
+        guard isSoundEnabled() else { return }
+        playSystemSound(1103) // Success sound
+    }
+    
+    func playErrorSound() {
+        guard isSoundEnabled() else { return }
+        playSystemSound(1104) // Error sound
+    }
+    
+    func playSelectionSound() {
+        guard isSoundEnabled() else { return }
+        playSystemSound(1105) // Selection sound
+    }
+    
+    private func playSystemSound(_ soundID: SystemSoundID) {
+        AudioServicesPlaySystemSound(soundID)
     }
 }

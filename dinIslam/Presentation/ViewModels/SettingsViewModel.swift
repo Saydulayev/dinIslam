@@ -9,11 +9,13 @@ import Foundation
 import Observation
 import UIKit
 import StoreKit
+import AudioToolbox
 
 @Observable
 class SettingsViewModel {
     private let settingsManager: SettingsManager
     private let hapticManager: HapticManager
+    private let soundManager: SoundManager
     
     var settings: AppSettings
     var showingLanguagePicker = false
@@ -23,6 +25,7 @@ class SettingsViewModel {
         self.settingsManager = settingsManager
         self.settings = settingsManager.settings
         self.hapticManager = HapticManager(settingsManager: settingsManager)
+        self.soundManager = SoundManager(settingsManager: settingsManager)
     }
     
     // MARK: - Language Settings
@@ -54,6 +57,11 @@ class SettingsViewModel {
         settingsManager.updateSoundEnabled(enabled)
         settings = settingsManager.settings
         hapticManager.selectionChanged()
+        
+        // Play sound to demonstrate the setting
+        if enabled {
+            soundManager.playSuccessSound()
+        }
     }
     
     // MARK: - Haptic Settings
