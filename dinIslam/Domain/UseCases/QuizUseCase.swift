@@ -26,15 +26,30 @@ class QuizUseCase: QuizUseCaseProtocol {
         let allQuestions = try await questionsRepository.loadQuestions(language: language)
         let progress = QuestionPoolProgress(version: questionPoolVersion)
         let used = progress.usedIds
-        var available = allQuestions.filter { !used.contains($0.id) }
+        let unusedQuestions = allQuestions.filter { !used.contains($0.id) }
         
-        let sessionCount = 20
-        if available.count < sessionCount {
+        let sessionCount = min(20, allQuestions.count) // Адаптивный размер сессии
+        var selected: [Question] = []
+        
+        if unusedQuestions.count >= sessionCount {
+            // Достаточно новых вопросов - берем только их
+            selected = Array(unusedQuestions.shuffled().prefix(sessionCount))
+            print("📚 Using \(selected.count) new questions")
+        } else if unusedQuestions.count > 0 {
+            // Частично новые + некоторые повторные
+            selected = Array(unusedQuestions.shuffled())
+            let remaining = sessionCount - unusedQuestions.count
+            let repeatedQuestions = allQuestions.filter { used.contains($0.id) }
+            let additional = Array(repeatedQuestions.shuffled().prefix(remaining))
+            selected.append(contentsOf: additional)
+            print("📚 Using \(unusedQuestions.count) new + \(additional.count) repeated questions")
+        } else {
+            // Все вопросы пройдены - начинаем заново
             progress.reset(for: questionPoolVersion)
-            available = allQuestions
+            selected = Array(allQuestions.shuffled().prefix(sessionCount))
+            print("🔄 All questions completed, starting fresh with \(selected.count) questions")
         }
         
-        let selected = Array(available.shuffled().prefix(sessionCount))
         progress.markUsed(selected.map { $0.id })
         return selected
     }
@@ -69,6 +84,19 @@ class QuizUseCase: QuizUseCaseProtocol {
             correctAnswers: correctAnswers,
             percentage: percentage,
             timeSpent: timeSpent
+        )
+    }
+    
+    func getProgressStats(language: String) async throws -> (total: Int, used: Int, remaining: Int) {
+        let allQuestions = try await questionsRepository.loadQuestions(language: language)
+        let progress = QuestionPoolProgress(version: questionPoolVersion)
+        let usedCount = progress.usedIds.count
+        let remainingCount = allQuestions.count - usedCount
+        
+        return (
+            total: allQuestions.count,
+            used: usedCount,
+            remaining: remainingCount
         )
     }
 }
