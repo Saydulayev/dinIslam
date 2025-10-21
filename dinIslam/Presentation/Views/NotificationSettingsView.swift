@@ -149,60 +149,6 @@ struct NotificationSettingsView: View {
                         }
                     }
                 }
-                
-                // Information Section
-                Section {
-                    VStack(alignment: .leading, spacing: 12) {
-                        HStack {
-                            Image(systemName: "info.circle")
-                                .foregroundColor(.blue)
-                                .font(.title2)
-                            
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text(LocalizationManager.shared.localizedString(for: "notification.settings.about.title"))
-                                    .font(.headline)
-                                    .foregroundColor(.primary)
-                                
-                                Text(LocalizationManager.shared.localizedString(for: "notification.settings.about.description"))
-                                    .font(.subheadline)
-                                    .foregroundColor(.secondary)
-                            }
-                        }
-                        
-                        VStack(alignment: .leading, spacing: 8) {
-                            HStack {
-                                Image(systemName: "checkmark.circle")
-                                    .foregroundColor(.green)
-                                    .font(.caption)
-                                
-                                Text(LocalizationManager.shared.localizedString(for: "notification.settings.features.daily"))
-                                    .font(.caption)
-                                    .foregroundColor(.primary)
-                            }
-                            
-                            HStack {
-                                Image(systemName: "checkmark.circle")
-                                    .foregroundColor(.green)
-                                    .font(.caption)
-                                
-                                Text(LocalizationManager.shared.localizedString(for: "notification.settings.features.achievements"))
-                                    .font(.caption)
-                                    .foregroundColor(.primary)
-                            }
-                            
-                            HStack {
-                                Image(systemName: "checkmark.circle")
-                                    .foregroundColor(.green)
-                                    .font(.caption)
-                                
-                                Text(LocalizationManager.shared.localizedString(for: "notification.settings.features.streak"))
-                                    .font(.caption)
-                                    .foregroundColor(.primary)
-                            }
-                        }
-                    }
-                    .padding(.vertical, 8)
-                }
             }
             .navigationTitle(LocalizationManager.shared.localizedString(for: "notification.settings.title"))
             .navigationBarTitleDisplayMode(.large)

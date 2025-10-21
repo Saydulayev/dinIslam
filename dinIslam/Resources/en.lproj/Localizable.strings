@@ -177,7 +177,7 @@
 "notification.settings.features.daily" = "Daily study reminders";
 "notification.settings.features.achievements" = "New achievement notifications";
 "notification.settings.features.streak" = "Streak maintenance reminders";
-"notification.settings.footer" = "You will receive reminders every day at the selected time.";
+"notification.settings.footer" = "Reminders will be sent daily at the selected time.";
 "notification.permission.denied.message" = "To receive reminders, you need to allow notifications in app settings.";
 "notification.test.sent.title" = "Test Notification";
 "notification.test.sent.message" = "Test notification sent!";

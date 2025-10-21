@@ -177,7 +177,7 @@
 "notification.settings.features.daily" = "Ежедневные напоминания о изучении";
 "notification.settings.features.achievements" = "Уведомления о новых достижениях";
 "notification.settings.features.streak" = "Напоминания о поддержании серии";
-"notification.settings.footer" = "Вы будете получать напоминания каждый день в выбранное время.";
+"notification.settings.footer" = "Напоминания будут приходить ежедневно в выбранное время.";
 "notification.permission.denied.message" = "Для получения напоминаний необходимо разрешить уведомления в настройках приложения.";
 "notification.test.sent.title" = "Тестовое уведомление";
 "notification.test.sent.message" = "Тестовое уведомление отправлено!";
