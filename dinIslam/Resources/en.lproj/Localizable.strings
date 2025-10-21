@@ -170,3 +170,14 @@
 // Settings
 "settings.on" = "On";
 "settings.off" = "Off";
+
+// Notification Settings
+"notification.settings.about.title" = "About Reminders";
+"notification.settings.about.description" = "Get daily reminders about Islamic learning to maintain consistency in knowledge.";
+"notification.settings.features.daily" = "Daily study reminders";
+"notification.settings.features.achievements" = "New achievement notifications";
+"notification.settings.features.streak" = "Streak maintenance reminders";
+"notification.settings.footer" = "You will receive reminders every day at the selected time.";
+"notification.permission.denied.message" = "To receive reminders, you need to allow notifications in app settings.";
+"notification.test.sent.title" = "Test Notification";
+"notification.test.sent.message" = "Test notification sent!";

@@ -143,7 +143,7 @@ struct NotificationSettingsView: View {
                         Text(LocalizationManager.shared.localizedString(for: "notification.settings.title"))
                     } footer: {
                         if notificationManager.isNotificationEnabled {
-                            Text("Вы будете получать напоминания каждый день в выбранное время.")
+                            Text(LocalizationManager.shared.localizedString(for: "notification.settings.footer"))
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                         }
@@ -159,11 +159,11 @@ struct NotificationSettingsView: View {
                                 .font(.title2)
                             
                             VStack(alignment: .leading, spacing: 4) {
-                                Text("О напоминаниях")
+                                Text(LocalizationManager.shared.localizedString(for: "notification.settings.about.title"))
                                     .font(.headline)
                                     .foregroundColor(.primary)
                                 
-                                Text("Получайте ежедневные напоминания о изучении ислама для поддержания постоянства в знаниях.")
+                                Text(LocalizationManager.shared.localizedString(for: "notification.settings.about.description"))
                                     .font(.subheadline)
                                     .foregroundColor(.secondary)
                             }
@@ -175,7 +175,7 @@ struct NotificationSettingsView: View {
                                     .foregroundColor(.green)
                                     .font(.caption)
                                 
-                                Text("Ежедневные напоминания о изучении")
+                                Text(LocalizationManager.shared.localizedString(for: "notification.settings.features.daily"))
                                     .font(.caption)
                                     .foregroundColor(.primary)
                             }
@@ -185,7 +185,7 @@ struct NotificationSettingsView: View {
                                     .foregroundColor(.green)
                                     .font(.caption)
                                 
-                                Text("Уведомления о новых достижениях")
+                                Text(LocalizationManager.shared.localizedString(for: "notification.settings.features.achievements"))
                                     .font(.caption)
                                     .foregroundColor(.primary)
                             }
@@ -195,7 +195,7 @@ struct NotificationSettingsView: View {
                                     .foregroundColor(.green)
                                     .font(.caption)
                                 
-                                Text("Напоминания о поддержании серии")
+                                Text(LocalizationManager.shared.localizedString(for: "notification.settings.features.streak"))
                                     .font(.caption)
                                     .foregroundColor(.primary)
                             }
@@ -219,15 +219,15 @@ struct NotificationSettingsView: View {
                     showingPermissionAlert = false
                 }
             } message: {
-                Text("Для получения напоминаний необходимо разрешить уведомления в настройках приложения.")
+                Text(LocalizationManager.shared.localizedString(for: "notification.permission.denied.message"))
             }
-            .alert("Тестовое уведомление",
+            .alert(LocalizationManager.shared.localizedString(for: "notification.test.sent.title"),
                    isPresented: $showingTestNotification) {
-                Button("OK") {
+                Button(LocalizationManager.shared.localizedString(for: "error.ok")) {
                     showingTestNotification = false
                 }
             } message: {
-                Text("Тестовое уведомление отправлено!")
+                Text(LocalizationManager.shared.localizedString(for: "notification.test.sent.message"))
             }
         }
     }
