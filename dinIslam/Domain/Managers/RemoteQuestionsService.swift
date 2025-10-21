@@ -81,7 +81,10 @@ class RemoteQuestionsService: ObservableObject {
         let fileName = language == .russian ? "questions.json" : "questions_en.json"
         let urlString = "\(baseURL)/\(fileName)"
         
+        print("🔄 RemoteQuestionsService: Attempting to fetch from \(urlString)")
+        
         guard let url = URL(string: urlString) else {
+            print("❌ RemoteQuestionsError: Invalid URL for \(fileName)")
             throw RemoteQuestionsError.invalidURL
         }
         
@@ -93,6 +96,7 @@ class RemoteQuestionsService: ObservableObject {
         }
         
         let remoteQuestions = try JSONDecoder().decode([RemoteQuestion].self, from: data)
+        print("✅ RemoteQuestionsService: Successfully loaded \(remoteQuestions.count) questions from \(fileName)")
         return remoteQuestions.map { $0.toQuestion() }
     }
     
@@ -102,8 +106,9 @@ class RemoteQuestionsService: ObservableObject {
         do {
             let data = try JSONEncoder().encode(questions)
             userDefaults.set(data, forKey: cacheKey)
+            print("💾 RemoteQuestionsService: Cached \(questions.count) questions for \(language.rawValue)")
         } catch {
-            print("Failed to cache questions: \(error)")
+            print("❌ Failed to cache questions: \(error)")
         }
     }
     
