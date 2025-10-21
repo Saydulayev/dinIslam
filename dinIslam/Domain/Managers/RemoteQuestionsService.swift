@@ -137,7 +137,7 @@ struct RemoteQuestion: Codable {
             answers: answers.map { $0.toAnswer() },
             correctIndex: correctIndex,
             category: category,
-            difficulty: QuestionDifficulty.fromString(difficulty)
+            difficulty: .medium // Default difficulty since we're simplifying
         )
     }
 }
