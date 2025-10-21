@@ -26,8 +26,8 @@ class StatsManager: ObservableObject {
         return stats
     }
     
-    func updateStats(correctCount: Int, totalCount: Int, wrongQuestionIds: [String]) {
-        stats.updateStats(correctCount: correctCount, totalCount: totalCount, wrongQuestionIds: wrongQuestionIds)
+    func updateStats(correctCount: Int, totalCount: Int, wrongQuestionIds: [String], percentage: Double = 0) {
+        stats.updateStats(correctCount: correctCount, totalCount: totalCount, wrongQuestionIds: wrongQuestionIds, percentage: percentage)
         saveStats()
     }
     

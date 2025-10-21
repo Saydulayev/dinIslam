@@ -113,3 +113,35 @@
 "mistakes.error" = "An error occurred";
 "mistakes.back" = "Back";
 "mistakes.close" = "Close";
+
+// Achievements
+"achievements.title" = "Achievements";
+"achievements.unlocked" = "Unlocked";
+"achievements.locked" = "Locked";
+"achievements.progress" = "Progress";
+"achievements.newAchievement" = "New Achievement!";
+"achievements.congratulations" = "Congratulations!";
+
+// Achievement Titles
+"achievements.firstQuiz.title" = "First Steps";
+"achievements.perfectScore.title" = "Perfect Score";
+"achievements.speedRunner.title" = "Speed Runner";
+"achievements.scholar.title" = "Scholar";
+"achievements.dedicated.title" = "Dedicated Student";
+"achievements.master.title" = "Master";
+"achievements.streak.title" = "Winning Streak";
+"achievements.explorer.title" = "Explorer";
+"achievements.perfectionist.title" = "Perfectionist";
+"achievements.legend.title" = "Legend";
+
+// Achievement Descriptions
+"achievements.firstQuiz.description" = "Complete your first quiz";
+"achievements.perfectScore.description" = "Get 100% correct answers";
+"achievements.speedRunner.description" = "Complete a quiz in less than 2 minutes";
+"achievements.scholar.description" = "Study 100 questions";
+"achievements.dedicated.description" = "Complete 10 quizzes";
+"achievements.master.description" = "Complete 50 quizzes";
+"achievements.streak.description" = "Complete 5 quizzes in a row with 80%+ score";
+"achievements.explorer.description" = "Study 500 questions";
+"achievements.perfectionist.description" = "Get 10 perfect scores";
+"achievements.legend.description" = "Complete 100 quizzes";

@@ -15,6 +15,9 @@ struct UserStats: Codable {
     var wrongQuestionIds: Set<String> = []
     var lastQuizDate: Date?
     var totalQuizzesCompleted: Int = 0
+    var currentStreak: Int = 0  // Текущая серия побед
+    var perfectScores: Int = 0  // Количество идеальных результатов
+    var lastQuizPercentage: Double = 0  // Процент последней викторины
     
     var accuracyPercentage: Double {
         guard totalQuestionsStudied > 0 else { return 0 }
@@ -25,7 +28,7 @@ struct UserStats: Codable {
         return wrongQuestionIds.count
     }
     
-    mutating func updateStats(correctCount: Int, totalCount: Int, wrongQuestionIds: [String]) {
+    mutating func updateStats(correctCount: Int, totalCount: Int, wrongQuestionIds: [String], percentage: Double = 0) {
         totalQuestionsStudied += totalCount
         correctAnswers += correctCount
         incorrectAnswers += (totalCount - correctCount)
@@ -37,6 +40,19 @@ struct UserStats: Codable {
         
         lastQuizDate = Date()
         totalQuizzesCompleted += 1
+        lastQuizPercentage = percentage
+        
+        // Обновляем серию побед
+        if percentage >= 80.0 {
+            currentStreak += 1
+        } else {
+            currentStreak = 0
+        }
+        
+        // Обновляем идеальные результаты
+        if percentage == 100.0 {
+            perfectScores += 1
+        }
     }
     
     mutating func clearWrongQuestions() {

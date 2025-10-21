@@ -113,3 +113,35 @@
 "mistakes.error" = "Произошла ошибка";
 "mistakes.back" = "Назад";
 "mistakes.close" = "Закрыть";
+
+// Achievements
+"achievements.title" = "Достижения";
+"achievements.unlocked" = "Разблокировано";
+"achievements.locked" = "Заблокировано";
+"achievements.progress" = "Прогресс";
+"achievements.newAchievement" = "Новое достижение!";
+"achievements.congratulations" = "Поздравляем!";
+
+// Achievement Titles
+"achievements.firstQuiz.title" = "Первые шаги";
+"achievements.perfectScore.title" = "Идеальный результат";
+"achievements.speedRunner.title" = "Скоростной бегун";
+"achievements.scholar.title" = "Учёный";
+"achievements.dedicated.title" = "Преданный ученик";
+"achievements.master.title" = "Мастер";
+"achievements.streak.title" = "Серия побед";
+"achievements.explorer.title" = "Исследователь";
+"achievements.perfectionist.title" = "Перфекционист";
+"achievements.legend.title" = "Легенда";
+
+// Achievement Descriptions
+"achievements.firstQuiz.description" = "Пройдите первую викторину";
+"achievements.perfectScore.description" = "Получите 100% правильных ответов";
+"achievements.speedRunner.description" = "Пройдите викторину менее чем за 2 минуты";
+"achievements.scholar.description" = "Изучите 100 вопросов";
+"achievements.dedicated.description" = "Пройдите 10 викторин";
+"achievements.master.description" = "Пройдите 50 викторин";
+"achievements.streak.description" = "Пройдите 5 викторин подряд с результатом выше 80%";
+"achievements.explorer.description" = "Изучите 500 вопросов";
+"achievements.perfectionist.description" = "Получите 10 раз идеальный результат";
+"achievements.legend.description" = "Пройдите 100 викторин";

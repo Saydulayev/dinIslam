@@ -11,6 +11,8 @@ struct ResultView: View {
     @State private var viewModel: QuizViewModel
     @Binding var bestScore: Double
     @ObservedObject private var localizationManager = LocalizationManager.shared
+    @State private var showingAchievementNotification = false
+    @State private var currentAchievement: Achievement?
     
     init(viewModel: QuizViewModel, bestScore: Binding<Double>) {
         self.viewModel = viewModel
@@ -120,7 +122,24 @@ struct ResultView: View {
         .padding()
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
+        .overlay(
+            // Achievement Notification Overlay
+            Group {
+                if showingAchievementNotification, let achievement = currentAchievement {
+                    ZStack {
+                        Color.black.opacity(0.4)
+                            .ignoresSafeArea()
+                        
+                        AchievementNotificationView(
+                            achievement: achievement,
+                            isPresented: $showingAchievementNotification
+                        )
+                    }
+                }
+            }
+        )
         .onAppear {
+            checkForNewAchievements()
             updateBestScore()
         }
     }
@@ -170,6 +189,21 @@ struct ResultView: View {
         if let percentage = viewModel.quizResult?.percentage,
            percentage > bestScore {
             bestScore = percentage
+        }
+    }
+    
+    private func checkForNewAchievements() {
+        let newAchievements = viewModel.newAchievements
+        
+        if !newAchievements.isEmpty {
+            // Show the first new achievement
+            currentAchievement = newAchievements.first
+            showingAchievementNotification = true
+            
+            // Clear the achievement from the view model after showing
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                viewModel.clearNewAchievements()
+            }
         }
     }
 }

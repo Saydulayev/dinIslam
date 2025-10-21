@@ -13,6 +13,7 @@ struct StartView: View {
     @StateObject private var statsManager = StatsManager()
     @State private var showingSettings = false
     @State private var showingStats = false
+    @State private var showingAchievements = false
     @AppStorage("bestScore") private var bestScore: Double = 0
     @ObservedObject private var localizationManager = LocalizationManager.shared
     
@@ -126,6 +127,9 @@ struct StartView: View {
             .navigationDestination(isPresented: $showingStats) {
                 StatsView(statsManager: statsManager)
             }
+            .navigationDestination(isPresented: $showingAchievements) {
+                AchievementsView()
+            }
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button(action: {
@@ -133,6 +137,15 @@ struct StartView: View {
                     }) {
                         Image(systemName: "chart.bar.fill")
                             .foregroundColor(.blue)
+                    }
+                }
+                
+                ToolbarItem(placement: .principal) {
+                    Button(action: {
+                        showingAchievements = true
+                    }) {
+                        Image(systemName: "trophy.fill")
+                            .foregroundColor(.orange)
                     }
                 }
                 

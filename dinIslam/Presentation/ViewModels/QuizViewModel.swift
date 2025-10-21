@@ -17,6 +17,7 @@ class QuizViewModel {
     private let hapticManager: HapticManager
     private let soundManager: SoundManager
     private let statsManager: StatsManager
+    private let achievementManager: AchievementManager
     
     var state: QuizState = .idle
     var questions: [Question] = []
@@ -28,6 +29,11 @@ class QuizViewModel {
     var quizResult: QuizResult?
     var errorMessage: String?
     var isLoading: Bool = false
+    
+    // MARK: - Achievement Properties
+    var newAchievements: [Achievement] {
+        achievementManager.newAchievements
+    }
     
     private var startTime: Date?
     private var questionResults: [String: Bool] = [:] // ID вопроса -> правильный ли ответ
@@ -53,6 +59,7 @@ class QuizViewModel {
         self.statsManager = statsManager
         self.hapticManager = HapticManager(settingsManager: settingsManager)
         self.soundManager = SoundManager(settingsManager: settingsManager)
+        self.achievementManager = AchievementManager()
     }
     
     // MARK: - Public Methods
@@ -146,8 +153,12 @@ class QuizViewModel {
         statsManager.updateStats(
             correctCount: correctAnswers,
             totalCount: questions.count,
-            wrongQuestionIds: wrongQuestionIds
+            wrongQuestionIds: wrongQuestionIds,
+            percentage: quizResult?.percentage ?? 0
         )
+        
+        // Check for new achievements
+        achievementManager.checkAchievements(for: statsManager.stats, quizResult: quizResult)
         
         state = .finished
     }
@@ -239,6 +250,11 @@ class QuizViewModel {
         print("DEBUG: Wrong questions after removal: \(statsManager.stats.wrongQuestionIds.count)")
         
         state = .mistakesFinished
+    }
+    
+    // MARK: - Achievement Methods
+    func clearNewAchievements() {
+        achievementManager.clearNewAchievements()
     }
 }
 
