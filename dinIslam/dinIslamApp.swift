@@ -16,7 +16,8 @@ struct dinIslamApp: App {
         WindowGroup {
             StartView(
                 quizUseCase: QuizUseCase(questionsRepository: QuestionsRepository()),
-                statsManager: statsManager
+                statsManager: statsManager,
+                settingsManager: settingsManager
             )
             .environmentObject(settingsManager)
         }

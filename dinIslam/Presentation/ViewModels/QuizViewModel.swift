@@ -13,7 +13,7 @@ import UIKit
 class QuizViewModel {
     // MARK: - Properties
     private let quizUseCase: QuizUseCaseProtocol
-    private let hapticManager = HapticManager()
+    private let hapticManager: HapticManager
     private let statsManager: StatsManager
     
     var state: QuizState = .idle
@@ -46,9 +46,10 @@ class QuizViewModel {
     }
     
     // MARK: - Initialization
-    init(quizUseCase: QuizUseCaseProtocol, statsManager: StatsManager) {
+    init(quizUseCase: QuizUseCaseProtocol, statsManager: StatsManager, settingsManager: SettingsManager) {
         self.quizUseCase = quizUseCase
         self.statsManager = statsManager
+        self.hapticManager = HapticManager(settingsManager: settingsManager)
     }
     
     // MARK: - Public Methods
@@ -237,17 +238,34 @@ class QuizViewModel {
 
 // MARK: - Haptic Feedback Manager
 class HapticManager {
+    private var settingsManager: SettingsManager?
+    
+    init(settingsManager: SettingsManager? = nil) {
+        self.settingsManager = settingsManager
+    }
+    
+    func setSettingsManager(_ settingsManager: SettingsManager) {
+        self.settingsManager = settingsManager
+    }
+    
+    private func isHapticEnabled() -> Bool {
+        return settingsManager?.settings.hapticEnabled ?? true
+    }
+    
     func selectionChanged() {
+        guard isHapticEnabled() else { return }
         let impactFeedback = UIImpactFeedbackGenerator(style: .light)
         impactFeedback.impactOccurred()
     }
     
     func success() {
+        guard isHapticEnabled() else { return }
         let notificationFeedback = UINotificationFeedbackGenerator()
         notificationFeedback.notificationOccurred(.success)
     }
     
     func error() {
+        guard isHapticEnabled() else { return }
         let notificationFeedback = UINotificationFeedbackGenerator()
         notificationFeedback.notificationOccurred(.error)
     }

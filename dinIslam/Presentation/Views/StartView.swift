@@ -20,9 +20,9 @@ struct StartView: View {
         self.viewModel = viewModel
     }
     
-    init(quizUseCase: QuizUseCaseProtocol, statsManager: StatsManager) {
+    init(quizUseCase: QuizUseCaseProtocol, statsManager: StatsManager, settingsManager: SettingsManager) {
         self._statsManager = StateObject(wrappedValue: statsManager)
-        self.viewModel = QuizViewModel(quizUseCase: quizUseCase, statsManager: statsManager)
+        self.viewModel = QuizViewModel(quizUseCase: quizUseCase, statsManager: statsManager, settingsManager: settingsManager)
     }
     
     var body: some View {
@@ -160,7 +160,8 @@ struct StartView: View {
 #Preview {
     StartView(
         quizUseCase: QuizUseCase(questionsRepository: QuestionsRepository()),
-        statsManager: StatsManager()
+        statsManager: StatsManager(),
+        settingsManager: SettingsManager()
     )
     .environmentObject(SettingsManager())
 }

@@ -83,6 +83,6 @@ struct MistakesReviewNavigationView: View {
 }
 
 #Preview {
-    let viewModel = QuizViewModel(quizUseCase: QuizUseCase(questionsRepository: QuestionsRepository()), statsManager: StatsManager())
+    let viewModel = QuizViewModel(quizUseCase: QuizUseCase(questionsRepository: QuestionsRepository()), statsManager: StatsManager(), settingsManager: SettingsManager())
     MistakesReviewNavigationView(viewModel: viewModel)
 }

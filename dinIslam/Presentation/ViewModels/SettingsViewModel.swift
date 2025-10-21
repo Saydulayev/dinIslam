@@ -13,7 +13,7 @@ import StoreKit
 @Observable
 class SettingsViewModel {
     private let settingsManager: SettingsManager
-    private let hapticManager = HapticManager()
+    private let hapticManager: HapticManager
     
     var settings: AppSettings
     var showingLanguagePicker = false
@@ -22,6 +22,7 @@ class SettingsViewModel {
     init(settingsManager: SettingsManager) {
         self.settingsManager = settingsManager
         self.settings = settingsManager.settings
+        self.hapticManager = HapticManager(settingsManager: settingsManager)
     }
     
     // MARK: - Language Settings

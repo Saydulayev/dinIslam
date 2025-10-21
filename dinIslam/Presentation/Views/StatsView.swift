@@ -9,6 +9,7 @@ import SwiftUI
 
 struct StatsView: View {
     @ObservedObject var statsManager: StatsManager
+    @EnvironmentObject private var settingsManager: SettingsManager
     @Environment(\.dismiss) private var dismiss
     @State private var mistakesViewModel: QuizViewModel?
     @State private var showingMistakesReview = false
@@ -167,7 +168,7 @@ struct StatsView: View {
         print("DEBUG: Wrong questions count: \(statsManager.stats.wrongQuestionIds.count)")
         
         let quizUseCase = QuizUseCase(questionsRepository: QuestionsRepository())
-        let viewModel = QuizViewModel(quizUseCase: quizUseCase, statsManager: statsManager)
+        let viewModel = QuizViewModel(quizUseCase: quizUseCase, statsManager: statsManager, settingsManager: settingsManager)
         
         mistakesViewModel = viewModel
         showingMistakesReview = true
