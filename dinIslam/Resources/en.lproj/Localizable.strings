@@ -42,7 +42,7 @@
 "settings.language.english" = "English";
 "settings.sound.title" = "Sound";
 "settings.haptic.title" = "Haptic Feedback";
-"settings.notifications.title" = "Notifications";
+"settings.notifications.title" = "Configure";
 
 // Support
 "settings.support" = "Support";

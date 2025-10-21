@@ -42,7 +42,7 @@
 "settings.language.english" = "English";
 "settings.sound.title" = "Звук";
 "settings.haptic.title" = "Тактильная обратная связь";
-"settings.notifications.title" = "Уведомления";
+"settings.notifications.title" = "Настроить";
 
 // Support
 "settings.support" = "Поддержка";
