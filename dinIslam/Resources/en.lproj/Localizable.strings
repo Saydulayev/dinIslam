@@ -126,25 +126,25 @@
 "achievements.congratulations" = "Congratulations!";
 
 // Achievement Titles
-"achievements.firstQuiz.title" = "First Steps";
-"achievements.perfectScore.title" = "Perfect Score";
-"achievements.speedRunner.title" = "Speed Runner";
-"achievements.scholar.title" = "Scholar";
-"achievements.dedicated.title" = "Dedicated Student";
-"achievements.master.title" = "Master";
-"achievements.streak.title" = "Winning Streak";
-"achievements.explorer.title" = "Explorer";
-"achievements.perfectionist.title" = "Perfectionist";
-"achievements.legend.title" = "Legend";
+"achievements.firstQuiz.title" = "Beginning of the Path";
+"achievements.perfectScore.title" = "Barakah";
+"achievements.speedRunner.title" = "Quick Mind";
+"achievements.scholar.title" = "Talib al-Ilm";
+"achievements.dedicated.title" = "Muta'allim";
+"achievements.master.title" = "Alim";
+"achievements.streak.title" = "Istiqamah";
+"achievements.explorer.title" = "Muhaddith";
+"achievements.perfectionist.title" = "Ihsan";
+"achievements.legend.title" = "Hafiz";
 
 // Achievement Descriptions
-"achievements.firstQuiz.description" = "Complete your first quiz";
-"achievements.perfectScore.description" = "Get 100% correct answers";
-"achievements.speedRunner.description" = "Complete a quiz in less than 2 minutes";
-"achievements.scholar.description" = "Study 100 questions";
-"achievements.dedicated.description" = "Complete 10 quizzes";
-"achievements.master.description" = "Complete 50 quizzes";
-"achievements.streak.description" = "Complete 5 quizzes in a row with 80%+ score";
-"achievements.explorer.description" = "Study 500 questions";
-"achievements.perfectionist.description" = "Get 10 perfect scores";
-"achievements.legend.description" = "Complete 100 quizzes";
+"achievements.firstQuiz.description" = "Take your first steps in learning Islam";
+"achievements.perfectScore.description" = "Show perfect knowledge";
+"achievements.speedRunner.description" = "Demonstrate quick thinking";
+"achievements.scholar.description" = "Study 100 Islamic questions";
+"achievements.dedicated.description" = "Show consistency in learning";
+"achievements.master.description" = "Reach the level of a scholar";
+"achievements.streak.description" = "Show consistency in knowledge";
+"achievements.explorer.description" = "Study 500 Islamic questions";
+"achievements.perfectionist.description" = "Achieve perfection 10 times";
+"achievements.legend.description" = "Become a keeper of knowledge";

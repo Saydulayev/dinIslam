@@ -126,25 +126,25 @@
 "achievements.congratulations" = "Поздравляем!";
 
 // Achievement Titles
-"achievements.firstQuiz.title" = "Первые шаги";
-"achievements.perfectScore.title" = "Идеальный результат";
-"achievements.speedRunner.title" = "Скоростной бегун";
-"achievements.scholar.title" = "Учёный";
-"achievements.dedicated.title" = "Преданный ученик";
-"achievements.master.title" = "Мастер";
-"achievements.streak.title" = "Серия побед";
-"achievements.explorer.title" = "Исследователь";
-"achievements.perfectionist.title" = "Перфекционист";
-"achievements.legend.title" = "Легенда";
+"achievements.firstQuiz.title" = "Начало пути";
+"achievements.perfectScore.title" = "Баракат";
+"achievements.speedRunner.title" = "Быстрый ум";
+"achievements.scholar.title" = "Талиб аль-ильм";
+"achievements.dedicated.title" = "Мутааллим";
+"achievements.master.title" = "Алим";
+"achievements.streak.title" = "Истикома";
+"achievements.explorer.title" = "Мухаддис";
+"achievements.perfectionist.title" = "Ихсан";
+"achievements.legend.title" = "Хафиз";
 
 // Achievement Descriptions
-"achievements.firstQuiz.description" = "Пройдите первую викторину";
-"achievements.perfectScore.description" = "Получите 100% правильных ответов";
-"achievements.speedRunner.description" = "Пройдите викторину менее чем за 2 минуты";
-"achievements.scholar.description" = "Изучите 100 вопросов";
-"achievements.dedicated.description" = "Пройдите 10 викторин";
-"achievements.master.description" = "Пройдите 50 викторин";
-"achievements.streak.description" = "Пройдите 5 викторин подряд с результатом выше 80%";
-"achievements.explorer.description" = "Изучите 500 вопросов";
-"achievements.perfectionist.description" = "Получите 10 раз идеальный результат";
-"achievements.legend.description" = "Пройдите 100 викторин";
+"achievements.firstQuiz.description" = "Сделайте первые шаги в изучении ислама";
+"achievements.perfectScore.description" = "Покажите совершенное знание";
+"achievements.speedRunner.description" = "Демонстрируйте быстроту ума";
+"achievements.scholar.description" = "Изучите 100 вопросов по исламу";
+"achievements.dedicated.description" = "Проявите постоянство в учении";
+"achievements.master.description" = "Достигните уровня знатока";
+"achievements.streak.description" = "Покажите постоянство в знаниях";
+"achievements.explorer.description" = "Изучите 500 вопросов по исламу";
+"achievements.perfectionist.description" = "Достигните совершенства 10 раз";
+"achievements.legend.description" = "Станьте хранителем знаний";
