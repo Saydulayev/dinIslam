@@ -9,7 +9,6 @@ import Foundation
 import Observation
 import UIKit
 import StoreKit
-import MessageUI
 
 @Observable
 class SettingsViewModel {
@@ -18,15 +17,11 @@ class SettingsViewModel {
     
     var settings: AppSettings
     var showingLanguagePicker = false
-    var showingFeedbackAlert = false
-    var showingRateAlert = false
-    var canSendMail = false
     var refreshTrigger = UUID()
     
     init(settingsManager: SettingsManager) {
         self.settingsManager = settingsManager
         self.settings = settingsManager.settings
-        self.canSendMail = MFMailComposeViewController.canSendMail()
     }
     
     // MARK: - Language Settings
@@ -76,22 +71,7 @@ class SettingsViewModel {
         hapticManager.selectionChanged()
     }
     
-    // MARK: - Feedback Actions
-    func sendFeedback() {
-        hapticManager.selectionChanged()
-        
-        if canSendMail {
-            showingFeedbackAlert = true
-        } else {
-            // Fallback to App Store review
-            requestAppReview()
-        }
-    }
     
-    func rateApp() {
-        hapticManager.selectionChanged()
-        showingRateAlert = true
-    }
     
     func requestAppReview() {
         if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {

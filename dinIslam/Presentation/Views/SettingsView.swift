@@ -110,7 +110,10 @@ struct SettingsView: View {
                         title: "settings.feedback.title",
                         subtitle: "settings.feedback.subtitle"
                     ) {
-                        viewModel.sendFeedback()
+                        // Open email client directly
+                        if let url = URL(string: "mailto:saydulayev.wien@gmail.com?subject=Feedback&body=") {
+                            UIApplication.shared.open(url)
+                        }
                     }
                     
                     // Rate App
@@ -120,7 +123,7 @@ struct SettingsView: View {
                         title: "settings.rate.title",
                         subtitle: "settings.rate.subtitle"
                     ) {
-                        viewModel.rateApp()
+                        viewModel.requestAppReview()
                     }
                     
                     // Share App
@@ -214,29 +217,6 @@ struct SettingsView: View {
         }
         .sheet(isPresented: $viewModel.showingLanguagePicker) {
             LanguagePickerView(viewModel: viewModel)
-        }
-        .alert(LocalizationManager.shared.localizedString(for: "settings.feedback.title"), isPresented: $viewModel.showingFeedbackAlert) {
-            Button(LocalizationManager.shared.localizedString(for: "settings.feedback.email")) {
-                // Open email client
-                if let url = URL(string: "mailto:support@dinislam.com?subject=Feedback&body=") {
-                    UIApplication.shared.open(url)
-                }
-            }
-            Button(LocalizationManager.shared.localizedString(for: "settings.feedback.appStore")) {
-                viewModel.requestAppReview()
-            }
-            Button(LocalizationManager.shared.localizedString(for: "settings.cancel"), role: .cancel) { }
-        } message: {
-            Text(LocalizationManager.shared.localizedString(for: "settings.feedback.message"))
-        }
-        .alert(LocalizationManager.shared.localizedString(for: "settings.rate.title"), isPresented: $viewModel.showingRateAlert) {
-            Button(LocalizationManager.shared.localizedString(for: "settings.rate.now")) {
-                viewModel.requestAppReview()
-            }
-            Button(LocalizationManager.shared.localizedString(for: "settings.rate.later")) { }
-            Button(LocalizationManager.shared.localizedString(for: "settings.cancel"), role: .cancel) { }
-        } message: {
-            Text(LocalizationManager.shared.localizedString(for: "settings.rate.message"))
         }
     }
 }
