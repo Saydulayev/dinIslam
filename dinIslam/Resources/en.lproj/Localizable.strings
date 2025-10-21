@@ -154,7 +154,7 @@
 "notification.body" = "Don't forget to learn new Islamic knowledge today!";
 "notification.permission.title" = "Allow Notifications";
 "notification.permission.message" = "Get reminders for daily study";
-"notification.settings.title" = "Notification Settings";
+"notification.settings.title" = "Notifications";
 "notification.settings.enabled" = "Enable Reminders";
 "notification.settings.time" = "Reminder Time";
 "notification.settings.test" = "Test Notification";
