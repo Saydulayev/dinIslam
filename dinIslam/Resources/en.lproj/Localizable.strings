@@ -42,7 +42,7 @@
 "settings.language.english" = "English";
 "settings.sound.title" = "Sound";
 "settings.haptic.title" = "Haptic Feedback";
-"settings.notifications.title" = "Configure";
+"settings.notifications.title" = "Notifications";
 
 // Support
 "settings.support" = "Support";
@@ -154,7 +154,7 @@
 "notification.body" = "Don't forget to learn new Islamic knowledge today!";
 "notification.permission.title" = "Allow Notifications";
 "notification.permission.message" = "Get reminders for daily study";
-"notification.settings.title" = "Notifications";
+"notification.settings.title" = "Configure";
 "notification.settings.enabled" = "Enable Reminders";
 "notification.settings.time" = "Reminder Time";
 "notification.settings.test" = "Test Notification";

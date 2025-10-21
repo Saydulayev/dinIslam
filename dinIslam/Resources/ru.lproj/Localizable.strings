@@ -42,7 +42,7 @@
 "settings.language.english" = "English";
 "settings.sound.title" = "Звук";
 "settings.haptic.title" = "Тактильная обратная связь";
-"settings.notifications.title" = "Настроить";
+"settings.notifications.title" = "Уведомления";
 
 // Support
 "settings.support" = "Поддержка";
@@ -154,7 +154,7 @@
 "notification.body" = "Не забудьте изучить новые знания об исламе сегодня!";
 "notification.permission.title" = "Разрешить уведомления";
 "notification.permission.message" = "Получайте напоминания о ежедневном изучении";
-"notification.settings.title" = "Уведомления";
+"notification.settings.title" = "Настроить";
 "notification.settings.enabled" = "Включить напоминания";
 "notification.settings.time" = "Время напоминания";
 "notification.settings.test" = "Тестовое уведомление";
