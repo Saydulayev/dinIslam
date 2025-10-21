@@ -132,7 +132,7 @@ struct StartView: View {
                 AchievementsView()
             }
             .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
+                ToolbarItem(placement: .topBarLeading) {
                     Button(action: {
                         showingStats = true
                     }) {
@@ -141,7 +141,7 @@ struct StartView: View {
                     }
                 }
                 
-                ToolbarItem(placement: .principal) {
+                ToolbarItem(placement: .topBarLeading) {
                     Button(action: {
                         showingAchievements = true
                     }) {
@@ -150,7 +150,7 @@ struct StartView: View {
                     }
                 }
                 
-                ToolbarItem(placement: .navigationBarTrailing) {
+                ToolbarItem(placement: .topBarTrailing) {
                     Button(action: {
                         showingSettings = true
                     }) {
