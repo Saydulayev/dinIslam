@@ -85,6 +85,7 @@
 "stats.correctAnswers" = "Правильных ответов";
 "stats.incorrectAnswers" = "Неправильных";
 "stats.correctedMistakes" = "Исправлено ошибок";
+"stats.totalQuestions" = "Всего вопросов";
 "stats.progress" = "Прогресс";
 "stats.quizzesCompleted" = "Завершено викторин";
 "stats.lastQuiz" = "Последняя викторина:";

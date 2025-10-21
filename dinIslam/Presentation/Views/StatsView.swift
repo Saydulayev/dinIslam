@@ -13,6 +13,7 @@ struct StatsView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var mistakesViewModel: QuizViewModel?
     @State private var showingMistakesReview = false
+    @State private var totalQuestionsCount: Int = 0
     
     var body: some View {
         GeometryReader { geometry in
@@ -68,6 +69,14 @@ struct StatsView: View {
                             value: "\(statsManager.stats.correctedMistakes)",
                             icon: "checkmark.circle.badge.xmark",
                             color: .orange,
+                            isCompact: geometry.size.height < 700
+                        )
+                        
+                        StatCard(
+                            title: LocalizationManager.shared.localizedString(for: "stats.totalQuestions"),
+                            value: "\(totalQuestionsCount)",
+                            icon: "book.fill",
+                            color: .purple,
                             isCompact: geometry.size.height < 700
                         )
                     }
@@ -160,6 +169,29 @@ struct StatsView: View {
                     MistakesReviewNavigationView(viewModel: viewModel)
                 }
             }
+            .onAppear {
+                loadTotalQuestionsCount()
+            }
+    }
+    
+    private func loadTotalQuestionsCount() {
+        Task {
+            do {
+                let questionsRepository = QuestionsRepository()
+                let currentLanguage = settingsManager.currentLanguage.rawValue
+                let questions = try await questionsRepository.loadQuestions(language: currentLanguage)
+                
+                await MainActor.run {
+                    totalQuestionsCount = questions.count
+                    print("📊 StatsView: Loaded \(questions.count) total questions")
+                }
+            } catch {
+                print("❌ StatsView: Failed to load questions count: \(error)")
+                await MainActor.run {
+                    totalQuestionsCount = 0
+                }
+            }
+        }
     }
     
     private func startMistakesReview() {
