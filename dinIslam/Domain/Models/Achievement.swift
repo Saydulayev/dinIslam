@@ -133,7 +133,7 @@ enum AchievementType: String, Codable, CaseIterable {
         case .speedRunner:
             return LocalizationManager.shared.localizedString(for: "achievements.speedRunner.description")
         case .scholar:
-            return LocalizationManager.shared.localizedString(for: "achievements.scholar.title")
+            return LocalizationManager.shared.localizedString(for: "achievements.scholar.description")
         case .dedicated:
             return LocalizationManager.shared.localizedString(for: "achievements.dedicated.description")
         case .master:
