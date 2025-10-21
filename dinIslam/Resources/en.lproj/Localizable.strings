@@ -129,13 +129,13 @@
 "achievements.firstQuiz.title" = "Beginning of the Path";
 "achievements.perfectScore.title" = "Barakah";
 "achievements.speedRunner.title" = "Quick Mind";
-"achievements.scholar.title" = "Talib al-Ilm";
-"achievements.dedicated.title" = "Muta'allim";
-"achievements.master.title" = "Alim";
-"achievements.streak.title" = "Istiqamah";
-"achievements.explorer.title" = "Muhaddith";
-"achievements.perfectionist.title" = "Ihsan";
-"achievements.legend.title" = "Hafiz";
+"achievements.scholar.title" = "Student";
+"achievements.dedicated.title" = "Diligent";
+"achievements.master.title" = "Knowledgeable";
+"achievements.streak.title" = "Steadfast";
+"achievements.explorer.title" = "Explorer";
+"achievements.perfectionist.title" = "Perfect";
+"achievements.legend.title" = "Wise";
 
 // Achievement Descriptions
 "achievements.firstQuiz.description" = "Take your first steps in learning Islam";

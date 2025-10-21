@@ -129,13 +129,13 @@
 "achievements.firstQuiz.title" = "Начало пути";
 "achievements.perfectScore.title" = "Баракат";
 "achievements.speedRunner.title" = "Быстрый ум";
-"achievements.scholar.title" = "Талиб аль-ильм";
-"achievements.dedicated.title" = "Мутааллим";
-"achievements.master.title" = "Алим";
-"achievements.streak.title" = "Истикома";
-"achievements.explorer.title" = "Мухаддис";
-"achievements.perfectionist.title" = "Ихсан";
-"achievements.legend.title" = "Хафиз";
+"achievements.scholar.title" = "Ученик";
+"achievements.dedicated.title" = "Усердный";
+"achievements.master.title" = "Знающий";
+"achievements.streak.title" = "Постоянный";
+"achievements.explorer.title" = "Исследователь";
+"achievements.perfectionist.title" = "Совершенный";
+"achievements.legend.title" = "Мудрый";
 
 // Achievement Descriptions
 "achievements.firstQuiz.description" = "Сделайте первые шаги в изучении ислама";
