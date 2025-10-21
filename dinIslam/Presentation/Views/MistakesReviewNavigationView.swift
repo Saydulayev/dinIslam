@@ -46,6 +46,27 @@ struct MistakesReviewNavigationView: View {
                 case .mistakesFinished:
                     MistakesResultView(viewModel: viewModel)
                     
+                case .idle:
+                    // User stopped the mistakes review, go back
+                    VStack(spacing: 20) {
+                        Image(systemName: "checkmark.circle.fill")
+                            .font(.system(size: 60))
+                            .foregroundColor(.green)
+                        
+                        Text(LocalizationManager.shared.localizedString(for: "mistakes.stopped"))
+                            .font(.headline)
+                            .foregroundColor(.primary)
+                        
+                        Button(LocalizationManager.shared.localizedString(for: "mistakes.back")) {
+                            dismiss()
+                        }
+                        .padding()
+                        .background(.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    
                 default:
                     VStack(spacing: 20) {
                         Text(LocalizationManager.shared.localizedString(for: "mistakes.error"))

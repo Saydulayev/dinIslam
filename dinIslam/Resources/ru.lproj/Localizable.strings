@@ -109,6 +109,7 @@
 "mistakes.result.repeatAgain" = "Повторить снова";
 "mistakes.result.backToStart" = "В главное меню";
 "mistakes.loading" = "Загрузка...";
+"mistakes.stopped" = "Повторение остановлено";
 "mistakes.error" = "Произошла ошибка";
 "mistakes.back" = "Назад";
 "mistakes.close" = "Закрыть";

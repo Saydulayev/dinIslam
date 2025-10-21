@@ -109,6 +109,7 @@
 "mistakes.result.repeatAgain" = "Repeat Again";
 "mistakes.result.backToStart" = "Back to Start";
 "mistakes.loading" = "Loading...";
+"mistakes.stopped" = "Review stopped";
 "mistakes.error" = "An error occurred";
 "mistakes.back" = "Back";
 "mistakes.close" = "Close";
