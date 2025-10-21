@@ -11,6 +11,7 @@ struct AchievementsView: View {
     @StateObject private var achievementManager = AchievementManager()
     @Environment(\.dismiss) private var dismiss
     @ObservedObject private var localizationManager = LocalizationManager.shared
+    @EnvironmentObject private var settingsManager: SettingsManager
     
     var body: some View {
         NavigationStack {

@@ -37,7 +37,7 @@ struct StartView: View {
                         .font(.system(size: 80))
                         .foregroundStyle(.blue.gradient)
                     
-                    Text("Tabiin Academy")
+                    LocalizedText("app.name")
                         .font(.largeTitle)
                         .fontWeight(.bold)
                         .foregroundStyle(.primary)

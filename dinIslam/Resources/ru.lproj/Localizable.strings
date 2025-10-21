@@ -5,6 +5,7 @@
 */
 
 // Start View
+"app.name" = "Tabiin Academy";
 "start.description" = "Знание – прежде слов и деяний!";
 "start.begin" = "Начать изучение";
 "start.loading" = "Загрузка...";
@@ -37,6 +38,8 @@
 "settings.appSettings" = "Настройки приложения";
 "settings.language.title" = "Язык";
 "settings.language.system" = "Системный";
+"settings.language.russian" = "Русский";
+"settings.language.english" = "English";
 "settings.sound.title" = "Звук";
 "settings.haptic.title" = "Тактильная обратная связь";
 "settings.notifications.title" = "Уведомления";

@@ -37,9 +37,9 @@ enum AppLanguage: String, CaseIterable, Codable {
         case .system:
             return LocalizationManager.shared.localizedString(for: "settings.language.system")
         case .russian:
-            return "Русский"
+            return LocalizationManager.shared.localizedString(for: "settings.language.russian")
         case .english:
-            return "English"
+            return LocalizationManager.shared.localizedString(for: "settings.language.english")
         }
     }
     

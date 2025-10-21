@@ -86,8 +86,8 @@ struct AchievementNotificationView: View {
         AchievementNotificationView(
             achievement: Achievement(
                 id: "test",
-                title: "Первые шаги",
-                description: "Пройдите первую викторину",
+                title: LocalizationManager.shared.localizedString(for: "achievements.firstQuiz.title"),
+                description: LocalizationManager.shared.localizedString(for: "achievements.firstQuiz.description"),
                 icon: "play.circle.fill",
                 color: .blue,
                 type: .firstQuiz,

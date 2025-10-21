@@ -19,6 +19,36 @@ class AchievementManager: ObservableObject {
     init() {
         loadAchievements()
         initializeDefaultAchievements()
+        
+        // Listen for language changes
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(languageChanged),
+            name: .languageChanged,
+            object: nil
+        )
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    @objc private func languageChanged() {
+        // Update achievement titles and descriptions when language changes
+        for i in 0..<achievements.count {
+            achievements[i] = Achievement(
+                id: achievements[i].id,
+                title: achievements[i].type.localizedTitle,
+                description: achievements[i].type.localizedDescription,
+                icon: achievements[i].icon,
+                color: achievements[i].color,
+                type: achievements[i].type,
+                requirement: achievements[i].requirement,
+                isUnlocked: achievements[i].isUnlocked,
+                unlockedDate: achievements[i].unlockedDate
+            )
+        }
+        saveAchievements()
     }
     
     // MARK: - Public Methods
@@ -86,8 +116,8 @@ class AchievementManager: ObservableObject {
         return [
             Achievement(
                 id: "first_quiz",
-                title: "Первые шаги",
-                description: "Пройдите первую викторину",
+                title: AchievementType.firstQuiz.localizedTitle,
+                description: AchievementType.firstQuiz.localizedDescription,
                 icon: "play.circle.fill",
                 color: .blue,
                 type: .firstQuiz,
@@ -95,8 +125,8 @@ class AchievementManager: ObservableObject {
             ),
             Achievement(
                 id: "perfect_score",
-                title: "Идеальный результат",
-                description: "Получите 100% правильных ответов",
+                title: AchievementType.perfectScore.localizedTitle,
+                description: AchievementType.perfectScore.localizedDescription,
                 icon: "star.fill",
                 color: .yellow,
                 type: .perfectScore,
@@ -104,8 +134,8 @@ class AchievementManager: ObservableObject {
             ),
             Achievement(
                 id: "speed_runner",
-                title: "Скоростной бегун",
-                description: "Пройдите викторину менее чем за 2 минуты",
+                title: AchievementType.speedRunner.localizedTitle,
+                description: AchievementType.speedRunner.localizedDescription,
                 icon: "timer",
                 color: .orange,
                 type: .speedRunner,
@@ -113,8 +143,8 @@ class AchievementManager: ObservableObject {
             ),
             Achievement(
                 id: "scholar",
-                title: "Учёный",
-                description: "Изучите 100 вопросов",
+                title: AchievementType.scholar.localizedTitle,
+                description: AchievementType.scholar.localizedDescription,
                 icon: "book.fill",
                 color: .purple,
                 type: .scholar,
@@ -122,8 +152,8 @@ class AchievementManager: ObservableObject {
             ),
             Achievement(
                 id: "dedicated",
-                title: "Преданный ученик",
-                description: "Пройдите 10 викторин",
+                title: AchievementType.dedicated.localizedTitle,
+                description: AchievementType.dedicated.localizedDescription,
                 icon: "flame.fill",
                 color: .red,
                 type: .dedicated,
@@ -131,8 +161,8 @@ class AchievementManager: ObservableObject {
             ),
             Achievement(
                 id: "master",
-                title: "Мастер",
-                description: "Пройдите 50 викторин",
+                title: AchievementType.master.localizedTitle,
+                description: AchievementType.master.localizedDescription,
                 icon: "crown.fill",
                 color: .yellow,
                 type: .master,
@@ -140,8 +170,8 @@ class AchievementManager: ObservableObject {
             ),
             Achievement(
                 id: "streak",
-                title: "Серия побед",
-                description: "Пройдите 5 викторин подряд с результатом выше 80%",
+                title: AchievementType.streak.localizedTitle,
+                description: AchievementType.streak.localizedDescription,
                 icon: "bolt.fill",
                 color: .cyan,
                 type: .streak,
@@ -149,8 +179,8 @@ class AchievementManager: ObservableObject {
             ),
             Achievement(
                 id: "explorer",
-                title: "Исследователь",
-                description: "Изучите 500 вопросов",
+                title: AchievementType.explorer.localizedTitle,
+                description: AchievementType.explorer.localizedDescription,
                 icon: "globe",
                 color: .green,
                 type: .explorer,
@@ -158,8 +188,8 @@ class AchievementManager: ObservableObject {
             ),
             Achievement(
                 id: "perfectionist",
-                title: "Перфекционист",
-                description: "Получите 10 раз идеальный результат",
+                title: AchievementType.perfectionist.localizedTitle,
+                description: AchievementType.perfectionist.localizedDescription,
                 icon: "diamond.fill",
                 color: .pink,
                 type: .perfectionist,
@@ -167,8 +197,8 @@ class AchievementManager: ObservableObject {
             ),
             Achievement(
                 id: "legend",
-                title: "Легенда",
-                description: "Пройдите 100 викторин",
+                title: AchievementType.legend.localizedTitle,
+                description: AchievementType.legend.localizedDescription,
                 icon: "trophy.fill",
                 color: .indigo,
                 type: .legend,
