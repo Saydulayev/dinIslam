@@ -32,8 +32,9 @@ struct StatsView: View {
                 .padding(.top, 8)
                 .padding(.bottom, 16)
                 
-                // Основной контент
-                VStack(spacing: 20) {
+                // Основной контент - с скроллом
+                ScrollView {
+                    VStack(spacing: 20) {
                     // Stats Cards - адаптивная сетка
                     let cardSpacing: CGFloat = geometry.size.height < 700 ? 16 : 20
                     
@@ -235,8 +236,10 @@ struct StatsView: View {
                             .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
                         }
                     }
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 20)
                 }
-                .padding(.horizontal, 16)
                 
                 Spacer()
             }
