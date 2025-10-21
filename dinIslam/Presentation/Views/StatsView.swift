@@ -34,7 +34,6 @@ struct StatsView: View {
                 VStack(spacing: 20) {
                     // Stats Cards - адаптивная сетка
                     let cardSpacing: CGFloat = geometry.size.height < 700 ? 16 : 20
-                    let cardPadding: CGFloat = geometry.size.height < 700 ? 12 : 16
                     
                     LazyVGrid(columns: [
                         GridItem(.flexible()),
