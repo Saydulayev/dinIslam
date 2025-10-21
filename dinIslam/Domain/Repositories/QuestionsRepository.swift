@@ -13,12 +13,31 @@ protocol QuestionsRepositoryProtocol {
 
 class QuestionsRepository: QuestionsRepositoryProtocol {
     private let bundle: Bundle
+    private let remoteService: RemoteQuestionsService
+    private let useRemoteQuestions: Bool
     
-    init(bundle: Bundle = .main) {
+    init(bundle: Bundle = .main, remoteService: RemoteQuestionsService = RemoteQuestionsService(), useRemoteQuestions: Bool = true) {
         self.bundle = bundle
+        self.remoteService = remoteService
+        self.useRemoteQuestions = useRemoteQuestions
     }
     
     func loadQuestions(language: String) async throws -> [Question] {
+        let appLanguage: AppLanguage = language == "en" ? .english : .russian
+        
+        if useRemoteQuestions {
+            // Try to load from remote first
+            let remoteQuestions = await remoteService.fetchQuestions(for: appLanguage)
+            if !remoteQuestions.isEmpty {
+                return remoteQuestions
+            }
+        }
+        
+        // Fallback to local questions
+        return try loadLocalQuestions(language: language)
+    }
+    
+    private func loadLocalQuestions(language: String) throws -> [Question] {
         let fileName = language == "en" ? "questions_en" : "questions"
         guard let url = bundle.url(forResource: fileName, withExtension: "json") else {
             throw QuestionsError.fileNotFound
