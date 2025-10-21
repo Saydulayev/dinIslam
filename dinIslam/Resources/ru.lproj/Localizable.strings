@@ -95,6 +95,7 @@
 "stats.sync.sync" = "Синхронизировать";
 "stats.progress" = "Прогресс";
 "stats.quizzesCompleted" = "Завершено викторин";
+"stats.currentStreak" = "Серия побед";
 "stats.lastQuiz" = "Последняя викторина:";
 "stats.wrongQuestions" = "Вопросы для повторения";
 "stats.wrongQuestionsCount" = "Неправильных вопросов:";

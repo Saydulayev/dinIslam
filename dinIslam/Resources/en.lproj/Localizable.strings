@@ -95,6 +95,7 @@
 "stats.sync.sync" = "Sync";
 "stats.progress" = "Progress";
 "stats.quizzesCompleted" = "Quizzes Completed";
+"stats.currentStreak" = "Win Streak";
 "stats.lastQuiz" = "Last Quiz:";
 "stats.wrongQuestions" = "Questions to Review";
 "stats.wrongQuestionsCount" = "Wrong Questions:";

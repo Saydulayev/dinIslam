@@ -83,34 +83,26 @@ struct StatsView: View {
                         )
                     }
                     
-                    // Progress Section - увеличенная
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text(LocalizationManager.shared.localizedString(for: "stats.progress"))
-                            .font(geometry.size.height < 700 ? .title3 : .title2)
-                            .fontWeight(.semibold)
+                    // Progress Cards - в стиле основных карточек
+                    LazyVGrid(columns: [
+                        GridItem(.flexible()),
+                        GridItem(.flexible())
+                    ], spacing: cardSpacing) {
+                        StatCard(
+                            title: LocalizationManager.shared.localizedString(for: "stats.quizzesCompleted"),
+                            value: "\(statsManager.stats.totalQuizzesCompleted)",
+                            icon: "checkmark.circle.fill",
+                            color: .blue,
+                            isCompact: geometry.size.height < 700
+                        )
                         
-                        VStack(spacing: 10) {
-                            ProgressRow(
-                                title: LocalizationManager.shared.localizedString(for: "stats.quizzesCompleted"),
-                                value: statsManager.stats.totalQuizzesCompleted,
-                                color: .blue,
-                                isCompact: geometry.size.height < 700
-                            )
-                            
-                            if let lastQuiz = statsManager.stats.lastQuizDate {
-                                HStack {
-                                    Text(LocalizationManager.shared.localizedString(for: "stats.lastQuiz"))
-                                        .font(geometry.size.height < 700 ? .caption : .subheadline)
-                                        .foregroundColor(.secondary)
-                                    Spacer()
-                                    Text(lastQuiz, style: .date)
-                                        .font(geometry.size.height < 700 ? .caption : .subheadline)
-                                        .fontWeight(.medium)
-                                }
-                            }
-                        }
-                        .padding(geometry.size.height < 700 ? 16 : 20)
-                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
+                        StatCard(
+                            title: LocalizationManager.shared.localizedString(for: "stats.currentStreak"),
+                            value: "\(statsManager.stats.currentStreak)",
+                            icon: "flame.fill",
+                            color: .orange,
+                            isCompact: geometry.size.height < 700
+                        )
                     }
                     
                     // Sync Section
