@@ -86,6 +86,13 @@
 "stats.incorrectAnswers" = "Неправильных";
 "stats.correctedMistakes" = "Исправлено ошибок";
 "stats.totalQuestions" = "Всего вопросов";
+"stats.sync.title" = "Синхронизация";
+"stats.sync.status" = "Статус";
+"stats.sync.available" = "Доступны обновления";
+"stats.sync.upToDate" = "Актуально";
+"stats.sync.newQuestions" = "Новых вопросов";
+"stats.sync.check" = "Проверить";
+"stats.sync.sync" = "Синхронизировать";
 "stats.progress" = "Прогресс";
 "stats.quizzesCompleted" = "Завершено викторин";
 "stats.lastQuiz" = "Последняя викторина:";

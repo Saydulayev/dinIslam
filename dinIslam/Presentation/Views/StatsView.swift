@@ -14,6 +14,7 @@ struct StatsView: View {
     @State private var mistakesViewModel: QuizViewModel?
     @State private var showingMistakesReview = false
     @State private var totalQuestionsCount: Int = 0
+    @StateObject private var remoteService = RemoteQuestionsService()
     
     var body: some View {
         GeometryReader { geometry in
@@ -111,6 +112,91 @@ struct StatsView: View {
                         .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
                     }
                     
+                    // Sync Section
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text(LocalizationManager.shared.localizedString(for: "stats.sync.title"))
+                            .font(geometry.size.height < 700 ? .title3 : .title2)
+                            .fontWeight(.semibold)
+                        
+                        VStack(spacing: 12) {
+                            HStack {
+                                Text(LocalizationManager.shared.localizedString(for: "stats.sync.status"))
+                                    .font(geometry.size.height < 700 ? .subheadline : .body)
+                                    .foregroundColor(.secondary)
+                                Spacer()
+                                if remoteService.isLoading {
+                                    ProgressView()
+                                        .scaleEffect(0.8)
+                                } else if remoteService.hasUpdates {
+                                    Text(LocalizationManager.shared.localizedString(for: "stats.sync.available"))
+                                        .font(geometry.size.height < 700 ? .subheadline : .body)
+                                        .fontWeight(.semibold)
+                                        .foregroundColor(.green)
+                                } else {
+                                    Text(LocalizationManager.shared.localizedString(for: "stats.sync.upToDate"))
+                                        .font(geometry.size.height < 700 ? .subheadline : .body)
+                                        .fontWeight(.semibold)
+                                        .foregroundColor(.blue)
+                                }
+                            }
+                            
+                            if remoteService.hasUpdates {
+                                HStack {
+                                    Text(LocalizationManager.shared.localizedString(for: "stats.sync.newQuestions"))
+                                        .font(geometry.size.height < 700 ? .caption : .subheadline)
+                                        .foregroundColor(.secondary)
+                                    Spacer()
+                                    Text("+\(remoteService.remoteQuestionsCount - remoteService.cachedQuestionsCount)")
+                                        .font(geometry.size.height < 700 ? .caption : .subheadline)
+                                        .fontWeight(.semibold)
+                                        .foregroundColor(.green)
+                                }
+                            }
+                            
+                            HStack(spacing: 12) {
+                                Button(action: {
+                                    Task {
+                                        await checkForUpdates()
+                                    }
+                                }) {
+                                    HStack {
+                                        Image(systemName: "arrow.clockwise")
+                                            .font(geometry.size.height < 700 ? .subheadline : .body)
+                                        Text(LocalizationManager.shared.localizedString(for: "stats.sync.check"))
+                                            .font(geometry.size.height < 700 ? .subheadline : .body)
+                                    }
+                                    .foregroundColor(.white)
+                                    .frame(maxWidth: .infinity)
+                                    .frame(height: geometry.size.height < 700 ? 44 : 50)
+                                    .background(.blue.gradient, in: RoundedRectangle(cornerRadius: 12))
+                                }
+                                .disabled(remoteService.isLoading)
+                                
+                                if remoteService.hasUpdates {
+                                    Button(action: {
+                                        Task {
+                                            await syncQuestions()
+                                        }
+                                    }) {
+                                        HStack {
+                                            Image(systemName: "arrow.down.circle")
+                                                .font(geometry.size.height < 700 ? .subheadline : .body)
+                                            Text(LocalizationManager.shared.localizedString(for: "stats.sync.sync"))
+                                                .font(geometry.size.height < 700 ? .subheadline : .body)
+                                        }
+                                        .foregroundColor(.white)
+                                        .frame(maxWidth: .infinity)
+                                        .frame(height: geometry.size.height < 700 ? 44 : 50)
+                                        .background(.green.gradient, in: RoundedRectangle(cornerRadius: 12))
+                                    }
+                                    .disabled(remoteService.isLoading)
+                                }
+                            }
+                        }
+                        .padding(geometry.size.height < 700 ? 16 : 20)
+                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
+                    }
+                    
                     // Wrong Questions Section - увеличенная
                     if !statsManager.stats.wrongQuestionIds.isEmpty {
                         VStack(alignment: .leading, spacing: 12) {
@@ -191,6 +277,27 @@ struct StatsView: View {
                     totalQuestionsCount = 0
                 }
             }
+        }
+    }
+    
+    private func checkForUpdates() async {
+        let currentLanguage: AppLanguage = settingsManager.settings.language == .system ? 
+            (Locale.current.language.languageCode?.identifier == "en" ? .english : .russian) :
+            settingsManager.settings.language
+        
+        await remoteService.checkForUpdates(for: currentLanguage)
+    }
+    
+    private func syncQuestions() async {
+        let currentLanguage: AppLanguage = settingsManager.settings.language == .system ? 
+            (Locale.current.language.languageCode?.identifier == "en" ? .english : .russian) :
+            settingsManager.settings.language
+        
+        let questions = await remoteService.forceSync(for: currentLanguage)
+        
+        await MainActor.run {
+            totalQuestionsCount = questions.count
+            print("🔄 StatsView: Synced \(questions.count) questions")
         }
     }
     

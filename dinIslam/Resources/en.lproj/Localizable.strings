@@ -86,6 +86,13 @@
 "stats.incorrectAnswers" = "Incorrect";
 "stats.correctedMistakes" = "Mistakes Corrected";
 "stats.totalQuestions" = "Total Questions";
+"stats.sync.title" = "Sync";
+"stats.sync.status" = "Status";
+"stats.sync.available" = "Updates Available";
+"stats.sync.upToDate" = "Up to Date";
+"stats.sync.newQuestions" = "New Questions";
+"stats.sync.check" = "Check";
+"stats.sync.sync" = "Sync";
 "stats.progress" = "Progress";
 "stats.quizzesCompleted" = "Quizzes Completed";
 "stats.lastQuiz" = "Last Quiz:";

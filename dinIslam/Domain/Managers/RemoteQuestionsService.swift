@@ -11,6 +11,9 @@ import Combine
 class RemoteQuestionsService: ObservableObject {
     @Published var isLoading = false
     @Published var lastUpdateDate: Date?
+    @Published var hasUpdates = false
+    @Published var remoteQuestionsCount = 0
+    @Published var cachedQuestionsCount = 0
     
     private let baseURL = "https://raw.githubusercontent.com/Saydulayev/dinIslam-questions/main"
     private let userDefaults = UserDefaults.standard
@@ -122,6 +125,79 @@ class RemoteQuestionsService: ObservableObject {
         }
         
         return questions
+    }
+    // MARK: - Update Check Methods
+    
+    func checkForUpdates(for language: AppLanguage) async {
+        await MainActor.run {
+            isLoading = true
+        }
+        
+        defer {
+            Task { @MainActor in
+                isLoading = false
+            }
+        }
+        
+        do {
+            // Get remote questions count
+            let remoteQuestions = try await loadFromRemote(language: language)
+            let remoteCount = remoteQuestions.count
+            
+            // Get cached questions count
+            let cachedQuestions = getCachedQuestions(for: language) ?? []
+            let cachedCount = cachedQuestions.count
+            
+            await MainActor.run {
+                remoteQuestionsCount = remoteCount
+                cachedQuestionsCount = cachedCount
+                hasUpdates = remoteCount > cachedCount
+                
+                print("🔄 Update check: Remote=\(remoteCount), Cached=\(cachedCount), HasUpdates=\(hasUpdates)")
+            }
+        } catch {
+            print("❌ Failed to check for updates: \(error)")
+            await MainActor.run {
+                hasUpdates = false
+            }
+        }
+    }
+    
+    func forceSync(for language: AppLanguage) async -> [Question] {
+        print("🔄 Force sync started for \(language.rawValue)")
+        
+        await MainActor.run {
+            isLoading = true
+        }
+        
+        defer {
+            Task { @MainActor in
+                isLoading = false
+            }
+        }
+        
+        do {
+            // Force fetch from remote
+            let remoteQuestions = try await loadFromRemote(language: language)
+            
+            // Cache the questions locally
+            await cacheQuestions(remoteQuestions, for: language)
+            
+            // Update last update date
+            await MainActor.run {
+                lastUpdateDate = Date()
+                userDefaults.set(Date(), forKey: lastUpdateKey)
+                hasUpdates = false
+                cachedQuestionsCount = remoteQuestions.count
+                remoteQuestionsCount = remoteQuestions.count
+            }
+            
+            print("✅ Force sync completed: \(remoteQuestions.count) questions")
+            return remoteQuestions
+        } catch {
+            print("❌ Force sync failed: \(error)")
+            return getCachedQuestions(for: language) ?? []
+        }
     }
 }
 
