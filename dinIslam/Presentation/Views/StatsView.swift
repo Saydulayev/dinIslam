@@ -14,94 +14,109 @@ struct StatsView: View {
     @State private var showingMistakesReview = false
     
     var body: some View {
-        ScrollView {
-                VStack(spacing: 24) {
-                    // Header
-                    VStack(spacing: 16) {
-                        Image(systemName: "chart.bar.fill")
-                            .font(.system(size: 60))
-                            .foregroundStyle(.blue.gradient)
-                        
-                        Text(LocalizationManager.shared.localizedString(for: "stats.title"))
-                            .font(.largeTitle)
-                            .fontWeight(.bold)
-                    }
-                    .padding(.top)
+        GeometryReader { geometry in
+            VStack(spacing: 0) {
+                // Header - компактный
+                VStack(spacing: 8) {
+                    Image(systemName: "chart.bar.fill")
+                        .font(.system(size: geometry.size.height < 700 ? 40 : 50))
+                        .foregroundStyle(.blue.gradient)
                     
-                    // Stats Cards
+                    Text(LocalizationManager.shared.localizedString(for: "stats.title"))
+                        .font(geometry.size.height < 700 ? .title2 : .largeTitle)
+                        .fontWeight(.bold)
+                }
+                .padding(.top, 8)
+                .padding(.bottom, 16)
+                
+                // Основной контент
+                VStack(spacing: 20) {
+                    // Stats Cards - адаптивная сетка
+                    let cardSpacing: CGFloat = geometry.size.height < 700 ? 16 : 20
+                    let cardPadding: CGFloat = geometry.size.height < 700 ? 12 : 16
+                    
                     LazyVGrid(columns: [
                         GridItem(.flexible()),
                         GridItem(.flexible())
-                    ], spacing: 16) {
+                    ], spacing: cardSpacing) {
                         StatCard(
                             title: LocalizationManager.shared.localizedString(for: "stats.questionsStudied"),
                             value: "\(statsManager.stats.totalQuestionsStudied)",
                             icon: "questionmark.circle.fill",
-                            color: .blue
+                            color: .blue,
+                            isCompact: geometry.size.height < 700
                         )
                         
                         StatCard(
                             title: LocalizationManager.shared.localizedString(for: "stats.correctAnswers"),
                             value: "\(statsManager.stats.correctAnswers)",
                             icon: "checkmark.circle.fill",
-                            color: .green
+                            color: .green,
+                            isCompact: geometry.size.height < 700
                         )
                         
                         StatCard(
                             title: LocalizationManager.shared.localizedString(for: "stats.incorrectAnswers"),
                             value: "\(statsManager.stats.incorrectAnswers)",
                             icon: "xmark.circle.fill",
-                            color: .red
+                            color: .red,
+                            isCompact: geometry.size.height < 700
                         )
                         
                         StatCard(
                             title: LocalizationManager.shared.localizedString(for: "stats.correctedMistakes"),
                             value: "\(statsManager.stats.correctedMistakes)",
                             icon: "checkmark.circle.badge.xmark",
-                            color: .orange
+                            color: .orange,
+                            isCompact: geometry.size.height < 700
                         )
                     }
                     
-                    // Progress Section
-                    VStack(alignment: .leading, spacing: 16) {
+                    // Progress Section - увеличенная
+                    VStack(alignment: .leading, spacing: 12) {
                         Text(LocalizationManager.shared.localizedString(for: "stats.progress"))
-                            .font(.title2)
+                            .font(geometry.size.height < 700 ? .title3 : .title2)
                             .fontWeight(.semibold)
                         
-                        VStack(spacing: 12) {
+                        VStack(spacing: 10) {
                             ProgressRow(
                                 title: LocalizationManager.shared.localizedString(for: "stats.quizzesCompleted"),
                                 value: statsManager.stats.totalQuizzesCompleted,
-                                color: .blue
+                                color: .blue,
+                                isCompact: geometry.size.height < 700
                             )
                             
                             if let lastQuiz = statsManager.stats.lastQuizDate {
                                 HStack {
                                     Text(LocalizationManager.shared.localizedString(for: "stats.lastQuiz"))
+                                        .font(geometry.size.height < 700 ? .caption : .subheadline)
                                         .foregroundColor(.secondary)
                                     Spacer()
                                     Text(lastQuiz, style: .date)
+                                        .font(geometry.size.height < 700 ? .caption : .subheadline)
                                         .fontWeight(.medium)
                                 }
                             }
                         }
-                        .padding()
+                        .padding(geometry.size.height < 700 ? 16 : 20)
                         .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
                     }
                     
-                    // Wrong Questions Section
+                    // Wrong Questions Section - увеличенная
                     if !statsManager.stats.wrongQuestionIds.isEmpty {
-                        VStack(alignment: .leading, spacing: 16) {
+                        VStack(alignment: .leading, spacing: 12) {
                             Text(LocalizationManager.shared.localizedString(for: "stats.wrongQuestions"))
-                                .font(.title2)
+                                .font(geometry.size.height < 700 ? .title3 : .title2)
                                 .fontWeight(.semibold)
                             
                             VStack(spacing: 12) {
                                 HStack {
                                     Text(LocalizationManager.shared.localizedString(for: "stats.wrongQuestionsCount"))
+                                        .font(geometry.size.height < 700 ? .subheadline : .body)
                                         .foregroundColor(.secondary)
                                     Spacer()
                                     Text("\(statsManager.stats.wrongQuestionsCount)")
+                                        .font(geometry.size.height < 700 ? .subheadline : .body)
                                         .fontWeight(.semibold)
                                         .foregroundColor(.red)
                                 }
@@ -111,23 +126,26 @@ struct StatsView: View {
                                 }) {
                                     HStack {
                                         Image(systemName: "arrow.clockwise")
+                                            .font(geometry.size.height < 700 ? .subheadline : .body)
                                         Text(LocalizationManager.shared.localizedString(for: "stats.repeatMistakes"))
+                                            .font(geometry.size.height < 700 ? .subheadline : .body)
                                     }
                                     .foregroundColor(.white)
                                     .frame(maxWidth: .infinity)
-                                    .frame(height: 44)
+                                    .frame(height: geometry.size.height < 700 ? 44 : 50)
                                     .background(.red.gradient, in: RoundedRectangle(cornerRadius: 12))
                                 }
                             }
-                            .padding()
+                            .padding(geometry.size.height < 700 ? 16 : 20)
                             .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
                         }
                     }
-                    
-                    Spacer(minLength: 100)
                 }
-                .padding()
+                .padding(.horizontal, 16)
+                
+                Spacer()
             }
+        }
             .navigationTitle(LocalizationManager.shared.localizedString(for: "stats.title"))
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
@@ -167,25 +185,27 @@ struct StatCard: View {
     let value: String
     let icon: String
     let color: Color
+    let isCompact: Bool
     
     var body: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: isCompact ? 10 : 16) {
             Image(systemName: icon)
-                .font(.system(size: 24))
+                .font(.system(size: isCompact ? 24 : 32))
                 .foregroundColor(color)
             
             Text(value)
-                .font(.title2)
+                .font(isCompact ? .title2 : .largeTitle)
                 .fontWeight(.bold)
             
             Text(title)
-                .font(.caption)
+                .font(isCompact ? .caption : .subheadline)
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
+                .lineLimit(2)
         }
         .frame(maxWidth: .infinity)
-        .padding()
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
+        .padding(isCompact ? 16 : 20)
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: isCompact ? 16 : 20))
     }
 }
 
@@ -193,13 +213,16 @@ struct ProgressRow: View {
     let title: String
     let value: Int
     let color: Color
+    let isCompact: Bool
     
     var body: some View {
         HStack {
             Text(title)
+                .font(isCompact ? .subheadline : .body)
                 .foregroundColor(.secondary)
             Spacer()
             Text("\(value)")
+                .font(isCompact ? .subheadline : .body)
                 .fontWeight(.semibold)
                 .foregroundColor(color)
         }
@@ -209,3 +232,4 @@ struct ProgressRow: View {
 #Preview {
     StatsView(statsManager: StatsManager())
 }
+
