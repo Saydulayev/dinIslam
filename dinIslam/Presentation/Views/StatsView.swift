@@ -16,6 +16,7 @@ struct StatsView: View {
     @State private var totalQuestionsCount: Int = 0
     @State private var usedQuestionsCount: Int = 0
     @State private var remainingQuestionsCount: Int = 0
+    @State private var usedQuestionIds: [String] = []
     @StateObject private var remoteService = RemoteQuestionsService()
     
     var body: some View {
@@ -137,6 +138,63 @@ struct StatsView: View {
                         }
                     }
                     
+                    // Debug Section - отладочная информация
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("🔍 Отладка прогресса")
+                            .font(.title3)
+                            .fontWeight(.semibold)
+                        
+                        VStack(spacing: 8) {
+                            HStack {
+                                Text("Использовано:")
+                                    .font(.body)
+                                    .foregroundColor(.secondary)
+                                Spacer()
+                                Text("\(usedQuestionsCount)")
+                                    .font(.body)
+                                    .fontWeight(.semibold)
+                            }
+                            
+                            HStack {
+                                Text("Осталось:")
+                                    .font(.body)
+                                    .foregroundColor(.secondary)
+                                Spacer()
+                                Text("\(remainingQuestionsCount)")
+                                    .font(.body)
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(remainingQuestionsCount > 0 ? .green : .orange)
+                            }
+                            
+                            if !usedQuestionIds.isEmpty {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text("ID использованных:")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                    Text(usedQuestionIds.joined(separator: ", "))
+                                        .font(.caption)
+                                        .foregroundColor(.primary)
+                                        .lineLimit(3)
+                                }
+                            }
+                            
+                            Button(action: {
+                                resetQuestionProgress()
+                            }) {
+                                HStack {
+                                    Image(systemName: "arrow.clockwise")
+                                    Text("Сбросить прогресс")
+                                }
+                                .foregroundColor(.white)
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 40)
+                                .background(.red.gradient, in: RoundedRectangle(cornerRadius: 8))
+                            }
+                        }
+                        .padding(16)
+                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
+                    }
+                    
                     // Sync Section - в самом низу
                     VStack(alignment: .leading, spacing: 12) {
                         Text(LocalizationManager.shared.localizedString(for: "stats.sync.title"))
@@ -255,11 +313,17 @@ struct StatsView: View {
                 let questions = try await questionsRepository.loadQuestions(language: currentLanguage)
                 let progressStats = try await quizUseCase.getProgressStats(language: currentLanguage)
                 
+                // Получаем детальную информацию о прогрессе
+                let progress = QuestionPoolProgress(version: 1)
+                let usedIds = Array(progress.usedIds)
+                
                 await MainActor.run {
                     totalQuestionsCount = questions.count
                     usedQuestionsCount = progressStats.used
                     remainingQuestionsCount = progressStats.remaining
+                    usedQuestionIds = usedIds.sorted()
                     print("📊 StatsView: Total=\(questions.count), Used=\(progressStats.used), Remaining=\(progressStats.remaining)")
+                    print("📋 Used IDs: \(usedIds.joined(separator: ", "))")
                 }
             } catch {
                 print("❌ StatsView: Failed to load questions count: \(error)")
@@ -308,6 +372,13 @@ struct StatsView: View {
             await viewModel.startMistakesReview()
             print("DEBUG: Mistakes review completed. State: \(viewModel.state)")
         }
+    }
+    
+    private func resetQuestionProgress() {
+        let progress = QuestionPoolProgress(version: 1)
+        progress.reset(for: 1)
+        print("🔄 Question progress reset")
+        loadTotalQuestionsCount()
     }
 }
 
