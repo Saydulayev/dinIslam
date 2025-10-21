@@ -12,6 +12,7 @@ struct SettingsView: View {
     @State private var viewModel: SettingsViewModel
     @Environment(\.dismiss) private var dismiss
     @ObservedObject private var localizationManager = LocalizationManager.shared
+    @State private var showingNotificationSettings = false
     
     init(viewModel: SettingsViewModel) {
         self.viewModel = viewModel
@@ -92,10 +93,13 @@ struct SettingsView: View {
                         
                         Spacer()
                         
-                        Toggle("", isOn: Binding(
-                            get: { viewModel.settings.notificationsEnabled },
-                            set: { viewModel.updateNotificationsEnabled($0) }
-                        ))
+                        Image(systemName: "chevron.right")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        showingNotificationSettings = true
                     }
                 } header: {
                     LocalizedText("settings.appSettings")
@@ -217,6 +221,9 @@ struct SettingsView: View {
         }
         .sheet(isPresented: $viewModel.showingLanguagePicker) {
             LanguagePickerView(viewModel: viewModel)
+        }
+        .sheet(isPresented: $showingNotificationSettings) {
+            NotificationSettingsView()
         }
     }
 }

@@ -16,6 +16,7 @@ struct StartView: View {
     @State private var showingAchievements = false
     @AppStorage("bestScore") private var bestScore: Double = 0
     @ObservedObject private var localizationManager = LocalizationManager.shared
+    @StateObject private var notificationManager = NotificationManager()
     
     init(viewModel: QuizViewModel) {
         self.viewModel = viewModel
@@ -166,6 +167,14 @@ struct StartView: View {
                 }
             } message: {
                 Text(viewModel.errorMessage ?? "")
+            }
+            .onAppear {
+                // Request notification permission on first launch
+                if !notificationManager.hasPermission {
+                    Task {
+                        await notificationManager.requestNotificationPermission()
+                    }
+                }
             }
         }
     }

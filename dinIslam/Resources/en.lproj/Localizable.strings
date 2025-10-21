@@ -148,3 +148,25 @@
 "achievements.explorer.description" = "Study 500 Islamic questions";
 "achievements.perfectionist.description" = "Achieve perfection 10 times";
 "achievements.legend.description" = "Become a keeper of knowledge";
+
+// Notifications
+"notification.title" = "Study Time";
+"notification.body" = "Don't forget to learn new Islamic knowledge today!";
+"notification.permission.title" = "Allow Notifications";
+"notification.permission.message" = "Get reminders for daily study";
+"notification.settings.title" = "Notification Settings";
+"notification.settings.enabled" = "Enable Reminders";
+"notification.settings.time" = "Reminder Time";
+"notification.settings.test" = "Test Notification";
+
+// Achievement Notifications
+"achievement.notification.title" = "New Achievement!";
+"achievement.notification.body" = "Congratulations! You earned an achievement:";
+
+// Streak Notifications
+"streak.notification.title" = "Don't Break the Streak!";
+"streak.notification.body" = "Continue daily study to maintain your streak";
+
+// Settings
+"settings.on" = "On";
+"settings.off" = "Off";

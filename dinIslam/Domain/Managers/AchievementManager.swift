@@ -15,6 +15,7 @@ class AchievementManager: ObservableObject {
     
     private let userDefaults = UserDefaults.standard
     private let achievementsKey = "UserAchievements"
+    private let notificationManager = NotificationManager()
     
     init() {
         loadAchievements()
@@ -84,6 +85,11 @@ class AchievementManager: ObservableObject {
         if !newlyUnlocked.isEmpty {
             newAchievements = newlyUnlocked
             saveAchievements()
+            
+            // Schedule notification for each new achievement
+            for achievement in newlyUnlocked {
+                notificationManager.scheduleAchievementNotification(for: achievement)
+            }
         }
     }
     

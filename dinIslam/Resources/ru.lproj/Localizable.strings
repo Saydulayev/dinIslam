@@ -148,3 +148,25 @@
 "achievements.explorer.description" = "Изучите 500 вопросов по исламу";
 "achievements.perfectionist.description" = "Достигните совершенства 10 раз";
 "achievements.legend.description" = "Станьте хранителем знаний";
+
+// Notifications
+"notification.title" = "Время изучения";
+"notification.body" = "Не забудьте изучить новые знания об исламе сегодня!";
+"notification.permission.title" = "Разрешить уведомления";
+"notification.permission.message" = "Получайте напоминания о ежедневном изучении";
+"notification.settings.title" = "Настройки уведомлений";
+"notification.settings.enabled" = "Включить напоминания";
+"notification.settings.time" = "Время напоминания";
+"notification.settings.test" = "Тестовое уведомление";
+
+// Achievement Notifications
+"achievement.notification.title" = "Новое достижение!";
+"achievement.notification.body" = "Поздравляем! Вы получили достижение:";
+
+// Streak Notifications
+"streak.notification.title" = "Не прерывайте серию!";
+"streak.notification.body" = "Продолжайте ежедневное изучение для поддержания серии";
+
+// Settings
+"settings.on" = "Включено";
+"settings.off" = "Выключено";
