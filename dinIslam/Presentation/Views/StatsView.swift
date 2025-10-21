@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct StatsView: View {
-    @ObservedObject var statsManager: StatsManager
+    var statsManager: StatsManager
     @EnvironmentObject private var settingsManager: SettingsManager
     @Environment(\.dismiss) private var dismiss
     @State private var mistakesViewModel: QuizViewModel?

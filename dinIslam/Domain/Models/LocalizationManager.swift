@@ -15,6 +15,10 @@ class LocalizationManager: ObservableObject {
     
     @Published var currentLanguage: String = "ru" // Default to Russian
     
+    // MARK: - Caching
+    private var cachedLocalizedStrings: [String: String] = [:]
+    private let cacheQueue = DispatchQueue(label: "localization.cache", attributes: .concurrent)
+    
     private init() {
         // Load saved language from UserDefaults
         if let savedLanguage = UserDefaults.standard.string(forKey: "SelectedLanguage") {
@@ -30,24 +34,43 @@ class LocalizationManager: ObservableObject {
         currentLanguage = language
         UserDefaults.standard.set(language, forKey: "SelectedLanguage")
         
+        // Clear cache when language changes
+        cacheQueue.async(flags: .barrier) {
+            self.cachedLocalizedStrings.removeAll()
+        }
+        
         // Force UI update
         objectWillChange.send()
     }
     
     func localizedString(for key: String) -> String {
+        // Check cache first
+        if let cachedString = cacheQueue.sync(execute: { cachedLocalizedStrings[key] }) {
+            return cachedString
+        }
+        
         let bundle = Bundle.main
+        var localizedString: String
         
         // Try to get localized string from current language bundle
         if let path = bundle.path(forResource: currentLanguage, ofType: "lproj"),
            let languageBundle = Bundle(path: path) {
-            let localizedString = languageBundle.localizedString(forKey: key, value: nil, table: nil)
-            if localizedString != key {
-                return localizedString
+            localizedString = languageBundle.localizedString(forKey: key, value: nil, table: nil)
+            if localizedString == key {
+                // Fallback to main bundle
+                localizedString = bundle.localizedString(forKey: key, value: nil, table: nil)
             }
+        } else {
+            // Fallback to main bundle
+            localizedString = bundle.localizedString(forKey: key, value: nil, table: nil)
         }
         
-        // Fallback to main bundle
-        return bundle.localizedString(forKey: key, value: nil, table: nil)
+        // Cache the result
+        cacheQueue.async(flags: .barrier) {
+            self.cachedLocalizedStrings[key] = localizedString
+        }
+        
+        return localizedString
     }
 }
 

@@ -9,17 +9,16 @@ import SwiftUI
 
 @main
 struct dinIslamApp: App {
-    @StateObject private var settingsManager = SettingsManager()
-    @StateObject private var statsManager = StatsManager()
+    private let container = DIContainer.shared
     
     var body: some Scene {
         WindowGroup {
             StartView(
-                quizUseCase: QuizUseCase(questionsRepository: QuestionsRepository()),
-                statsManager: statsManager,
-                settingsManager: settingsManager
+                quizUseCase: container.quizUseCase,
+                statsManager: container.statsManager,
+                settingsManager: container.settingsManager
             )
-            .environmentObject(settingsManager)
+            .environmentObject(container.settingsManager)
         }
     }
 }

@@ -97,7 +97,8 @@ struct MistakesReviewView: View {
                         
                         // Answer options
                         VStack(spacing: 12) {
-                            ForEach(Array(question.answers.enumerated()), id: \.element.id) { index, answer in
+                            ForEach(question.answers, id: \.id) { answer in
+                                let index = question.answers.firstIndex(where: { $0.id == answer.id })!
                                 AnswerButton(
                                     answer: answer,
                                     index: index,
@@ -108,6 +109,9 @@ struct MistakesReviewView: View {
                                         viewModel.selectAnswer(at: index)
                                     }
                                 )
+                                .accessibilityLabel("Answer option \(index + 1)")
+                                .accessibilityHint("Double tap to select this answer")
+                                .accessibilityAddTraits(viewModel.selectedAnswerIndex == index ? .isSelected : [])
                             }
                         }
                     }

@@ -17,13 +17,16 @@ class SettingsViewModel {
     private let hapticManager: HapticManager
     private let soundManager: SoundManager
     
-    var settings: AppSettings
+    // Убираем дублирование - используем только settingsManager.settings
+    var settings: AppSettings {
+        settingsManager.settings
+    }
+    
     var showingLanguagePicker = false
     var refreshTrigger = UUID()
     
     init(settingsManager: SettingsManager) {
         self.settingsManager = settingsManager
-        self.settings = settingsManager.settings
         self.hapticManager = HapticManager(settingsManager: settingsManager)
         self.soundManager = SoundManager(settingsManager: settingsManager)
     }
@@ -31,7 +34,6 @@ class SettingsViewModel {
     // MARK: - Language Settings
     func updateLanguage(_ language: AppLanguage) {
         settingsManager.updateLanguage(language)
-        settings = settingsManager.settings
         
         // Update localization helper
         let languageCode: String
@@ -55,7 +57,6 @@ class SettingsViewModel {
     // MARK: - Sound Settings
     func updateSoundEnabled(_ enabled: Bool) {
         settingsManager.updateSoundEnabled(enabled)
-        settings = settingsManager.settings
         hapticManager.selectionChanged()
         
         // Play sound to demonstrate the setting
@@ -67,7 +68,6 @@ class SettingsViewModel {
     // MARK: - Haptic Settings
     func updateHapticEnabled(_ enabled: Bool) {
         settingsManager.updateHapticEnabled(enabled)
-        settings = settingsManager.settings
         if enabled {
             hapticManager.selectionChanged()
         }
@@ -76,7 +76,6 @@ class SettingsViewModel {
     // MARK: - Notifications Settings
     func updateNotificationsEnabled(_ enabled: Bool) {
         settingsManager.updateNotificationsEnabled(enabled)
-        settings = settingsManager.settings
         hapticManager.selectionChanged()
     }
     
@@ -139,7 +138,6 @@ class SettingsViewModel {
         settingsManager.updateSoundEnabled(defaultSettings.soundEnabled)
         settingsManager.updateHapticEnabled(defaultSettings.hapticEnabled)
         settingsManager.updateNotificationsEnabled(defaultSettings.notificationsEnabled)
-        
-        settings = settingsManager.settings
+
     }
 }

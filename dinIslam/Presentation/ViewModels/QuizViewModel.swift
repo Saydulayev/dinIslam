@@ -71,20 +71,24 @@ class QuizViewModel {
         
         do {
             let loadedQuestions = try await quizUseCase.startQuiz(language: language)
-            questions = loadedQuestions.map { quizUseCase.shuffleAnswers(for: $0) }
-            currentQuestionIndex = 0
-            correctAnswers = 0
-            selectedAnswerIndex = nil
-            isAnswerSelected = false
-            showResult = false
-            startTime = Date()
-            state = .playing
+            await MainActor.run {
+                questions = loadedQuestions.map { quizUseCase.shuffleAnswers(for: $0) }
+                currentQuestionIndex = 0
+                correctAnswers = 0
+                selectedAnswerIndex = nil
+                isAnswerSelected = false
+                showResult = false
+                startTime = Date()
+                state = .playing
+                isLoading = false
+            }
         } catch {
-            errorMessage = error.localizedDescription
-            state = .idle
+            await MainActor.run {
+                errorMessage = error.localizedDescription
+                state = .error
+                isLoading = false
+            }
         }
-        
-        isLoading = false
     }
     
     @MainActor

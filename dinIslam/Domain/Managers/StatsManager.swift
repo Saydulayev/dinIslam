@@ -6,10 +6,11 @@
 //
 
 import Foundation
-import Combine
+import Observation
 
-class StatsManager: ObservableObject {
-    @Published var stats: UserStats
+@Observable
+class StatsManager {
+    var stats: UserStats
     
     private let userDefaults = UserDefaults.standard
     private let statsKey = "UserStats"

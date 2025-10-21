@@ -15,6 +15,11 @@ struct QuizView: View {
         self.viewModel = viewModel
     }
     
+    // MARK: - Computed Properties
+    private var progressText: String {
+        "\(viewModel.currentQuestionIndex + 1) / \(viewModel.questions.count)"
+    }
+    
     var body: some View {
         VStack(spacing: 0) {
             // Header with progress and score
@@ -32,7 +37,7 @@ struct QuizView: View {
                 }
                 
                 HStack {
-                    Text("\(viewModel.currentQuestionIndex + 1) / \(viewModel.questions.count)")
+                    Text(progressText)
                         .font(.title2)
                         .fontWeight(.bold)
                     
@@ -64,6 +69,9 @@ struct QuizView: View {
                                 .multilineTextAlignment(.center)
                                 .padding()
                                 .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
+                                .accessibilityLabel("Question: \(question.text)")
+                                .accessibilityAddTraits(.isHeader)
+                                .dynamicTypeSize(.large)
                             
                             // Category and difficulty
                             HStack {
@@ -82,7 +90,8 @@ struct QuizView: View {
                         
                         // Answer options
                         VStack(spacing: 12) {
-                            ForEach(Array(question.answers.enumerated()), id: \.element.id) { index, answer in
+                            ForEach(question.answers, id: \.id) { answer in
+                                let index = question.answers.firstIndex(where: { $0.id == answer.id })!
                                 AnswerButton(
                                     answer: answer,
                                     index: index,
@@ -93,6 +102,9 @@ struct QuizView: View {
                                         viewModel.selectAnswer(at: index)
                                     }
                                 )
+                                .accessibilityLabel("Answer option \(index + 1)")
+                                .accessibilityHint("Double tap to select this answer")
+                                .accessibilityAddTraits(viewModel.selectedAnswerIndex == index ? .isSelected : [])
                             }
                         }
                     }
@@ -118,6 +130,8 @@ struct QuizView: View {
                 .padding(.horizontal)
                 .padding(.bottom, 8)
             }
+            .accessibilityLabel("Stop quiz")
+            .accessibilityHint("Double tap to stop the current quiz")
         }
         .alert(
             LocalizationManager.shared.localizedString(for: "quiz.stop.confirm.title"),

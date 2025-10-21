@@ -10,7 +10,7 @@ import SwiftUI
 struct StartView: View {
     @State private var viewModel: QuizViewModel
     @EnvironmentObject private var settingsManager: SettingsManager
-    @StateObject private var statsManager = StatsManager()
+    @State private var statsManager: StatsManager
     @State private var showingSettings = false
     @State private var showingStats = false
     @State private var showingAchievements = false
@@ -19,10 +19,11 @@ struct StartView: View {
     
     init(viewModel: QuizViewModel) {
         self.viewModel = viewModel
+        self.statsManager = StatsManager()
     }
     
     init(quizUseCase: QuizUseCaseProtocol, statsManager: StatsManager, settingsManager: SettingsManager) {
-        self._statsManager = StateObject(wrappedValue: statsManager)
+        self.statsManager = statsManager
         self.viewModel = QuizViewModel(quizUseCase: quizUseCase, statsManager: statsManager, settingsManager: settingsManager)
     }
     

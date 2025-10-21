@@ -49,6 +49,7 @@ enum QuizState {
     case finished
     case mistakesReview
     case mistakesFinished
+    case error
 }
 
 struct QuizResult {
