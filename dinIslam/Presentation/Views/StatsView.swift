@@ -178,7 +178,7 @@ struct StatsView: View {
         Task {
             do {
                 let questionsRepository = QuestionsRepository()
-                let currentLanguage = settingsManager.currentLanguage.rawValue
+                let currentLanguage = settingsManager.settings.language.rawValue
                 let questions = try await questionsRepository.loadQuestions(language: currentLanguage)
                 
                 await MainActor.run {
