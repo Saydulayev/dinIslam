@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UserNotifications
 
 struct ResultView: View {
     @State private var viewModel: QuizViewModel
@@ -142,8 +143,8 @@ struct ResultView: View {
             checkForNewAchievements()
             updateBestScore()
             
-            // Clear app badge when results are shown
-            UIApplication.shared.applicationIconBadgeNumber = 0
+            // Clear app badge when results are shown (iOS 17+ API)
+            UNUserNotificationCenter.current().setBadgeCount(0, withCompletionHandler: { _ in })
         }
     }
     

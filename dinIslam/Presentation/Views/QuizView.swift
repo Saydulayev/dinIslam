@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UserNotifications
 
 struct QuizView: View {
     @State private var viewModel: QuizViewModel
@@ -148,7 +149,11 @@ struct QuizView: View {
         }
         .onAppear {
             // Clear app badge when quiz starts
-            UIApplication.shared.applicationIconBadgeNumber = 0
+            if #available(iOS 17.0, *) {
+                UNUserNotificationCenter.current().setBadgeCount(0) { _ in }
+            } else {
+                UIApplication.shared.applicationIconBadgeNumber = 0
+            }
         }
     }
 }

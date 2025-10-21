@@ -60,7 +60,7 @@ class NotificationManager: ObservableObject {
         content.title = LocalizationManager.shared.localizedString(for: "notification.title")
         content.body = LocalizationManager.shared.localizedString(for: "notification.body")
         content.sound = .default
-        // Don't set badge for daily reminders to avoid persistent badges
+        content.badge = 1
         
         // Create date components for the reminder time
         let calendar = Calendar.current
@@ -137,7 +137,7 @@ class NotificationManager: ObservableObject {
         content.title = LocalizationManager.shared.localizedString(for: "achievement.notification.title")
         content.body = "\(LocalizationManager.shared.localizedString(for: "achievement.notification.body")) \(achievement.title)"
         content.sound = .default
-        // Don't set badge for achievement notifications
+        content.badge = 1
         
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
         
@@ -164,6 +164,7 @@ class NotificationManager: ObservableObject {
         content.title = LocalizationManager.shared.localizedString(for: "streak.notification.title")
         content.body = LocalizationManager.shared.localizedString(for: "streak.notification.body")
         content.sound = .default
+        content.badge = 1
         
         // Schedule for tomorrow at the same time
         let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: Date()) ?? Date()

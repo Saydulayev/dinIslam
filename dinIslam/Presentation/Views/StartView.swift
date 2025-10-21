@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UserNotifications
 
 struct StartView: View {
     @State private var viewModel: QuizViewModel
@@ -170,7 +171,11 @@ struct StartView: View {
             }
             .onAppear {
                 // Clear app badge when app is opened
-                UIApplication.shared.applicationIconBadgeNumber = 0
+                if #available(iOS 17.0, *) {
+                    UNUserNotificationCenter.current().setBadgeCount(0, withCompletionHandler: { _ in })
+                } else {
+                    UIApplication.shared.applicationIconBadgeNumber = 0
+                }
                 
                 // Request notification permission on first launch
                 if !notificationManager.hasPermission {

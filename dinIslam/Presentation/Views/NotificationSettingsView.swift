@@ -239,6 +239,7 @@ struct NotificationSettingsView: View {
         content.title = LocalizationManager.shared.localizedString(for: "notification.title")
         content.body = LocalizationManager.shared.localizedString(for: "notification.body")
         content.sound = .default
+        content.badge = 1
         
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
         
