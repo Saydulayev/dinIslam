@@ -302,24 +302,24 @@ struct StatCard: View {
     let isCompact: Bool
     
     var body: some View {
-        VStack(spacing: isCompact ? 10 : 16) {
+        VStack(spacing: 16) {
             Image(systemName: icon)
-                .font(.system(size: isCompact ? 24 : 32))
+                .font(.system(size: 32))
                 .foregroundColor(color)
             
             Text(value)
-                .font(isCompact ? .title2 : .largeTitle)
+                .font(.largeTitle)
                 .fontWeight(.bold)
             
             Text(title)
-                .font(isCompact ? .caption : .subheadline)
+                .font(.subheadline)
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
                 .lineLimit(2)
         }
-        .frame(maxWidth: .infinity)
-        .padding(isCompact ? 16 : 20)
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: isCompact ? 16 : 20))
+        .frame(maxWidth: .infinity, minHeight: 140, maxHeight: 140)
+        .padding(20)
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 20))
     }
 }
 
