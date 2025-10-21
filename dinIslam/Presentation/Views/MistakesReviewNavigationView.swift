@@ -65,10 +65,16 @@ struct MistakesReviewNavigationView: View {
             }
             .navigationTitle(LocalizationManager.shared.localizedString(for: "mistakes.reviewTitle"))
             .navigationBarTitleDisplayMode(.inline)
+            .navigationBarBackButtonHidden(true)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button(LocalizationManager.shared.localizedString(for: "mistakes.close")) {
+                    Button(action: {
                         dismiss()
+                    }) {
+                        HStack(spacing: 2) {
+                            Image(systemName: "chevron.left")
+                                .font(.system(size: 17, weight: .medium))
+                        }
                     }
                 }
             }
