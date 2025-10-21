@@ -100,6 +100,15 @@ class RemoteQuestionsService: ObservableObject {
         
         let remoteQuestions = try JSONDecoder().decode([RemoteQuestion].self, from: data)
         print("✅ RemoteQuestionsService: Successfully loaded \(remoteQuestions.count) questions from \(fileName)")
+        print("📋 Remote question IDs: \(remoteQuestions.map { $0.id }.joined(separator: ", "))")
+        
+        // Проверяем, есть ли q31
+        if remoteQuestions.contains(where: { $0.id == "q31" }) {
+            print("🎯 Found q31 in remote questions!")
+        } else {
+            print("❌ q31 NOT found in remote questions")
+        }
+        
         return remoteQuestions.map { $0.toQuestion() }
     }
     
@@ -110,6 +119,14 @@ class RemoteQuestionsService: ObservableObject {
             let data = try JSONEncoder().encode(questions)
             userDefaults.set(data, forKey: cacheKey)
             print("💾 RemoteQuestionsService: Cached \(questions.count) questions for \(language.rawValue)")
+            print("📋 Cached question IDs: \(questions.map { $0.id }.joined(separator: ", "))")
+            
+            // Проверяем, есть ли q31 в кэше
+            if questions.contains(where: { $0.id == "q31" }) {
+                print("🎯 q31 is cached successfully!")
+            } else {
+                print("❌ q31 NOT cached")
+            }
         } catch {
             print("❌ Failed to cache questions: \(error)")
         }
