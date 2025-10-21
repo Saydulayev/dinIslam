@@ -91,7 +91,46 @@ struct StatsView: View {
                         )
                     }
                     
-                    // Sync Section
+                    // Wrong Questions Section - увеличенная
+                    if !statsManager.stats.wrongQuestionIds.isEmpty {
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text(LocalizationManager.shared.localizedString(for: "stats.wrongQuestions"))
+                                .font(geometry.size.height < 700 ? .title3 : .title2)
+                                .fontWeight(.semibold)
+                            
+                            VStack(spacing: 12) {
+                                HStack {
+                                    Text(LocalizationManager.shared.localizedString(for: "stats.wrongQuestionsCount"))
+                                        .font(geometry.size.height < 700 ? .subheadline : .body)
+                                        .foregroundColor(.secondary)
+                                    Spacer()
+                                    Text("\(statsManager.stats.wrongQuestionsCount)")
+                                        .font(geometry.size.height < 700 ? .subheadline : .body)
+                                        .fontWeight(.semibold)
+                                        .foregroundColor(.red)
+                                }
+                                
+                                Button(action: {
+                                    startMistakesReview()
+                                }) {
+                                    HStack {
+                                        Image(systemName: "arrow.clockwise")
+                                            .font(geometry.size.height < 700 ? .subheadline : .body)
+                                        Text(LocalizationManager.shared.localizedString(for: "stats.repeatMistakes"))
+                                            .font(geometry.size.height < 700 ? .subheadline : .body)
+                                    }
+                                    .foregroundColor(.white)
+                                    .frame(maxWidth: .infinity)
+                                    .frame(height: geometry.size.height < 700 ? 44 : 50)
+                                    .background(.red.gradient, in: RoundedRectangle(cornerRadius: 12))
+                                }
+                            }
+                            .padding(geometry.size.height < 700 ? 16 : 20)
+                            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
+                        }
+                    }
+                    
+                    // Sync Section - в самом низу
                     VStack(alignment: .leading, spacing: 12) {
                         Text(LocalizationManager.shared.localizedString(for: "stats.sync.title"))
                             .font(geometry.size.height < 700 ? .title3 : .title2)
@@ -174,45 +213,6 @@ struct StatsView: View {
                         }
                         .padding(geometry.size.height < 700 ? 16 : 20)
                         .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
-                    }
-                    
-                    // Wrong Questions Section - увеличенная
-                    if !statsManager.stats.wrongQuestionIds.isEmpty {
-                        VStack(alignment: .leading, spacing: 12) {
-                            Text(LocalizationManager.shared.localizedString(for: "stats.wrongQuestions"))
-                                .font(geometry.size.height < 700 ? .title3 : .title2)
-                                .fontWeight(.semibold)
-                            
-                            VStack(spacing: 12) {
-                                HStack {
-                                    Text(LocalizationManager.shared.localizedString(for: "stats.wrongQuestionsCount"))
-                                        .font(geometry.size.height < 700 ? .subheadline : .body)
-                                        .foregroundColor(.secondary)
-                                    Spacer()
-                                    Text("\(statsManager.stats.wrongQuestionsCount)")
-                                        .font(geometry.size.height < 700 ? .subheadline : .body)
-                                        .fontWeight(.semibold)
-                                        .foregroundColor(.red)
-                                }
-                                
-                                Button(action: {
-                                    startMistakesReview()
-                                }) {
-                                    HStack {
-                                        Image(systemName: "arrow.clockwise")
-                                            .font(geometry.size.height < 700 ? .subheadline : .body)
-                                        Text(LocalizationManager.shared.localizedString(for: "stats.repeatMistakes"))
-                                            .font(geometry.size.height < 700 ? .subheadline : .body)
-                                    }
-                                    .foregroundColor(.white)
-                                    .frame(maxWidth: .infinity)
-                                    .frame(height: geometry.size.height < 700 ? 44 : 50)
-                                    .background(.red.gradient, in: RoundedRectangle(cornerRadius: 12))
-                                }
-                            }
-                            .padding(geometry.size.height < 700 ? 16 : 20)
-                            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
-                        }
                     }
                     }
                     .padding(.horizontal, 16)
