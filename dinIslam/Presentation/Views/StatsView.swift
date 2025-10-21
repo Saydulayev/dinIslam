@@ -14,7 +14,6 @@ struct StatsView: View {
     @State private var mistakesViewModel: QuizViewModel?
     @State private var showingMistakesReview = false
     @State private var totalQuestionsCount: Int = 0
-    @State private var remainingQuestionsCount: Int = 0
     @StateObject private var remoteService = RemoteQuestionsService()
     
     var body: some View {
@@ -85,14 +84,6 @@ struct StatsView: View {
                             value: "\(statsManager.stats.totalQuizzesCompleted)",
                             icon: "checkmark.circle.fill",
                             color: .blue,
-                            isCompact: false
-                        )
-                        
-                        StatCard(
-                            title: LocalizationManager.shared.localizedString(for: "stats.remainingQuestions"),
-                            value: "\(remainingQuestionsCount)",
-                            icon: "book.pages.fill",
-                            color: .indigo,
                             isCompact: false
                         )
                     }
@@ -248,22 +239,18 @@ struct StatsView: View {
         Task {
             do {
                 let questionsRepository = QuestionsRepository()
-                let quizUseCase = QuizUseCase(questionsRepository: questionsRepository)
                 let currentLanguage = settingsManager.settings.language.rawValue
                 
                 let questions = try await questionsRepository.loadQuestions(language: currentLanguage)
-                let progressStats = try await quizUseCase.getProgressStats(language: currentLanguage)
                 
                 await MainActor.run {
                     totalQuestionsCount = questions.count
-                    remainingQuestionsCount = progressStats.remaining
-                    print("📊 StatsView: Total=\(questions.count), Remaining=\(progressStats.remaining)")
+                    print("📊 StatsView: Total=\(questions.count) questions")
                 }
             } catch {
                 print("❌ StatsView: Failed to load questions count: \(error)")
                 await MainActor.run {
                     totalQuestionsCount = 0
-                    remainingQuestionsCount = 0
                 }
             }
         }
