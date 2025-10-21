@@ -17,37 +17,34 @@ struct StatsView: View {
     @StateObject private var remoteService = RemoteQuestionsService()
     
     var body: some View {
-        GeometryReader { geometry in
-            VStack(spacing: 0) {
-                // Header - компактный
-                VStack(spacing: 8) {
-                    Image(systemName: "chart.bar.fill")
-                        .font(.system(size: geometry.size.height < 700 ? 40 : 50))
-                        .foregroundStyle(.blue.gradient)
-                    
-                    Text(LocalizationManager.shared.localizedString(for: "stats.title"))
-                        .font(geometry.size.height < 700 ? .title2 : .largeTitle)
-                        .fontWeight(.bold)
-                }
-                .padding(.top, 8)
-                .padding(.bottom, 16)
+        VStack(spacing: 0) {
+            // Header - фиксированный размер
+            VStack(spacing: 8) {
+                Image(systemName: "chart.bar.fill")
+                    .font(.system(size: 40))
+                    .foregroundStyle(.blue.gradient)
                 
-                // Основной контент - с скроллом
-                ScrollView {
-                    VStack(spacing: 20) {
-                    // Stats Cards - адаптивная сетка
-                    let cardSpacing: CGFloat = geometry.size.height < 700 ? 16 : 20
-                    
+                Text(LocalizationManager.shared.localizedString(for: "stats.title"))
+                    .font(.title2)
+                    .fontWeight(.bold)
+            }
+            .padding(.top, 8)
+            .padding(.bottom, 16)
+                
+            // Основной контент - с скроллом
+            ScrollView {
+                VStack(spacing: 20) {
+                    // Stats Cards - фиксированная сетка
                     LazyVGrid(columns: [
                         GridItem(.flexible()),
                         GridItem(.flexible())
-                    ], spacing: cardSpacing) {
+                    ], spacing: 16) {
                         StatCard(
                             title: LocalizationManager.shared.localizedString(for: "stats.questionsStudied"),
                             value: "\(statsManager.stats.totalQuestionsStudied)",
                             icon: "questionmark.circle.fill",
                             color: .blue,
-                            isCompact: geometry.size.height < 700
+                            isCompact: false
                         )
                         
                         StatCard(
@@ -55,7 +52,7 @@ struct StatsView: View {
                             value: "\(statsManager.stats.correctAnswers)",
                             icon: "checkmark.circle.fill",
                             color: .green,
-                            isCompact: geometry.size.height < 700
+                            isCompact: false
                         )
                         
                         StatCard(
@@ -63,7 +60,7 @@ struct StatsView: View {
                             value: "\(statsManager.stats.incorrectAnswers)",
                             icon: "xmark.circle.fill",
                             color: .red,
-                            isCompact: geometry.size.height < 700
+                            isCompact: false
                         )
                         
                         StatCard(
@@ -71,7 +68,7 @@ struct StatsView: View {
                             value: "\(statsManager.stats.correctedMistakes)",
                             icon: "checkmark.circle.badge.xmark",
                             color: .orange,
-                            isCompact: geometry.size.height < 700
+                            isCompact: false
                         )
                         
                         StatCard(
@@ -79,7 +76,7 @@ struct StatsView: View {
                             value: "\(totalQuestionsCount)",
                             icon: "book.fill",
                             color: .purple,
-                            isCompact: geometry.size.height < 700
+                            isCompact: false
                         )
                         
                         StatCard(
@@ -87,7 +84,7 @@ struct StatsView: View {
                             value: "\(statsManager.stats.totalQuizzesCompleted)",
                             icon: "checkmark.circle.fill",
                             color: .blue,
-                            isCompact: geometry.size.height < 700
+                            isCompact: false
                         )
                     }
                     
@@ -95,17 +92,17 @@ struct StatsView: View {
                     if !statsManager.stats.wrongQuestionIds.isEmpty {
                         VStack(alignment: .leading, spacing: 12) {
                             Text(LocalizationManager.shared.localizedString(for: "stats.wrongQuestions"))
-                                .font(geometry.size.height < 700 ? .title3 : .title2)
+                                .font(.title3)
                                 .fontWeight(.semibold)
                             
                             VStack(spacing: 12) {
                                 HStack {
                                     Text(LocalizationManager.shared.localizedString(for: "stats.wrongQuestionsCount"))
-                                        .font(geometry.size.height < 700 ? .subheadline : .body)
+                                        .font(.body)
                                         .foregroundColor(.secondary)
                                     Spacer()
                                     Text("\(statsManager.stats.wrongQuestionsCount)")
-                                        .font(geometry.size.height < 700 ? .subheadline : .body)
+                                        .font(.body)
                                         .fontWeight(.semibold)
                                         .foregroundColor(.red)
                                 }
@@ -115,17 +112,17 @@ struct StatsView: View {
                                 }) {
                                     HStack {
                                         Image(systemName: "arrow.clockwise")
-                                            .font(geometry.size.height < 700 ? .subheadline : .body)
+                                            .font(.body)
                                         Text(LocalizationManager.shared.localizedString(for: "stats.repeatMistakes"))
-                                            .font(geometry.size.height < 700 ? .subheadline : .body)
+                                            .font(.body)
                                     }
                                     .foregroundColor(.white)
                                     .frame(maxWidth: .infinity)
-                                    .frame(height: geometry.size.height < 700 ? 44 : 50)
+                                    .frame(height: 50)
                                     .background(.red.gradient, in: RoundedRectangle(cornerRadius: 12))
                                 }
                             }
-                            .padding(geometry.size.height < 700 ? 16 : 20)
+                            .padding(20)
                             .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
                         }
                     }
@@ -133,13 +130,13 @@ struct StatsView: View {
                     // Sync Section - в самом низу
                     VStack(alignment: .leading, spacing: 12) {
                         Text(LocalizationManager.shared.localizedString(for: "stats.sync.title"))
-                            .font(geometry.size.height < 700 ? .title3 : .title2)
+                            .font(.title3)
                             .fontWeight(.semibold)
                         
                         VStack(spacing: 12) {
                             HStack {
                                 Text(LocalizationManager.shared.localizedString(for: "stats.sync.status"))
-                                    .font(geometry.size.height < 700 ? .subheadline : .body)
+                                    .font(.body)
                                     .foregroundColor(.secondary)
                                 Spacer()
                                 if remoteService.isLoading {
@@ -147,12 +144,12 @@ struct StatsView: View {
                                         .scaleEffect(0.8)
                                 } else if remoteService.hasUpdates {
                                     Text(LocalizationManager.shared.localizedString(for: "stats.sync.available"))
-                                        .font(geometry.size.height < 700 ? .subheadline : .body)
+                                        .font(.body)
                                         .fontWeight(.semibold)
                                         .foregroundColor(.green)
                                 } else {
                                     Text(LocalizationManager.shared.localizedString(for: "stats.sync.upToDate"))
-                                        .font(geometry.size.height < 700 ? .subheadline : .body)
+                                        .font(.body)
                                         .fontWeight(.semibold)
                                         .foregroundColor(.blue)
                                 }
@@ -161,11 +158,11 @@ struct StatsView: View {
                             if remoteService.hasUpdates {
                                 HStack {
                                     Text(LocalizationManager.shared.localizedString(for: "stats.sync.newQuestions"))
-                                        .font(geometry.size.height < 700 ? .caption : .subheadline)
+                                        .font(.subheadline)
                                         .foregroundColor(.secondary)
                                     Spacer()
                                     Text("+\(remoteService.remoteQuestionsCount - remoteService.cachedQuestionsCount)")
-                                        .font(geometry.size.height < 700 ? .caption : .subheadline)
+                                        .font(.subheadline)
                                         .fontWeight(.semibold)
                                         .foregroundColor(.green)
                                 }
@@ -179,13 +176,13 @@ struct StatsView: View {
                                 }) {
                                     HStack {
                                         Image(systemName: "arrow.clockwise")
-                                            .font(geometry.size.height < 700 ? .subheadline : .body)
+                                            .font(.body)
                                         Text(LocalizationManager.shared.localizedString(for: "stats.sync.check"))
-                                            .font(geometry.size.height < 700 ? .subheadline : .body)
+                                            .font(.body)
                                     }
                                     .foregroundColor(.white)
                                     .frame(maxWidth: .infinity)
-                                    .frame(height: geometry.size.height < 700 ? 44 : 50)
+                                    .frame(height: 50)
                                     .background(.blue.gradient, in: RoundedRectangle(cornerRadius: 12))
                                 }
                                 .disabled(remoteService.isLoading)
@@ -198,28 +195,25 @@ struct StatsView: View {
                                     }) {
                                         HStack {
                                             Image(systemName: "arrow.down.circle")
-                                                .font(geometry.size.height < 700 ? .subheadline : .body)
+                                                .font(.body)
                                             Text(LocalizationManager.shared.localizedString(for: "stats.sync.sync"))
-                                                .font(geometry.size.height < 700 ? .subheadline : .body)
+                                                .font(.body)
                                         }
                                         .foregroundColor(.white)
                                         .frame(maxWidth: .infinity)
-                                        .frame(height: geometry.size.height < 700 ? 44 : 50)
+                                        .frame(height: 50)
                                         .background(.green.gradient, in: RoundedRectangle(cornerRadius: 12))
                                     }
                                     .disabled(remoteService.isLoading)
                                 }
                             }
                         }
-                        .padding(geometry.size.height < 700 ? 16 : 20)
+                        .padding(20)
                         .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
                     }
-                    }
-                    .padding(.horizontal, 16)
-                    .padding(.bottom, 20)
                 }
-                
-                Spacer()
+                .padding(.horizontal, 16)
+                .padding(.bottom, 20)
             }
         }
             .navigationTitle(LocalizationManager.shared.localizedString(for: "stats.title"))
