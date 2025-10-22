@@ -39,9 +39,17 @@ struct AchievementsView: View {
 struct AchievementCard: View {
     let achievement: Achievement
     @ObservedObject private var localizationManager = LocalizationManager.shared
+    @EnvironmentObject private var settingsManager: SettingsManager
     
     private var isUnlocked: Bool {
         achievement.isUnlocked
+    }
+    
+    private var progress: AchievementProgress {
+        // Получаем статистику для расчета прогресса
+        let statsManager = StatsManager()
+        let achievementManager = AchievementManager()
+        return achievementManager.getAchievementProgress(for: achievement.type, stats: statsManager.stats)
     }
     
     private var cardColor: Color {
@@ -110,10 +118,26 @@ struct AchievementCard: View {
                         .foregroundColor(.green)
                         .fontWeight(.medium)
                 } else {
-                    Text(LocalizationManager.shared.localizedString(for: "achievements.locked"))
-                        .font(.caption)
-                        .foregroundColor(.orange)
-                        .fontWeight(.medium)
+                    VStack(alignment: .leading, spacing: 4) {
+                        // Прогресс-бар
+                        ProgressView(value: progress.progressPercentage)
+                            .progressViewStyle(LinearProgressViewStyle(tint: achievement.color))
+                            .scaleEffect(x: 1, y: 0.8)
+                        
+                        // Текст прогресса
+                        HStack {
+                            Text("\(progress.currentProgress)/\(progress.requirement)")
+                                .font(.caption)
+                                .fontWeight(.semibold)
+                                .foregroundColor(achievement.color)
+                            
+                            Spacer()
+                            
+                            Text(getProgressDescription())
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                    }
                 }
             }
         }
@@ -128,6 +152,25 @@ struct AchievementCard: View {
         )
         .opacity(isUnlocked ? 1.0 : 0.7)
         .animation(.easeInOut(duration: 0.3), value: isUnlocked)
+    }
+    
+    private func getProgressDescription() -> String {
+        switch achievement.type {
+        case .firstQuiz:
+            return LocalizationManager.shared.localizedString(for: "achievements.progress.quiz")
+        case .perfectScore:
+            return LocalizationManager.shared.localizedString(for: "achievements.progress.perfect")
+        case .speedRunner:
+            return LocalizationManager.shared.localizedString(for: "achievements.progress.speed")
+        case .scholar, .explorer:
+            return LocalizationManager.shared.localizedString(for: "achievements.progress.questions")
+        case .dedicated, .master, .legend:
+            return LocalizationManager.shared.localizedString(for: "achievements.progress.quizzes")
+        case .streak:
+            return LocalizationManager.shared.localizedString(for: "achievements.progress.streak")
+        case .perfectionist:
+            return LocalizationManager.shared.localizedString(for: "achievements.progress.perfects")
+        }
     }
 }
 

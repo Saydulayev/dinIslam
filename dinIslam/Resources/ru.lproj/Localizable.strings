@@ -148,16 +148,25 @@
 "achievements.legend.title" = "Мудрый";
 
 // Achievement Descriptions
-"achievements.firstQuiz.description" = "Сделайте первые шаги в изучении ислама";
-"achievements.perfectScore.description" = "Покажите совершенное знание";
-"achievements.speedRunner.description" = "Демонстрируйте быстроту ума";
-"achievements.scholar.description" = "Изучите 100 вопросов по исламу";
-"achievements.dedicated.description" = "Проявите постоянство в учении";
-"achievements.master.description" = "Достигните уровня знатока";
-"achievements.streak.description" = "Покажите постоянство в знаниях";
-"achievements.explorer.description" = "Изучите 500 вопросов по исламу";
-"achievements.perfectionist.description" = "Достигните совершенства 10 раз";
-"achievements.legend.description" = "Станьте хранителем знаний";
+"achievements.firstQuiz.description" = "Пройдите первую викторину";
+"achievements.perfectScore.description" = "Получите 100% в любой викторине";
+"achievements.speedRunner.description" = "Пройдите викторину менее чем за 2 минуты";
+"achievements.scholar.description" = "Изучите 100 вопросов";
+"achievements.dedicated.description" = "Пройдите 10 викторин";
+"achievements.master.description" = "Пройдите 50 викторин";
+"achievements.streak.description" = "Изучайте 5 дней подряд";
+"achievements.explorer.description" = "Изучите 500 вопросов";
+"achievements.perfectionist.description" = "Получите 10 идеальных результатов";
+"achievements.legend.description" = "Пройдите 100 викторин";
+
+// Achievement Progress Descriptions
+"achievements.progress.quiz" = "викторин";
+"achievements.progress.perfect" = "идеальных результатов";
+"achievements.progress.speed" = "быстрых прохождений";
+"achievements.progress.questions" = "вопросов изучено";
+"achievements.progress.quizzes" = "викторин завершено";
+"achievements.progress.streak" = "дней подряд";
+"achievements.progress.perfects" = "идеальных результатов";
 
 // Notifications
 "notification.title" = "Время изучения";
