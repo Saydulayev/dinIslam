@@ -17,25 +17,23 @@ struct StatsView: View {
     @StateObject private var remoteService = RemoteQuestionsService()
     
     var body: some View {
-        VStack(spacing: 0) {
-            // Header - фиксированный размер
-            VStack(spacing: 8) {
-                Image(systemName: "chart.bar.fill")
-                    .font(.system(size: 40))
-                    .foregroundStyle(.blue.gradient)
+        ScrollView {
+            VStack(spacing: 20) {
+                // Header - теперь внутри скролла
+                VStack(spacing: 8) {
+                    Image(systemName: "chart.bar.fill")
+                        .font(.system(size: 40))
+                        .foregroundStyle(.blue.gradient)
+                    
+                    Text(LocalizationManager.shared.localizedString(for: "stats.title"))
+                        .font(.title2)
+                        .fontWeight(.bold)
+                }
+                .padding(.top, 8)
+                .padding(.bottom, 16)
                 
-                Text(LocalizationManager.shared.localizedString(for: "stats.title"))
-                    .font(.title2)
-                    .fontWeight(.bold)
-            }
-            .padding(.top, 8)
-            .padding(.bottom, 16)
-                
-            // Основной контент - с скроллом
-            ScrollView {
-                VStack(spacing: 20) {
-                    // Stats Cards - фиксированная сетка
-                    LazyVGrid(columns: [
+                // Stats Cards - фиксированная сетка
+                LazyVGrid(columns: [
                         GridItem(.flexible()),
                         GridItem(.flexible())
                     ], spacing: 16) {
@@ -214,7 +212,6 @@ struct StatsView: View {
                 }
                 .padding(.horizontal, 16)
                 .padding(.bottom, 20)
-            }
         }
             .navigationTitle(LocalizationManager.shared.localizedString(for: "stats.title"))
             .navigationBarTitleDisplayMode(.large)
