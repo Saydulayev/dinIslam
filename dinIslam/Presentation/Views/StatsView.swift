@@ -15,6 +15,7 @@ struct StatsView: View {
     @State private var showingMistakesReview = false
     @State private var totalQuestionsCount: Int = 0
     @StateObject private var remoteService = RemoteQuestionsService()
+    @State private var showingResetAlert = false
     
     var body: some View {
         ScrollView {
@@ -217,9 +218,10 @@ struct StatsView: View {
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(LocalizationManager.shared.localizedString(for: "stats.done")) {
-                        dismiss()
+                    Button(LocalizationManager.shared.localizedString(for: "stats.reset")) {
+                        showingResetAlert = true
                     }
+                    .foregroundColor(.red)
                 }
             }
             .navigationDestination(isPresented: $showingMistakesReview) {
@@ -229,6 +231,20 @@ struct StatsView: View {
             }
             .onAppear {
                 loadTotalQuestionsCount()
+            }
+            .alert(
+                LocalizationManager.shared.localizedString(for: "stats.reset.confirm.title"),
+                isPresented: $showingResetAlert
+            ) {
+                Button(LocalizationManager.shared.localizedString(for: "stats.reset.confirm.cancel"), role: .cancel) {
+                    showingResetAlert = false
+                }
+                Button(LocalizationManager.shared.localizedString(for: "stats.reset.confirm.ok"), role: .destructive) {
+                    statsManager.resetStatsExceptTotalQuestions()
+                    showingResetAlert = false
+                }
+            } message: {
+                Text(LocalizationManager.shared.localizedString(for: "stats.reset.confirm.message"))
             }
     }
     

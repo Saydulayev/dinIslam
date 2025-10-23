@@ -60,6 +60,11 @@ class StatsManager {
         saveStats()
     }
     
+    func resetStatsExceptTotalQuestions() {
+        stats = UserStats()
+        saveStats()
+    }
+    
     func getCorrectedMistakesCount() -> Int {
         return stats.correctedMistakes
     }

@@ -81,6 +81,11 @@
 // Stats View
 "stats.title" = "Statistics";
 "stats.done" = "Done";
+"stats.reset" = "Reset";
+"stats.reset.confirm.title" = "Reset Statistics?";
+"stats.reset.confirm.message" = "This will reset all statistics. This action cannot be undone.";
+"stats.reset.confirm.ok" = "Reset";
+"stats.reset.confirm.cancel" = "Cancel";
 "stats.questionsStudied" = "Questions Studied";
 "stats.correctAnswers" = "Correct Answers";
 "stats.incorrectAnswers" = "Incorrect";

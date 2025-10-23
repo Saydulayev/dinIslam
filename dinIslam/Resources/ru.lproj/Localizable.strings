@@ -81,6 +81,11 @@
 // Stats View
 "stats.title" = "Статистика";
 "stats.done" = "Готово";
+"stats.reset" = "Сбросить";
+"stats.reset.confirm.title" = "Сбросить статистику?";
+"stats.reset.confirm.message" = "Это действие сбросит всю статистику. Это действие нельзя отменить.";
+"stats.reset.confirm.ok" = "Сбросить";
+"stats.reset.confirm.cancel" = "Отмена";
 "stats.questionsStudied" = "Изучено вопросов";
 "stats.correctAnswers" = "Правильных ответов";
 "stats.incorrectAnswers" = "Неправильных";
