@@ -17,6 +17,11 @@ struct StatsView: View {
     @State private var totalQuestionsCount: Int = 0
     @State private var showingResetAlert = false
     
+    // Task cancellation
+    @State private var updateTask: Task<Void, Never>?
+    @State private var syncTask: Task<Void, Never>?
+    @State private var loadQuestionsTask: Task<Void, Never>?
+    
     init(statsManager: StatsManager) {
         self._statsManager = State(initialValue: statsManager)
     }
@@ -173,7 +178,8 @@ struct StatsView: View {
                             
                             HStack(spacing: 12) {
                                 Button(action: {
-                                    Task {
+                                    updateTask?.cancel()
+                                    updateTask = Task {
                                         await checkForUpdates()
                                     }
                                 }) {
@@ -192,7 +198,8 @@ struct StatsView: View {
                                 
                                 if remoteService.hasUpdates {
                                     Button(action: {
-                                        Task {
+                                        syncTask?.cancel()
+                                        syncTask = Task {
                                             await syncQuestions()
                                         }
                                     }) {
@@ -233,9 +240,15 @@ struct StatsView: View {
                     MistakesReviewNavigationView(viewModel: viewModel)
                 }
             }
-            .onAppear {
-                loadTotalQuestionsCount()
-            }
+        .onAppear {
+            loadTotalQuestionsCount()
+        }
+        .onDisappear {
+            // Cancel all pending tasks when view disappears
+            updateTask?.cancel()
+            syncTask?.cancel()
+            loadQuestionsTask?.cancel()
+        }
             .alert(
                 "stats.reset.confirm.title".localized,
                 isPresented: $showingResetAlert
@@ -253,7 +266,8 @@ struct StatsView: View {
     }
     
     private func loadTotalQuestionsCount() {
-        Task {
+        loadQuestionsTask?.cancel()
+        loadQuestionsTask = Task {
             do {
                 let questionsRepository = QuestionsRepository()
                 let currentLanguage = settingsManager.settings.language.rawValue
@@ -309,11 +323,14 @@ struct StatsView: View {
         mistakesViewModel = viewModel
         showingMistakesReview = true
         
-        Task {
+        let mistakesTask = Task {
             print("DEBUG: Starting async mistakes review...")
             await viewModel.startMistakesReview()
             print("DEBUG: Mistakes review completed. State: \(viewModel.state)")
         }
+        
+        // Store task for potential cancellation
+        updateTask = mistakesTask
     }
     
 }

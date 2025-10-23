@@ -17,6 +17,9 @@ struct StartView: View {
     @State private var showingAchievements = false
     @AppStorage("bestScore") private var bestScore: Double = 0
     
+    // Task cancellation
+    @State private var startQuizTask: Task<Void, Never>?
+    
     init(viewModel: QuizViewModel) {
         self.viewModel = viewModel
     }
@@ -68,7 +71,8 @@ struct StartView: View {
                 
                 // Start Button
                 Button(action: {
-                    Task {
+                    startQuizTask?.cancel()
+                    startQuizTask = Task {
                         let languageCode = settingsManager.settings.language.locale?.language.languageCode?.identifier ?? "ru"
                         await viewModel.startQuiz(language: languageCode)
                     }
@@ -165,6 +169,10 @@ struct StartView: View {
                     UIApplication.shared.applicationIconBadgeNumber = 0
                 }
             }
+        }
+        .onDisappear {
+            // Cancel pending tasks when view disappears
+            startQuizTask?.cancel()
         }
     }
 }

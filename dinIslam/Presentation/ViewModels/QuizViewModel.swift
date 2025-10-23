@@ -120,8 +120,9 @@ class QuizViewModel {
         }
         
         // Show result briefly before moving to next question
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
-            self?.nextQuestion()
+        Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 1_500_000_000) // 1.5 seconds
+            nextQuestion()
         }
     }
     

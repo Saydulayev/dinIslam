@@ -10,6 +10,7 @@ import SwiftUI
 import Combine
 
 // MARK: - Localization Manager
+@MainActor
 class LocalizationManager: ObservableObject {
     static let shared = LocalizationManager()
     
@@ -17,7 +18,6 @@ class LocalizationManager: ObservableObject {
     
     // MARK: - Caching
     private var cachedLocalizedStrings: [String: String] = [:]
-    private let cacheQueue = DispatchQueue(label: "localization.cache", attributes: .concurrent)
     
     private init() {
         // Load saved language from UserDefaults
@@ -35,9 +35,7 @@ class LocalizationManager: ObservableObject {
         UserDefaults.standard.set(language, forKey: "SelectedLanguage")
         
         // Clear cache when language changes
-        cacheQueue.async(flags: .barrier) {
-            self.cachedLocalizedStrings.removeAll()
-        }
+        cachedLocalizedStrings.removeAll()
         
         // Force UI update
         objectWillChange.send()
@@ -45,7 +43,7 @@ class LocalizationManager: ObservableObject {
     
     func localizedString(for key: String) -> String {
         // Check cache first
-        if let cachedString = cacheQueue.sync(execute: { cachedLocalizedStrings[key] }) {
+        if let cachedString = cachedLocalizedStrings[key] {
             return cachedString
         }
         
@@ -66,9 +64,7 @@ class LocalizationManager: ObservableObject {
         }
         
         // Cache the result
-        cacheQueue.async(flags: .barrier) {
-            self.cachedLocalizedStrings[key] = localizedString
-        }
+        cachedLocalizedStrings[key] = localizedString
         
         return localizedString
     }

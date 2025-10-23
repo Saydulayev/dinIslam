@@ -194,7 +194,7 @@ struct NotificationSettingsView: View {
         )
         
         UNUserNotificationCenter.current().add(request) { error in
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 if error == nil {
                     showingTestNotification = true
                 }

@@ -42,7 +42,7 @@ class NotificationManager: ObservableObject {
     
     private func checkNotificationPermission() {
         center.getNotificationSettings { settings in
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 self.hasPermission = settings.authorizationStatus == .authorized
             }
         }
