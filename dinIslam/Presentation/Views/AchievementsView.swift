@@ -144,10 +144,6 @@ struct AchievementCard: View {
                                 .foregroundColor(achievement.color)
                             
                             Spacer()
-                            
-                            Text(getProgressDescription())
-                                .font(.caption)
-                                .foregroundColor(.secondary)
                         }
                     }
                 }
@@ -166,24 +162,6 @@ struct AchievementCard: View {
         .animation(.easeInOut(duration: 0.3), value: isUnlocked)
     }
     
-    private func getProgressDescription() -> String {
-        switch achievement.type {
-        case .firstQuiz:
-            return LocalizationManager.shared.localizedString(for: "achievements.progress.quiz")
-        case .perfectScore:
-            return LocalizationManager.shared.localizedString(for: "achievements.progress.perfect")
-        case .speedRunner:
-            return LocalizationManager.shared.localizedString(for: "achievements.progress.speed")
-        case .scholar, .explorer:
-            return LocalizationManager.shared.localizedString(for: "achievements.progress.questions")
-        case .dedicated, .master, .legend:
-            return LocalizationManager.shared.localizedString(for: "achievements.progress.quizzes")
-        case .streak:
-            return LocalizationManager.shared.localizedString(for: "achievements.progress.streak")
-        case .perfectionist:
-            return LocalizationManager.shared.localizedString(for: "achievements.progress.perfects")
-        }
-    }
 }
 
 #Preview {
