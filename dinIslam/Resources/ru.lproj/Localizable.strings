@@ -254,3 +254,97 @@
 "terms.law.content" = "Данные условия регулируются законами Австрии. Любые споры подлежат рассмотрению в судах Австрии.";
 "terms.contact.title" = "Контактная информация";
 "terms.contact.content" = "По вопросам, связанным с условиями использования, обращайтесь:\n\nEmail: saydulayev.wien@gmail.com";
+
+// Error Messages
+"error.title" = "Ошибка";
+"error.ok" = "ОК";
+
+// Mistakes Review
+"mistakes.title" = "Повтор ошибок";
+"mistakes.reviewTitle" = "Повтор ошибок";
+"mistakes.loading" = "Загрузка...";
+"mistakes.stopped" = "Повтор остановлен";
+"mistakes.back" = "Назад";
+"mistakes.error" = "Ошибка";
+"mistakes.wrongAnswer" = "Неправильный ответ";
+"mistakes.stop" = "Остановить";
+"mistakes.stop.confirm.title" = "Остановить повтор?";
+"mistakes.stop.confirm.cancel" = "Отмена";
+"mistakes.stop.confirm.ok" = "Остановить";
+"mistakes.stop.confirm.message" = "Вы уверены, что хотите остановить повтор ошибок?";
+"mistakes.noWrongQuestions" = "Нет неправильных ответов для повторения";
+
+// Quiz
+"quiz.question" = "Вопрос";
+"quiz.score" = "Счет";
+"quiz.stop" = "Остановить";
+"quiz.stop.confirm.title" = "Остановить викторину?";
+"quiz.stop.confirm.cancel" = "Отмена";
+"quiz.stop.confirm.ok" = "Остановить";
+"quiz.stop.confirm.message" = "Вы уверены, что хотите остановить викторину?";
+
+// Results
+"result.title" = "Результат";
+"result.correctAnswers" = "Правильные ответы";
+"result.totalQuestions" = "Всего вопросов";
+"result.correctAnswers" = "Правильных ответов";
+"result.timeSpent" = "Время";
+"result.newRecord" = "Новый рекорд!";
+"result.playAgain" = "Играть снова";
+"result.backToStart" = "Вернуться в начало";
+
+// Achievements
+"achievements.title" = "Достижения";
+"achievements.reset" = "Сбросить";
+"achievements.reset.confirm.title" = "Сбросить достижения?";
+"achievements.reset.confirm.cancel" = "Отмена";
+"achievements.reset.confirm.ok" = "Сбросить";
+"achievements.reset.confirm.message" = "Все достижения будут сброшены. Это действие нельзя отменить.";
+"achievements.unlocked" = "Разблокировано";
+"achievements.progress.quiz" = "викторин";
+"achievements.progress.perfect" = "идеальных результатов";
+"achievements.progress.speed" = "быстрых прохождений";
+"achievements.progress.questions" = "вопросов";
+"achievements.progress.quizzes" = "викторин";
+"achievements.progress.streak" = "дней подряд";
+"achievements.progress.perfects" = "идеальных результатов";
+
+// Stats
+"stats.title" = "Статистика";
+"stats.reset" = "Сбросить";
+"stats.reset.confirm.title" = "Сбросить статистику?";
+"stats.reset.confirm.cancel" = "Отмена";
+"stats.reset.confirm.ok" = "Сбросить";
+"stats.reset.confirm.message" = "Вся статистика будет сброшена. Это действие нельзя отменить.";
+"stats.questionsStudied" = "Изучено вопросов";
+"stats.correctAnswers" = "Правильных ответов";
+"stats.incorrectAnswers" = "Неправильных ответов";
+"stats.correctedMistakes" = "Исправлено ошибок";
+"stats.totalQuestions" = "Всего вопросов";
+"stats.quizzesCompleted" = "Пройдено викторин";
+"stats.wrongQuestions" = "Неправильные ответы";
+"stats.wrongQuestionsCount" = "Количество";
+"stats.repeatMistakes" = "Повторить ошибки";
+"stats.sync.title" = "Синхронизация";
+"stats.sync.status" = "Статус";
+"stats.sync.available" = "Доступно обновление";
+"stats.sync.upToDate" = "Актуально";
+"stats.sync.newQuestions" = "Новых вопросов";
+"stats.sync.check" = "Проверить";
+"stats.sync.sync" = "Синхронизировать";
+
+// Notifications
+"notification.title" = "Напоминание";
+"notification.body" = "Время изучать ислам!";
+"notification.permission.title" = "Разрешение уведомлений";
+"notification.permission.message" = "Для получения напоминаний разрешите уведомления";
+"notification.permission.request" = "Разрешить уведомления";
+"notification.settings.title" = "Настройки уведомлений";
+"notification.settings.enabled" = "Уведомления включены";
+"notification.settings.time" = "Время напоминания";
+"notification.settings.test" = "Отправить тестовое уведомление";
+
+// Achievement Notifications
+"achievements.congratulations" = "Поздравляем!";
+"achievements.firstQuiz.title" = "Первая викторина";
+"achievements.firstQuiz.description" = "Пройдите свою первую викторину";

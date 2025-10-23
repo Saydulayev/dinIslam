@@ -254,3 +254,97 @@
 "terms.law.content" = "These terms are governed by the laws of Austria. Any disputes shall be resolved in the courts of Austria.";
 "terms.contact.title" = "Contact Information";
 "terms.contact.content" = "For questions related to terms of service, contact:\n\nEmail: saydulayev.wien@gmail.com";
+
+// Error Messages
+"error.title" = "Error";
+"error.ok" = "OK";
+
+// Mistakes Review
+"mistakes.title" = "Mistakes Review";
+"mistakes.reviewTitle" = "Mistakes Review";
+"mistakes.loading" = "Loading...";
+"mistakes.stopped" = "Review stopped";
+"mistakes.back" = "Back";
+"mistakes.error" = "Error";
+"mistakes.wrongAnswer" = "Wrong answer";
+"mistakes.stop" = "Stop";
+"mistakes.stop.confirm.title" = "Stop review?";
+"mistakes.stop.confirm.cancel" = "Cancel";
+"mistakes.stop.confirm.ok" = "Stop";
+"mistakes.stop.confirm.message" = "Are you sure you want to stop the mistakes review?";
+"mistakes.noWrongQuestions" = "No wrong answers to review";
+
+// Quiz
+"quiz.question" = "Question";
+"quiz.score" = "Score";
+"quiz.stop" = "Stop";
+"quiz.stop.confirm.title" = "Stop quiz?";
+"quiz.stop.confirm.cancel" = "Cancel";
+"quiz.stop.confirm.ok" = "Stop";
+"quiz.stop.confirm.message" = "Are you sure you want to stop the quiz?";
+
+// Results
+"result.title" = "Result";
+"result.correctAnswers" = "Correct answers";
+"result.totalQuestions" = "Total questions";
+"result.correctAnswers" = "Correct answers";
+"result.timeSpent" = "Time";
+"result.newRecord" = "New record!";
+"result.playAgain" = "Play again";
+"result.backToStart" = "Back to start";
+
+// Achievements
+"achievements.title" = "Achievements";
+"achievements.reset" = "Reset";
+"achievements.reset.confirm.title" = "Reset achievements?";
+"achievements.reset.confirm.cancel" = "Cancel";
+"achievements.reset.confirm.ok" = "Reset";
+"achievements.reset.confirm.message" = "All achievements will be reset. This action cannot be undone.";
+"achievements.unlocked" = "Unlocked";
+"achievements.progress.quiz" = "quizzes";
+"achievements.progress.perfect" = "perfect scores";
+"achievements.progress.speed" = "fast completions";
+"achievements.progress.questions" = "questions";
+"achievements.progress.quizzes" = "quizzes";
+"achievements.progress.streak" = "days in a row";
+"achievements.progress.perfects" = "perfect scores";
+
+// Stats
+"stats.title" = "Statistics";
+"stats.reset" = "Reset";
+"stats.reset.confirm.title" = "Reset statistics?";
+"stats.reset.confirm.cancel" = "Cancel";
+"stats.reset.confirm.ok" = "Reset";
+"stats.reset.confirm.message" = "All statistics will be reset. This action cannot be undone.";
+"stats.questionsStudied" = "Questions studied";
+"stats.correctAnswers" = "Correct answers";
+"stats.incorrectAnswers" = "Incorrect answers";
+"stats.correctedMistakes" = "Mistakes corrected";
+"stats.totalQuestions" = "Total questions";
+"stats.quizzesCompleted" = "Quizzes completed";
+"stats.wrongQuestions" = "Wrong answers";
+"stats.wrongQuestionsCount" = "Count";
+"stats.repeatMistakes" = "Repeat mistakes";
+"stats.sync.title" = "Synchronization";
+"stats.sync.status" = "Status";
+"stats.sync.available" = "Update available";
+"stats.sync.upToDate" = "Up to date";
+"stats.sync.newQuestions" = "New questions";
+"stats.sync.check" = "Check";
+"stats.sync.sync" = "Sync";
+
+// Notifications
+"notification.title" = "Reminder";
+"notification.body" = "Time to study Islam!";
+"notification.permission.title" = "Notification Permission";
+"notification.permission.message" = "Allow notifications to receive reminders";
+"notification.permission.request" = "Allow notifications";
+"notification.settings.title" = "Notification Settings";
+"notification.settings.enabled" = "Notifications enabled";
+"notification.settings.time" = "Reminder time";
+"notification.settings.test" = "Send test notification";
+
+// Achievement Notifications
+"achievements.congratulations" = "Congratulations!";
+"achievements.firstQuiz.title" = "First Quiz";
+"achievements.firstQuiz.description" = "Complete your first quiz";
