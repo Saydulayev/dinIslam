@@ -112,28 +112,34 @@ struct QuizView: View {
                 }
                 .padding()
             }
+            
+            // Stop button at the bottom
+            VStack(spacing: 0) {
+                Divider()
+                    .background(.separator)
+                
+                Button(action: {
+                    showingStopConfirm = true
+                }) {
+                    HStack {
+                        Image(systemName: "stop.fill")
+                        Text(LocalizationManager.shared.localizedString(for: "quiz.stop"))
+                            .fontWeight(.semibold)
+                    }
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 52)
+                    .background(Color.red.gradient, in: RoundedRectangle(cornerRadius: 14))
+                    .padding(.horizontal)
+                    .padding(.vertical, 12)
+                }
+                .accessibilityLabel("Stop quiz")
+                .accessibilityHint("Double tap to stop the current quiz")
+                .background(.ultraThinMaterial)
+            }
         }
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
-        .safeAreaInset(edge: .bottom) {
-            Button(action: {
-                showingStopConfirm = true
-            }) {
-                HStack {
-                    Image(systemName: "stop.fill")
-                    Text(LocalizationManager.shared.localizedString(for: "quiz.stop"))
-                        .fontWeight(.semibold)
-                }
-                .foregroundColor(.white)
-                .frame(maxWidth: .infinity)
-                .frame(height: 52)
-                .background(Color.red.gradient, in: RoundedRectangle(cornerRadius: 14))
-                .padding(.horizontal)
-                .padding(.bottom, 8)
-            }
-            .accessibilityLabel("Stop quiz")
-            .accessibilityHint("Double tap to stop the current quiz")
-        }
         .alert(
             LocalizationManager.shared.localizedString(for: "quiz.stop.confirm.title"),
             isPresented: $showingStopConfirm

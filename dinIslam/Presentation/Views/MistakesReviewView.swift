@@ -118,27 +118,33 @@ struct MistakesReviewView: View {
                 }
                 .padding()
             }
+            
+            // Stop button at the bottom
+            VStack(spacing: 0) {
+                Divider()
+                    .background(.separator)
+                
+                Button(action: {
+                    showingStopConfirm = true
+                }) {
+                    HStack {
+                        Image(systemName: "stop.fill")
+                        Text(LocalizationManager.shared.localizedString(for: "mistakes.stop"))
+                            .fontWeight(.semibold)
+                    }
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 52)
+                    .background(Color.red.gradient, in: RoundedRectangle(cornerRadius: 14))
+                    .padding(.horizontal)
+                    .padding(.vertical, 12)
+                }
+                .background(.ultraThinMaterial)
+            }
         }
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
         .navigationTitle(LocalizationManager.shared.localizedString(for: "mistakes.reviewTitle"))
-        .safeAreaInset(edge: .bottom) {
-            Button(action: {
-                showingStopConfirm = true
-            }) {
-                HStack {
-                    Image(systemName: "stop.fill")
-                    Text(LocalizationManager.shared.localizedString(for: "mistakes.stop"))
-                        .fontWeight(.semibold)
-                }
-                .foregroundColor(.white)
-                .frame(maxWidth: .infinity)
-                .frame(height: 52)
-                .background(Color.red.gradient, in: RoundedRectangle(cornerRadius: 14))
-                .padding(.horizontal)
-                .padding(.bottom, 8)
-            }
-        }
         .alert(
             LocalizationManager.shared.localizedString(for: "mistakes.stop.confirm.title"),
             isPresented: $showingStopConfirm
