@@ -65,7 +65,7 @@ class QuizViewModel {
     // MARK: - Public Methods
     @MainActor
     func startQuiz(language: String) async {
-        state = .loading
+        state = .active(.loading)
         isLoading = true
         errorMessage = nil
         
@@ -79,13 +79,13 @@ class QuizViewModel {
                 isAnswerSelected = false
                 showResult = false
                 startTime = Date()
-                state = .playing
+                state = .active(.playing)
                 isLoading = false
             }
         } catch {
             await MainActor.run {
                 errorMessage = error.localizedDescription
-                state = .error
+                state = .error(.networkError)
                 isLoading = false
             }
         }
@@ -120,18 +120,21 @@ class QuizViewModel {
         }
         
         // Show result briefly before moving to next question
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-            self.nextQuestion()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
+            self?.nextQuestion()
         }
     }
     
     @MainActor
     func nextQuestion() {
         if isLastQuestion {
-            if state == .playing {
+            switch state {
+            case .active(.playing):
                 finishQuiz()
-            } else if state == .mistakesReview {
+            case .active(.mistakesReview):
                 finishMistakesReview()
+            default:
+                break
             }
         } else {
             currentQuestionIndex += 1
@@ -164,7 +167,7 @@ class QuizViewModel {
         // Check for new achievements
         achievementManager.checkAchievements(for: statsManager.stats, quizResult: quizResult)
         
-        state = .finished
+        state = .completed(.finished)
     }
     
     @MainActor
@@ -185,7 +188,7 @@ class QuizViewModel {
     @MainActor
     func startMistakesReview() async {
         print("DEBUG: QuizViewModel.startMistakesReview() called")
-        state = .loading
+        state = .active(.loading)
         isLoading = true
         errorMessage = nil
         
@@ -216,7 +219,7 @@ class QuizViewModel {
             isAnswerSelected = false
             showResult = false
             startTime = Date()
-            state = .mistakesReview
+            state = .active(.mistakesReview)
             print("DEBUG: Set state to mistakesReview with \(questions.count) questions")
         } catch {
             print("DEBUG: Error loading questions: \(error)")
@@ -253,7 +256,7 @@ class QuizViewModel {
         
         print("DEBUG: Wrong questions after removal: \(statsManager.stats.wrongQuestionIds.count)")
         
-        state = .mistakesFinished
+        state = .completed(.mistakesFinished)
     }
     
     // MARK: - Achievement Methods

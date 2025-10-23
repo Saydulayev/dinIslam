@@ -6,175 +6,173 @@
 //
 
 import SwiftUI
+import UserNotifications
 
 struct NotificationSettingsView: View {
-    @StateObject private var notificationManager = NotificationManager()
+    @EnvironmentObject private var notificationManager: NotificationManager
     @Environment(\.dismiss) private var dismiss
-    @ObservedObject private var localizationManager = LocalizationManager.shared
     @State private var showingPermissionAlert = false
     @State private var showingTestNotification = false
     
     var body: some View {
-        NavigationStack {
-            List {
-                // Permission Section
-                if !notificationManager.hasPermission {
-                    Section {
-                        VStack(alignment: .leading, spacing: 12) {
-                            HStack {
-                                Image(systemName: "bell.badge")
-                                    .foregroundColor(.blue)
-                                    .font(.title2)
+        List {
+            // Permission Section
+            if !notificationManager.hasPermission {
+                Section {
+                    VStack(alignment: .leading, spacing: 12) {
+                        HStack {
+                            Image(systemName: "bell.badge")
+                                .foregroundColor(.blue)
+                                .font(.title2)
+                            
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("notification.permission.title".localized)
+                                    .font(.headline)
+                                    .foregroundColor(.primary)
                                 
-                                VStack(alignment: .leading, spacing: 4) {
-                                    Text(LocalizationManager.shared.localizedString(for: "notification.permission.title"))
-                                        .font(.headline)
-                                        .foregroundColor(.primary)
-                                    
-                                    Text(LocalizationManager.shared.localizedString(for: "notification.permission.message"))
-                                        .font(.subheadline)
-                                        .foregroundColor(.secondary)
-                                }
-                                
-                                Spacer()
+                                Text("notification.permission.message".localized)
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
                             }
                             
-                            Button(action: {
-                                Task {
-                                    let granted = await notificationManager.requestNotificationPermission()
-                                    if !granted {
-                                        showingPermissionAlert = true
-                                    }
-                                }
-                            }) {
-                                Text(LocalizationManager.shared.localizedString(for: "notification.permission.title"))
-                                    .fontWeight(.semibold)
-                                    .foregroundColor(.white)
-                                    .frame(maxWidth: .infinity)
-                                    .frame(height: 44)
-                                    .background(.blue.gradient, in: RoundedRectangle(cornerRadius: 12))
-                            }
+                            Spacer()
                         }
-                        .padding(.vertical, 8)
+                        
+                        Button(action: {
+                            Task {
+                                let granted = await notificationManager.requestNotificationPermission()
+                                if !granted {
+                                    showingPermissionAlert = true
+                                }
+                            }
+                        }) {
+                            Text("notification.permission.request".localized)
+                                .fontWeight(.semibold)
+                                .foregroundColor(.white)
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 44)
+                                .background(.blue.gradient, in: RoundedRectangle(cornerRadius: 12))
+                        }
                     }
+                    .padding(.vertical, 8)
                 }
-                
-                // Settings Section
-                if notificationManager.hasPermission {
-                    Section {
-                        // Enable/Disable Notifications
+            }
+            
+            // Settings Section
+            if notificationManager.hasPermission {
+                Section {
+                    // Enable/Disable Notifications
+                    HStack {
+                        Image(systemName: "bell")
+                            .foregroundColor(.blue)
+                            .frame(width: 24)
+                        
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("notification.settings.enabled".localized)
+                                .font(.body)
+                                .foregroundColor(.primary)
+                            
+                            Text(notificationManager.isNotificationEnabled ?
+                                 "settings.on".localized :
+                                 "settings.off".localized)
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        
+                        Spacer()
+                        
+                        Toggle("", isOn: $notificationManager.isNotificationEnabled)
+                            .onChange(of: notificationManager.isNotificationEnabled) { _, newValue in
+                                notificationManager.toggleNotifications(newValue)
+                            }
+                    }
+                    .padding(.vertical, 4)
+                    
+                    // Reminder Time
+                    if notificationManager.isNotificationEnabled {
                         HStack {
-                            Image(systemName: "bell")
+                            Image(systemName: "clock")
                                 .foregroundColor(.blue)
                                 .frame(width: 24)
                             
                             VStack(alignment: .leading, spacing: 2) {
-                                Text(LocalizationManager.shared.localizedString(for: "notification.settings.enabled"))
+                                Text("notification.settings.time".localized)
                                     .font(.body)
                                     .foregroundColor(.primary)
                                 
-                                Text(notificationManager.isNotificationEnabled ? 
-                                     LocalizationManager.shared.localizedString(for: "settings.on") : 
-                                     LocalizationManager.shared.localizedString(for: "settings.off"))
+                                Text(notificationManager.reminderTime.formatted(date: .omitted, time: .shortened))
                                     .font(.caption)
                                     .foregroundColor(.secondary)
                             }
                             
                             Spacer()
                             
-                            Toggle("", isOn: $notificationManager.isNotificationEnabled)
-                                .onChange(of: notificationManager.isNotificationEnabled) { _, newValue in
-                                    notificationManager.toggleNotifications(newValue)
+                            DatePicker("", selection: $notificationManager.reminderTime, displayedComponents: .hourAndMinute)
+                                .labelsHidden()
+                                .onChange(of: notificationManager.reminderTime) { _, newValue in
+                                    notificationManager.updateReminderTime(newValue)
                                 }
                         }
                         .padding(.vertical, 4)
                         
-                        // Reminder Time
-                        if notificationManager.isNotificationEnabled {
+                        // Test Notification Button
+                        Button(action: {
+                            sendTestNotification()
+                        }) {
                             HStack {
-                                Image(systemName: "clock")
+                                Image(systemName: "paperplane")
                                     .foregroundColor(.blue)
                                     .frame(width: 24)
                                 
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text(LocalizationManager.shared.localizedString(for: "notification.settings.time"))
-                                        .font(.body)
-                                        .foregroundColor(.primary)
-                                    
-                                    Text(notificationManager.reminderTime.formatted(date: .omitted, time: .shortened))
-                                        .font(.caption)
-                                        .foregroundColor(.secondary)
-                                }
+                                Text("notification.settings.test".localized)
+                                    .font(.body)
+                                    .foregroundColor(.primary)
                                 
                                 Spacer()
                                 
-                                DatePicker("", selection: $notificationManager.reminderTime, displayedComponents: .hourAndMinute)
-                                    .labelsHidden()
-                                    .onChange(of: notificationManager.reminderTime) { _, newValue in
-                                        notificationManager.updateReminderTime(newValue)
-                                    }
+                                Image(systemName: "chevron.right")
+                                    .foregroundColor(.secondary)
+                                    .font(.caption)
                             }
                             .padding(.vertical, 4)
-                            
-                            // Test Notification Button
-                            Button(action: {
-                                sendTestNotification()
-                            }) {
-                                HStack {
-                                    Image(systemName: "paperplane")
-                                        .foregroundColor(.blue)
-                                        .frame(width: 24)
-                                    
-                                    Text(LocalizationManager.shared.localizedString(for: "notification.settings.test"))
-                                        .font(.body)
-                                        .foregroundColor(.primary)
-                                    
-                                    Spacer()
-                                    
-                                    Image(systemName: "chevron.right")
-                                        .foregroundColor(.secondary)
-                                        .font(.caption)
-                                }
-                                .padding(.vertical, 4)
-                            }
-                            .buttonStyle(PlainButtonStyle())
                         }
-                    } header: {
-                        Text(LocalizationManager.shared.localizedString(for: "notification.settings.title"))
-                    } footer: {
-                        if notificationManager.isNotificationEnabled {
-                            Text(LocalizationManager.shared.localizedString(for: "notification.settings.footer"))
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }
+                        .buttonStyle(PlainButtonStyle())
+                    }
+                } header: {
+                    Text("notification.settings.title".localized)
+                } footer: {
+                    if notificationManager.isNotificationEnabled {
+                        Text("notification.settings.footer".localized)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
                     }
                 }
             }
-            .navigationTitle(LocalizationManager.shared.localizedString(for: "notification.settings.title"))
-            .navigationBarTitleDisplayMode(.large)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(LocalizationManager.shared.localizedString(for: "settings.done")) {
-                        dismiss()
-                    }
+        }
+        .navigationTitle("notification.settings.title".localized)
+        .navigationBarTitleDisplayMode(.large)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button("settings.done".localized) {
+                    dismiss()
                 }
             }
-            .alert(LocalizationManager.shared.localizedString(for: "notification.permission.title"),
-                   isPresented: $showingPermissionAlert) {
-                Button(LocalizationManager.shared.localizedString(for: "error.ok")) {
-                    showingPermissionAlert = false
-                }
-            } message: {
-                Text(LocalizationManager.shared.localizedString(for: "notification.permission.denied.message"))
+        }
+        .alert("notification.permission.title".localized,
+               isPresented: $showingPermissionAlert) {
+            Button("error.ok".localized) {
+                showingPermissionAlert = false
             }
-            .alert(LocalizationManager.shared.localizedString(for: "notification.test.sent.title"),
-                   isPresented: $showingTestNotification) {
-                Button(LocalizationManager.shared.localizedString(for: "error.ok")) {
-                    showingTestNotification = false
-                }
-            } message: {
-                Text(LocalizationManager.shared.localizedString(for: "notification.test.sent.message"))
+        } message: {
+            Text("notification.permission.denied.message".localized)
+        }
+        .alert("notification.test.sent.title".localized,
+               isPresented: $showingTestNotification) {
+            Button("error.ok".localized) {
+                showingTestNotification = false
             }
+        } message: {
+            Text("notification.test.sent.message".localized)
         }
     }
     
@@ -182,8 +180,8 @@ struct NotificationSettingsView: View {
         guard notificationManager.hasPermission else { return }
         
         let content = UNMutableNotificationContent()
-        content.title = LocalizationManager.shared.localizedString(for: "notification.title")
-        content.body = LocalizationManager.shared.localizedString(for: "notification.body")
+        content.title = "notification.title".localized
+        content.body = "notification.body".localized
         content.sound = .default
         content.badge = 1
         
@@ -207,4 +205,5 @@ struct NotificationSettingsView: View {
 
 #Preview {
     NotificationSettingsView()
+        .environmentObject(NotificationManager())
 }

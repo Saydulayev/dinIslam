@@ -44,12 +44,26 @@ enum Difficulty: String, Codable, CaseIterable {
 
 enum QuizState {
     case idle
+    case active(ActiveState)
+    case completed(CompletedState)
+    case error(ErrorState)
+}
+
+enum ActiveState {
     case loading
     case playing
-    case finished
     case mistakesReview
+}
+
+enum CompletedState {
+    case finished
     case mistakesFinished
-    case error
+}
+
+enum ErrorState {
+    case networkError
+    case dataError
+    case unknownError
 }
 
 struct QuizResult {

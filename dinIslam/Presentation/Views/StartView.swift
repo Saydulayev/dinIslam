@@ -11,21 +11,17 @@ import UserNotifications
 struct StartView: View {
     @State private var viewModel: QuizViewModel
     @EnvironmentObject private var settingsManager: SettingsManager
-    @State private var statsManager: StatsManager
+    @Environment(\.statsManager) private var statsManager: StatsManager
     @State private var showingSettings = false
     @State private var showingStats = false
     @State private var showingAchievements = false
     @AppStorage("bestScore") private var bestScore: Double = 0
-    @ObservedObject private var localizationManager = LocalizationManager.shared
-    @StateObject private var notificationManager = NotificationManager()
     
     init(viewModel: QuizViewModel) {
         self.viewModel = viewModel
-        self.statsManager = StatsManager()
     }
     
     init(quizUseCase: QuizUseCaseProtocol, statsManager: StatsManager, settingsManager: SettingsManager) {
-        self.statsManager = statsManager
         self.viewModel = QuizViewModel(quizUseCase: quizUseCase, statsManager: statsManager, settingsManager: settingsManager)
     }
     
@@ -100,32 +96,24 @@ struct StartView: View {
                 Spacer()
             }
             .padding()
-            .navigationDestination(
-                isPresented: Binding(
-                    get: { viewModel.state == .playing },
-                    set: { isPresented in
-                        if !isPresented {
-                            viewModel.restartQuiz()
-                        }
-                    }
-                )
-            ) {
+            .navigationDestination(isPresented: .constant({
+                if case .active(.playing) = viewModel.state { return true }
+                return false
+            }())) {
                 QuizView(viewModel: viewModel)
             }
-            .navigationDestination(
-                isPresented: Binding(
-                    get: { viewModel.state == .finished },
-                    set: { isPresented in
-                        if !isPresented {
-                            viewModel.restartQuiz()
-                        }
-                    }
-                )
-            ) {
+            .navigationDestination(isPresented: .constant({
+                if case .completed(.finished) = viewModel.state { return true }
+                return false
+            }())) {
                 ResultView(viewModel: viewModel, bestScore: $bestScore)
             }
             .sheet(isPresented: $showingSettings) {
-                SettingsView(viewModel: SettingsViewModel(settingsManager: settingsManager))
+                NavigationStack {
+                    SettingsView(viewModel: SettingsViewModel(settingsManager: settingsManager))
+                }
+                .presentationDetents([.large])
+                .presentationDragIndicator(.visible)
             }
             .navigationDestination(isPresented: $showingStats) {
                 StatsView(statsManager: statsManager)
@@ -161,9 +149,9 @@ struct StartView: View {
                     }
                 }
             }
-            .alert(LocalizationManager.shared.localizedString(for: "error.title"),
+            .alert("error.title".localized,
                    isPresented: .constant(viewModel.errorMessage != nil)) {
-                Button(LocalizationManager.shared.localizedString(for: "error.ok")) {
+                Button("error.ok".localized) {
                     viewModel.errorMessage = nil
                 }
             } message: {
@@ -175,13 +163,6 @@ struct StartView: View {
                     UNUserNotificationCenter.current().setBadgeCount(0, withCompletionHandler: { _ in })
                 } else {
                     UIApplication.shared.applicationIconBadgeNumber = 0
-                }
-                
-                // Request notification permission on first launch
-                if !notificationManager.hasPermission {
-                    Task {
-                        await notificationManager.requestNotificationPermission()
-                    }
                 }
             }
         }

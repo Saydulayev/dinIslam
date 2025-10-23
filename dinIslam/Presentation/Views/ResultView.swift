@@ -11,7 +11,6 @@ import UserNotifications
 struct ResultView: View {
     @State private var viewModel: QuizViewModel
     @Binding var bestScore: Double
-    @ObservedObject private var localizationManager = LocalizationManager.shared
     @State private var showingAchievementNotification = false
     @State private var currentAchievement: Achievement?
     
@@ -52,17 +51,17 @@ struct ResultView: View {
                 // Detailed stats
                 VStack(spacing: 12) {
                     StatRow(
-                        title: localizationManager.localizedString(for: "result.totalQuestions"),
+                        title: "result.totalQuestions".localized,
                         value: "\(viewModel.quizResult?.totalQuestions ?? 0)"
                     )
                     
                     StatRow(
-                        title: localizationManager.localizedString(for: "result.correctAnswers"),
+                        title: "result.correctAnswers".localized,
                         value: "\(viewModel.quizResult?.correctAnswers ?? 0)"
                     )
                     
                     StatRow(
-                        title: localizationManager.localizedString(for: "result.timeSpent"),
+                        title: "result.timeSpent".localized,
                         value: formatTime(viewModel.quizResult?.timeSpent ?? 0)
                     )
                 }

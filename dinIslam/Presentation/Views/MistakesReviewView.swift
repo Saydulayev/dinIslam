@@ -10,7 +10,6 @@ import SwiftUI
 struct MistakesReviewView: View {
     @State private var viewModel: QuizViewModel
     @State private var showingStopConfirm: Bool = false
-    @ObservedObject private var localizationManager = LocalizationManager.shared
     
     init(viewModel: QuizViewModel) {
         self.viewModel = viewModel
@@ -144,19 +143,19 @@ struct MistakesReviewView: View {
         }
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
-        .navigationTitle(LocalizationManager.shared.localizedString(for: "mistakes.reviewTitle"))
+        .navigationTitle("mistakes.reviewTitle".localized)
         .alert(
-            LocalizationManager.shared.localizedString(for: "mistakes.stop.confirm.title"),
+            "mistakes.stop.confirm.title".localized,
             isPresented: $showingStopConfirm
         ) {
-            Button(LocalizationManager.shared.localizedString(for: "mistakes.stop.confirm.cancel"), role: .cancel) {
+            Button("mistakes.stop.confirm.cancel".localized, role: .cancel) {
                 showingStopConfirm = false
             }
-            Button(LocalizationManager.shared.localizedString(for: "mistakes.stop.confirm.ok"), role: .destructive) {
+            Button("mistakes.stop.confirm.ok".localized, role: .destructive) {
                 viewModel.restartQuiz()
             }
         } message: {
-            Text(LocalizationManager.shared.localizedString(for: "mistakes.stop.confirm.message"))
+            Text("mistakes.stop.confirm.message".localized)
         }
     }
 }

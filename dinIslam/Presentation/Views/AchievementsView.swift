@@ -8,45 +8,42 @@
 import SwiftUI
 
 struct AchievementsView: View {
-    @StateObject private var achievementManager = AchievementManager()
+    @EnvironmentObject private var achievementManager: AchievementManager
     @Environment(\.dismiss) private var dismiss
-    @ObservedObject private var localizationManager = LocalizationManager.shared
     @EnvironmentObject private var settingsManager: SettingsManager
     @State private var showingResetAlert = false
     
     var body: some View {
-        NavigationStack {
-            ScrollView {
-                LazyVStack(spacing: 16) {
-                    ForEach(achievementManager.achievements) { achievement in
-                        AchievementCard(achievement: achievement)
-                    }
-                }
-                .padding()
-            }
-            .navigationTitle(LocalizationManager.shared.localizedString(for: "achievements.title"))
-            .navigationBarTitleDisplayMode(.large)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(LocalizationManager.shared.localizedString(for: "achievements.reset")) {
-                        showingResetAlert = true
-                    }
-                    .foregroundColor(.red)
+        ScrollView {
+            LazyVStack(spacing: 16) {
+                ForEach(achievementManager.achievements) { achievement in
+                    AchievementCard(achievement: achievement)
                 }
             }
-            .alert(
-                LocalizationManager.shared.localizedString(for: "achievements.reset.confirm.title"),
-                isPresented: $showingResetAlert
-            ) {
-                Button(LocalizationManager.shared.localizedString(for: "achievements.reset.confirm.cancel"), role: .cancel) {
-                    // Cancel action
+            .padding()
+        }
+        .navigationTitle("achievements.title".localized)
+        .navigationBarTitleDisplayMode(.large)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button("achievements.reset".localized) {
+                    showingResetAlert = true
                 }
-                Button(LocalizationManager.shared.localizedString(for: "achievements.reset.confirm.ok"), role: .destructive) {
-                    achievementManager.resetAllAchievements()
-                }
-            } message: {
-                Text(LocalizationManager.shared.localizedString(for: "achievements.reset.confirm.message"))
+                .foregroundColor(.red)
             }
+        }
+        .alert(
+            "achievements.reset.confirm.title".localized,
+            isPresented: $showingResetAlert
+        ) {
+            Button("achievements.reset.confirm.cancel".localized, role: .cancel) {
+                // Cancel action
+            }
+            Button("achievements.reset.confirm.ok".localized, role: .destructive) {
+                achievementManager.resetAllAchievements()
+            }
+        } message: {
+            Text("achievements.reset.confirm.message".localized)
         }
     }
 }
@@ -55,15 +52,15 @@ struct AchievementCard: View {
     let achievement: Achievement
     @ObservedObject private var localizationManager = LocalizationManager.shared
     @EnvironmentObject private var settingsManager: SettingsManager
+    @EnvironmentObject private var achievementManager: AchievementManager
+    @Environment(\.statsManager) private var statsManager: StatsManager
     
     private var isUnlocked: Bool {
         achievement.isUnlocked
     }
     
     private var progress: AchievementProgress {
-        // Получаем статистику для расчета прогресса
-        let statsManager = StatsManager()
-        let achievementManager = AchievementManager()
+        // Используем существующие экземпляры из EnvironmentObject
         return achievementManager.getAchievementProgress(for: achievement.type, stats: statsManager.stats)
     }
     
@@ -129,9 +126,9 @@ struct AchievementCard: View {
                 if isUnlocked, let unlockedDate = achievement.unlockedDate {
                     Text(LocalizationManager.shared.localizedString(for: "achievements.unlocked") + " " + 
                          unlockedDate.formatted(date: .abbreviated, time: .omitted))
-                        .font(.caption)
-                        .foregroundColor(.green)
-                        .fontWeight(.medium)
+                    .font(.caption)
+                    .foregroundColor(.green)
+                    .fontWeight(.medium)
                 } else {
                     VStack(alignment: .leading, spacing: 4) {
                         // Прогресс-бар
@@ -191,4 +188,6 @@ struct AchievementCard: View {
 
 #Preview {
     AchievementsView()
+        .environmentObject(AchievementManager())
+        .environmentObject(SettingsManager())
 }

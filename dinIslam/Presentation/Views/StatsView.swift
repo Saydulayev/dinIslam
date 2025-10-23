@@ -8,14 +8,18 @@
 import SwiftUI
 
 struct StatsView: View {
-    var statsManager: StatsManager
+    @State private var statsManager: StatsManager
     @EnvironmentObject private var settingsManager: SettingsManager
+    @EnvironmentObject private var remoteService: RemoteQuestionsService
     @Environment(\.dismiss) private var dismiss
     @State private var mistakesViewModel: QuizViewModel?
     @State private var showingMistakesReview = false
     @State private var totalQuestionsCount: Int = 0
-    @StateObject private var remoteService = RemoteQuestionsService()
     @State private var showingResetAlert = false
+    
+    init(statsManager: StatsManager) {
+        self._statsManager = State(initialValue: statsManager)
+    }
     
     var body: some View {
         ScrollView {
@@ -26,7 +30,7 @@ struct StatsView: View {
                         .font(.system(size: 40))
                         .foregroundStyle(.blue.gradient)
                     
-                    Text(LocalizationManager.shared.localizedString(for: "stats.title"))
+                    Text("stats.title".localized)
                         .font(.title2)
                         .fontWeight(.bold)
                 }
@@ -39,7 +43,7 @@ struct StatsView: View {
                         GridItem(.flexible())
                     ], spacing: 16) {
                         StatCard(
-                            title: LocalizationManager.shared.localizedString(for: "stats.questionsStudied"),
+                            title: "stats.questionsStudied".localized,
                             value: "\(statsManager.stats.totalQuestionsStudied)",
                             icon: "questionmark.circle.fill",
                             color: .blue,
@@ -47,7 +51,7 @@ struct StatsView: View {
                         )
                         
                         StatCard(
-                            title: LocalizationManager.shared.localizedString(for: "stats.correctAnswers"),
+                            title: "stats.correctAnswers".localized,
                             value: "\(statsManager.stats.correctAnswers)",
                             icon: "checkmark.circle.fill",
                             color: .green,
@@ -55,7 +59,7 @@ struct StatsView: View {
                         )
                         
                         StatCard(
-                            title: LocalizationManager.shared.localizedString(for: "stats.incorrectAnswers"),
+                            title: "stats.incorrectAnswers".localized,
                             value: "\(statsManager.stats.incorrectAnswers)",
                             icon: "xmark.circle.fill",
                             color: .red,
@@ -63,7 +67,7 @@ struct StatsView: View {
                         )
                         
                         StatCard(
-                            title: LocalizationManager.shared.localizedString(for: "stats.correctedMistakes"),
+                            title: "stats.correctedMistakes".localized,
                             value: "\(statsManager.stats.correctedMistakes)",
                             icon: "checkmark.circle.badge.xmark",
                             color: .orange,
@@ -71,7 +75,7 @@ struct StatsView: View {
                         )
                         
                         StatCard(
-                            title: LocalizationManager.shared.localizedString(for: "stats.totalQuestions"),
+                            title: "stats.totalQuestions".localized,
                             value: "\(totalQuestionsCount)",
                             icon: "book.fill",
                             color: .purple,
@@ -79,7 +83,7 @@ struct StatsView: View {
                         )
                         
                         StatCard(
-                            title: LocalizationManager.shared.localizedString(for: "stats.quizzesCompleted"),
+                            title: "stats.quizzesCompleted".localized,
                             value: "\(statsManager.stats.totalQuizzesCompleted)",
                             icon: "checkmark.circle.fill",
                             color: .blue,
@@ -90,13 +94,13 @@ struct StatsView: View {
                     // Wrong Questions Section - увеличенная
                     if !statsManager.stats.wrongQuestionIds.isEmpty {
                         VStack(alignment: .leading, spacing: 12) {
-                            Text(LocalizationManager.shared.localizedString(for: "stats.wrongQuestions"))
+                            Text("stats.wrongQuestions".localized)
                                 .font(.title3)
                                 .fontWeight(.semibold)
                             
                             VStack(spacing: 12) {
                                 HStack {
-                                    Text(LocalizationManager.shared.localizedString(for: "stats.wrongQuestionsCount"))
+                                    Text("stats.wrongQuestionsCount".localized)
                                         .font(.body)
                                         .foregroundColor(.secondary)
                                     Spacer()
@@ -112,7 +116,7 @@ struct StatsView: View {
                                     HStack {
                                         Image(systemName: "arrow.clockwise")
                                             .font(.body)
-                                        Text(LocalizationManager.shared.localizedString(for: "stats.repeatMistakes"))
+                                        Text("stats.repeatMistakes".localized)
                                             .font(.body)
                                     }
                                     .foregroundColor(.white)
@@ -128,13 +132,13 @@ struct StatsView: View {
                     
                     // Sync Section - в самом низу
                     VStack(alignment: .leading, spacing: 12) {
-                        Text(LocalizationManager.shared.localizedString(for: "stats.sync.title"))
+                        Text("stats.sync.title".localized)
                             .font(.title3)
                             .fontWeight(.semibold)
                         
                         VStack(spacing: 12) {
                             HStack {
-                                Text(LocalizationManager.shared.localizedString(for: "stats.sync.status"))
+                                Text("stats.sync.status".localized)
                                     .font(.body)
                                     .foregroundColor(.secondary)
                                 Spacer()
@@ -142,12 +146,12 @@ struct StatsView: View {
                                     ProgressView()
                                         .scaleEffect(0.8)
                                 } else if remoteService.hasUpdates {
-                                    Text(LocalizationManager.shared.localizedString(for: "stats.sync.available"))
+                                    Text("stats.sync.available".localized)
                                         .font(.body)
                                         .fontWeight(.semibold)
                                         .foregroundColor(.green)
                                 } else {
-                                    Text(LocalizationManager.shared.localizedString(for: "stats.sync.upToDate"))
+                                    Text("stats.sync.upToDate".localized)
                                         .font(.body)
                                         .fontWeight(.semibold)
                                         .foregroundColor(.blue)
@@ -156,7 +160,7 @@ struct StatsView: View {
                             
                             if remoteService.hasUpdates {
                                 HStack {
-                                    Text(LocalizationManager.shared.localizedString(for: "stats.sync.newQuestions"))
+                                    Text("stats.sync.newQuestions".localized)
                                         .font(.subheadline)
                                         .foregroundColor(.secondary)
                                     Spacer()
@@ -176,7 +180,7 @@ struct StatsView: View {
                                     HStack {
                                         Image(systemName: "arrow.clockwise")
                                             .font(.body)
-                                        Text(LocalizationManager.shared.localizedString(for: "stats.sync.check"))
+                                        Text("stats.sync.check".localized)
                                             .font(.body)
                                     }
                                     .foregroundColor(.white)
@@ -195,7 +199,7 @@ struct StatsView: View {
                                         HStack {
                                             Image(systemName: "arrow.down.circle")
                                                 .font(.body)
-                                            Text(LocalizationManager.shared.localizedString(for: "stats.sync.sync"))
+                                            Text("stats.sync.sync".localized)
                                                 .font(.body)
                                         }
                                         .foregroundColor(.white)
@@ -233,18 +237,18 @@ struct StatsView: View {
                 loadTotalQuestionsCount()
             }
             .alert(
-                LocalizationManager.shared.localizedString(for: "stats.reset.confirm.title"),
+                "stats.reset.confirm.title".localized,
                 isPresented: $showingResetAlert
             ) {
-                Button(LocalizationManager.shared.localizedString(for: "stats.reset.confirm.cancel"), role: .cancel) {
+                Button("stats.reset.confirm.cancel".localized, role: .cancel) {
                     showingResetAlert = false
                 }
-                Button(LocalizationManager.shared.localizedString(for: "stats.reset.confirm.ok"), role: .destructive) {
+                Button("stats.reset.confirm.ok".localized, role: .destructive) {
                     statsManager.resetStatsExceptTotalQuestions()
                     showingResetAlert = false
                 }
             } message: {
-                Text(LocalizationManager.shared.localizedString(for: "stats.reset.confirm.message"))
+                Text("stats.reset.confirm.message".localized)
             }
     }
     
@@ -294,8 +298,13 @@ struct StatsView: View {
         print("DEBUG: Starting mistakes review...")
         print("DEBUG: Wrong questions count: \(statsManager.stats.wrongQuestionIds.count)")
         
-        let quizUseCase = QuizUseCase(questionsRepository: QuestionsRepository())
-        let viewModel = QuizViewModel(quizUseCase: quizUseCase, statsManager: statsManager, settingsManager: settingsManager)
+        // Используем существующие экземпляры из DI контейнера
+        let container = DIContainer.shared
+        let viewModel = QuizViewModel(
+            quizUseCase: container.quizUseCase, 
+            statsManager: statsManager, 
+            settingsManager: settingsManager
+        )
         
         mistakesViewModel = viewModel
         showingMistakesReview = true
@@ -360,5 +369,7 @@ struct ProgressRow: View {
 
 #Preview {
     StatsView(statsManager: StatsManager())
+        .environmentObject(SettingsManager())
+        .environmentObject(RemoteQuestionsService())
 }
 

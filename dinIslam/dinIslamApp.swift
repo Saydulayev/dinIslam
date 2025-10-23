@@ -7,6 +7,18 @@
 
 import SwiftUI
 
+// MARK: - Environment Keys
+private struct StatsManagerKey: EnvironmentKey {
+    static let defaultValue = StatsManager()
+}
+
+extension EnvironmentValues {
+    var statsManager: StatsManager {
+        get { self[StatsManagerKey.self] }
+        set { self[StatsManagerKey.self] = newValue }
+    }
+}
+
 @main
 struct dinIslamApp: App {
     private let container = DIContainer.shared
@@ -19,6 +31,10 @@ struct dinIslamApp: App {
                 settingsManager: container.settingsManager
             )
             .environmentObject(container.settingsManager)
+            .environmentObject(container.achievementManager)
+            .environmentObject(container.remoteQuestionsService)
+            .environmentObject(container.notificationManager)
+            .environment(\.statsManager, container.statsManager)
         }
     }
 }

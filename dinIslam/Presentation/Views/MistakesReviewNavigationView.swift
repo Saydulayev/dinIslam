@@ -16,34 +16,27 @@ struct MistakesReviewNavigationView: View {
     }
     
     var body: some View {
-        NavigationStack {
-            Group {
+        Group {
                 switch viewModel.state {
-                case .loading:
+                case .active(.loading):
                     VStack(spacing: 20) {
                         ProgressView()
                             .scaleEffect(1.5)
-                        Text(LocalizationManager.shared.localizedString(for: "mistakes.loading"))
+                        Text("mistakes.loading".localized)
                             .font(.headline)
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     
-                case .mistakesReview:
+                case .active(.mistakesReview):
                     MistakesReviewView(viewModel: viewModel)
-                        .navigationDestination(
-                            isPresented: Binding(
-                                get: { viewModel.state == .mistakesFinished },
-                                set: { isPresented in
-                                    if !isPresented {
-                                        viewModel.restartQuiz()
-                                    }
-                                }
-                            )
-                        ) {
+                        .navigationDestination(isPresented: .constant({
+                            if case .completed(.mistakesFinished) = viewModel.state { return true }
+                            return false
+                        }())) {
                             MistakesResultView(viewModel: viewModel)
                         }
                     
-                case .mistakesFinished:
+                case .completed(.mistakesFinished):
                     MistakesResultView(viewModel: viewModel)
                     
                 case .idle:
@@ -53,11 +46,11 @@ struct MistakesReviewNavigationView: View {
                             .font(.system(size: 60))
                             .foregroundColor(.green)
                         
-                        Text(LocalizationManager.shared.localizedString(for: "mistakes.stopped"))
+                        Text("mistakes.stopped".localized)
                             .font(.headline)
                             .foregroundColor(.primary)
                         
-                        Button(LocalizationManager.shared.localizedString(for: "mistakes.back")) {
+                        Button("mistakes.back".localized) {
                             dismiss()
                         }
                         .padding()
@@ -69,11 +62,11 @@ struct MistakesReviewNavigationView: View {
                     
                 default:
                     VStack(spacing: 20) {
-                        Text(LocalizationManager.shared.localizedString(for: "mistakes.error"))
+                        Text("mistakes.error".localized)
                             .font(.headline)
                             .foregroundColor(.red)
                         
-                        Button(LocalizationManager.shared.localizedString(for: "mistakes.back")) {
+                        Button("mistakes.back".localized) {
                             dismiss()
                         }
                         .padding()
@@ -101,7 +94,7 @@ struct MistakesReviewNavigationView: View {
             }
         }
     }
-}
+
 
 #Preview {
     let viewModel = QuizViewModel(quizUseCase: QuizUseCase(questionsRepository: QuestionsRepository()), statsManager: StatsManager(), settingsManager: SettingsManager())

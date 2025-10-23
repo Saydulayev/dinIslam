@@ -47,6 +47,14 @@ class DIContainer {
         SoundManager(settingsManager: settingsManager)
     }()
     
+    lazy var remoteQuestionsService: RemoteQuestionsService = {
+        RemoteQuestionsService()
+    }()
+    
+    lazy var notificationManager: NotificationManager = {
+        NotificationManager()
+    }()
+    
     private init() {}
     
     // MARK: - Reset for Testing
@@ -63,6 +71,8 @@ class DIContainer {
             questionsRepository = QuestionsRepository()
             hapticManager = HapticManager(settingsManager: settingsManager)
             soundManager = SoundManager(settingsManager: settingsManager)
+            remoteQuestionsService = RemoteQuestionsService()
+            notificationManager = NotificationManager()
         }
     }
 }

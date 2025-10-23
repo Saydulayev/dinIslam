@@ -123,7 +123,7 @@ struct QuizView: View {
                 }) {
                     HStack {
                         Image(systemName: "stop.fill")
-                        Text(LocalizationManager.shared.localizedString(for: "quiz.stop"))
+                        Text("quiz.stop".localized)
                             .fontWeight(.semibold)
                     }
                     .foregroundColor(.white)
@@ -141,17 +141,17 @@ struct QuizView: View {
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
         .alert(
-            LocalizationManager.shared.localizedString(for: "quiz.stop.confirm.title"),
+            "quiz.stop.confirm.title".localized,
             isPresented: $showingStopConfirm
         ) {
-            Button(LocalizationManager.shared.localizedString(for: "quiz.stop.confirm.cancel"), role: .cancel) {
+            Button("quiz.stop.confirm.cancel".localized, role: .cancel) {
                 showingStopConfirm = false
             }
-            Button(LocalizationManager.shared.localizedString(for: "quiz.stop.confirm.ok"), role: .destructive) {
+            Button("quiz.stop.confirm.ok".localized, role: .destructive) {
                 viewModel.restartQuiz()
             }
         } message: {
-            Text(LocalizationManager.shared.localizedString(for: "quiz.stop.confirm.message"))
+            Text("quiz.stop.confirm.message".localized)
         }
         .onAppear {
             // Clear app badge when quiz starts
