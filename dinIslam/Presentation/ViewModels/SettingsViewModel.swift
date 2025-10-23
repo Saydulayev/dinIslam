@@ -23,6 +23,8 @@ class SettingsViewModel {
     }
     
     var showingLanguagePicker = false
+    var showingPrivacyPolicy = false
+    var showingTermsOfService = false
     var refreshTrigger = UUID()
     
     init(settingsManager: SettingsManager) {
@@ -98,18 +100,12 @@ class SettingsViewModel {
     
     func openPrivacyPolicy() {
         hapticManager.selectionChanged()
-        
-        if let url = URL(string: "https://example.com/privacy") {
-            UIApplication.shared.open(url)
-        }
+        showingPrivacyPolicy = true
     }
     
     func openTermsOfService() {
         hapticManager.selectionChanged()
-        
-        if let url = URL(string: "https://example.com/terms") {
-            UIApplication.shared.open(url)
-        }
+        showingTermsOfService = true
     }
     
     func shareApp() {

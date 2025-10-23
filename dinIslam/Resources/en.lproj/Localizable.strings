@@ -210,3 +210,47 @@
 "notification.permission.denied.message" = "To receive reminders, you need to allow notifications in app settings.";
 "notification.test.sent.title" = "Test Notification";
 "notification.test.sent.message" = "Test notification sent!";
+
+// Privacy Policy
+"privacy.title" = "Privacy Policy";
+"privacy.done" = "Done";
+"privacy.lastUpdated" = "Last updated: October 20, 2025";
+"privacy.introduction.title" = "Introduction";
+"privacy.introduction.content" = "Tabiin Academy respects your privacy and is committed to protecting your personal data. This privacy policy explains how we collect, use, and protect your information when using our app.";
+"privacy.collection.title" = "Information Collection";
+"privacy.collection.content" = "We collect only the minimum necessary information for app functionality:\n\n• Learning statistics (number of questions answered, correct answers)\n• App settings (language, sound, notifications)\n• Achievement and progress data\n\nWe do NOT collect personal information such as name, email, or phone number.";
+"privacy.usage.title" = "Data Usage";
+"privacy.usage.content" = "Collected information is used for:\n\n• Displaying your learning progress\n• Personalizing the learning experience\n• Improving app functionality\n• Sending notifications (if enabled)";
+"privacy.storage.title" = "Data Storage";
+"privacy.storage.content" = "All data is stored locally on your device. We do not share your data with third parties and do not use cloud services for storing personal information.";
+"privacy.thirdParty.title" = "Third Party Services";
+"privacy.thirdParty.content" = "The app may use the following third-party services:\n\n• App Store (for app updates)\n• iOS system notifications\n\nThese services have their own privacy policies.";
+"privacy.rights.title" = "Your Rights";
+"privacy.rights.content" = "You have the right to:\n\n• View your data in the statistics section\n• Reset all data through settings\n• Disable notifications at any time\n• Delete the app (all data will be removed)";
+"privacy.contact.title" = "Contact Information";
+"privacy.contact.content" = "If you have questions about this privacy policy, contact us:\n\nEmail: saydulayev.wien@gmail.com";
+"privacy.changes.title" = "Policy Changes";
+"privacy.changes.content" = "We may update this privacy policy. We will notify you of any changes through app updates.";
+
+// Terms of Service
+"terms.title" = "Terms of Service";
+"terms.done" = "Done";
+"terms.lastUpdated" = "Last updated: October 20, 2025";
+"terms.acceptance.title" = "Acceptance of Terms";
+"terms.acceptance.content" = "By using the Tabiin Academy app, you agree to these terms of service. If you do not agree to any of the terms, please do not use the app.";
+"terms.license.title" = "License";
+"terms.license.content" = "You are granted a limited, non-exclusive, non-transferable license to use the Tabiin Academy app for personal, non-commercial purposes.";
+"terms.prohibited.title" = "Prohibited Uses";
+"terms.prohibited.content" = "You may not:\n\n• Reverse engineer the app\n• Attempt to hack or compromise security\n• Use for commercial purposes without permission\n• Distribute malicious content";
+"terms.content.title" = "User Content";
+"terms.content.content" = "The app does not collect or process user content. All data is stored locally on your device.";
+"terms.termination.title" = "Termination";
+"terms.termination.content" = "You may stop using the app at any time by deleting it from your device. We reserve the right to discontinue services in case of violation of these terms.";
+"terms.disclaimer.title" = "Disclaimer";
+"terms.disclaimer.content" = "The app is provided \"as is\" without any warranties. We are not responsible for any losses arising from the use of the app.";
+"terms.liability.title" = "Limitation of Liability";
+"terms.liability.content" = "To the maximum extent permitted by law, our liability is limited to the cost of the app or the amount paid for it.";
+"terms.law.title" = "Governing Law";
+"terms.law.content" = "These terms are governed by the laws of Austria. Any disputes shall be resolved in the courts of Austria.";
+"terms.contact.title" = "Contact Information";
+"terms.contact.content" = "For questions related to terms of service, contact:\n\nEmail: saydulayev.wien@gmail.com";

@@ -226,6 +226,16 @@ struct SettingsView: View {
         .sheet(isPresented: $showingNotificationSettings) {
             NotificationSettingsView()
         }
+        .sheet(isPresented: $viewModel.showingPrivacyPolicy) {
+            NavigationStack {
+                PrivacyPolicyView()
+            }
+        }
+        .sheet(isPresented: $viewModel.showingTermsOfService) {
+            NavigationStack {
+                TermsOfServiceView()
+            }
+        }
     }
     
     struct SettingsRow: View {
