@@ -10,7 +10,7 @@
     ],
     "correctIndex": 2,
     "category": "Fiqh",
-    "difficulty": "medium",
+    "difficulty": "medium"
   },
   {
     "id": "q2",
@@ -23,7 +23,7 @@
     ],
     "correctIndex": 1,
     "category": "Quran",
-    "difficulty": "medium",
+    "difficulty": "medium"
   },
   {
     "id": "q3",
@@ -36,7 +36,7 @@
     ],
     "correctIndex": 2,
     "category": "Hadith",
-    "difficulty": "easy",
+    "difficulty": "easy"
   },
   {
     "id": "q4",
@@ -49,7 +49,7 @@
     ],
     "correctIndex": 2,
     "category": "Fiqh",
-    "difficulty": "medium",
+    "difficulty": "medium"
   },
   {
     "id": "q5",
@@ -62,7 +62,7 @@
     ],
     "correctIndex": 3,
     "category": "Hadith",
-    "difficulty": "medium",
+    "difficulty": "medium"
   },
   {
     "id": "q6",
@@ -75,7 +75,7 @@
     ],
     "correctIndex": 2,
     "category": "Fiqh",
-    "difficulty": "easy",
+    "difficulty": "easy"
   },
   {
     "id": "q7",
@@ -87,8 +87,8 @@
       { "id": "a4", "text": "1 group out of 71 Jewish groups" }
     ],
     "correctIndex": 1,
-    "category": "Aqeedah",
-    "difficulty": "medium",
+    "category": "Aqidah",
+    "difficulty": "medium"
   },
   {
     "id": "q8",
@@ -101,7 +101,7 @@
     ],
     "correctIndex": 2,
     "category": "Hadith",
-    "difficulty": "medium",
+    "difficulty": "medium"
   },
   {
     "id": "q9",
@@ -114,7 +114,7 @@
     ],
     "correctIndex": 2,
     "category": "Fiqh",
-    "difficulty": "easy",
+    "difficulty": "easy"
   },
   {
     "id": "q10",
@@ -127,7 +127,7 @@
     ],
     "correctIndex": 0,
     "category": "Islamic History",
-    "difficulty": "medium",
+    "difficulty": "medium"
   },
   {
     "id": "q11",
@@ -140,11 +140,11 @@
     ],
     "correctIndex": 1,
     "category": "Seerah",
-    "difficulty": "medium",
+    "difficulty": "medium"
   },
   {
     "id": "q12",
-    "text": "The Prophet (peace be upon him) said that among his wives, the first to join him after his death would be the wife with long arms. Who is she?",
+    "text": "The Prophet ﷺ said that among his wives, the first to join him after his death would be the wife with long arms. Who is she?",
     "answers": [
       { "id": "a1", "text": "Umm Salama" },
       { "id": "a2", "text": "Zaynab bint Jahsh" },
@@ -153,7 +153,7 @@
     ],
     "correctIndex": 1,
     "category": "Seerah",
-    "difficulty": "medium",
+    "difficulty": "medium"
   },
   {
     "id": "q13",
@@ -166,7 +166,7 @@
     ],
     "correctIndex": 2,
     "category": "Companions",
-    "difficulty": "medium",
+    "difficulty": "medium"
   },
   {
     "id": "q14",
@@ -178,8 +178,8 @@
       { "id": "a4", "text": "Whale liver" }
     ],
     "correctIndex": 0,
-    "category": "Aqeedah",
-    "difficulty": "medium",
+    "category": "Aqidah",
+    "difficulty": "medium"
   },
   {
     "id": "q15",
@@ -192,7 +192,7 @@
     ],
     "correctIndex": 3,
     "category": "Quran",
-    "difficulty": "medium",
+    "difficulty": "medium"
   },
   {
     "id": "q16",
@@ -205,7 +205,7 @@
     ],
     "correctIndex": 2,
     "category": "Fiqh",
-    "difficulty": "medium",
+    "difficulty": "medium"
   },
   {
     "id": "q17",
@@ -218,7 +218,7 @@
     ],
     "correctIndex": 0,
     "category": "Quran",
-    "difficulty": "easy",
+    "difficulty": "easy"
   },
   {
     "id": "q18",
@@ -231,7 +231,7 @@
     ],
     "correctIndex": 2,
     "category": "Fiqh",
-    "difficulty": "medium",
+    "difficulty": "medium"
   },
   {
     "id": "q19",
@@ -244,7 +244,7 @@
     ],
     "correctIndex": 3,
     "category": "Hadith",
-    "difficulty": "medium",
+    "difficulty": "medium"
   },
   {
     "id": "q20",
@@ -257,7 +257,7 @@
     ],
     "correctIndex": 3,
     "category": "Islamic History",
-    "difficulty": "medium",
+    "difficulty": "medium"
   },
   {
     "id": "q21",
@@ -270,7 +270,7 @@
     ],
     "correctIndex": 3,
     "category": "Fiqh",
-    "difficulty": "easy",
+    "difficulty": "easy"
   },
   {
     "id": "q22",
@@ -283,7 +283,7 @@
     ],
     "correctIndex": 2,
     "category": "Fiqh",
-    "difficulty": "medium",
+    "difficulty": "medium"
   },
   {
     "id": "q23",
@@ -296,7 +296,7 @@
     ],
     "correctIndex": 1,
     "category": "Fiqh",
-    "difficulty": "easy",
+    "difficulty": "easy"
   },
   {
     "id": "q24",
@@ -309,7 +309,7 @@
     ],
     "correctIndex": 1,
     "category": "Fiqh",
-    "difficulty": "medium",
+    "difficulty": "medium"
   },
   {
     "id": "q25",
@@ -322,7 +322,7 @@
     ],
     "correctIndex": 3,
     "category": "Quran",
-    "difficulty": "easy",
+    "difficulty": "easy"
   },
   {
     "id": "q26",
@@ -335,11 +335,11 @@
     ],
     "correctIndex": 3,
     "category": "Companions",
-    "difficulty": "medium",
+    "difficulty": "medium"
   },
   {
     "id": "q27",
-    "text": "Mutawatir - a hadith transmitted by many transmitters. For example, when Jibril asked about Islam, iman and ihsan, 8 companions were present. Gharib hadith - 1 transmitter. Determine the hadith: 'Actions are judged by intentions.'",
+    "text": "Mutawatir – a hadith transmitted by many narrators. For example, when Jibril asked about Islam, iman and ihsan, 8 companions were present. Gharib hadith – a single narrator. Classify the hadith: 'Actions are judged by intentions.'",
     "answers": [
       { "id": "a1", "text": "Mutawatir" },
       { "id": "a2", "text": "Gharib" },
@@ -348,7 +348,7 @@
     ],
     "correctIndex": 1,
     "category": "Hadith",
-    "difficulty": "medium",
+    "difficulty": "medium"
   },
   {
     "id": "q28",
@@ -361,7 +361,7 @@
     ],
     "correctIndex": 2,
     "category": "Fiqh",
-    "difficulty": "medium",
+    "difficulty": "medium"
   },
   {
     "id": "q29",
@@ -374,7 +374,7 @@
     ],
     "correctIndex": 0,
     "category": "Fiqh",
-    "difficulty": "medium",
+    "difficulty": "medium"
   },
   {
     "id": "q30",
@@ -387,6 +387,576 @@
     ],
     "correctIndex": 2,
     "category": "Hadith",
-    "difficulty": "medium",
-  }
+    "difficulty": "medium"
+  },
+  {
+    "id": "q31",
+    "text": "What does the name of Allah al-Qarib mean?",
+    "answers": [
+      { "id": "a1", "text": "Big" },
+      { "id": "a2", "text": "Close" },
+      { "id": "a3", "text": "Mighty" },
+      { "id": "a4", "text": "Wise" }
+    ],
+    "correctIndex": 1,
+    "category": "Aqidah",
+    "difficulty": "medium"
+  },
+  {
+    "id": "q32",
+    "text": "What is the meaning of Allah's name Al-Muqtadir?",
+    "answers": [
+      { "id": "a1", "text": "The Almighty" },
+      { "id": "a2", "text": "The Guardian" },
+      { "id": "a3", "text": "The All-Knowing" },
+      { "id": "a4", "text": "The Withholder, The Constrictor" }
+    ],
+    "correctIndex": 0,
+    "category": "Aqidah",
+    "difficulty": "medium"
+  },
+  {
+  "id": "q33",
+  "text": "Al-Bayt al-Ma'mur is the heavenly house where 70,000 angels enter daily and never return. Where is it located?",
+  "answers": [
+    { "id": "a1", "text": "Directly above the Kaaba" },
+    { "id": "a2", "text": "On the first heaven above the Kaaba" },
+    { "id": "a3", "text": "On the third heaven" },
+    { "id": "a4", "text": "On the seventh heaven" }
+  ],
+  "correctIndex": 3,
+  "category": "Aqidah",
+  "difficulty": "medium"
+},
+{
+  "id": "q34",
+  "text": "Surah 37:1 — “By those who line up in ranks (as-Saffat)...” — Who is being referred to?",
+  "answers": [
+    { "id": "a1", "text": "Participants of the Battle of Badr" },
+    { "id": "a2", "text": "The angels" },
+    { "id": "a3", "text": "Those who pledged under the tree" },
+    { "id": "a4", "text": "Participants of the Battle of Mu'tah" }
+  ],
+  "correctIndex": 1,
+  "category": "Qur'an",
+  "difficulty": "medium"
+},
+{
+  "id": "q35",
+  "text": "What happened to the tree under which the companions pledged allegiance (Bay'at ar-Ridwan)?",
+  "answers": [
+    { "id": "a1", "text": "It was cut down" },
+    { "id": "a2", "text": "It still blooms today" },
+    { "id": "a3", "text": "It dried up" },
+    { "id": "a4", "text": "People still take oaths under it" }
+  ],
+  "correctIndex": 0,
+  "category": "Seerah",
+  "difficulty": "medium"
+},
+{
+  "id": "q36",
+  "text": "Who ordered the cutting down of the tree under which the companions took the pledge?",
+  "answers": [
+    { "id": "a1", "text": "Umar" },
+    { "id": "a2", "text": "Ali" },
+    { "id": "a3", "text": "Caliph Marwan" },
+    { "id": "a4", "text": "The governor of Makkah" }
+  ],
+  "correctIndex": 0,
+  "category": "Seerah",
+  "difficulty": "medium"
+},
+{
+  "id": "q37",
+  "text": "Is the following supplication a sign of monotheism (Tawheed): “O Allah, You are ash-Shafi (The Healer), heal me”?",
+  "answers": [
+    { "id": "a1", "text": "No" },
+    { "id": "a2", "text": "Yes" },
+    { "id": "a3", "text": "I don't know" },
+    { "id": "a4", "text": "Depends on intention" }
+  ],
+  "correctIndex": 1,
+  "category": "Aqidah",
+  "difficulty": "medium"
+},
+{
+  "id": "q38",
+  "text": "What does the Name of Allah 'Al-Qarib' mean?",
+  "answers": [
+    { "id": "a1", "text": "The Great" },
+    { "id": "a2", "text": "The Near" },
+    { "id": "a3", "text": "The Mighty" },
+    { "id": "a4", "text": "The Wise" }
+  ],
+  "correctIndex": 1,
+  "category": "Aqidah",
+  "difficulty": "easy"
+},
+{
+  "id": "q39",
+  "text": "Which Surah is called 'As-Sab'ul-Mathani' (The Seven Oft-Repeated)?",
+  "answers": [
+    { "id": "a1", "text": "Ihsan" },
+    { "id": "a2", "text": "Al-Fatihah" },
+    { "id": "a3", "text": "At-Tawbah" },
+    { "id": "a4", "text": "Al-Buruj" }
+  ],
+  "correctIndex": 1,
+  "category": "Qur'an",
+  "difficulty": "medium"
+},
+  {
+  "id": "q40",
+  "text": "He was born in 773 AH and died in 852 AH. A scholar, jurist, and muhaddith who authored 'Bulugh al-Maram', one of the best books on fiqh. Who is he?",
+  "answers": [
+    { "id": "a1", "text": "Az-Zuhri" },
+    { "id": "a2", "text": "Al-Qurtubi" },
+    { "id": "a3", "text": "Az-Zahabi" },
+    { "id": "a4", "text": "Al-Asqalani" }
+  ],
+  "correctIndex": 3,
+  "category": "Islamic Scholars",
+  "difficulty": "medium"
+},
+{
+  "id": "q41",
+  "text": "Hadith in Sahih Muslim (meaning): Do not bathe in still water while being in a state of…",
+  "answers": [
+    { "id": "a1", "text": "Intoxication" },
+    { "id": "a2", "text": "Concussion" },
+    { "id": "a3", "text": "Insanity" },
+    { "id": "a4", "text": "Major impurity (Janabah)" }
+  ],
+  "correctIndex": 3,
+  "category": "Fiqh",
+  "difficulty": "easy"
+},
+{
+  "id": "q42",
+  "text": "Hadith from Ibn Majah (meaning): We are allowed to eat two types of dead animals. Which ones?",
+  "answers": [
+    { "id": "a1", "text": "Wild donkey and hyena" },
+    { "id": "a2", "text": "Lizard and crocodile" },
+    { "id": "a3", "text": "Camel and sheep" },
+    { "id": "a4", "text": "Locust and fish" }
+  ],
+  "correctIndex": 3,
+  "category": "Halal and Haram",
+  "difficulty": "medium"
+},
+{
+  "id": "q43",
+  "text": "Hadith from Ibn Hibban (meaning): As a result of what does the skin of a dead animal become pure?",
+  "answers": [
+    { "id": "a1", "text": "Boiling" },
+    { "id": "a2", "text": "Washing with earth and sand" },
+    { "id": "a3", "text": "Tanning" },
+    { "id": "a4", "text": "Drying under the sun" }
+  ],
+  "correctIndex": 2,
+  "category": "Fiqh",
+  "difficulty": "medium"
+},
+{
+  "id": "q44",
+  "text": "The supplication recited at the beginning of the prayer is called…",
+  "answers": [
+    { "id": "a1", "text": "Qunut" },
+    { "id": "a2", "text": "Iftirash" },
+    { "id": "a3", "text": "Istiftah" },
+    { "id": "a4", "text": "Tawarruk" }
+  ],
+  "correctIndex": 2,
+  "category": "Salah",
+  "difficulty": "medium"
+},
+{
+  "id": "q45",
+  "text": "In Salah, Jalsat al-Istirahah refers to…",
+  "answers": [
+    { "id": "a1", "text": "Sitting between the two prostrations" },
+    { "id": "a2", "text": "Sitting briefly after the second prostration before standing up" },
+    { "id": "a3", "text": "Pausing after rising from ruku‘" },
+    { "id": "a4", "text": "Raising hands in supplication for repentance" }
+  ],
+  "correctIndex": 1,
+  "category": "Salah",
+  "difficulty": "medium"
+},
+{
+  "id": "q46",
+  "text": "Hadith by ad-Darimi and al-Hakim: Whoever recites 100 verses at night in prayer will not be recorded among the heedless, and whoever recites 200 will be recorded among the sincere servants of Allah. Which prayer is this?",
+  "answers": [
+    { "id": "a1", "text": "Maghrib" },
+    { "id": "a2", "text": "Isha" },
+    { "id": "a3", "text": "Tahajjud" },
+    { "id": "a4", "text": "Two rak‘ahs of Sunnah before Fajr" }
+  ],
+  "correctIndex": 2,
+  "category": "Salah",
+  "difficulty": "medium"
+},
+  {
+  "id": "q47",
+  "text": "What is the reward for throwing pebbles during Hajj?",
+  "answers": [
+    { "id": "a1", "text": "Freeing one slave for each pebble" },
+    { "id": "a2", "text": "Forgiveness of one major sin for each pebble" },
+    { "id": "a3", "text": "Forgiveness of all minor sins" },
+    { "id": "a4", "text": "Freeing twenty-one slaves" }
+  ],
+  "correctIndex": 1,
+  "category": "Hajj",
+  "difficulty": "medium"
+},
+{
+  "id": "q48",
+  "text": "Shaving the hair after completing Hajj is…",
+  "answers": [
+    { "id": "a1", "text": "For every hair, one good deed and one sin erased" },
+    { "id": "a2", "text": "Freeing ten slaves" },
+    { "id": "a3", "text": "Forgiveness of major sins" },
+    { "id": "a4", "text": "Forgiveness of minor sins" }
+  ],
+  "correctIndex": 0,
+  "category": "Hajj",
+  "difficulty": "medium"
+},
+{
+  "id": "q49",
+  "text": "The Hajj accepted by Allah and performed according to all rules is called…",
+  "answers": [
+    { "id": "a1", "text": "Hajj al-Ifrad" },
+    { "id": "a2", "text": "Hajj al-Qiran" },
+    { "id": "a3", "text": "Hajj at-Tamattu‘" },
+    { "id": "a4", "text": "Hajj Mabrur" }
+  ],
+  "correctIndex": 3,
+  "category": "Hajj",
+  "difficulty": "medium"
+},
+{
+  "id": "q50",
+  "text": "If Muslims perform Eid prayer in the morning on Friday, is the Jumu‘ah prayer still obligatory for them?",
+  "answers": [
+    { "id": "a1", "text": "Yes, it is obligatory" },
+    { "id": "a2", "text": "No, it is not obligatory" }
+  ],
+  "correctIndex": 1,
+  "category": "Prayer",
+  "difficulty": "medium"
+},
+{
+  "id": "q51",
+  "text": "The congregational prayer for rain during drought is called…",
+  "answers": [
+    { "id": "a1", "text": "Istikhara" },
+    { "id": "a2", "text": "Istisqa" },
+    { "id": "a3", "text": "Wasilah" },
+    { "id": "a4", "text": "Ashura al-Muharram" }
+  ],
+  "correctIndex": 1,
+  "category": "Prayer",
+  "difficulty": "medium"
+},
+{
+  "id": "q52",
+  "text": "An authentic hadith with a chain of narrators going back to the Prophet Muhammad (peace be upon him) is called…",
+  "answers": [
+    { "id": "a1", "text": "Marfu‘" },
+    { "id": "a2", "text": "Mudtarib" },
+    { "id": "a3", "text": "Gharib" },
+    { "id": "a4", "text": "Mursal" }
+  ],
+  "correctIndex": 0,
+  "category": "Hadith",
+  "difficulty": "medium"
+},
+  {
+  "id": "q53",
+  "text": "The Quran is divided into long, medium, and short surahs. How many long surahs are there?",
+  "answers": [
+    { "id": "a1", "text": "6" },
+    { "id": "a2", "text": "8" },
+    { "id": "a3", "text": "7" },
+    { "id": "a4", "text": "9" }
+  ],
+  "correctIndex": 2,
+  "category": "Quran",
+  "difficulty": "easy"
+},
+{
+  "id": "q54",
+  "text": "The surahs called Al-Mathani (frequently recited) are the surahs located...",
+  "answers": [
+    { "id": "a1", "text": "Between the long and short surahs" },
+    { "id": "a2", "text": "Between the long and the detailed (Mufassal) surahs" },
+    { "id": "a3", "text": "Between the medium and short surahs" },
+    { "id": "a4", "text": "Starting from the last hizb (Surah Al-Fajr)" }
+  ],
+  "correctIndex": 1,
+  "category": "Quran",
+  "difficulty": "medium"
+},
+{
+  "id": "q55",
+  "text": "Under which caliph were hadiths first collected and written down?",
+  "answers": [
+    { "id": "a1", "text": "Umar ibn Abdul Aziz" },
+    { "id": "a2", "text": "Uthman" },
+    { "id": "a3", "text": "Marwan" },
+    { "id": "a4", "text": "Muawiyah" }
+  ],
+  "correctIndex": 0,
+  "category": "Hadith",
+  "difficulty": "medium"
+},
+{
+  "id": "q56",
+  "text": "A hadith that begins with the words 'Do you know what your Lord has said' is called...",
+  "answers": [
+    { "id": "a1", "text": "Marfu‘" },
+    { "id": "a2", "text": "Mursal" },
+    { "id": "a3", "text": "Hasan" },
+    { "id": "a4", "text": "Qudsi" }
+  ],
+  "correctIndex": 3,
+  "category": "Hadith",
+  "difficulty": "medium"
+},
+{
+  "id": "q57",
+  "text": "When entering the mosque, one can determine from a person's sitting posture which Tashahhud it is — the first or the second. During the last Tashahhud, the worshipper sits on the thigh, placing the left leg under the right shin and raising the right foot vertically. What is this posture called?",
+  "answers": [
+    { "id": "a1", "text": "Iftirash" },
+    { "id": "a2", "text": "Tawarruk" },
+    { "id": "a3", "text": "Musalla" },
+    { "id": "a4", "text": "Istihsan" }
+  ],
+  "correctIndex": 1,
+  "category": "Prayer",
+  "difficulty": "medium"
+},
+{
+  "id": "q58",
+  "text": "The night prayers performed after the Isha prayer are called...",
+  "answers": [
+    { "id": "a1", "text": "Qiyam al-Layl" },
+    { "id": "a2", "text": "Tahajjud" },
+    { "id": "a3", "text": "Tarawih" },
+    { "id": "a4", "text": "All of these categories" }
+  ],
+  "correctIndex": 3,
+  "category": "Prayer",
+  "difficulty": "medium"
+},
+{
+  "id": "q59",
+  "text": "The best time to perform Tahajjud prayer is...",
+  "answers": [
+    { "id": "a1", "text": "Right after midnight" },
+    { "id": "a2", "text": "Right after Isha prayer" },
+    { "id": "a3", "text": "In the last third of the night" },
+    { "id": "a4", "text": "Close to Fajr" }
+  ],
+  "correctIndex": 2,
+  "category": "Prayer",
+  "difficulty": "medium"
+},
+{
+  "id": "q60",
+  "text": "Maghrib is at 20:00, Fajr at 05:00 — there are 9 hours between them. From what time is the best period for Tahajjud?",
+  "answers": [
+    { "id": "a1", "text": "12:00" },
+    { "id": "a2", "text": "01:00" },
+    { "id": "a3", "text": "02:00" },
+    { "id": "a4", "text": "03:00" }
+  ],
+  "correctIndex": 2,
+  "category": "Prayer",
+  "difficulty": "medium"
+},
+{
+  "id": "q61",
+  "text": "Before the revelation of the Quran to Prophet Muhammad ﷺ, this man was a Hanif (monotheist) and later accepted Islam. The Prophet ﷺ saw him in a dream in Paradise on the second level. Who was he?",
+  "answers": [
+    { "id": "a1", "text": "Waraqah" },
+    { "id": "a2", "text": "Zayd ibn Amr ibn Nufayl" },
+    { "id": "a3", "text": "Abu Kuhafa at-Taymi al-Qurashi" },
+    { "id": "a4", "text": "Amr ibn al-As" }
+  ],
+  "correctIndex": 1,
+  "category": "History",
+  "difficulty": "medium"
+},
+{
+  "id": "q62",
+  "text": "What is the reward for a person who performs Sa‘i between the hills of Safa and Marwah during Hajj?",
+  "answers": [
+    { "id": "a1", "text": "Freeing 7 slaves" },
+    { "id": "a2", "text": "Freeing 1 slave" },
+    { "id": "a3", "text": "Freeing 10 slaves" },
+    { "id": "a4", "text": "Freeing 70 slaves" }
+  ],
+  "correctIndex": 3,
+  "category": "Hajj",
+  "difficulty": "medium"
+},
+{
+  "id": "q63",
+  "text": "In which year of Hijra did Muslims begin fasting during Ramadan?",
+  "answers": [
+    { "id": "a1", "text": "In the 4th year" },
+    { "id": "a2", "text": "In the 3rd year" },
+    { "id": "a3", "text": "In the 2nd year" },
+    { "id": "a4", "text": "In the 5th year" }
+  ],
+  "correctIndex": 2,
+  "category": "Fasting",
+  "difficulty": "medium"
+},
+{
+  "id": "q64",
+  "text": "In which year of Hijra was Hajj prescribed?",
+  "answers": [
+    { "id": "a1", "text": "In the 7th year" },
+    { "id": "a2", "text": "In the 8th year" },
+    { "id": "a3", "text": "In the 9th year" },
+    { "id": "a4", "text": "In the 6th year" }
+  ],
+  "correctIndex": 2,
+  "category": "Hajj",
+  "difficulty": "medium"
+},
+{
+  "id": "q65",
+  "text": "Which Muslim scholar wrote the first Seerah (biography of the Prophet ﷺ)?",
+  "answers": [
+    { "id": "a1", "text": "Ibn Hisham" },
+    { "id": "a2", "text": "As-Sawri" },
+    { "id": "a3", "text": "Ibn al-Qayyim" },
+    { "id": "a4", "text": "Mubarakfuri" }
+  ],
+  "correctIndex": 0,
+  "category": "History",
+  "difficulty": "medium"
+},
+{
+  "id": "q66",
+  "text": "According to the narration of Aisha (may Allah be pleased with her), after how long following Al-Mi'raj did Muslims start performing prayer as we do today?",
+  "answers": [
+    { "id": "a1", "text": "Two months after Hijra" },
+    { "id": "a2", "text": "One month after Hijra" },
+    { "id": "a3", "text": "On the second day of Hijra" },
+    { "id": "a4", "text": "Immediately after Al-Mi'raj" }
+  ],
+  "correctIndex": 0,
+  "category": "Prayer",
+  "difficulty": "medium"
+},
+{
+  "id": "q67",
+  "text": "What is the name of the sitting position in the first Tashahhud?",
+  "answers": [
+    { "id": "a1", "text": "Tawarruk" },
+    { "id": "a2", "text": "Iftirash" },
+    { "id": "a3", "text": "Istisqa" },
+    { "id": "a4", "text": "Qiyam" }
+  ],
+  "correctIndex": 1,
+  "category": "Prayer",
+  "difficulty": "medium"
+},
+{
+  "id": "q68",
+  "text": "In Madinah during the time of the Prophet ﷺ, it used to happen that during the morning Adhan, additional words were said: what were they?",
+  "answers": [
+    { "id": "a1", "text": "Dress warmly" },
+    { "id": "a2", "text": "March is announced" },
+    { "id": "a3", "text": "Stay in your homes" },
+    { "id": "a4", "text": "Receive zakat dirhams in the mosque" }
+  ],
+  "correctIndex": 2,
+  "category": "Prayer",
+  "difficulty": "medium"
+},
+  {
+  "id": "q69",
+  "text": "In the hadith, the Duha prayer is called the prayer of...",
+  "answers": [
+    { "id": "a1", "text": "The sincerely devoted" },
+    { "id": "a2", "text": "The repentant" },
+    { "id": "a3", "text": "The believers" },
+    { "id": "a4", "text": "The foremost" }
+  ],
+  "correctIndex": 1,
+  "category": "Salah",
+  "difficulty": "medium"
+},
+{
+  "id": "q70",
+  "text": "Surah Al-‘Adiyat was revealed about me — said Khalid ibn al-Walid — and there was no time dearer to me than waiting to attack a settlement in the pre-dawn darkness, trembling from the cold. What were they waiting for?",
+  "answers": [
+    { "id": "a1", "text": "The dawn, so it would be easier to attack" },
+    { "id": "a2", "text": "For the residents to leave their homes" },
+    { "id": "a3", "text": "The Adhan" },
+    { "id": "a4", "text": "The sunrise, to offer Islam or the payment of Jizyah" }
+  ],
+  "correctIndex": 2,
+  "category": "History",
+  "difficulty": "medium"
+},
+{
+  "id": "q71",
+  "text": "This hadith is an example of which type of Sunnah: ‘Aisha (r.a.) said — The Prophet ﷺ used to help his wives, and when the time for prayer came, he would stand up and perform Salah.",
+  "answers": [
+    { "id": "a1", "text": "Qawli (verbal Sunnah)" },
+    { "id": "a2", "text": "Fi‘li (action-based Sunnah)" },
+    { "id": "a3", "text": "Taqriri (approved Sunnah)" },
+    { "id": "a4", "text": "Qadari" }
+  ],
+  "correctIndex": 1,
+  "category": "Sunnah",
+  "difficulty": "medium"
+},
+{
+  "id": "q72",
+  "text": "A collective obligation that is imposed not on an individual but on the Muslim community as a whole is called...",
+  "answers": [
+    { "id": "a1", "text": "Fard ‘Ayn" },
+    { "id": "a2", "text": "Mandub" },
+    { "id": "a3", "text": "Mubah" },
+    { "id": "a4", "text": "Fard Kifayah" }
+  ],
+  "correctIndex": 3,
+  "category": "Fiqh",
+  "difficulty": "medium"
+},
+{
+  "id": "q73",
+  "text": "The Prophet ﷺ swore that Allah shows mercy only to the one who himself shows mercy. The companions said: “But we all show mercy.” The Prophet ﷺ replied: “Mercy means...”",
+  "answers": [
+    { "id": "a1", "text": "Showing kindness to one's friends and companions" },
+    { "id": "a2", "text": "To one’s household" },
+    { "id": "a3", "text": "To all Muslims" },
+    { "id": "a4", "text": "To all people, even non-believers" }
+  ],
+  "correctIndex": 3,
+  "category": "Akhlaq",
+  "difficulty": "medium"
+},
+{
+  "id": "q74",
+  "text": "In which month and on which day is the fast of ‘Ashura observed?",
+  "answers": [
+    { "id": "a1", "text": "Rajab, 9th day" },
+    { "id": "a2", "text": "Dhul-Hijjah, 10th day" },
+    { "id": "a3", "text": "Dhul-Qa‘dah, 9th day" },
+    { "id": "a4", "text": "Muharram, 10th day" }
+  ],
+  "correctIndex": 3,
+  "category": "Fasting",
+  "difficulty": "medium"
+}
 ]

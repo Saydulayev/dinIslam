@@ -168,6 +168,13 @@ struct StartView: View {
                 } else {
                     UIApplication.shared.applicationIconBadgeNumber = 0
                 }
+                
+                // Предзагрузка вопросов для улучшения UX
+                Task {
+                    await EnhancedDIContainer.shared.enhancedQuizUseCase.preloadQuestions(
+                        for: ["ru", "en"]
+                    )
+                }
             }
         }
         .onDisappear {
