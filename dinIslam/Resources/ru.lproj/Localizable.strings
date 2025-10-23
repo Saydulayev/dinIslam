@@ -134,6 +134,11 @@
 "achievements.progress" = "Прогресс";
 "achievements.newAchievement" = "Новое достижение!";
 "achievements.congratulations" = "Поздравляем!";
+"achievements.reset" = "Сбросить";
+"achievements.reset.confirm.title" = "Сбросить достижения?";
+"achievements.reset.confirm.message" = "Все достижения будут заблокированы. Это действие нельзя отменить.";
+"achievements.reset.confirm.ok" = "Сбросить";
+"achievements.reset.confirm.cancel" = "Отмена";
 
 // Achievement Titles
 "achievements.firstQuiz.title" = "Начало пути";

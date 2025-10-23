@@ -134,6 +134,11 @@
 "achievements.progress" = "Progress";
 "achievements.newAchievement" = "New Achievement!";
 "achievements.congratulations" = "Congratulations!";
+"achievements.reset" = "Reset";
+"achievements.reset.confirm.title" = "Reset Achievements?";
+"achievements.reset.confirm.message" = "All achievements will be locked. This action cannot be undone.";
+"achievements.reset.confirm.ok" = "Reset";
+"achievements.reset.confirm.cancel" = "Cancel";
 
 // Achievement Titles
 "achievements.firstQuiz.title" = "Beginning of the Path";

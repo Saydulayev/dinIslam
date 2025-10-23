@@ -12,6 +12,7 @@ struct AchievementsView: View {
     @Environment(\.dismiss) private var dismiss
     @ObservedObject private var localizationManager = LocalizationManager.shared
     @EnvironmentObject private var settingsManager: SettingsManager
+    @State private var showingResetAlert = false
     
     var body: some View {
         NavigationStack {
@@ -27,10 +28,24 @@ struct AchievementsView: View {
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(LocalizationManager.shared.localizedString(for: "settings.done")) {
-                        dismiss()
+                    Button(LocalizationManager.shared.localizedString(for: "achievements.reset")) {
+                        showingResetAlert = true
                     }
+                    .foregroundColor(.red)
                 }
+            }
+            .alert(
+                LocalizationManager.shared.localizedString(for: "achievements.reset.confirm.title"),
+                isPresented: $showingResetAlert
+            ) {
+                Button(LocalizationManager.shared.localizedString(for: "achievements.reset.confirm.cancel"), role: .cancel) {
+                    // Cancel action
+                }
+                Button(LocalizationManager.shared.localizedString(for: "achievements.reset.confirm.ok"), role: .destructive) {
+                    achievementManager.resetAllAchievements()
+                }
+            } message: {
+                Text(LocalizationManager.shared.localizedString(for: "achievements.reset.confirm.message"))
             }
         }
     }

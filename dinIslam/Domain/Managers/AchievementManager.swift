@@ -109,6 +109,29 @@ class AchievementManager: ObservableObject {
         newAchievements.removeAll()
     }
     
+    func resetAllAchievements() {
+        // Reset all achievements to locked state
+        for i in 0..<achievements.count {
+            achievements[i] = Achievement(
+                id: achievements[i].id,
+                title: achievements[i].title,
+                description: achievements[i].description,
+                icon: achievements[i].icon,
+                color: achievements[i].color,
+                type: achievements[i].type,
+                requirement: achievements[i].requirement,
+                isUnlocked: false,
+                unlockedDate: nil
+            )
+        }
+        
+        // Clear new achievements
+        newAchievements.removeAll()
+        
+        // Save changes
+        saveAchievements()
+    }
+    
     // MARK: - Private Methods
     
     private func initializeDefaultAchievements() {
