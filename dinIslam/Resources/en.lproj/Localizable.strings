@@ -78,7 +78,7 @@
 "quiz.stop.confirm.ok" = "Quit";
 "quiz.stop.confirm.cancel" = "Cancel";
 
-// Stats View
+// Stats View - Pluralization Support
 "stats.title" = "Statistics";
 "stats.done" = "Done";
 "stats.reset" = "Reset";
@@ -86,26 +86,52 @@
 "stats.reset.confirm.message" = "This will reset all statistics. This action cannot be undone.";
 "stats.reset.confirm.ok" = "Reset";
 "stats.reset.confirm.cancel" = "Cancel";
-"stats.questionsStudied" = "Questions Studied";
-"stats.correctAnswers" = "Correct Answers";
-"stats.incorrectAnswers" = "Incorrect";
-"stats.correctedMistakes" = "Mistakes Corrected";
-"stats.totalQuestions" = "Total Questions";
-"stats.remainingQuestions" = "Remaining to Study";
+
+// Stat titles (without pluralization)
+"stats.questionsStudied.title" = "Questions Studied";
+"stats.correctAnswers.title" = "Correct Answers";
+"stats.incorrectAnswers.title" = "Incorrect Answers";
+"stats.correctedMistakes.title" = "Mistakes Corrected";
+"stats.totalQuestions.title" = "Total Questions";
+"stats.remainingQuestions.title" = "Remaining Questions";
+"stats.quizzesCompleted.title" = "Quizzes Completed";
+"stats.currentStreak.title" = "Current Streak";
+"stats.lastQuiz" = "Last Quiz:";
+"stats.wrongQuestions" = "Questions to Review";
+"stats.wrongQuestionsCount.title" = "Wrong Questions";
+"stats.repeatMistakes" = "Repeat Mistakes";
+
+// Pluralization for stats (with %d)
+"stats.questionsStudied" = "%d question studied";
+"stats.questionsStudied_other" = "%d questions studied";
+"stats.correctAnswers" = "%d correct answer";
+"stats.correctAnswers_other" = "%d correct answers";
+"stats.incorrectAnswers" = "%d incorrect answer";
+"stats.incorrectAnswers_other" = "%d incorrect answers";
+"stats.correctedMistakes" = "%d mistake corrected";
+"stats.correctedMistakes_other" = "%d mistakes corrected";
+"stats.totalQuestions" = "%d total question";
+"stats.totalQuestions_other" = "%d total questions";
+"stats.remainingQuestions" = "%d question remaining";
+"stats.remainingQuestions_other" = "%d questions remaining";
+"stats.quizzesCompleted" = "%d quiz completed";
+"stats.quizzesCompleted_other" = "%d quizzes completed";
+"stats.currentStreak" = "%d day streak";
+"stats.currentStreak_other" = "%d days streak";
+"stats.wrongQuestionsCount" = "%d wrong question";
+"stats.wrongQuestionsCount_other" = "%d wrong questions";
+
+// Sync Section
 "stats.sync.title" = "Sync";
 "stats.sync.status" = "Status";
 "stats.sync.available" = "Updates Available";
 "stats.sync.upToDate" = "Up to Date";
-"stats.sync.newQuestions" = "New Questions";
+"stats.sync.newQuestions.title" = "New Questions";
+"stats.sync.newQuestions" = "%d new question";
+"stats.sync.newQuestions_other" = "%d new questions";
 "stats.sync.check" = "Check";
 "stats.sync.sync" = "Sync";
 "stats.progress" = "Progress";
-"stats.quizzesCompleted" = "Quizzes Completed";
-"stats.currentStreak" = "Win Streak";
-"stats.lastQuiz" = "Last Quiz:";
-"stats.wrongQuestions" = "Questions to Review";
-"stats.wrongQuestionsCount" = "Wrong Questions:";
-"stats.repeatMistakes" = "Repeat Mistakes";
 
 // Mistakes Review
 "mistakes.title" = "Review";
@@ -169,14 +195,21 @@
 "achievements.perfectionist.description" = "Get 10 perfect scores";
 "achievements.legend.description" = "Complete 100 quizzes";
 
-// Achievement Progress Descriptions
-"achievements.progress.quiz" = "quizzes";
-"achievements.progress.perfect" = "perfect scores";
-"achievements.progress.speed" = "fast completions";
-"achievements.progress.questions" = "questions studied";
-"achievements.progress.quizzes" = "quizzes completed";
-"achievements.progress.streak" = "days in a row";
-"achievements.progress.perfects" = "perfect scores";
+// Achievement Progress Descriptions - Pluralization
+"achievements.progress.quiz" = "%d quiz";
+"achievements.progress.quiz_other" = "%d quizzes";
+"achievements.progress.perfect" = "%d perfect score";
+"achievements.progress.perfect_other" = "%d perfect scores";
+"achievements.progress.speed" = "%d fast completion";
+"achievements.progress.speed_other" = "%d fast completions";
+"achievements.progress.questions" = "%d question studied";
+"achievements.progress.questions_other" = "%d questions studied";
+"achievements.progress.quizzes" = "%d quiz completed";
+"achievements.progress.quizzes_other" = "%d quizzes completed";
+"achievements.progress.streak" = "%d day in a row";
+"achievements.progress.streak_other" = "%d days in a row";
+"achievements.progress.perfects" = "%d perfect score";
+"achievements.progress.perfects_other" = "%d perfect scores";
 
 // Notifications
 "notification.title" = "Study Time";
@@ -258,93 +291,3 @@
 // Error Messages
 "error.title" = "Error";
 "error.ok" = "OK";
-
-// Mistakes Review
-"mistakes.title" = "Mistakes Review";
-"mistakes.reviewTitle" = "Mistakes Review";
-"mistakes.loading" = "Loading...";
-"mistakes.stopped" = "Review stopped";
-"mistakes.back" = "Back";
-"mistakes.error" = "Error";
-"mistakes.wrongAnswer" = "Wrong answer";
-"mistakes.stop" = "Stop";
-"mistakes.stop.confirm.title" = "Stop review?";
-"mistakes.stop.confirm.cancel" = "Cancel";
-"mistakes.stop.confirm.ok" = "Stop";
-"mistakes.stop.confirm.message" = "Are you sure you want to stop the mistakes review?";
-"mistakes.noWrongQuestions" = "No wrong answers to review";
-
-// Quiz
-"quiz.question" = "Question";
-"quiz.score" = "Score";
-"quiz.stop" = "Stop";
-"quiz.stop.confirm.title" = "Stop quiz?";
-"quiz.stop.confirm.cancel" = "Cancel";
-"quiz.stop.confirm.ok" = "Stop";
-"quiz.stop.confirm.message" = "Are you sure you want to stop the quiz?";
-
-// Results
-"result.title" = "Result";
-"result.correctAnswers" = "Correct answers";
-"result.totalQuestions" = "Total questions";
-"result.correctAnswers" = "Correct answers";
-"result.timeSpent" = "Time";
-"result.newRecord" = "New record!";
-"result.playAgain" = "Play again";
-"result.backToStart" = "Back to start";
-
-// Achievements
-"achievements.title" = "Achievements";
-"achievements.reset" = "Reset";
-"achievements.reset.confirm.title" = "Reset achievements?";
-"achievements.reset.confirm.cancel" = "Cancel";
-"achievements.reset.confirm.ok" = "Reset";
-"achievements.reset.confirm.message" = "All achievements will be reset. This action cannot be undone.";
-"achievements.unlocked" = "Unlocked";
-"achievements.progress.quiz" = "quizzes";
-"achievements.progress.perfect" = "perfect scores";
-"achievements.progress.speed" = "fast completions";
-"achievements.progress.questions" = "questions";
-"achievements.progress.quizzes" = "quizzes";
-"achievements.progress.streak" = "days in a row";
-"achievements.progress.perfects" = "perfect scores";
-
-// Stats
-"stats.title" = "Statistics";
-"stats.reset" = "Reset";
-"stats.reset.confirm.title" = "Reset statistics?";
-"stats.reset.confirm.cancel" = "Cancel";
-"stats.reset.confirm.ok" = "Reset";
-"stats.reset.confirm.message" = "All statistics will be reset. This action cannot be undone.";
-"stats.questionsStudied" = "Questions studied";
-"stats.correctAnswers" = "Correct answers";
-"stats.incorrectAnswers" = "Incorrect answers";
-"stats.correctedMistakes" = "Mistakes corrected";
-"stats.totalQuestions" = "Total questions";
-"stats.quizzesCompleted" = "Quizzes completed";
-"stats.wrongQuestions" = "Wrong answers";
-"stats.wrongQuestionsCount" = "Count";
-"stats.repeatMistakes" = "Repeat mistakes";
-"stats.sync.title" = "Synchronization";
-"stats.sync.status" = "Status";
-"stats.sync.available" = "Update available";
-"stats.sync.upToDate" = "Up to date";
-"stats.sync.newQuestions" = "New questions";
-"stats.sync.check" = "Check";
-"stats.sync.sync" = "Sync";
-
-// Notifications
-"notification.title" = "Reminder";
-"notification.body" = "Time to study Islam!";
-"notification.permission.title" = "Notification Permission";
-"notification.permission.message" = "Allow notifications to receive reminders";
-"notification.permission.request" = "Allow notifications";
-"notification.settings.title" = "Notification Settings";
-"notification.settings.enabled" = "Notifications enabled";
-"notification.settings.time" = "Reminder time";
-"notification.settings.test" = "Send test notification";
-
-// Achievement Notifications
-"achievements.congratulations" = "Congratulations!";
-"achievements.firstQuiz.title" = "First Quiz";
-"achievements.firstQuiz.description" = "Complete your first quiz";

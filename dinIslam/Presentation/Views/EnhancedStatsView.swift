@@ -1,5 +1,5 @@
 //
-//  StatsView.swift
+//  EnhancedStatsView.swift
 //  dinIslam
 //
 //  Created by Saydulayev on 20.10.25.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct StatsView: View {
+struct EnhancedStatsView: View {
     @State private var statsManager: StatsManager
     @EnvironmentObject private var settingsManager: SettingsManager
     @EnvironmentObject private var remoteService: RemoteQuestionsService
@@ -16,6 +16,11 @@ struct StatsView: View {
     @State private var showingMistakesReview = false
     @State private var totalQuestionsCount: Int = 0
     @State private var showingResetAlert = false
+    
+    // Accessibility and UX enhancements
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.accessibilityDifferentiateWithoutColor) private var differentiateWithoutColor
+    @Environment(\.layoutDirection) private var layoutDirection
     
     // Task cancellation
     @State private var updateTask: Task<Void, Never>?
@@ -29,90 +34,104 @@ struct StatsView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
-                // Header - теперь внутри скролла
+                // Header
                 VStack(spacing: 8) {
                     Image(systemName: "chart.bar.fill")
                         .font(.system(size: 40))
                         .foregroundStyle(.blue.gradient)
+                        .accessibilityHidden(true)
                     
                     Text("stats.title".localized)
                         .font(.title2)
                         .fontWeight(.bold)
+                        .dynamicTypeSize(.accessibility1)
+                        .accessibilityAddTraits(.isHeader)
                 }
                 .padding(.top, 8)
                 .padding(.bottom, 16)
                 
-                // Stats Cards - фиксированная сетка
+                // Stats Cards with pluralization
                 LazyVGrid(columns: [
                         GridItem(.flexible()),
                         GridItem(.flexible())
                     ], spacing: 16) {
-                        StatCard(
+                        EnhancedStatCard(
                             title: "stats.questionsStudied.title".localized,
-                            value: "\(statsManager.stats.totalQuestionsStudied)",
+                            value: statsManager.stats.totalQuestionsStudied,
+                            pluralizationKey: "stats.questionsStudied",
                             icon: "questionmark.circle.fill",
                             color: .blue,
                             isCompact: false
                         )
                         
-                        StatCard(
+                        EnhancedStatCard(
                             title: "stats.correctAnswers.title".localized,
-                            value: "\(statsManager.stats.correctAnswers)",
+                            value: statsManager.stats.correctAnswers,
+                            pluralizationKey: "stats.correctAnswers",
                             icon: "checkmark.circle.fill",
                             color: .green,
                             isCompact: false
                         )
                         
-                        StatCard(
+                        EnhancedStatCard(
                             title: "stats.incorrectAnswers.title".localized,
-                            value: "\(statsManager.stats.incorrectAnswers)",
+                            value: statsManager.stats.incorrectAnswers,
+                            pluralizationKey: "stats.incorrectAnswers",
                             icon: "xmark.circle.fill",
                             color: .red,
                             isCompact: false
                         )
                         
-                        StatCard(
+                        EnhancedStatCard(
                             title: "stats.correctedMistakes.title".localized,
-                            value: "\(statsManager.stats.correctedMistakes)",
+                            value: statsManager.stats.correctedMistakes,
+                            pluralizationKey: "stats.correctedMistakes",
                             icon: "checkmark.circle.badge.xmark",
                             color: .orange,
                             isCompact: false
                         )
                         
-                        StatCard(
+                        EnhancedStatCard(
                             title: "stats.totalQuestions.title".localized,
-                            value: "\(totalQuestionsCount)",
+                            value: totalQuestionsCount,
+                            pluralizationKey: "stats.totalQuestions",
                             icon: "book.fill",
                             color: .purple,
                             isCompact: false
                         )
                         
-                        StatCard(
+                        EnhancedStatCard(
                             title: "stats.quizzesCompleted.title".localized,
-                            value: "\(statsManager.stats.totalQuizzesCompleted)",
+                            value: statsManager.stats.totalQuizzesCompleted,
+                            pluralizationKey: "stats.quizzesCompleted",
                             icon: "checkmark.circle.fill",
                             color: .blue,
                             isCompact: false
                         )
                     }
                     
-                    // Wrong Questions Section - увеличенная
+                    // Wrong Questions Section
                     if !statsManager.stats.wrongQuestionIds.isEmpty {
                         VStack(alignment: .leading, spacing: 12) {
                             Text("stats.wrongQuestions".localized)
                                 .font(.title3)
                                 .fontWeight(.semibold)
+                                .dynamicTypeSize(.accessibility1)
+                                .accessibilityAddTraits(.isHeader)
                             
                             VStack(spacing: 12) {
                                 HStack {
                                     Text("stats.wrongQuestionsCount.title".localized)
                                         .font(.body)
                                         .foregroundColor(.secondary)
+                                        .dynamicTypeSize(.accessibility1)
                                     Spacer()
                                     Text("\(statsManager.stats.wrongQuestionsCount)")
                                         .font(.body)
                                         .fontWeight(.semibold)
                                         .foregroundColor(.red)
+                                        .dynamicTypeSize(.accessibility1)
+                                        .accessibilityLabel("stats.wrongQuestionsCount".localized(count: statsManager.stats.wrongQuestionsCount))
                                 }
                                 
                                 Button(action: {
@@ -129,37 +148,46 @@ struct StatsView: View {
                                     .frame(height: 50)
                                     .background(.red.gradient, in: RoundedRectangle(cornerRadius: 12))
                                 }
+                                .accessibilityLabel("Repeat mistakes")
+                                .accessibilityHint("Double tap to review incorrect answers")
+                                .dynamicTypeSize(.accessibility1)
                             }
                             .padding(20)
                             .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
                         }
                     }
                     
-                    // Sync Section - в самом низу
+                    // Sync Section
                     VStack(alignment: .leading, spacing: 12) {
                         Text("stats.sync.title".localized)
                             .font(.title3)
                             .fontWeight(.semibold)
+                            .dynamicTypeSize(.accessibility1)
+                            .accessibilityAddTraits(.isHeader)
                         
                         VStack(spacing: 12) {
                             HStack {
                                 Text("stats.sync.status".localized)
                                     .font(.body)
                                     .foregroundColor(.secondary)
+                                    .dynamicTypeSize(.accessibility1)
                                 Spacer()
                                 if remoteService.isLoading {
                                     ProgressView()
                                         .scaleEffect(0.8)
+                                        .accessibilityLabel("Loading")
                                 } else if remoteService.hasUpdates {
                                     Text("stats.sync.available".localized)
                                         .font(.body)
                                         .fontWeight(.semibold)
                                         .foregroundColor(.green)
+                                        .dynamicTypeSize(.accessibility1)
                                 } else {
                                     Text("stats.sync.upToDate".localized)
                                         .font(.body)
                                         .fontWeight(.semibold)
                                         .foregroundColor(.blue)
+                                        .dynamicTypeSize(.accessibility1)
                                 }
                             }
                             
@@ -168,11 +196,14 @@ struct StatsView: View {
                                     Text("stats.sync.newQuestions.title".localized)
                                         .font(.subheadline)
                                         .foregroundColor(.secondary)
+                                        .dynamicTypeSize(.accessibility1)
                                     Spacer()
                                     Text("+\(remoteService.remoteQuestionsCount - remoteService.cachedQuestionsCount)")
                                         .font(.subheadline)
                                         .fontWeight(.semibold)
                                         .foregroundColor(.green)
+                                        .dynamicTypeSize(.accessibility1)
+                                        .accessibilityLabel("stats.sync.newQuestions".localized(count: remoteService.remoteQuestionsCount - remoteService.cachedQuestionsCount))
                                 }
                             }
                             
@@ -195,6 +226,9 @@ struct StatsView: View {
                                     .background(.blue.gradient, in: RoundedRectangle(cornerRadius: 12))
                                 }
                                 .disabled(remoteService.isLoading)
+                                .accessibilityLabel("Check for updates")
+                                .accessibilityHint("Double tap to check for new questions")
+                                .dynamicTypeSize(.accessibility1)
                                 
                                 if remoteService.hasUpdates {
                                     Button(action: {
@@ -215,6 +249,9 @@ struct StatsView: View {
                                         .background(.green.gradient, in: RoundedRectangle(cornerRadius: 12))
                                     }
                                     .disabled(remoteService.isLoading)
+                                    .accessibilityLabel("Sync questions")
+                                    .accessibilityHint("Double tap to download new questions")
+                                    .dynamicTypeSize(.accessibility1)
                                 }
                             }
                         }
@@ -225,14 +262,17 @@ struct StatsView: View {
                 .padding(.horizontal, 16)
                 .padding(.bottom, 20)
         }
-            .navigationTitle(LocalizationManager.shared.localizedString(for: "stats.title"))
+            .navigationTitle("stats.title".localized)
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(LocalizationManager.shared.localizedString(for: "stats.reset")) {
+                    Button("stats.reset".localized) {
                         showingResetAlert = true
                     }
                     .foregroundColor(.red)
+                    .accessibilityLabel("Reset statistics")
+                    .accessibilityHint("Double tap to reset all statistics")
+                    .dynamicTypeSize(.accessibility1)
                 }
             }
             .navigationDestination(isPresented: $showingMistakesReview) {
@@ -332,12 +372,12 @@ struct StatsView: View {
         // Store task for potential cancellation
         updateTask = mistakesTask
     }
-    
 }
 
-struct StatCard: View {
+struct EnhancedStatCard: View {
     let title: String
-    let value: String
+    let value: Int
+    let pluralizationKey: String
     let icon: String
     let color: Color
     let isCompact: Bool
@@ -347,46 +387,42 @@ struct StatCard: View {
             Image(systemName: icon)
                 .font(.system(size: 32))
                 .foregroundColor(color)
+                .accessibilityHidden(true)
             
-            Text(value)
+            Text("\(value)")
                 .font(.largeTitle)
                 .fontWeight(.bold)
+                .dynamicTypeSize(.accessibility1)
+                .accessibilityLabel("\(value)")
             
-            Text(title)
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
-                .lineLimit(2)
+            if !pluralizationKey.isEmpty {
+                Text(pluralizationKey.localized(count: value))
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+                    .lineLimit(2)
+                    .dynamicTypeSize(.accessibility1)
+                    .accessibilityLabel(pluralizationKey.localized(count: value))
+            } else {
+                Text(title)
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+                    .lineLimit(2)
+                    .dynamicTypeSize(.accessibility1)
+                    .accessibilityLabel(title)
+            }
         }
         .frame(maxWidth: .infinity, minHeight: 140, maxHeight: 140)
         .padding(20)
         .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 20))
-    }
-}
-
-struct ProgressRow: View {
-    let title: String
-    let value: Int
-    let color: Color
-    let isCompact: Bool
-    
-    var body: some View {
-        HStack {
-            Text(title)
-                .font(isCompact ? .subheadline : .body)
-                .foregroundColor(.secondary)
-            Spacer()
-            Text("\(value)")
-                .font(isCompact ? .subheadline : .body)
-                .fontWeight(.semibold)
-                .foregroundColor(color)
-        }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(title): \(value)")
     }
 }
 
 #Preview {
-    StatsView(statsManager: StatsManager())
+    EnhancedStatsView(statsManager: StatsManager())
         .environmentObject(SettingsManager())
         .environmentObject(RemoteQuestionsService())
 }
-

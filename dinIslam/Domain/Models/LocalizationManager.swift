@@ -75,6 +75,14 @@ extension String {
     var localized: String {
         return LocalizationManager.shared.localizedString(for: self)
     }
+    
+    func localized(count: Int) -> String {
+        return EnhancedLocalizationManager.shared.localizedString(for: self, count: count)
+    }
+    
+    func localized(count: Int, arguments: CVarArg...) -> String {
+        return EnhancedLocalizationManager.shared.localizedString(for: self, count: count, arguments: arguments)
+    }
 }
 
 // MARK: - Localized Text View
