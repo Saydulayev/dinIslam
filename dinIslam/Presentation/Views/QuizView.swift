@@ -21,6 +21,14 @@ struct QuizView: View {
         "\(viewModel.currentQuestionIndex + 1) / \(viewModel.questions.count)"
     }
     
+    // Мемоизированные индексы ответов для избежания повторных вычислений
+    private var answerIndices: [String: Int] {
+        guard let question = viewModel.currentQuestion else { return [:] }
+        return Dictionary(uniqueKeysWithValues: 
+            question.answers.enumerated().map { ($1.id, $0) }
+        )
+    }
+    
     var body: some View {
         VStack(spacing: 0) {
             // Header with progress and score
@@ -92,7 +100,7 @@ struct QuizView: View {
                         // Answer options
                         VStack(spacing: 12) {
                             ForEach(question.answers, id: \.id) { answer in
-                                let index = question.answers.firstIndex(where: { $0.id == answer.id })!
+                                let index = answerIndices[answer.id] ?? 0
                                 AnswerButton(
                                     answer: answer,
                                     index: index,

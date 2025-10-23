@@ -28,7 +28,7 @@ struct StatsView: View {
     
     var body: some View {
         ScrollView {
-            VStack(spacing: 20) {
+            LazyVStack(spacing: 20) {
                 // Header - теперь внутри скролла
                 VStack(spacing: 8) {
                     Image(systemName: "chart.bar.fill")

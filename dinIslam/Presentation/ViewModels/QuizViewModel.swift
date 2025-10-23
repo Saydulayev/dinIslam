@@ -38,15 +38,36 @@ class QuizViewModel {
     private var startTime: Date?
     private var questionResults: [String: Bool] = [:] // ID вопроса -> правильный ли ответ
     
+    // Мемоизация для избежания повторных вычислений
+    private var memoizedProgress: Double?
+    private var memoizedCurrentQuestion: Question?
+    
     // MARK: - Computed Properties
     var currentQuestion: Question? {
         guard currentQuestionIndex < questions.count else { return nil }
-        return questions[currentQuestionIndex]
+        
+        // Мемоизация для избежания повторных обращений к массиву
+        if let memoized = memoizedCurrentQuestion, 
+           memoized.id == questions[currentQuestionIndex].id {
+            return memoized
+        }
+        
+        let question = questions[currentQuestionIndex]
+        memoizedCurrentQuestion = question
+        return question
     }
     
     var progress: Double {
         guard !questions.isEmpty else { return 0 }
-        return Double(currentQuestionIndex) / Double(questions.count)
+        
+        // Мемоизация прогресса
+        if let memoized = memoizedProgress {
+            return memoized
+        }
+        
+        let progressValue = Double(currentQuestionIndex) / Double(questions.count)
+        memoizedProgress = progressValue
+        return progressValue
     }
     
     var isLastQuestion: Bool {
@@ -71,23 +92,23 @@ class QuizViewModel {
         
         do {
             let loadedQuestions = try await quizUseCase.startQuiz(language: language)
-            await MainActor.run {
-                questions = loadedQuestions.map { quizUseCase.shuffleAnswers(for: $0) }
-                currentQuestionIndex = 0
-                correctAnswers = 0
-                selectedAnswerIndex = nil
-                isAnswerSelected = false
-                showResult = false
-                startTime = Date()
-                state = .active(.playing)
-                isLoading = false
-            }
+            
+            // Shuffle answers (simple CPU work; safe to do on main actor for small arrays)
+            let processedQuestions = loadedQuestions.map { quizUseCase.shuffleAnswers(for: $0) }
+            
+            questions = processedQuestions
+            currentQuestionIndex = 0
+            correctAnswers = 0
+            selectedAnswerIndex = nil
+            isAnswerSelected = false
+            showResult = false
+            startTime = Date()
+            state = .active(.playing)
+            isLoading = false
         } catch {
-            await MainActor.run {
-                errorMessage = error.localizedDescription
-                state = .error(.networkError)
-                isLoading = false
-            }
+            errorMessage = error.localizedDescription
+            state = .error(.networkError)
+            isLoading = false
         }
     }
     
@@ -141,6 +162,10 @@ class QuizViewModel {
             currentQuestionIndex += 1
             selectedAnswerIndex = nil
             isAnswerSelected = false
+            
+            // Сброс мемоизации при переходе к следующему вопросу
+            memoizedProgress = nil
+            memoizedCurrentQuestion = nil
         }
     }
     
@@ -183,6 +208,10 @@ class QuizViewModel {
         quizResult = nil
         errorMessage = nil
         questionResults.removeAll()
+        
+        // Сброс мемоизации при перезапуске
+        memoizedProgress = nil
+        memoizedCurrentQuestion = nil
     }
     
     // MARK: - Mistakes Review Methods

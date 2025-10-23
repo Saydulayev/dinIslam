@@ -17,6 +17,9 @@ struct StartView: View {
     @State private var showingAchievements = false
     @AppStorage("bestScore") private var bestScore: Double = 0
     
+    // Кэшированный код языка для избежания синхронных операций
+    @State private var cachedLanguageCode: String = "ru"
+    
     // Task cancellation
     @State private var startQuizTask: Task<Void, Never>?
     
@@ -73,8 +76,7 @@ struct StartView: View {
                 Button(action: {
                     startQuizTask?.cancel()
                     startQuizTask = Task {
-                        let languageCode = settingsManager.settings.language.locale?.language.languageCode?.identifier ?? "ru"
-                        await viewModel.startQuiz(language: languageCode)
+                        await viewModel.startQuiz(language: cachedLanguageCode)
                     }
                 }) {
                     HStack {
@@ -167,6 +169,11 @@ struct StartView: View {
                     UNUserNotificationCenter.current().setBadgeCount(0, withCompletionHandler: { _ in })
                 } else {
                     UIApplication.shared.applicationIconBadgeNumber = 0
+                }
+                
+                // Кэширование кода языка асинхронно
+                Task {
+                    cachedLanguageCode = settingsManager.settings.language.locale?.language.languageCode?.identifier ?? "ru"
                 }
                 
                 // Предзагрузка вопросов для улучшения UX
