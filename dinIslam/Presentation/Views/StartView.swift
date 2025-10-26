@@ -36,10 +36,8 @@ struct StartView: View {
     
     var body: some View {
         NavigationStack {
-            VStack(spacing: 40) {
-                Spacer()
-                
-                // App Title
+            VStack(spacing: 0) {
+                // App Title - по центру экрана
                 VStack(spacing: 16) {
                     Image(systemName: "brain.head.profile")
                         .font(.system(size: 80))
@@ -56,71 +54,72 @@ struct StartView: View {
                         .multilineTextAlignment(.center)
                         .padding(.horizontal)
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
                 
-                Spacer()
-                
-                // Best Score
-                if bestScore > 0 {
-                    VStack(spacing: 8) {
-                        LocalizedText("start.bestScore")
-                            .font(.headline)
-                            .foregroundStyle(.secondary)
-                        
-                        Text("\(Int(bestScore))%")
-                            .font(.title)
-                            .fontWeight(.bold)
-                            .foregroundStyle(.green)
-                    }
-                    .padding()
-                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
-                }
-                
-                // Action Buttons
-                VStack(spacing: 16) {
-                    // Regular Quiz Button
-                    Button(action: {
-                        startQuizTask?.cancel()
-                        startQuizTask = Task {
-                            await viewModel.startQuiz(language: cachedLanguageCode)
-                        }
-                    }) {
-                        HStack {
-                            if viewModel.isLoading {
-                                ProgressView()
-                                    .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                                    .scaleEffect(0.8)
-                            } else {
-                                Image(systemName: "play.fill")
-                            }
+                // Bottom section with best score and buttons
+                VStack(spacing: 24) {
+                    // Best Score
+                    if bestScore > 0 {
+                        VStack(spacing: 8) {
+                            LocalizedText("start.bestScore")
+                                .font(.headline)
+                                .foregroundStyle(.secondary)
                             
-                            LocalizedText(viewModel.isLoading ? "start.loading" : "start.begin")
-                                .fontWeight(.semibold)
+                            Text("\(Int(bestScore))%")
+                                .font(.title)
+                                .fontWeight(.bold)
+                                .foregroundStyle(.green)
                         }
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 56)
-                        .background(.blue.gradient, in: RoundedRectangle(cornerRadius: 16))
+                        .padding()
+                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
                     }
-                    .disabled(viewModel.isLoading)
                     
-                    // Exam Mode Button
-                    Button(action: {
-                        showingExamSettings = true
-                    }) {
-                        HStack {
-                            Image(systemName: "timer")
-                            LocalizedText("start.examMode")
-                                .fontWeight(.semibold)
+                    // Action Buttons
+                    VStack(spacing: 16) {
+                        // Regular Quiz Button
+                        Button(action: {
+                            startQuizTask?.cancel()
+                            startQuizTask = Task {
+                                await viewModel.startQuiz(language: cachedLanguageCode)
+                            }
+                        }) {
+                            HStack {
+                                if viewModel.isLoading {
+                                    ProgressView()
+                                        .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                                        .scaleEffect(0.8)
+                                } else {
+                                    Image(systemName: "play.fill")
+                                }
+                                
+                                LocalizedText(viewModel.isLoading ? "start.loading" : "start.begin")
+                                    .fontWeight(.semibold)
+                            }
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 56)
+                            .background(.blue.gradient, in: RoundedRectangle(cornerRadius: 16))
                         }
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 56)
-                        .background(.orange.gradient, in: RoundedRectangle(cornerRadius: 16))
+                        .disabled(viewModel.isLoading)
+                        
+                        // Exam Mode Button
+                        Button(action: {
+                            showingExamSettings = true
+                        }) {
+                            HStack {
+                                Image(systemName: "timer")
+                                LocalizedText("start.examMode")
+                                    .fontWeight(.semibold)
+                            }
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 56)
+                            .background(.orange.gradient, in: RoundedRectangle(cornerRadius: 16))
+                        }
                     }
+                    .padding(.horizontal)
                 }
-                .padding(.horizontal)
-                
-                Spacer()
+                .padding(.bottom, 40)
             }
             .padding()
             .navigationDestination(isPresented: .constant({
