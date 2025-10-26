@@ -277,14 +277,14 @@ class ExamViewModel {
     
     // MARK: - Timer Methods
     private func startQuestionTimer() {
-        guard let currentQuestion = currentQuestion else { return }
+        guard currentQuestion != nil else { return }
         
         timeRemaining = configuration.timePerQuestion
         isTimerActive = true
         questionStartTime = Date()
         
         timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
-            Task { @MainActor in
+            Task { @MainActor [weak self] in
                 self?.updateTimer()
             }
         }

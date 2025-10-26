@@ -37,7 +37,7 @@ struct ExamAnswer: Codable, Equatable {
     }
     
     var isCorrect: Bool {
-        guard let selectedIndex = selectedAnswerIndex, !isSkipped, !isTimeExpired else {
+        guard let _ = selectedAnswerIndex, !isSkipped, !isTimeExpired else {
             return false
         }
         // This will be determined by comparing with the correct answer index
