@@ -18,7 +18,6 @@ struct StartView: View {
     @State private var showingExamSettings = false
     @State private var showingExam = false
     @State private var examViewModel: ExamViewModel?
-    @AppStorage("bestScore") private var bestScore: Double = 0
     
     // Кэшированный код языка для избежания синхронных операций
     @State private var cachedLanguageCode: String = "ru"
@@ -56,19 +55,36 @@ struct StartView: View {
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 
-                // Bottom section with best score and buttons
+                // Bottom section with average score and buttons
                 VStack(spacing: 24) {
-                    // Best Score
-                    if bestScore > 0 {
+                    // Average Score
+                    if statsManager.hasRecentGames() {
                         VStack(spacing: 8) {
-                            LocalizedText("start.bestScore")
+                            LocalizedText("start.averageScore")
                                 .font(.headline)
                                 .foregroundStyle(.secondary)
                             
-                            Text("\(Int(bestScore))%")
+                            Text("\(Int(statsManager.getAverageRecentScore()))%")
                                 .font(.title)
                                 .fontWeight(.bold)
-                                .foregroundStyle(.green)
+                                .foregroundStyle(.blue)
+                            
+                            Text(String(format: NSLocalizedString("start.basedOnGames", comment: ""), statsManager.getRecentGamesCount()))
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                        .padding()
+                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
+                    } else {
+                        VStack(spacing: 8) {
+                            LocalizedText("start.noGamesYet")
+                                .font(.headline)
+                                .foregroundStyle(.secondary)
+                            
+                            Text("—")
+                                .font(.title)
+                                .fontWeight(.bold)
+                                .foregroundStyle(.gray)
                         }
                         .padding()
                         .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
@@ -132,7 +148,7 @@ struct StartView: View {
                 if case .completed(.finished) = viewModel.state { return true }
                 return false
             }())) {
-                ResultView(viewModel: viewModel, bestScore: $bestScore)
+                ResultView(viewModel: viewModel)
             }
             .sheet(isPresented: $showingSettings) {
                 NavigationStack {

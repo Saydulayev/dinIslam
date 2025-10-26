@@ -11,6 +11,9 @@
 "start.loading" = "Загрузка...";
 "start.bestScore" = "Лучший результат";
 "start.examMode" = "Режим экзамена";
+"start.averageScore" = "Средний результат";
+"start.basedOnGames" = "на основе %d игр";
+"start.noGamesYet" = "Пока нет игр";
 
 // Quiz View
 "quiz.question" = "Вопрос";

@@ -69,4 +69,18 @@ class StatsManager {
     func getCorrectedMistakesCount() -> Int {
         return stats.correctedMistakes
     }
+    
+    // MARK: - Recent Score Methods
+    
+    func getAverageRecentScore() -> Double {
+        return stats.averageRecentScore
+    }
+    
+    func getRecentGamesCount() -> Int {
+        return stats.recentGamesCount
+    }
+    
+    func hasRecentGames() -> Bool {
+        return !stats.recentQuizResults.isEmpty
+    }
 }

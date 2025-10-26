@@ -7,6 +7,19 @@
 
 import Foundation
 
+// MARK: - Quiz Result Record
+struct QuizResultRecord: Codable, Equatable {
+    let percentage: Double
+    let date: Date
+    let questionsCount: Int
+    
+    init(percentage: Double, date: Date, questionsCount: Int) {
+        self.percentage = percentage
+        self.date = date
+        self.questionsCount = questionsCount
+    }
+}
+
 struct UserStats: Codable {
     var totalQuestionsStudied: Int = 0
     var correctAnswers: Int = 0
@@ -18,10 +31,21 @@ struct UserStats: Codable {
     var currentStreak: Int = 0  // Текущая серия побед
     var perfectScores: Int = 0  // Количество идеальных результатов
     var lastQuizPercentage: Double = 0  // Процент последней викторины
+    var recentQuizResults: [QuizResultRecord] = []  // Последние 10 результатов
     
     var accuracyPercentage: Double {
         guard totalQuestionsStudied > 0 else { return 0 }
         return Double(correctAnswers) / Double(totalQuestionsStudied) * 100
+    }
+    
+    var averageRecentScore: Double {
+        guard !recentQuizResults.isEmpty else { return 0 }
+        let sum = recentQuizResults.reduce(0) { $0 + $1.percentage }
+        return sum / Double(recentQuizResults.count)
+    }
+    
+    var recentGamesCount: Int {
+        return recentQuizResults.count
     }
     
     var wrongQuestionsCount: Int {
@@ -41,6 +65,19 @@ struct UserStats: Codable {
         lastQuizDate = Date()
         totalQuizzesCompleted += 1
         lastQuizPercentage = percentage
+        
+        // Добавляем результат в массив последних игр
+        let newResult = QuizResultRecord(
+            percentage: percentage,
+            date: Date(),
+            questionsCount: totalCount
+        )
+        recentQuizResults.insert(newResult, at: 0) // Добавляем в начало
+        
+        // Ограничиваем массив до 10 элементов
+        if recentQuizResults.count > 10 {
+            recentQuizResults.removeLast()
+        }
         
         // Обновляем серию побед
         if percentage >= 80.0 {

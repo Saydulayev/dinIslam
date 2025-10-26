@@ -11,6 +11,9 @@
 "start.loading" = "Loading...";
 "start.bestScore" = "Best Score";
 "start.examMode" = "Exam Mode";
+"start.averageScore" = "Average Score";
+"start.basedOnGames" = "based on %d games";
+"start.noGamesYet" = "No games yet";
 
 // Quiz View
 "quiz.question" = "Question";

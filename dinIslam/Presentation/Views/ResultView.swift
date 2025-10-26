@@ -10,13 +10,11 @@ import UserNotifications
 
 struct ResultView: View {
     @State private var viewModel: QuizViewModel
-    @Binding var bestScore: Double
     @State private var showingAchievementNotification = false
     @State private var currentAchievement: Achievement?
     
-    init(viewModel: QuizViewModel, bestScore: Binding<Double>) {
+    init(viewModel: QuizViewModel) {
         self.viewModel = viewModel
-        self._bestScore = bestScore
     }
     
     var body: some View {
@@ -87,7 +85,6 @@ struct ResultView: View {
             // Action buttons
             VStack(spacing: 16) {
                 Button(action: {
-                    updateBestScore()
                     viewModel.restartQuiz()
                 }) {
                     HStack {
@@ -102,7 +99,6 @@ struct ResultView: View {
                 }
                 
                 Button(action: {
-                    updateBestScore()
                     // Navigate back to start
                     viewModel.restartQuiz()
                 }) {
@@ -140,7 +136,6 @@ struct ResultView: View {
         )
         .onAppear {
             checkForNewAchievements()
-            updateBestScore()
             
             // Clear app badge when results are shown (iOS 17+ API)
             UNUserNotificationCenter.current().setBadgeCount(0, withCompletionHandler: { _ in })
@@ -188,13 +183,6 @@ struct ResultView: View {
         }
     }
     
-    private func updateBestScore() {
-        if let percentage = viewModel.quizResult?.percentage,
-           percentage > bestScore {
-            bestScore = percentage
-        }
-    }
-    
     private func checkForNewAchievements() {
         let newAchievements = viewModel.newAchievements
         
@@ -232,5 +220,5 @@ struct StatRow: View {
 
 #Preview {
     let viewModel = QuizViewModel(quizUseCase: QuizUseCase(questionsRepository: QuestionsRepository()), statsManager: StatsManager(), settingsManager: SettingsManager())
-    ResultView(viewModel: viewModel, bestScore: .constant(85.0))
+    ResultView(viewModel: viewModel)
 }
