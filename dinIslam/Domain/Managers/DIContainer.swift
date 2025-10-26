@@ -20,6 +20,10 @@ class DIContainer {
         StatsManager()
     }()
     
+    lazy var examStatisticsManager: ExamStatisticsManager = {
+        ExamStatisticsManager()
+    }()
+    
     lazy var achievementManager: AchievementManager = {
         AchievementManager()
     }()
@@ -31,6 +35,10 @@ class DIContainer {
     // MARK: - Use Cases
     lazy var quizUseCase: QuizUseCaseProtocol = {
         QuizUseCase(questionsRepository: questionsRepository)
+    }()
+    
+    lazy var examUseCase: ExamUseCaseProtocol = {
+        ExamUseCase(questionsRepository: questionsRepository, examStatisticsManager: examStatisticsManager)
     }()
     
     // MARK: - Repositories

@@ -10,6 +10,7 @@
 "start.begin" = "Начать изучение";
 "start.loading" = "Загрузка...";
 "start.bestScore" = "Лучший результат";
+"start.examMode" = "Режим экзамена";
 
 // Quiz View
 "quiz.question" = "Вопрос";
@@ -306,3 +307,78 @@
 // Error Messages
 "error.title" = "Ошибка";
 "error.ok" = "ОК";
+
+// Exam Mode
+"exam.title" = "Экзамен";
+"exam.stop" = "Остановить";
+"exam.pause" = "Пауза";
+"exam.resume" = "Продолжить";
+"exam.skip" = "Пропустить";
+"exam.submit" = "Завершить экзамен";
+
+// Exam Settings
+"exam.settings.title" = "Настройки экзамена";
+"exam.settings.cancel" = "Отмена";
+"exam.settings.start" = "Начать экзамен";
+"exam.settings.presets" = "Предустановки";
+"exam.settings.presets.footer" = "Выберите готовую конфигурацию или создайте свою";
+"exam.settings.custom" = "Пользовательские настройки";
+"exam.settings.custom.footer" = "Настройте параметры экзамена под себя";
+"exam.settings.timePerQuestion" = "Время на вопрос";
+"exam.settings.totalQuestions" = "Количество вопросов";
+"exam.settings.allowSkip" = "Разрешить пропуск";
+"exam.settings.showTimer" = "Показывать таймер";
+"exam.settings.autoSubmit" = "Автозавершение";
+"exam.settings.preview" = "Предварительный просмотр";
+"exam.settings.preview.title" = "Параметры экзамена";
+"exam.settings.preview.questions" = "Вопросов";
+"exam.settings.preview.timePerQuestion" = "Время на вопрос";
+"exam.settings.preview.totalTime" = "Общее время";
+"exam.settings.preview.options" = "Опции";
+"exam.settings.preview.skip" = "Пропуск";
+"exam.settings.preview.timer" = "Таймер";
+"exam.settings.preview.autoSubmit" = "Автозавершение";
+
+// Exam Presets
+"exam.preset.quick" = "Быстрый";
+"exam.preset.quick.description" = "10 вопросов по 15 секунд";
+"exam.preset.standard" = "Стандартный";
+"exam.preset.standard.description" = "20 вопросов по 30 секунд";
+"exam.preset.extended" = "Расширенный";
+"exam.preset.extended.description" = "30 вопросов по 60 секунд";
+"exam.preset.custom" = "Пользовательский";
+"exam.preset.custom.description" = "Настройте параметры самостоятельно";
+
+// Exam Alerts
+"exam.pause.title" = "Пауза экзамена";
+"exam.pause.message" = "Вы уверены, что хотите поставить экзамен на паузу?";
+"exam.pause.cancel" = "Отмена";
+"exam.pause.confirm" = "Пауза";
+"exam.stop.title" = "Остановить экзамен";
+"exam.stop.message" = "Вы уверены, что хотите остановить экзамен? Результаты будут сохранены.";
+"exam.stop.cancel" = "Отмена";
+"exam.stop.confirm" = "Остановить";
+
+// Exam Result
+"exam.result.title" = "Результат экзамена";
+"exam.result.done" = "Готово";
+"exam.result.passed" = "Экзамен сдан!";
+"exam.result.failed" = "Экзамен не сдан";
+"exam.result.grade" = "Оценка";
+"exam.result.answered" = "Отвечено";
+"exam.result.correct" = "Правильно";
+"exam.result.incorrect" = "Неправильно";
+"exam.result.skipped" = "Пропущено";
+"exam.result.breakdown" = "Детализация";
+"exam.result.totalQuestions" = "Всего вопросов";
+"exam.result.timeSpent" = "Время выполнения";
+"exam.result.averageTime" = "Среднее время";
+"exam.result.timeExpired" = "Время истекло";
+"exam.result.retake" = "Пересдать";
+"exam.result.share" = "Поделиться";
+
+// Exam Grades
+"exam.grade.excellent" = "Отлично";
+"exam.grade.good" = "Хорошо";
+"exam.grade.satisfactory" = "Удовлетворительно";
+"exam.grade.unsatisfactory" = "Неудовлетворительно";

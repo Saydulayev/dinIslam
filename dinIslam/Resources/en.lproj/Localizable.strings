@@ -10,6 +10,7 @@
 "start.begin" = "Start Learning";
 "start.loading" = "Loading...";
 "start.bestScore" = "Best Score";
+"start.examMode" = "Exam Mode";
 
 // Quiz View
 "quiz.question" = "Question";
@@ -291,3 +292,78 @@
 // Error Messages
 "error.title" = "Error";
 "error.ok" = "OK";
+
+// Exam Mode
+"exam.title" = "Exam";
+"exam.stop" = "Stop";
+"exam.pause" = "Pause";
+"exam.resume" = "Resume";
+"exam.skip" = "Skip";
+"exam.submit" = "Submit Exam";
+
+// Exam Settings
+"exam.settings.title" = "Exam Settings";
+"exam.settings.cancel" = "Cancel";
+"exam.settings.start" = "Start Exam";
+"exam.settings.presets" = "Presets";
+"exam.settings.presets.footer" = "Choose a ready configuration or create your own";
+"exam.settings.custom" = "Custom Settings";
+"exam.settings.custom.footer" = "Configure exam parameters to your liking";
+"exam.settings.timePerQuestion" = "Time per question";
+"exam.settings.totalQuestions" = "Number of questions";
+"exam.settings.allowSkip" = "Allow skip";
+"exam.settings.showTimer" = "Show timer";
+"exam.settings.autoSubmit" = "Auto submit";
+"exam.settings.preview" = "Preview";
+"exam.settings.preview.title" = "Exam Parameters";
+"exam.settings.preview.questions" = "Questions";
+"exam.settings.preview.timePerQuestion" = "Time per question";
+"exam.settings.preview.totalTime" = "Total time";
+"exam.settings.preview.options" = "Options";
+"exam.settings.preview.skip" = "Skip";
+"exam.settings.preview.timer" = "Timer";
+"exam.settings.preview.autoSubmit" = "Auto submit";
+
+// Exam Presets
+"exam.preset.quick" = "Quick";
+"exam.preset.quick.description" = "10 questions, 15 seconds each";
+"exam.preset.standard" = "Standard";
+"exam.preset.standard.description" = "20 questions, 30 seconds each";
+"exam.preset.extended" = "Extended";
+"exam.preset.extended.description" = "30 questions, 60 seconds each";
+"exam.preset.custom" = "Custom";
+"exam.preset.custom.description" = "Configure parameters yourself";
+
+// Exam Alerts
+"exam.pause.title" = "Pause Exam";
+"exam.pause.message" = "Are you sure you want to pause the exam?";
+"exam.pause.cancel" = "Cancel";
+"exam.pause.confirm" = "Pause";
+"exam.stop.title" = "Stop Exam";
+"exam.stop.message" = "Are you sure you want to stop the exam? Results will be saved.";
+"exam.stop.cancel" = "Cancel";
+"exam.stop.confirm" = "Stop";
+
+// Exam Result
+"exam.result.title" = "Exam Result";
+"exam.result.done" = "Done";
+"exam.result.passed" = "Exam Passed!";
+"exam.result.failed" = "Exam Failed";
+"exam.result.grade" = "Grade";
+"exam.result.answered" = "Answered";
+"exam.result.correct" = "Correct";
+"exam.result.incorrect" = "Incorrect";
+"exam.result.skipped" = "Skipped";
+"exam.result.breakdown" = "Breakdown";
+"exam.result.totalQuestions" = "Total questions";
+"exam.result.timeSpent" = "Time spent";
+"exam.result.averageTime" = "Average time";
+"exam.result.timeExpired" = "Time expired";
+"exam.result.retake" = "Retake";
+"exam.result.share" = "Share";
+
+// Exam Grades
+"exam.grade.excellent" = "Excellent";
+"exam.grade.good" = "Good";
+"exam.grade.satisfactory" = "Satisfactory";
+"exam.grade.unsatisfactory" = "Unsatisfactory";

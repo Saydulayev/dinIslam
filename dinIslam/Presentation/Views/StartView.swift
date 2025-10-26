@@ -15,6 +15,9 @@ struct StartView: View {
     @State private var showingSettings = false
     @State private var showingStats = false
     @State private var showingAchievements = false
+    @State private var showingExamSettings = false
+    @State private var showingExam = false
+    @State private var examViewModel: ExamViewModel?
     @AppStorage("bestScore") private var bestScore: Double = 0
     
     // Кэшированный код языка для избежания синхронных операций
@@ -72,31 +75,49 @@ struct StartView: View {
                     .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
                 }
                 
-                // Start Button
-                Button(action: {
-                    startQuizTask?.cancel()
-                    startQuizTask = Task {
-                        await viewModel.startQuiz(language: cachedLanguageCode)
-                    }
-                }) {
-                    HStack {
-                        if viewModel.isLoading {
-                            ProgressView()
-                                .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                                .scaleEffect(0.8)
-                        } else {
-                            Image(systemName: "play.fill")
+                // Action Buttons
+                VStack(spacing: 16) {
+                    // Regular Quiz Button
+                    Button(action: {
+                        startQuizTask?.cancel()
+                        startQuizTask = Task {
+                            await viewModel.startQuiz(language: cachedLanguageCode)
                         }
-                        
-                        LocalizedText(viewModel.isLoading ? "start.loading" : "start.begin")
-                            .fontWeight(.semibold)
+                    }) {
+                        HStack {
+                            if viewModel.isLoading {
+                                ProgressView()
+                                    .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                                    .scaleEffect(0.8)
+                            } else {
+                                Image(systemName: "play.fill")
+                            }
+                            
+                            LocalizedText(viewModel.isLoading ? "start.loading" : "start.begin")
+                                .fontWeight(.semibold)
+                        }
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 56)
+                        .background(.blue.gradient, in: RoundedRectangle(cornerRadius: 16))
                     }
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 56)
-                    .background(.blue.gradient, in: RoundedRectangle(cornerRadius: 16))
+                    .disabled(viewModel.isLoading)
+                    
+                    // Exam Mode Button
+                    Button(action: {
+                        showingExamSettings = true
+                    }) {
+                        HStack {
+                            Image(systemName: "timer")
+                            LocalizedText("start.examMode")
+                                .fontWeight(.semibold)
+                        }
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 56)
+                        .background(.orange.gradient, in: RoundedRectangle(cornerRadius: 16))
+                    }
                 }
-                .disabled(viewModel.isLoading)
                 .padding(.horizontal)
                 
                 Spacer()
@@ -120,6 +141,17 @@ struct StartView: View {
                 }
                 .presentationDetents([.large])
                 .presentationDragIndicator(.visible)
+            }
+            .sheet(isPresented: $showingExamSettings) {
+                ExamSettingsView { configuration in
+                    startExam(with: configuration)
+                }
+                .environmentObject(settingsManager)
+            }
+            .navigationDestination(isPresented: $showingExam) {
+                if let examViewModel = examViewModel {
+                    ExamView(viewModel: examViewModel)
+                }
             }
             .navigationDestination(isPresented: $showingStats) {
                 StatsView(statsManager: statsManager)
@@ -187,6 +219,22 @@ struct StartView: View {
         .onDisappear {
             // Cancel pending tasks when view disappears
             startQuizTask?.cancel()
+        }
+    }
+    
+    private func startExam(with configuration: ExamConfiguration) {
+        let container = DIContainer.shared
+        let examViewModel = ExamViewModel(
+            examUseCase: container.examUseCase,
+            examStatisticsManager: container.examStatisticsManager,
+            settingsManager: settingsManager
+        )
+        
+        self.examViewModel = examViewModel
+        showingExam = true
+        
+        Task {
+            await examViewModel.startExam(configuration: configuration, language: cachedLanguageCode)
         }
     }
 }
