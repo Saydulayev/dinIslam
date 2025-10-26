@@ -8,6 +8,18 @@
 import SwiftUI
 import UserNotifications
 
+// MARK: - Particle Structure
+struct Particle: Identifiable {
+    let id = UUID()
+    var x: Double
+    var y: Double
+    var opacity: Double
+    var size: Double
+    var velocityX: Double
+    var velocityY: Double
+    var life: Double
+}
+
 struct StartView: View {
     @State private var viewModel: QuizViewModel
     @EnvironmentObject private var settingsManager: SettingsManager
@@ -18,6 +30,8 @@ struct StartView: View {
     @State private var showingExamSettings = false
     @State private var showingExam = false
     @State private var examViewModel: ExamViewModel?
+    @State private var logoGlowIntensity: Double = 0.5
+    @State private var particles: [Particle] = []
     
     // Кэшированный код языка для избежания синхронных операций
     @State private var cachedLanguageCode: String = "ru"
@@ -38,9 +52,38 @@ struct StartView: View {
             VStack(spacing: 0) {
                 // App Title - по центру экрана
                 VStack(spacing: 16) {
-                    Image(systemName: "brain.head.profile")
-                        .font(.system(size: 80))
-                        .foregroundStyle(.blue.gradient)
+                    ZStack {
+                        // Фоновое свечение
+                        Circle()
+                            .fill(
+                                RadialGradient(
+                                    colors: [.blue.opacity(0.2 * logoGlowIntensity), .purple.opacity(0.1 * logoGlowIntensity), .clear],
+                                    center: .center,
+                                    startRadius: 30,
+                                    endRadius: 80
+                                )
+                            )
+                            .frame(width: 160, height: 160)
+                            .blur(radius: 20)
+                        
+                        // Основное изображение
+                        Image("image")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 120, height: 120)
+                            .clipShape(Circle())
+                            .shadow(color: .blue.opacity(0.4 * logoGlowIntensity), radius: 20, x: 0, y: 10)
+                            .shadow(color: .purple.opacity(0.3 * logoGlowIntensity), radius: 30, x: 0, y: 0)
+                        
+                        // Магические частицы
+                        ForEach(particles) { particle in
+                            Circle()
+                                .fill(.yellow.opacity(particle.opacity))
+                                .frame(width: particle.size, height: particle.size)
+                                .offset(x: particle.x, y: particle.y)
+                                .blur(radius: 1)
+                        }
+                    }
                     
                     LocalizedText("app.name")
                         .font(.largeTitle)
@@ -229,6 +272,17 @@ struct StartView: View {
                         for: ["ru", "en"]
                     )
                 }
+                
+                // Анимация свечения логотипа
+                withAnimation(.easeInOut(duration: 2.0).repeatForever(autoreverses: true)) {
+                    logoGlowIntensity = 1.0
+                }
+                
+                // Создание частиц
+                createParticles()
+                
+                // Анимация частиц
+                startParticleAnimation()
             }
         }
         .onDisappear {
@@ -250,6 +304,49 @@ struct StartView: View {
         
         Task {
             await examViewModel.startExam(configuration: configuration, language: cachedLanguageCode)
+        }
+    }
+    
+    // MARK: - Particle Functions
+    private func createParticles() {
+        particles = (0..<12).map { _ in
+            Particle(
+                x: Double.random(in: -80...80),
+                y: Double.random(in: -80...80),
+                opacity: Double.random(in: 0.3...0.8),
+                size: Double.random(in: 2...6),
+                velocityX: Double.random(in: -0.5...0.5),
+                velocityY: Double.random(in: -0.5...0.5),
+                life: Double.random(in: 0.5...1.0)
+            )
+        }
+    }
+    
+    private func startParticleAnimation() {
+        Timer.scheduledTimer(withTimeInterval: 0.016, repeats: true) { _ in
+            updateParticles()
+        }
+    }
+    
+    private func updateParticles() {
+        for i in particles.indices {
+            particles[i].x += particles[i].velocityX
+            particles[i].y += particles[i].velocityY
+            particles[i].life -= 0.01
+            particles[i].opacity = particles[i].life * 0.8
+            
+            // Если частица угасла, создаем новую
+            if particles[i].life <= 0 {
+                particles[i] = Particle(
+                    x: Double.random(in: -80...80),
+                    y: Double.random(in: -80...80),
+                    opacity: Double.random(in: 0.3...0.8),
+                    size: Double.random(in: 2...6),
+                    velocityX: Double.random(in: -0.5...0.5),
+                    velocityY: Double.random(in: -0.5...0.5),
+                    life: Double.random(in: 0.5...1.0)
+                )
+            }
         }
     }
 }
