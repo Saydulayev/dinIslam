@@ -24,6 +24,7 @@ struct StartView: View {
     @State private var viewModel: QuizViewModel
     @EnvironmentObject private var settingsManager: SettingsManager
     @Environment(\.statsManager) private var statsManager: StatsManager
+    @Environment(\.colorScheme) private var colorScheme
     @State private var showingSettings = false
     @State private var showingStats = false
     @State private var showingAchievements = false
@@ -124,7 +125,7 @@ struct StartView: View {
                         .background(.regularMaterial.opacity(0.3), in: RoundedRectangle(cornerRadius: 16))
                         .overlay(
                             RoundedRectangle(cornerRadius: 16)
-                                .stroke(.white.opacity(0.2), lineWidth: 1)
+                                .stroke(adaptiveBorderColor, lineWidth: 0.5)
                         )
                     } else {
                         VStack(spacing: 8) {
@@ -141,7 +142,7 @@ struct StartView: View {
                         .background(.regularMaterial.opacity(0.3), in: RoundedRectangle(cornerRadius: 16))
                         .overlay(
                             RoundedRectangle(cornerRadius: 16)
-                                .stroke(.white.opacity(0.2), lineWidth: 1)
+                                .stroke(adaptiveBorderColor, lineWidth: 0.5)
                         )
                     }
                     
@@ -183,7 +184,7 @@ struct StartView: View {
                             .background(.regularMaterial.opacity(0.3), in: RoundedRectangle(cornerRadius: 16))
                             .overlay(
                                 RoundedRectangle(cornerRadius: 16)
-                                    .stroke(.white.opacity(0.2), lineWidth: 1)
+                                    .stroke(adaptiveBorderColor, lineWidth: 0.5)
                             )
                         }
                         .disabled(viewModel.isLoading)
@@ -215,7 +216,7 @@ struct StartView: View {
                             .background(.regularMaterial.opacity(0.3), in: RoundedRectangle(cornerRadius: 16))
                             .overlay(
                                 RoundedRectangle(cornerRadius: 16)
-                                    .stroke(.white.opacity(0.2), lineWidth: 1)
+                                    .stroke(adaptiveBorderColor, lineWidth: 0.5)
                             )
                         }
                     }
@@ -357,6 +358,18 @@ struct StartView: View {
         
         Task {
             await examViewModel.startExam(configuration: configuration, language: cachedLanguageCode)
+        }
+    }
+    
+    // MARK: - Helper Functions
+    private var adaptiveBorderColor: Color {
+        switch colorScheme {
+        case .light:
+            return .black.opacity(0.2)
+        case .dark:
+            return .white.opacity(0.3)
+        @unknown default:
+            return .primary.opacity(0.2)
         }
     }
     
