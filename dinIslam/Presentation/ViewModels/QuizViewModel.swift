@@ -170,7 +170,7 @@ class QuizViewModel {
     }
     
     @MainActor
-    func finishQuiz() {
+    func finishQuiz(isComplete: Bool = true) {
         let timeSpent = Date().timeIntervalSince(startTime ?? Date())
         quizResult = quizUseCase.calculateResult(
             correctAnswers: correctAnswers,
@@ -178,20 +178,22 @@ class QuizViewModel {
             timeSpent: timeSpent
         )
         
-        // Обновляем статистику
-        let wrongQuestionIds = questionResults.compactMap { (questionId, isCorrect) in
-            return isCorrect ? nil : questionId
+        // Обновляем статистику только если викторина завершена полностью
+        if isComplete {
+            let wrongQuestionIds = questionResults.compactMap { (questionId, isCorrect) in
+                return isCorrect ? nil : questionId
+            }
+            
+            statsManager.updateStats(
+                correctCount: correctAnswers,
+                totalCount: questions.count,
+                wrongQuestionIds: wrongQuestionIds,
+                percentage: quizResult?.percentage ?? 0
+            )
+            
+            // Check for new achievements
+            achievementManager.checkAchievements(for: statsManager.stats, quizResult: quizResult)
         }
-        
-        statsManager.updateStats(
-            correctCount: correctAnswers,
-            totalCount: questions.count,
-            wrongQuestionIds: wrongQuestionIds,
-            percentage: quizResult?.percentage ?? 0
-        )
-        
-        // Check for new achievements
-        achievementManager.checkAchievements(for: statsManager.stats, quizResult: quizResult)
         
         state = .completed(.finished)
         
@@ -202,8 +204,8 @@ class QuizViewModel {
     
     @MainActor
     func forceFinishQuiz() {
-        // Force finish quiz with current progress - same as finishQuiz but can be called manually
-        finishQuiz()
+        // Force finish quiz with current progress - don't update stats for incomplete quiz
+        finishQuiz(isComplete: false)
     }
     
     @MainActor
