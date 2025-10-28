@@ -26,7 +26,7 @@ struct ExamSettingsView: View {
             List {
                 // Preset configurations
                 Section {
-                    ForEach(ExamPreset.allCases, id: \.self) { preset in
+                    ForEach(ExamPreset.allCases.filter { $0 != .custom }, id: \.self) { preset in
                         ExamPresetRow(
                             preset: preset,
                             isSelected: selectedConfiguration == preset.configuration && !isCustomMode,
@@ -43,6 +43,12 @@ struct ExamSettingsView: View {
                         isSelected: isCustomMode,
                         onTap: {
                             isCustomMode = true
+                            // Инициализируем пользовательские параметры значениями по умолчанию
+                            customTimePerQuestion = 30
+                            customTotalQuestions = 20
+                            allowSkip = true
+                            showTimer = true
+                            autoSubmit = true
                         }
                     )
                 } header: {
@@ -251,7 +257,7 @@ enum ExamPreset: CaseIterable {
         case .standard:
             return "clock.fill"
         case .extended:
-            return "hourglass.fill"
+            return "clock.badge.checkmark"
         case .custom:
             return "slider.horizontal.3"
         }
