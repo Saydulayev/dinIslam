@@ -96,7 +96,7 @@
 "stats.done" = "Готово";
 "stats.reset" = "Сбросить";
 "stats.reset.confirm.title" = "Сбросить статистику?";
-"stats.reset.confirm.message" = "Это действие сбросит всю статистику. Это действие нельзя отменить.";
+"stats.reset.confirm.message" = "Это действие сбросит всю статистику, включая средний результат. Это действие нельзя отменить.";
 "stats.reset.confirm.ok" = "Сбросить";
 "stats.reset.confirm.cancel" = "Отмена";
 
