@@ -146,22 +146,33 @@ struct StartView: View {
                                 await viewModel.startQuiz(language: cachedLanguageCode)
                             }
                         }) {
-                            HStack {
+                            HStack(spacing: 12) {
                                 if viewModel.isLoading {
                                     ProgressView()
-                                        .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                                        .progressViewStyle(CircularProgressViewStyle(tint: .blue))
                                         .scaleEffect(0.8)
                                 } else {
                                     Image(systemName: "play.fill")
+                                        .foregroundColor(.blue)
+                                        .font(.title2)
                                 }
                                 
-                                LocalizedText(viewModel.isLoading ? "start.loading" : "start.begin")
-                                    .fontWeight(.semibold)
+                                VStack(alignment: .leading, spacing: 2) {
+                                    LocalizedText(viewModel.isLoading ? "start.loading" : "start.begin")
+                                        .font(.headline)
+                                        .fontWeight(.semibold)
+                                        .foregroundStyle(.primary)
+                                    
+                                    LocalizedText("start.beginDescription")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
+                                
+                                Spacer()
                             }
-                            .foregroundColor(.white)
+                            .padding()
                             .frame(maxWidth: .infinity)
-                            .frame(height: 56)
-                            .background(.blue.gradient, in: RoundedRectangle(cornerRadius: 16))
+                            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
                         }
                         .disabled(viewModel.isLoading)
                         
@@ -169,15 +180,27 @@ struct StartView: View {
                         Button(action: {
                             showingExamSettings = true
                         }) {
-                            HStack {
+                            HStack(spacing: 12) {
                                 Image(systemName: "timer")
-                                LocalizedText("start.examMode")
-                                    .fontWeight(.semibold)
+                                    .foregroundColor(.orange)
+                                    .font(.title2)
+                                
+                                VStack(alignment: .leading, spacing: 2) {
+                                    LocalizedText("start.examMode")
+                                        .font(.headline)
+                                        .fontWeight(.semibold)
+                                        .foregroundStyle(.primary)
+                                    
+                                    LocalizedText("start.examModeDescription")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
+                                
+                                Spacer()
                             }
-                            .foregroundColor(.white)
+                            .padding()
                             .frame(maxWidth: .infinity)
-                            .frame(height: 56)
-                            .background(.orange.gradient, in: RoundedRectangle(cornerRadius: 16))
+                            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
                         }
                     }
                     .padding(.horizontal)

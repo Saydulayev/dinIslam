@@ -8,9 +8,11 @@
 "app.name" = "Tabiin Academy";
 "start.description" = "Знание – прежде слов и деяний!";
 "start.begin" = "Начать изучение";
+"start.beginDescription" = "Изучайте вопросы в удобном темпе";
 "start.loading" = "Загрузка...";
 "start.bestScore" = "Лучший результат";
 "start.examMode" = "Режим экзамена";
+"start.examModeDescription" = "Проверьте знания в условиях экзамена";
 "start.averageScore" = "Средний результат";
 "start.basedOnGames" = "на основе %d игр";
 "start.noGamesYet" = "Пока нет игр";
@@ -62,7 +64,7 @@
 "settings.rate.later" = "Напомнить позже";
 "settings.share.title" = "Поделиться";
 "settings.share.subtitle" = "Расскажите друзьям";
-"settings.share.text" = "Изучайте исламские знания с Tabiin Academy!";
+"settings.share.text" = "Изучайте свою религию с Tabiin Academy";
 
 // About
 "settings.about" = "О приложении";

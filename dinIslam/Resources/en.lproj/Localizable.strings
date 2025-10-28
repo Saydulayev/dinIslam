@@ -8,9 +8,11 @@
 "app.name" = "Tabiin Academy";
 "start.description" = "Knowledge before words and deeds!";
 "start.begin" = "Start Learning";
+"start.beginDescription" = "Study questions at your own pace";
 "start.loading" = "Loading...";
 "start.bestScore" = "Best Score";
 "start.examMode" = "Exam Mode";
+"start.examModeDescription" = "Test your knowledge under exam conditions";
 "start.averageScore" = "Average Score";
 "start.basedOnGames" = "based on %d games";
 "start.noGamesYet" = "No games yet";
@@ -62,7 +64,7 @@
 "settings.rate.later" = "Remind Later";
 "settings.share.title" = "Share";
 "settings.share.subtitle" = "Tell your friends";
-"settings.share.text" = "Learn Islamic knowledge with Tabiin Academy!";
+"settings.share.text" = "Learn your religion with Tabiin Academy";
 
 // About
 "settings.about" = "About";
