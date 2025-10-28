@@ -86,6 +86,7 @@ struct ExamView: View {
             }
             .navigationTitle("exam.title".localized)
             .navigationBarTitleDisplayMode(.inline)
+            .navigationBarBackButtonHidden(true)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(viewModel.state == .active(.paused) ? "exam.resume".localized : "exam.pause".localized) {
