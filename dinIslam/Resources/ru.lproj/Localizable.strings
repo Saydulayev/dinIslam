@@ -317,7 +317,11 @@
 "exam.pause" = "Пауза";
 "exam.resume" = "Продолжить";
 "exam.skip" = "Пропустить";
-"exam.submit" = "Завершить экзамен";
+"exam.finish" = "Завершить экзамен";
+"exam.finish.title" = "Завершить экзамен";
+"exam.finish.message" = "Вы уверены, что хотите завершить экзамен? Результаты будут сохранены.";
+"exam.finish.cancel" = "Отмена";
+"exam.finish.confirm" = "Завершить";
 
 // Exam Settings
 "exam.settings.title" = "Настройки экзамена";

@@ -302,7 +302,11 @@
 "exam.pause" = "Pause";
 "exam.resume" = "Resume";
 "exam.skip" = "Skip";
-"exam.submit" = "Submit Exam";
+"exam.finish" = "Finish Exam";
+"exam.finish.title" = "Finish Exam";
+"exam.finish.message" = "Are you sure you want to finish the exam? Results will be saved.";
+"exam.finish.cancel" = "Cancel";
+"exam.finish.confirm" = "Finish";
 
 // Exam Settings
 "exam.settings.title" = "Exam Settings";
