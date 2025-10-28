@@ -32,12 +32,16 @@ struct StartView: View {
     @State private var examViewModel: ExamViewModel?
     @State private var logoGlowIntensity: Double = 0.5
     @State private var particles: [Particle] = []
+    @State private var isGlowAnimationStarted: Bool = false
     
     // Кэшированный код языка для избежания синхронных операций
     @State private var cachedLanguageCode: String = "ru"
     
     // Task cancellation
     @State private var startQuizTask: Task<Void, Never>?
+    
+    // Particle animation timer
+    @State private var particleTimer: Timer?
     
     init(viewModel: QuizViewModel) {
         self.viewModel = viewModel
@@ -273,21 +277,32 @@ struct StartView: View {
                     )
                 }
                 
-                // Анимация свечения логотипа
-                withAnimation(.easeInOut(duration: 2.0).repeatForever(autoreverses: true)) {
-                    logoGlowIntensity = 1.0
+                // Анимация свечения логотипа (только если еще не запущена)
+                if !isGlowAnimationStarted {
+                    withAnimation(.easeInOut(duration: 2.0).repeatForever(autoreverses: true)) {
+                        logoGlowIntensity = 1.0
+                    }
+                    isGlowAnimationStarted = true
                 }
                 
-                // Создание частиц
-                createParticles()
+                // Создание частиц (только если их еще нет)
+                if particles.isEmpty {
+                    createParticles()
+                }
                 
-                // Анимация частиц
-                startParticleAnimation()
+                // Анимация частиц (только если таймер не запущен)
+                if particleTimer == nil {
+                    startParticleAnimation()
+                }
             }
         }
         .onDisappear {
             // Cancel pending tasks when view disappears
             startQuizTask?.cancel()
+            
+            // Останавливаем таймер частиц
+            particleTimer?.invalidate()
+            particleTimer = nil
         }
     }
     
@@ -323,7 +338,11 @@ struct StartView: View {
     }
     
     private func startParticleAnimation() {
-        Timer.scheduledTimer(withTimeInterval: 0.016, repeats: true) { _ in
+        // Останавливаем существующий таймер, если он есть
+        particleTimer?.invalidate()
+        
+        // Создаем новый таймер
+        particleTimer = Timer.scheduledTimer(withTimeInterval: 0.016, repeats: true) { _ in
             updateParticles()
         }
     }
