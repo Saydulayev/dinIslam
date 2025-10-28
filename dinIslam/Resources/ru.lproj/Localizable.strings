@@ -234,7 +234,7 @@
 
 // Notifications
 "notification.title" = "Время изучения";
-"notification.body" = "Не забудьте изучить новые знания об исламе сегодня!";
+"notification.body" = "Время для новых знаний!";
 "notification.permission.title" = "Разрешить уведомления";
 "notification.permission.message" = "Получайте напоминания о ежедневном изучении";
 "notification.settings.title" = "Настроить";
@@ -256,7 +256,7 @@
 
 // Notification Settings
 "notification.settings.about.title" = "О напоминаниях";
-"notification.settings.about.description" = "Получайте ежедневные напоминания о изучении ислама для поддержания постоянства в знаниях.";
+"notification.settings.about.description" = "Поддерживайте постоянство в изучении";
 "notification.settings.features.daily" = "Ежедневные напоминания о изучении";
 "notification.settings.features.achievements" = "Уведомления о новых достижениях";
 "notification.settings.features.streak" = "Напоминания о поддержании серии";

@@ -219,7 +219,7 @@
 
 // Notifications
 "notification.title" = "Study Time";
-"notification.body" = "Don't forget to learn new Islamic knowledge today!";
+"notification.body" = "Time for new knowledge!";
 "notification.permission.title" = "Allow Notifications";
 "notification.permission.message" = "Get reminders for daily study";
 "notification.settings.title" = "Configure";
@@ -241,7 +241,7 @@
 
 // Notification Settings
 "notification.settings.about.title" = "About Reminders";
-"notification.settings.about.description" = "Get daily reminders about Islamic learning to maintain consistency in knowledge.";
+"notification.settings.about.description" = "Maintain consistency in learning";
 "notification.settings.features.daily" = "Daily study reminders";
 "notification.settings.features.achievements" = "New achievement notifications";
 "notification.settings.features.streak" = "Streak maintenance reminders";
