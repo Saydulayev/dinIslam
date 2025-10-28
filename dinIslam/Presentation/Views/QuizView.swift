@@ -11,6 +11,7 @@ import UserNotifications
 struct QuizView: View {
     @State private var viewModel: QuizViewModel
     @State private var showingStopConfirm: Bool = false
+    @State private var showingFinishConfirm: Bool = false
     
     init(viewModel: QuizViewModel) {
         self.viewModel = viewModel
@@ -127,27 +128,40 @@ struct QuizView: View {
                     .background(.separator)
                 
                 Button(action: {
-                    showingStopConfirm = true
+                    showingFinishConfirm = true
                 }) {
                     HStack {
-                        Image(systemName: "stop.fill")
-                        Text("quiz.stop".localized)
+                        Image(systemName: "checkmark.circle.fill")
+                        Text("quiz.finish".localized)
                             .fontWeight(.semibold)
                     }
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
                     .frame(height: 52)
-                    .background(Color.red.gradient, in: RoundedRectangle(cornerRadius: 14))
+                    .background(Color.green.gradient, in: RoundedRectangle(cornerRadius: 14))
                     .padding(.horizontal)
                     .padding(.vertical, 12)
                 }
-                .accessibilityLabel("Stop quiz")
-                .accessibilityHint("Double tap to stop the current quiz")
+                .accessibilityLabel("Finish quiz")
+                .accessibilityHint("Double tap to finish the current quiz")
                 .background(.ultraThinMaterial)
             }
         }
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
+        .alert(
+            "quiz.finish.confirm.title".localized,
+            isPresented: $showingFinishConfirm
+        ) {
+            Button("quiz.finish.confirm.cancel".localized, role: .cancel) {
+                showingFinishConfirm = false
+            }
+            Button("quiz.finish.confirm.ok".localized, role: .destructive) {
+                viewModel.forceFinishQuiz()
+            }
+        } message: {
+            Text("quiz.finish.confirm.message".localized)
+        }
         .alert(
             "quiz.stop.confirm.title".localized,
             isPresented: $showingStopConfirm

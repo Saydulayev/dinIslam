@@ -84,6 +84,13 @@
 "quiz.stop.confirm.ok" = "Quit";
 "quiz.stop.confirm.cancel" = "Cancel";
 
+// Quiz Finish
+"quiz.finish" = "Finish";
+"quiz.finish.confirm.title" = "Finish Quiz?";
+"quiz.finish.confirm.message" = "Results will be saved.";
+"quiz.finish.confirm.ok" = "Finish";
+"quiz.finish.confirm.cancel" = "Cancel";
+
 // Stats View - Pluralization Support
 "stats.title" = "Statistics";
 "stats.done" = "Done";

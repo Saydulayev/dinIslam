@@ -84,6 +84,13 @@
 "quiz.stop.confirm.ok" = "Выйти";
 "quiz.stop.confirm.cancel" = "Отмена";
 
+// Quiz Finish
+"quiz.finish" = "Завершить";
+"quiz.finish.confirm.title" = "Завершить викторину?";
+"quiz.finish.confirm.message" = "Результаты будут сохранены.";
+"quiz.finish.confirm.ok" = "Завершить";
+"quiz.finish.confirm.cancel" = "Отмена";
+
 // Stats View - Pluralization Support
 "stats.title" = "Статистика";
 "stats.done" = "Готово";

@@ -194,6 +194,16 @@ class QuizViewModel {
         achievementManager.checkAchievements(for: statsManager.stats, quizResult: quizResult)
         
         state = .completed(.finished)
+        
+        // Provide completion feedback - same as in exam mode
+        hapticManager.success()
+        soundManager.playSuccessSound()
+    }
+    
+    @MainActor
+    func forceFinishQuiz() {
+        // Force finish quiz with current progress - same as finishQuiz but can be called manually
+        finishQuiz()
     }
     
     @MainActor
@@ -287,6 +297,10 @@ class QuizViewModel {
         print("DEBUG: Wrong questions after removal: \(statsManager.stats.wrongQuestionIds.count)")
         
         state = .completed(.mistakesFinished)
+        
+        // Provide completion feedback - same as in exam mode
+        hapticManager.success()
+        soundManager.playSuccessSound()
     }
     
     // MARK: - Achievement Methods
