@@ -121,7 +121,11 @@ struct StartView: View {
                                 .foregroundStyle(.secondary)
                         }
                         .padding()
-                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
+                        .background(.regularMaterial.opacity(0.3), in: RoundedRectangle(cornerRadius: 16))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 16)
+                                .stroke(.white.opacity(0.2), lineWidth: 1)
+                        )
                     } else {
                         VStack(spacing: 8) {
                             LocalizedText("start.noGamesYet")
@@ -134,7 +138,11 @@ struct StartView: View {
                                 .foregroundStyle(.gray)
                         }
                         .padding()
-                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
+                        .background(.regularMaterial.opacity(0.3), in: RoundedRectangle(cornerRadius: 16))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 16)
+                                .stroke(.white.opacity(0.2), lineWidth: 1)
+                        )
                     }
                     
                     // Action Buttons
@@ -172,7 +180,11 @@ struct StartView: View {
                             }
                             .padding()
                             .frame(maxWidth: .infinity)
-                            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
+                            .background(.regularMaterial.opacity(0.3), in: RoundedRectangle(cornerRadius: 16))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 16)
+                                    .stroke(.white.opacity(0.2), lineWidth: 1)
+                            )
                         }
                         .disabled(viewModel.isLoading)
                         
@@ -200,12 +212,15 @@ struct StartView: View {
                             }
                             .padding()
                             .frame(maxWidth: .infinity)
-                            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
+                            .background(.regularMaterial.opacity(0.3), in: RoundedRectangle(cornerRadius: 16))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 16)
+                                    .stroke(.white.opacity(0.2), lineWidth: 1)
+                            )
                         }
                     }
                     .padding(.horizontal)
                 }
-                .padding(.bottom, 40)
             }
             .padding()
             .navigationDestination(isPresented: .constant({
