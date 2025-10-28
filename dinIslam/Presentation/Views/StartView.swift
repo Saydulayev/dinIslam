@@ -165,7 +165,7 @@ struct StartView: View {
                                     
                                     LocalizedText("start.beginDescription")
                                         .font(.caption)
-                                        .foregroundStyle(.secondary)
+                                        .foregroundStyle(.gray)
                                 }
                                 
                                 Spacer()
@@ -193,7 +193,7 @@ struct StartView: View {
                                     
                                     LocalizedText("start.examModeDescription")
                                         .font(.caption)
-                                        .foregroundStyle(.secondary)
+                                        .foregroundStyle(.gray)
                                 }
                                 
                                 Spacer()
