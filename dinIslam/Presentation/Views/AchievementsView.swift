@@ -11,6 +11,7 @@ struct AchievementsView: View {
     @EnvironmentObject private var achievementManager: AchievementManager
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var settingsManager: SettingsManager
+    @Environment(\.statsManager) private var statsManager: StatsManager
     @State private var showingResetAlert = false
     
     var body: some View {
@@ -41,6 +42,7 @@ struct AchievementsView: View {
             }
             Button("achievements.reset.confirm.ok".localized, role: .destructive) {
                 achievementManager.resetAllAchievements()
+                statsManager.resetAchievementProgress()
             }
         } message: {
             Text("achievements.reset.confirm.message".localized)

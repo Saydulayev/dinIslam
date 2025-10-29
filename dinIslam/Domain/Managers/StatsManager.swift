@@ -83,4 +83,14 @@ class StatsManager {
     func hasRecentGames() -> Bool {
         return !stats.recentQuizResults.isEmpty
     }
+
+    // MARK: - Achievements-related reset
+    func resetAchievementProgress() {
+        // Сбрасываем только метрики, влияющие на прогресс достижений
+        stats.totalQuestionsStudied = 0
+        stats.totalQuizzesCompleted = 0
+        stats.currentStreak = 0
+        stats.perfectScores = 0
+        saveStats()
+    }
 }
