@@ -15,7 +15,7 @@
 "start.examModeDescription" = "Test your knowledge under exam conditions";
 "start.averageScore" = "Average Score";
 "start.basedOnGames" = "based on %d games";
-"start.noGamesYet" = "No games yet";
+"start.noGamesYet" = "No data yet";
 
 // Quiz View
 "quiz.question" = "Question";

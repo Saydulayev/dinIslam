@@ -15,7 +15,7 @@
 "start.examModeDescription" = "Проверьте знания в условиях экзамена";
 "start.averageScore" = "Средний результат";
 "start.basedOnGames" = "на основе %d игр";
-"start.noGamesYet" = "Пока нет игр";
+"start.noGamesYet" = "Пока нет данных";
 
 // Quiz View
 "quiz.question" = "Вопрос";
