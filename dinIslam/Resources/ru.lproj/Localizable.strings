@@ -204,7 +204,7 @@
 "achievements.perfectionist.title" = "Успешный";
 "achievements.legend.title" = "Мудрый";
 
-// Achievement Descriptions
+// Achievement Descriptions (Locked)
 "achievements.firstQuiz.description" = "Пройдите первую викторину";
 "achievements.perfectScore.description" = "Получите 100% в любой викторине";
 "achievements.speedRunner.description" = "Пройдите викторину менее чем за 2 минуты";
@@ -215,6 +215,18 @@
 "achievements.explorer.description" = "Изучите 500 вопросов";
 "achievements.perfectionist.description" = "Получите 10 идеальных результатов";
 "achievements.legend.description" = "Пройдите 100 викторин";
+
+// Achievement Notifications (Unlocked)
+"achievements.firstQuiz.notification" = "Вы прошли свою первую викторину! Начало положено.";
+"achievements.perfectScore.notification" = "Превосходно! Вы получили идеальный результат.";
+"achievements.speedRunner.notification" = "Невероятная скорость! Вы знаете материал на отлично.";
+"achievements.scholar.notification" = "Отличная работа! Вы изучили 100 вопросов.";
+"achievements.dedicated.notification" = "Впечатляющая преданность! Вы прошли 10 викторин.";
+"achievements.master.notification" = "Невероятное мастерство! Вы прошли 50 викторин.";
+"achievements.streak.notification" = "Удивительное постоянство! Вы учитесь 5 дней подряд.";
+"achievements.explorer.notification" = "Глубокие знания! Вы изучили 500 вопросов.";
+"achievements.perfectionist.notification" = "Великолепная точность! Вы получили 10 идеальных результатов.";
+"achievements.legend.notification" = "Легендарное достижение! Вы прошли 100 викторин.";
 
 // Achievement Progress Descriptions - Pluralization (Russian)
 "achievements.progress.quiz" = "%d викторина";

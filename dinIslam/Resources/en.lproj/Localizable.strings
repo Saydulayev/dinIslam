@@ -196,7 +196,7 @@
 "achievements.perfectionist.title" = "Successful";
 "achievements.legend.title" = "Wise";
 
-// Achievement Descriptions
+// Achievement Descriptions (Locked)
 "achievements.firstQuiz.description" = "Complete your first quiz";
 "achievements.perfectScore.description" = "Get 100% in any quiz";
 "achievements.speedRunner.description" = "Complete a quiz in under 2 minutes";
@@ -207,6 +207,18 @@
 "achievements.explorer.description" = "Study 500 questions";
 "achievements.perfectionist.description" = "Get 10 perfect scores";
 "achievements.legend.description" = "Complete 100 quizzes";
+
+// Achievement Notifications (Unlocked)
+"achievements.firstQuiz.notification" = "You completed your first quiz! Great start.";
+"achievements.perfectScore.notification" = "Excellent! You got a perfect score.";
+"achievements.speedRunner.notification" = "Incredible speed! You know the material perfectly.";
+"achievements.scholar.notification" = "Great work! You've studied 100 questions.";
+"achievements.dedicated.notification" = "Impressive dedication! You completed 10 quizzes.";
+"achievements.master.notification" = "Incredible mastery! You completed 50 quizzes.";
+"achievements.streak.notification" = "Amazing consistency! You've studied for 5 days straight.";
+"achievements.explorer.notification" = "Deep knowledge! You've studied 500 questions.";
+"achievements.perfectionist.notification" = "Excellent precision! You got 10 perfect scores.";
+"achievements.legend.notification" = "Legendary achievement! You completed 100 quizzes.";
 
 // Achievement Progress Descriptions - Pluralization
 "achievements.progress.quiz" = "%d quiz";

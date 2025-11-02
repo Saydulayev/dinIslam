@@ -148,6 +148,31 @@ enum AchievementType: String, Codable, CaseIterable {
             return LocalizationManager.shared.localizedString(for: "achievements.legend.description")
         }
     }
+    
+    var localizedNotification: String {
+        switch self {
+        case .firstQuiz:
+            return LocalizationManager.shared.localizedString(for: "achievements.firstQuiz.notification")
+        case .perfectScore:
+            return LocalizationManager.shared.localizedString(for: "achievements.perfectScore.notification")
+        case .speedRunner:
+            return LocalizationManager.shared.localizedString(for: "achievements.speedRunner.notification")
+        case .scholar:
+            return LocalizationManager.shared.localizedString(for: "achievements.scholar.notification")
+        case .dedicated:
+            return LocalizationManager.shared.localizedString(for: "achievements.dedicated.notification")
+        case .master:
+            return LocalizationManager.shared.localizedString(for: "achievements.master.notification")
+        case .streak:
+            return LocalizationManager.shared.localizedString(for: "achievements.streak.notification")
+        case .explorer:
+            return LocalizationManager.shared.localizedString(for: "achievements.explorer.notification")
+        case .perfectionist:
+            return LocalizationManager.shared.localizedString(for: "achievements.perfectionist.notification")
+        case .legend:
+            return LocalizationManager.shared.localizedString(for: "achievements.legend.notification")
+        }
+    }
 }
 
 // MARK: - Achievement Progress

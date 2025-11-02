@@ -40,7 +40,7 @@ struct AchievementNotificationView: View {
             }
             
             // Description
-            Text(achievement.description)
+            Text(achievement.type.localizedNotification)
                 .font(.subheadline)
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
