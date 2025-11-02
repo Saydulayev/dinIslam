@@ -168,6 +168,6 @@ struct AchievementCard: View {
 
 #Preview {
     AchievementsView()
-        .environmentObject(AchievementManager())
+        .environmentObject(AchievementManager.shared)
         .environmentObject(SettingsManager())
 }

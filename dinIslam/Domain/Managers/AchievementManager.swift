@@ -10,6 +10,8 @@ import Combine
 import SwiftUI
 
 class AchievementManager: ObservableObject {
+    static let shared = AchievementManager()
+    
     @Published var achievements: [Achievement] = []
     @Published var newAchievements: [Achievement] = []
     
@@ -17,7 +19,7 @@ class AchievementManager: ObservableObject {
     private let achievementsKey = "UserAchievements"
     private let notificationManager = NotificationManager()
     
-    init() {
+    private init() {
         loadAchievements()
         initializeDefaultAchievements()
         

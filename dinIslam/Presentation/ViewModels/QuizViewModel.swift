@@ -80,7 +80,7 @@ class QuizViewModel {
         self.statsManager = statsManager
         self.hapticManager = HapticManager(settingsManager: settingsManager)
         self.soundManager = SoundManager(settingsManager: settingsManager)
-        self.achievementManager = AchievementManager()
+        self.achievementManager = AchievementManager.shared
     }
     
     // MARK: - Public Methods

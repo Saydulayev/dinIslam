@@ -39,7 +39,7 @@ class EnhancedDIContainer {
     }()
     
     lazy var achievementManager: AchievementManager = {
-        AchievementManager()
+        AchievementManager.shared
     }()
     
     lazy var localizationManager: LocalizationManager = {
@@ -138,7 +138,7 @@ class EnhancedDIContainer {
             // Only reset during testing
             settingsManager = SettingsManager()
             statsManager = StatsManager()
-            achievementManager = AchievementManager()
+            achievementManager = AchievementManager.shared
             networkManager = NetworkManager()
             cacheManager = CacheManager()
             enhancedRemoteQuestionsService = EnhancedRemoteQuestionsService()

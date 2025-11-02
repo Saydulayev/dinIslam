@@ -25,7 +25,7 @@ class DIContainer {
     }()
     
     lazy var achievementManager: AchievementManager = {
-        AchievementManager()
+        AchievementManager.shared
     }()
     
     lazy var localizationManager: LocalizationManager = {
@@ -74,7 +74,7 @@ class DIContainer {
             // Only reset during testing
             settingsManager = SettingsManager()
             statsManager = StatsManager()
-            achievementManager = AchievementManager()
+            achievementManager = AchievementManager.shared
             quizUseCase = QuizUseCase(questionsRepository: questionsRepository)
             questionsRepository = QuestionsRepository()
             hapticManager = HapticManager(settingsManager: settingsManager)
