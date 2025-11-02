@@ -117,7 +117,7 @@ struct StartView: View {
                                 .fontWeight(.bold)
                                 .foregroundStyle(.blue)
                             
-                            Text(String(format: NSLocalizedString("start.basedOnGames", comment: ""), statsManager.getRecentGamesCount()))
+                            Text("start.basedOnGames".localized(count: statsManager.getRecentGamesCount(), arguments: statsManager.getRecentGamesCount()))
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                         }
