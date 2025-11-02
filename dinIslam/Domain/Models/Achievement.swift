@@ -20,6 +20,15 @@ struct Achievement: Identifiable, Equatable {
     let isUnlocked: Bool
     let unlockedDate: Date?
     
+    // Computed property для получения правильного описания в зависимости от статуса
+    var displayDescription: String {
+        if isUnlocked {
+            return type.localizedUnlockedDescription
+        } else {
+            return description
+        }
+    }
+    
     init(id: String, title: String, description: String, icon: String, color: Color, type: AchievementType, requirement: Int, isUnlocked: Bool = false, unlockedDate: Date? = nil) {
         self.id = id
         self.title = title
@@ -146,6 +155,31 @@ enum AchievementType: String, Codable, CaseIterable {
             return LocalizationManager.shared.localizedString(for: "achievements.perfectionist.description")
         case .legend:
             return LocalizationManager.shared.localizedString(for: "achievements.legend.description")
+        }
+    }
+    
+    var localizedUnlockedDescription: String {
+        switch self {
+        case .firstQuiz:
+            return LocalizationManager.shared.localizedString(for: "achievements.firstQuiz.description.unlocked")
+        case .perfectScore:
+            return LocalizationManager.shared.localizedString(for: "achievements.perfectScore.description.unlocked")
+        case .speedRunner:
+            return LocalizationManager.shared.localizedString(for: "achievements.speedRunner.description.unlocked")
+        case .scholar:
+            return LocalizationManager.shared.localizedString(for: "achievements.scholar.description.unlocked")
+        case .dedicated:
+            return LocalizationManager.shared.localizedString(for: "achievements.dedicated.description.unlocked")
+        case .master:
+            return LocalizationManager.shared.localizedString(for: "achievements.master.description.unlocked")
+        case .streak:
+            return LocalizationManager.shared.localizedString(for: "achievements.streak.description.unlocked")
+        case .explorer:
+            return LocalizationManager.shared.localizedString(for: "achievements.explorer.description.unlocked")
+        case .perfectionist:
+            return LocalizationManager.shared.localizedString(for: "achievements.perfectionist.description.unlocked")
+        case .legend:
+            return LocalizationManager.shared.localizedString(for: "achievements.legend.description.unlocked")
         }
     }
     

@@ -178,6 +178,8 @@
 "achievements.progress" = "Progress";
 "achievements.newAchievement" = "New Achievement!";
 "achievements.congratulations" = "Congratulations!";
+"achievements.share" = "Share";
+"achievements.share.text" = "Achievement unlocked";
 "achievements.reset" = "Reset";
 "achievements.reset.confirm.title" = "Reset Achievements?";
 "achievements.reset.confirm.message" = "All achievements will be locked. This action cannot be undone.";
@@ -207,6 +209,18 @@
 "achievements.explorer.description" = "Study 500 questions";
 "achievements.perfectionist.description" = "Get 10 perfect scores";
 "achievements.legend.description" = "Complete 100 quizzes";
+
+// Achievement Descriptions (Unlocked)
+"achievements.firstQuiz.description.unlocked" = "You completed your first quiz";
+"achievements.perfectScore.description.unlocked" = "You got 100% in a quiz";
+"achievements.speedRunner.description.unlocked" = "You completed a quiz in under 2 minutes";
+"achievements.scholar.description.unlocked" = "You studied 100 questions";
+"achievements.dedicated.description.unlocked" = "You completed 10 quizzes";
+"achievements.master.description.unlocked" = "You completed 50 quizzes";
+"achievements.streak.description.unlocked" = "You studied for 5 days in a row";
+"achievements.explorer.description.unlocked" = "You studied 500 questions";
+"achievements.perfectionist.description.unlocked" = "You got 10 perfect scores";
+"achievements.legend.description.unlocked" = "You completed 100 quizzes";
 
 // Achievement Notifications (Unlocked)
 "achievements.firstQuiz.notification" = "You completed your first quiz! Great start.";

@@ -186,6 +186,8 @@
 "achievements.progress" = "Прогресс";
 "achievements.newAchievement" = "Новое достижение!";
 "achievements.congratulations" = "Поздравляем!";
+"achievements.share" = "Поделиться";
+"achievements.share.text" = "Достижение разблокировано";
 "achievements.reset" = "Сбросить";
 "achievements.reset.confirm.title" = "Сбросить достижения?";
 "achievements.reset.confirm.message" = "Все достижения будут заблокированы. Это действие нельзя отменить.";
@@ -215,6 +217,18 @@
 "achievements.explorer.description" = "Изучите 500 вопросов";
 "achievements.perfectionist.description" = "Получите 10 идеальных результатов";
 "achievements.legend.description" = "Пройдите 100 викторин";
+
+// Achievement Descriptions (Unlocked)
+"achievements.firstQuiz.description.unlocked" = "Вы прошли первую викторину";
+"achievements.perfectScore.description.unlocked" = "Вы получили 100% в викторине";
+"achievements.speedRunner.description.unlocked" = "Вы прошли викторину менее чем за 2 минуты";
+"achievements.scholar.description.unlocked" = "Вы изучили 100 вопросов";
+"achievements.dedicated.description.unlocked" = "Вы прошли 10 викторин";
+"achievements.master.description.unlocked" = "Вы прошли 50 викторин";
+"achievements.streak.description.unlocked" = "Вы изучали 5 дней подряд";
+"achievements.explorer.description.unlocked" = "Вы изучили 500 вопросов";
+"achievements.perfectionist.description.unlocked" = "Вы получили 10 идеальных результатов";
+"achievements.legend.description.unlocked" = "Вы прошли 100 викторин";
 
 // Achievement Notifications (Unlocked)
 "achievements.firstQuiz.notification" = "Вы прошли свою первую викторину! Начало положено.";

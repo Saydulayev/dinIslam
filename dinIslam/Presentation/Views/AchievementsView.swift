@@ -13,12 +13,16 @@ struct AchievementsView: View {
     @EnvironmentObject private var settingsManager: SettingsManager
     @Environment(\.statsManager) private var statsManager: StatsManager
     @State private var showingResetAlert = false
+    @State private var selectedAchievement: Achievement?
     
     var body: some View {
         ScrollView {
             LazyVStack(spacing: 16) {
                 ForEach(achievementManager.achievements) { achievement in
-                    AchievementCard(achievement: achievement)
+                    AchievementCard(
+                        achievement: achievement,
+                        onTap: { selectedAchievement = achievement }
+                    )
                 }
             }
             .padding()
@@ -47,11 +51,36 @@ struct AchievementsView: View {
         } message: {
             Text("achievements.reset.confirm.message".localized)
         }
+        .overlay(
+            // Expanded Achievement Card Overlay
+            Group {
+                if let achievement = selectedAchievement, achievement.isUnlocked {
+                    ZStack {
+                        Color.black.opacity(0.4)
+                            .ignoresSafeArea()
+                            .onTapGesture {
+                                withAnimation {
+                                    selectedAchievement = nil
+                                }
+                            }
+                        
+                        ExpandedAchievementCard(
+                            achievement: achievement,
+                            isPresented: Binding(
+                                get: { selectedAchievement != nil },
+                                set: { if !$0 { selectedAchievement = nil } }
+                            )
+                        )
+                    }
+                }
+            }
+        )
     }
 }
 
 struct AchievementCard: View {
     let achievement: Achievement
+    let onTap: () -> Void
     @ObservedObject private var localizationManager = LocalizationManager.shared
     @EnvironmentObject private var settingsManager: SettingsManager
     @EnvironmentObject private var achievementManager: AchievementManager
@@ -120,7 +149,7 @@ struct AchievementCard: View {
                     }
                 }
                 
-                Text(achievement.description)
+                Text(achievement.displayDescription)
                     .font(.subheadline)
                     .foregroundColor(.secondary)
                     .multilineTextAlignment(.leading)
@@ -162,12 +191,250 @@ struct AchievementCard: View {
         )
         .opacity(isUnlocked ? 1.0 : 0.7)
         .animation(.easeInOut(duration: 0.3), value: isUnlocked)
+        .onTapGesture {
+            if isUnlocked {
+                withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
+                    onTap()
+                }
+            }
+        }
     }
     
 }
 
+struct ExpandedAchievementCard: View {
+    let achievement: Achievement
+    @Binding var isPresented: Bool
+    @ObservedObject private var localizationManager = LocalizationManager.shared
+    
+    var body: some View {
+        VStack(spacing: 20) {
+            // Icon and Title
+            VStack(spacing: 16) {
+                ZStack {
+                    Circle()
+                        .fill(achievement.color.opacity(0.2))
+                        .frame(width: 100, height: 100)
+                    
+                    Image(systemName: achievement.icon)
+                        .font(.system(size: 50, weight: .semibold))
+                        .foregroundColor(achievement.color)
+                }
+                
+                VStack(spacing: 8) {
+                    Text(achievement.title)
+                        .font(.title)
+                        .fontWeight(.bold)
+                        .foregroundColor(.primary)
+                        .multilineTextAlignment(.center)
+                    
+                    Text(achievement.displayDescription)
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                    
+                    if let unlockedDate = achievement.unlockedDate {
+                        Text(LocalizationManager.shared.localizedString(for: "achievements.unlocked") + " " + 
+                             unlockedDate.formatted(date: .abbreviated, time: .omitted))
+                        .font(.caption)
+                        .foregroundColor(.green)
+                        .fontWeight(.medium)
+                        .padding(.top, 4)
+                    }
+                }
+            }
+            
+            // Share Button
+            Button(action: {
+                shareAchievement()
+            }) {
+                HStack {
+                    Image(systemName: "square.and.arrow.up")
+                    Text("achievements.share".localized)
+                }
+                .font(.headline)
+                .fontWeight(.semibold)
+                .foregroundColor(.white)
+                .frame(maxWidth: .infinity)
+                .frame(height: 50)
+                .background(achievement.color.gradient, in: RoundedRectangle(cornerRadius: 12))
+            }
+            .padding(.horizontal)
+            
+            // Close Button
+            Button(action: {
+                withAnimation(.easeInOut(duration: 0.3)) {
+                    isPresented = false
+                }
+            }) {
+                Text(LocalizationManager.shared.localizedString(for: "settings.done"))
+                    .font(.headline)
+                    .fontWeight(.semibold)
+                    .foregroundColor(achievement.color)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 50)
+                    .background(achievement.color.opacity(0.1), in: RoundedRectangle(cornerRadius: 12))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(achievement.color.opacity(0.3), lineWidth: 1)
+                    )
+            }
+            .padding(.horizontal)
+        }
+        .padding(24)
+        .background(
+            RoundedRectangle(cornerRadius: 20)
+                .fill(.ultraThinMaterial)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 20)
+                        .stroke(achievement.color.opacity(0.3), lineWidth: 2)
+                )
+        )
+        .padding(.horizontal, 32)
+        .scaleEffect(isPresented ? 1.0 : 0.8)
+        .opacity(isPresented ? 1.0 : 0.0)
+        .animation(.spring(response: 0.6, dampingFraction: 0.8), value: isPresented)
+    }
+    
+    private func shareAchievement() {
+        guard let shareImage = generateShareImage() else {
+            // Fallback to text if image generation fails
+            let shareText = generateShareText()
+            presentShareSheet(items: [shareText])
+            return
+        }
+        
+        presentShareSheet(items: [shareImage])
+    }
+    
+    private func generateShareImage() -> UIImage? {
+        let shareableCard = ShareableAchievementCardView(achievement: achievement)
+        
+        // Используем ImageRenderer для конвертации View в UIImage
+        let renderer = ImageRenderer(content: shareableCard)
+        renderer.scale = UIScreen.main.scale
+        
+        // Устанавливаем размер изображения
+        // Размер карточки 1000x1200 + padding 60 с каждой стороны = 1120x1320
+        let targetSize = CGSize(width: 1120, height: 1320)
+        renderer.proposedSize = .init(width: targetSize.width, height: targetSize.height)
+        
+        // Даем время на рендеринг
+        return renderer.uiImage
+    }
+    
+    private func generateShareText() -> String {
+        let appName = LocalizationManager.shared.localizedString(for: "app.name")
+        let unlockedDate = achievement.unlockedDate?.formatted(date: .abbreviated, time: .omitted) ?? ""
+        
+        return """
+        🏆 \(achievement.title)
+        
+        \(achievement.displayDescription)
+        
+        \(LocalizationManager.shared.localizedString(for: "achievements.share.text")) \(unlockedDate)
+        
+        \(appName)
+        """
+    }
+    
+    private func presentShareSheet(items: [Any]) {
+        let activityViewController = UIActivityViewController(
+            activityItems: items,
+            applicationActivities: nil
+        )
+        
+        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+           let window = windowScene.windows.first,
+           let rootViewController = window.rootViewController {
+            // Для iPad нужна точка привязки
+            if let popover = activityViewController.popoverPresentationController {
+                popover.sourceView = window
+                popover.sourceRect = CGRect(x: window.bounds.midX, y: window.bounds.midY, width: 0, height: 0)
+                popover.permittedArrowDirections = []
+            }
+            rootViewController.present(activityViewController, animated: true)
+        }
+    }
+}
+
+struct ShareableAchievementCardView: View {
+    let achievement: Achievement
+    @ObservedObject private var localizationManager = LocalizationManager.shared
+    
+    var body: some View {
+        VStack(spacing: 40) {
+            // Icon
+            ZStack {
+                Circle()
+                    .fill(achievement.color.opacity(0.2))
+                    .frame(width: 200, height: 200)
+                
+                Image(systemName: achievement.icon)
+                    .font(.system(size: 100, weight: .semibold))
+                    .foregroundColor(achievement.color)
+            }
+            .padding(.top, 60)
+            
+            // Title and Description
+            VStack(spacing: 20) {
+                Text(achievement.title)
+                    .font(.system(size: 64, weight: .bold))
+                    .foregroundColor(Color.black)
+                    .multilineTextAlignment(.center)
+                
+                Text(achievement.displayDescription)
+                    .font(.system(size: 32))
+                    .foregroundColor(Color.gray)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 60)
+                
+                if let unlockedDate = achievement.unlockedDate {
+                    Text(LocalizationManager.shared.localizedString(for: "achievements.unlocked") + " " + 
+                         unlockedDate.formatted(date: .abbreviated, time: .omitted))
+                    .font(.system(size: 22))
+                    .foregroundColor(Color(red: 0.0, green: 0.7, blue: 0.0))
+                    .fontWeight(.medium)
+                    .padding(.top, 16)
+                }
+            }
+            
+            Spacer()
+            
+            // App Logo and Name at bottom
+            VStack(spacing: 20) {
+                Image("image")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 180, height: 180)
+                
+                Text(LocalizationManager.shared.localizedString(for: "app.name"))
+                    .font(.system(size: 36, weight: .semibold))
+                    .foregroundColor(achievement.color)
+            }
+            .padding(.bottom, 60)
+        }
+        .frame(width: 1000, height: 1200)
+        .background(
+            ZStack {
+                // Фон (белый)
+                RoundedRectangle(cornerRadius: 24)
+                    .fill(Color.white)
+                
+                // Обводка
+                RoundedRectangle(cornerRadius: 24)
+                    .stroke(achievement.color.opacity(0.3), lineWidth: 3)
+            }
+            .shadow(color: Color.black.opacity(0.1), radius: 20, x: 0, y: 10)
+        )
+        .padding(60)
+    }
+}
+
 #Preview {
-    AchievementsView()
-        .environmentObject(AchievementManager.shared)
-        .environmentObject(SettingsManager())
+    NavigationStack {
+        AchievementsView()
+            .environmentObject(AchievementManager.shared)
+            .environmentObject(SettingsManager())
+    }
 }
