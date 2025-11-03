@@ -278,9 +278,7 @@ struct StatsView: View {
                     totalQuestionsCount = questions.count
                 }
             } catch {
-                #if DEBUG
-                print("❌ StatsView: Failed to load questions count: \(error)")
-                #endif
+                AppLogger.error("StatsView: Failed to load questions count", error: error, category: AppLogger.data)
                 await MainActor.run {
                     totalQuestionsCount = 0
                 }

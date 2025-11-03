@@ -7,6 +7,7 @@
 
 import Foundation
 import UserNotifications
+import OSLog
 import SwiftUI
 import Combine
 
@@ -35,7 +36,7 @@ class NotificationManager: ObservableObject {
             }
             return granted
         } catch {
-            print("Error requesting notification permission: \(error)")
+            AppLogger.error("Error requesting notification permission", error: error, category: AppLogger.ui)
             return false
         }
     }
@@ -79,9 +80,9 @@ class NotificationManager: ObservableObject {
         
         center.add(request) { error in
             if let error = error {
-                print("Error scheduling notification: \(error)")
+                AppLogger.error("Error scheduling notification", error: error, category: AppLogger.ui)
             } else {
-                print("Daily reminder scheduled successfully")
+                AppLogger.ui.info("Daily reminder scheduled successfully")
             }
         }
     }
@@ -149,7 +150,7 @@ class NotificationManager: ObservableObject {
         
         center.add(request) { error in
             if let error = error {
-                print("Error scheduling achievement notification: \(error)")
+                AppLogger.error("Error scheduling achievement notification", error: error, category: AppLogger.ui)
             }
         }
     }
@@ -183,7 +184,7 @@ class NotificationManager: ObservableObject {
         
         center.add(request) { error in
             if let error = error {
-                print("Error scheduling streak reminder: \(error)")
+                AppLogger.error("Error scheduling streak reminder", error: error, category: AppLogger.ui)
             }
         }
     }

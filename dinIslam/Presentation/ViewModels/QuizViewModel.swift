@@ -9,6 +9,7 @@ import Foundation
 import Observation
 import UIKit
 import AudioToolbox
+import OSLog
 
 @Observable
 class QuizViewModel {
@@ -106,6 +107,7 @@ class QuizViewModel {
             state = .active(.playing)
             isLoading = false
         } catch {
+            AppLogger.error("Failed to start quiz", error: error, category: AppLogger.network)
             errorMessage = error.localizedDescription
             state = .error(.networkError)
             isLoading = false
@@ -256,6 +258,7 @@ class QuizViewModel {
             startTime = Date()
             state = .active(.mistakesReview)
         } catch {
+            AppLogger.error("Failed to start mistakes review", error: error, category: AppLogger.data)
             errorMessage = error.localizedDescription
             state = .idle
         }

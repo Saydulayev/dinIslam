@@ -8,6 +8,7 @@
 import Foundation
 import Network
 import Combine
+import OSLog
 
 // MARK: - Network Error Types
 enum NetworkError: Error, LocalizedError {
@@ -158,11 +159,11 @@ class NetworkManager: ObservableObject {
         retryCount: Int
     ) async throws -> T {
         let delay = min(
-            configuration.retryDelay * pow(2.0, Double(retryCount - 1)),
-            configuration.maxRetryDelay
+            self.configuration.retryDelay * pow(2.0, Double(retryCount - 1)),
+            self.configuration.maxRetryDelay
         )
         
-        print("🔄 Retrying request in \(delay) seconds (attempt \(retryCount + 1)/\(configuration.maxRetries))")
+        AppLogger.network.info("Retrying request in \(delay) seconds (attempt \(retryCount + 1)/\(self.configuration.maxRetries))")
         
         try await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
         return try await request(url: url.absoluteString, responseType: responseType, retryCount: retryCount)
