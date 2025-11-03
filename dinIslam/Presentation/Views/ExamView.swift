@@ -267,11 +267,11 @@ struct ExamAnswerButton: View {
     
     private var buttonColor: Color {
         if isAnswered {
+            // Показываем цвет только для выбранного ответа
             if isSelected {
                 return isCorrect ? .green : .red
-            } else if isCorrect {
-                return .green
             } else {
+                // Остальные ответы остаются серыми, правильный ответ не выделяется
                 return .gray
             }
         } else {
@@ -291,11 +291,11 @@ struct ExamAnswerButton: View {
     
     private var buttonBackground: Color {
         if isAnswered {
+            // Показываем фон только для выбранного ответа
             if isSelected {
                 return isCorrect ? .green.opacity(0.1) : .red.opacity(0.1)
-            } else if isCorrect {
-                return .green.opacity(0.1)
             } else {
+                // Остальные ответы остаются с обычным фоном
                 return .gray.opacity(0.05)
             }
         } else {
@@ -322,8 +322,8 @@ struct ExamAnswerButton: View {
                 
                 Spacer()
                 
-                // Status icon
-                if isAnswered {
+                // Status icon - показываем только для выбранного ответа
+                if isAnswered && isSelected {
                     Image(systemName: isCorrect ? "checkmark.circle.fill" : "xmark.circle.fill")
                         .foregroundColor(checkmarkColor)
                         .font(.title2)
