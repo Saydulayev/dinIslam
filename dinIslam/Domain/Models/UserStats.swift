@@ -86,8 +86,8 @@ struct UserStats: Codable {
             currentStreak = 0
         }
         
-        // Обновляем идеальные результаты
-        if percentage == 100.0 {
+        // Обновляем идеальные результаты (используем >= 99.99 для учета погрешности округления)
+        if percentage >= 99.99 {
             perfectScores += 1
         }
     }

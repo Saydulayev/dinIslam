@@ -243,7 +243,8 @@ class AchievementManager: ObservableObject {
         case .firstQuiz:
             return stats.totalQuizzesCompleted >= 1
         case .perfectScore:
-            return quizResult?.percentage == 100.0
+            // Используем >= 99.99 для учета погрешности округления при расчете процента
+            return (quizResult?.percentage ?? 0) >= 99.99
         case .speedRunner:
             return quizResult?.timeSpent ?? 0 < 120 // 2 minutes
         case .scholar:
