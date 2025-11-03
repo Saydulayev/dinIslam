@@ -104,7 +104,7 @@ struct StartView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 
                 // Bottom section with average score and buttons
-                VStack(spacing: 24) {
+                VStack(spacing: 0) {
                     // Average Score
                     if statsManager.hasRecentGames() {
                         VStack(spacing: 8) {
@@ -122,11 +122,7 @@ struct StartView: View {
                                 .foregroundStyle(.secondary)
                         }
                         .padding()
-                        .background(.regularMaterial.opacity(0.3), in: RoundedRectangle(cornerRadius: 16))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 16)
-                                .stroke(adaptiveBorderColor, lineWidth: 0.5)
-                        )
+                        .frame(maxWidth: .infinity)
                     } else {
                         VStack(spacing: 8) {
                             LocalizedText("start.noGamesYet")
@@ -139,15 +135,15 @@ struct StartView: View {
                                 .foregroundStyle(.gray)
                         }
                         .padding()
-                        .background(.regularMaterial.opacity(0.3), in: RoundedRectangle(cornerRadius: 16))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 16)
-                                .stroke(adaptiveBorderColor, lineWidth: 0.5)
-                        )
+                        .frame(maxWidth: .infinity)
                     }
                     
+                    // Divider
+                    Divider()
+                        .background(adaptiveBorderColor)
+                    
                     // Action Buttons
-                    VStack(spacing: 16) {
+                    VStack(spacing: 12) {
                         // Regular Quiz Button
                         Button(action: {
                             startQuizTask?.cancel()
@@ -166,27 +162,18 @@ struct StartView: View {
                                         .font(.title2)
                                 }
                                 
-                                VStack(alignment: .leading, spacing: 2) {
-                                    LocalizedText(viewModel.isLoading ? "start.loading" : "start.begin")
-                                        .font(.headline)
-                                        .fontWeight(.semibold)
-                                        .foregroundStyle(.primary)
-                                    
-                                    LocalizedText("start.beginDescription")
-                                        .font(.caption)
-                                        .foregroundStyle(.gray)
-                                }
+                                LocalizedText(viewModel.isLoading ? "start.loading" : "start.begin")
+                                    .font(.headline)
+                                    .fontWeight(.semibold)
+                                    .foregroundStyle(.primary)
                                 
                                 Spacer()
                             }
                             .padding()
                             .frame(maxWidth: .infinity)
-                            .background(.regularMaterial.opacity(0.3), in: RoundedRectangle(cornerRadius: 16))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 16)
-                                    .stroke(adaptiveBorderColor, lineWidth: 0.5)
-                            )
+                            .background(Color.blue.opacity(0.1), in: RoundedRectangle(cornerRadius: 12))
                         }
+                        .buttonStyle(.plain)
                         .disabled(viewModel.isLoading)
                         
                         // Exam Mode Button
@@ -198,30 +185,28 @@ struct StartView: View {
                                     .foregroundColor(.orange)
                                     .font(.title2)
                                 
-                                VStack(alignment: .leading, spacing: 2) {
-                                    LocalizedText("start.examMode")
-                                        .font(.headline)
-                                        .fontWeight(.semibold)
-                                        .foregroundStyle(.primary)
-                                    
-                                    LocalizedText("start.examModeDescription")
-                                        .font(.caption)
-                                        .foregroundStyle(.gray)
-                                }
+                                LocalizedText("start.examMode")
+                                    .font(.headline)
+                                    .fontWeight(.semibold)
+                                    .foregroundStyle(.primary)
                                 
                                 Spacer()
                             }
                             .padding()
                             .frame(maxWidth: .infinity)
-                            .background(.regularMaterial.opacity(0.3), in: RoundedRectangle(cornerRadius: 16))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 16)
-                                    .stroke(adaptiveBorderColor, lineWidth: 0.5)
-                            )
+                            .background(Color.orange.opacity(0.1), in: RoundedRectangle(cornerRadius: 12))
                         }
+                        .buttonStyle(.plain)
                     }
-                    .padding(.horizontal)
+                    .padding(.vertical, 12)
                 }
+                .padding()
+                .background(.regularMaterial.opacity(0.3), in: RoundedRectangle(cornerRadius: 16))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16)
+                        .stroke(adaptiveBorderColor, lineWidth: 0.5)
+                )
+                .padding(.horizontal)
             }
             .padding()
             .navigationDestination(isPresented: .constant({

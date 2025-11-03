@@ -8,11 +8,9 @@
 "app.name" = "Tabiin Academy";
 "start.description" = "Knowledge before words and deeds!";
 "start.begin" = "Start Learning";
-"start.beginDescription" = "Study questions at your own pace";
 "start.loading" = "Loading...";
 "start.bestScore" = "Best Score";
 "start.examMode" = "Exam Mode";
-"start.examModeDescription" = "Test your knowledge under exam conditions";
 "start.averageScore" = "Average Score";
 "start.basedOnGames" = "based on %d game";
 "start.basedOnGames_other" = "based on %d games";

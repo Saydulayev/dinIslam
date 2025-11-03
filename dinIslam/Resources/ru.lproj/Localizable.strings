@@ -8,11 +8,9 @@
 "app.name" = "Tabiin Academy";
 "start.description" = "Знание – прежде слов и деяний!";
 "start.begin" = "Начать изучение";
-"start.beginDescription" = "Изучайте вопросы в удобном темпе";
 "start.loading" = "Загрузка...";
 "start.bestScore" = "Лучший результат";
 "start.examMode" = "Режим экзамена";
-"start.examModeDescription" = "Проверьте знания в условиях экзамена";
 "start.averageScore" = "Средний результат";
 "start.basedOnGames" = "на основе %d игры";
 "start.basedOnGames_2" = "на основе %d игр";
