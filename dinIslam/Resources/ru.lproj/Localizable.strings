@@ -418,6 +418,12 @@
 "exam.result.timeExpired" = "Время истекло";
 "exam.result.retake" = "Пересдать";
 "exam.result.share" = "Поделиться";
+"exam.result.share.title" = "📚 Результат экзамена по исламу";
+"exam.result.share.grade" = "Оценка:";
+"exam.result.share.correctAnswers" = "Правильных ответов:";
+"exam.result.share.percentage" = "Процент:";
+"exam.result.share.time" = "Время:";
+"exam.result.share.footer" = "Скачайте приложение Tabiin Academy для изучения исламских знаний!";
 
 // Exam Grades
 "exam.grade.excellent" = "Отлично";

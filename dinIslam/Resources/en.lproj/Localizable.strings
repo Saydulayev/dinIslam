@@ -402,6 +402,12 @@
 "exam.result.timeExpired" = "Time expired";
 "exam.result.retake" = "Retake";
 "exam.result.share" = "Share";
+"exam.result.share.title" = "📚 Islamic Exam Results";
+"exam.result.share.grade" = "Grade:";
+"exam.result.share.correctAnswers" = "Correct answers:";
+"exam.result.share.percentage" = "Percentage:";
+"exam.result.share.time" = "Time:";
+"exam.result.share.footer" = "Download Tabiin Academy app to learn Islamic knowledge!";
 
 // Exam Grades
 "exam.grade.excellent" = "Excellent";

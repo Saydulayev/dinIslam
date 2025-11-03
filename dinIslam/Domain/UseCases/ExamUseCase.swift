@@ -116,7 +116,8 @@ class ExamUseCase: ExamUseCaseProtocol {
             }
         }
         
-        let percentage = answeredQuestions > 0 ? Double(correctAnswers) / Double(answeredQuestions) * 100 : 0
+        // Процент рассчитывается от общего количества вопросов
+        let percentage = Double(correctAnswers) / Double(questions.count) * 100
         let averageTimePerQuestion = answeredQuestions > 0 ? totalQuestionTime / Double(answeredQuestions) : 0
         
         return ExamResult(

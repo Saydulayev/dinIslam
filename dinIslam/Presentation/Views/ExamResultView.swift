@@ -64,8 +64,8 @@ struct ExamResultHeaderView: View {
                 .fontWeight(.bold)
                 .foregroundColor(.primary)
             
-            // Score
-            Text("\(Int(result.accuracyPercentage))%")
+            // Score - показываем процент от общего количества вопросов
+            Text("\(Int(result.percentage))%")
                 .font(.system(size: 48, weight: .bold, design: .rounded))
                 .foregroundStyle(result.isPassed ? .green : .red)
         }
@@ -297,14 +297,14 @@ struct ExamResultActionsView: View {
         guard let result = viewModel.examResult else { return }
         
         let shareText = """
-        📚 Результат экзамена по исламу
+        \("exam.result.share.title".localized)
         
-        Оценка: \(result.grade.localizedName)
-        Правильных ответов: \(result.correctAnswers)/\(result.answeredQuestions)
-        Процент: \(Int(result.accuracyPercentage))%
-        Время: \(formatTime(result.totalTimeSpent))
+        \("exam.result.share.grade".localized) \(result.grade.localizedName)
+        \("exam.result.share.correctAnswers".localized) \(result.correctAnswers)/\(result.totalQuestions)
+        \("exam.result.share.percentage".localized) \(Int(result.percentage))%
+        \("exam.result.share.time".localized) \(formatTime(result.totalTimeSpent))
         
-        Скачайте приложение Tabiin Academy для изучения исламских знаний!
+        \("exam.result.share.footer".localized)
         """
         
         let activityViewController = UIActivityViewController(

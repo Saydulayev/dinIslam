@@ -101,24 +101,31 @@ struct ExamResult: Codable, Equatable {
     let configuration: ExamConfiguration
     let completedAt: Date
     
+    // Процент правильных ответов от отвеченных вопросов (для аналитики)
     var accuracyPercentage: Double {
         guard answeredQuestions > 0 else { return 0 }
         return Double(correctAnswers) / Double(answeredQuestions) * 100
     }
     
+    // Основной процент для отображения - от общего количества вопросов
+    var overallPercentage: Double {
+        return percentage
+    }
+    
     var isPassed: Bool {
         // Экзамен считается сданным только если:
         // 1. Все вопросы были отвечены (нет пропущенных)
-        // 2. Процент правильных ответов >= 70%
+        // 2. Процент правильных ответов от общего количества вопросов >= 70%
         guard skippedQuestions == 0 else {
             // Если есть пропущенные вопросы, экзамен не сдан
             return false
         }
-        return accuracyPercentage >= 70.0 // 70% для прохождения экзамена
+        return percentage >= 70.0 // 70% от общего количества вопросов для прохождения
     }
     
     var grade: ExamGrade {
-        switch accuracyPercentage {
+        // Оценка основывается на проценте правильных ответов от общего количества вопросов
+        switch percentage {
         case 90...100:
             return .excellent
         case 80..<90:
@@ -196,9 +203,9 @@ struct ExamStatistics: Codable {
         totalTimeSpent += result.totalTimeSpent
         lastExamDate = result.completedAt
         
-        // Update best score
-        if result.accuracyPercentage > bestScore {
-            bestScore = result.accuracyPercentage
+        // Update best score - используем процент от общего количества вопросов
+        if result.percentage > bestScore {
+            bestScore = result.percentage
         }
         
         // Update average score
