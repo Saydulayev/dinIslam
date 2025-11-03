@@ -263,6 +263,8 @@ struct ExamAnswerButton: View {
     let isAnswered: Bool
     let onTap: () -> Void
     
+    @Environment(\.colorScheme) private var colorScheme
+    
     private var buttonColor: Color {
         if isAnswered {
             if isSelected {
@@ -274,6 +276,16 @@ struct ExamAnswerButton: View {
             }
         } else {
             return isSelected ? .blue : .gray
+        }
+    }
+    
+    private var checkmarkColor: Color {
+        if isCorrect {
+            // Адаптивный цвет для правильного ответа - более контрастный в светлой теме
+            return colorScheme == .light ? Color(red: 0.0, green: 0.6, blue: 0.2) : .green
+        } else {
+            // Адаптивный цвет для неправильного ответа - более контрастный в светлой теме
+            return colorScheme == .light ? Color(red: 0.8, green: 0.0, blue: 0.0) : .red
         }
     }
     
@@ -313,7 +325,7 @@ struct ExamAnswerButton: View {
                 // Status icon
                 if isAnswered {
                     Image(systemName: isCorrect ? "checkmark.circle.fill" : "xmark.circle.fill")
-                        .foregroundColor(buttonColor)
+                        .foregroundColor(checkmarkColor)
                         .font(.title2)
                 }
             }

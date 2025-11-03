@@ -205,6 +205,8 @@ struct EnhancedAnswerButton: View {
     let differentiateWithoutColor: Bool
     let action: () -> Void
     
+    @Environment(\.colorScheme) private var colorScheme
+    
     private var buttonColor: Color {
         if !isAnswerSelected {
             return .blue
@@ -214,6 +216,16 @@ struct EnhancedAnswerButton: View {
             return .green
         } else {
             return .gray
+        }
+    }
+    
+    private var checkmarkColor: Color {
+        if isCorrect {
+            // Адаптивный цвет для правильного ответа - более контрастный в светлой теме
+            return colorScheme == .light ? Color(red: 0.0, green: 0.6, blue: 0.2) : .green
+        } else {
+            // Адаптивный цвет для неправильного ответа - более контрастный в светлой теме
+            return colorScheme == .light ? Color(red: 0.8, green: 0.0, blue: 0.0) : .red
         }
     }
     
@@ -239,10 +251,10 @@ struct EnhancedAnswerButton: View {
                 
                 if isAnswerSelected && isCorrect && isSelected {
                     Image(systemName: "checkmark.circle.fill")
-                        .foregroundColor(.white)
+                        .foregroundColor(checkmarkColor)
                 } else if isAnswerSelected && !isCorrect && isSelected {
                     Image(systemName: "xmark.circle.fill")
-                        .foregroundColor(.white)
+                        .foregroundColor(checkmarkColor)
                 }
             }
             .padding()
