@@ -86,9 +86,9 @@ print("DEBUG: ...")
 
 - **Crash reporting** (Firebase Crashlytics / Sentry) — поможет отслеживать ошибки после релиза
 - ✅ **Unit тесты** — базовые тесты созданы и проходят успешно
-  - QuizUseCaseTests — тесты бизнес-логики викторины
-  - StatsManagerTests — тесты управления статистикой
-  - dinIslamTests — базовые тесты проекта
+  - ✅ QuizUseCaseTests — тесты бизнес-логики викторины
+  - ✅ StatsManagerTests — тесты управления статистикой
+  - ✅ dinIslamTests — базовые тесты проекта
 - **Базовое логирование** — OSLog для важных событий вместо print()
 
 ---
