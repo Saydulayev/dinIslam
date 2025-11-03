@@ -6,8 +6,19 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXContainerItemProxy section */
+		C282B4F32EB9088D00024B17 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C227476C2EA631EA00F2199B /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C22747732EA631EA00F2199B;
+			remoteInfo = dinIslam;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		C22747742EA631EA00F2199B /* dinIslam.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = dinIslam.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C282B4EF2EB9088D00024B17 /* dinIslamTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = dinIslamTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -16,10 +27,22 @@
 			path = dinIslam;
 			sourceTree = "<group>";
 		};
+		C282B4F02EB9088D00024B17 /* dinIslamTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = dinIslamTests;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		C22747712EA631EA00F2199B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C282B4EC2EB9088D00024B17 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -33,6 +56,7 @@
 			isa = PBXGroup;
 			children = (
 				C22747762EA631EA00F2199B /* dinIslam */,
+				C282B4F02EB9088D00024B17 /* dinIslamTests */,
 				C22747752EA631EA00F2199B /* Products */,
 			);
 			sourceTree = "<group>";
@@ -41,6 +65,7 @@
 			isa = PBXGroup;
 			children = (
 				C22747742EA631EA00F2199B /* dinIslam.app */,
+				C282B4EF2EB9088D00024B17 /* dinIslamTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -70,6 +95,29 @@
 			productReference = C22747742EA631EA00F2199B /* dinIslam.app */;
 			productType = "com.apple.product-type.application";
 		};
+		C282B4EE2EB9088D00024B17 /* dinIslamTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C282B4F52EB9088D00024B17 /* Build configuration list for PBXNativeTarget "dinIslamTests" */;
+			buildPhases = (
+				C282B4EB2EB9088D00024B17 /* Sources */,
+				C282B4EC2EB9088D00024B17 /* Frameworks */,
+				C282B4ED2EB9088D00024B17 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				C282B4F42EB9088D00024B17 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				C282B4F02EB9088D00024B17 /* dinIslamTests */,
+			);
+			name = dinIslamTests;
+			packageProductDependencies = (
+			);
+			productName = dinIslamTests;
+			productReference = C282B4EF2EB9088D00024B17 /* dinIslamTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -82,6 +130,10 @@
 				TargetAttributes = {
 					C22747732EA631EA00F2199B = {
 						CreatedOnToolsVersion = 26.0.1;
+					};
+					C282B4EE2EB9088D00024B17 = {
+						CreatedOnToolsVersion = 26.0.1;
+						TestTargetID = C22747732EA631EA00F2199B;
 					};
 				};
 			};
@@ -101,12 +153,20 @@
 			projectRoot = "";
 			targets = (
 				C22747732EA631EA00F2199B /* dinIslam */,
+				C282B4EE2EB9088D00024B17 /* dinIslamTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		C22747722EA631EA00F2199B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C282B4ED2EB9088D00024B17 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -123,7 +183,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		C282B4EB2EB9088D00024B17 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		C282B4F42EB9088D00024B17 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C22747732EA631EA00F2199B /* dinIslam */;
+			targetProxy = C282B4F32EB9088D00024B17 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		C227477D2EA631EB00F2199B /* Debug */ = {
@@ -315,6 +390,48 @@
 			};
 			name = Release;
 		};
+		C282B4F62EB9088D00024B17 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 93NA5FP2X8;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "saydulayev.wien-gmail.com.dinIslamTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/dinIslam.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/dinIslam";
+			};
+			name = Debug;
+		};
+		C282B4F72EB9088D00024B17 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 93NA5FP2X8;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "saydulayev.wien-gmail.com.dinIslamTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/dinIslam.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/dinIslam";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -332,6 +449,15 @@
 			buildConfigurations = (
 				C22747802EA631EB00F2199B /* Debug */,
 				C22747812EA631EB00F2199B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C282B4F52EB9088D00024B17 /* Build configuration list for PBXNativeTarget "dinIslamTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C282B4F62EB9088D00024B17 /* Debug */,
+				C282B4F72EB9088D00024B17 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

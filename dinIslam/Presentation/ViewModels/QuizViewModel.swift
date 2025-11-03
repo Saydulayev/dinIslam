@@ -128,8 +128,6 @@ class QuizViewModel {
             let isCorrect = index == currentQuestion.correctIndex
             questionResults[currentQuestion.id] = isCorrect
             
-            print("DEBUG: Question \(currentQuestion.id) answered \(isCorrect ? "correctly" : "incorrectly")")
-            
             if isCorrect {
                 correctAnswers += 1
                 hapticManager.success()
@@ -229,7 +227,6 @@ class QuizViewModel {
     // MARK: - Mistakes Review Methods
     @MainActor
     func startMistakesReview() async {
-        print("DEBUG: QuizViewModel.startMistakesReview() called")
         state = .active(.loading)
         isLoading = true
         errorMessage = nil
@@ -237,16 +234,12 @@ class QuizViewModel {
         do {
             // Get all questions to find the wrong ones
             let languageCode = LocalizationManager.shared.currentLanguage
-            print("DEBUG: Loading questions for language: \(languageCode)")
             let allQuestions = try await quizUseCase.loadAllQuestions(language: languageCode)
-            print("DEBUG: Loaded \(allQuestions.count) total questions")
             
             // Filter only wrong questions
             let wrongQuestions = statsManager.getWrongQuestions(from: allQuestions)
-            print("DEBUG: Found \(wrongQuestions.count) wrong questions")
             
             guard !wrongQuestions.isEmpty else {
-                print("DEBUG: No wrong questions found")
                 errorMessage = LocalizationManager.shared.localizedString(for: "mistakes.noWrongQuestions")
                 state = .idle
                 isLoading = false
@@ -262,15 +255,12 @@ class QuizViewModel {
             showResult = false
             startTime = Date()
             state = .active(.mistakesReview)
-            print("DEBUG: Set state to mistakesReview with \(questions.count) questions")
         } catch {
-            print("DEBUG: Error loading questions: \(error)")
             errorMessage = error.localizedDescription
             state = .idle
         }
         
         isLoading = false
-        print("DEBUG: QuizViewModel.startMistakesReview() completed. State: \(state)")
     }
     
     @MainActor
@@ -287,16 +277,10 @@ class QuizViewModel {
             return isCorrect ? questionId : nil
         }
         
-        print("DEBUG: Correctly answered question IDs: \(correctlyAnsweredIds)")
-        print("DEBUG: Total question results: \(questionResults)")
-        
         // Remove correctly answered questions from wrong questions list
         for questionId in correctlyAnsweredIds {
-            print("DEBUG: Removing question \(questionId) from wrong questions list")
             statsManager.removeWrongQuestion(questionId)
         }
-        
-        print("DEBUG: Wrong questions after removal: \(statsManager.stats.wrongQuestionIds.count)")
         
         state = .completed(.mistakesFinished)
         

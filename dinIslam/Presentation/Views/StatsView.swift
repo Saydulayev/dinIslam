@@ -276,10 +276,11 @@ struct StatsView: View {
                 
                 await MainActor.run {
                     totalQuestionsCount = questions.count
-                    print("📊 StatsView: Total=\(questions.count) questions")
                 }
             } catch {
+                #if DEBUG
                 print("❌ StatsView: Failed to load questions count: \(error)")
+                #endif
                 await MainActor.run {
                     totalQuestionsCount = 0
                 }
@@ -304,14 +305,10 @@ struct StatsView: View {
         
         await MainActor.run {
             totalQuestionsCount = questions.count
-            print("🔄 StatsView: Synced \(questions.count) questions")
         }
     }
     
     private func startMistakesReview() {
-        print("DEBUG: Starting mistakes review...")
-        print("DEBUG: Wrong questions count: \(statsManager.stats.wrongQuestionIds.count)")
-        
         // Используем существующие экземпляры из DI контейнера
         let container = DIContainer.shared
         let viewModel = QuizViewModel(
@@ -324,9 +321,7 @@ struct StatsView: View {
         showingMistakesReview = true
         
         let mistakesTask = Task {
-            print("DEBUG: Starting async mistakes review...")
             await viewModel.startMistakesReview()
-            print("DEBUG: Mistakes review completed. State: \(viewModel.state)")
         }
         
         // Store task for potential cancellation
