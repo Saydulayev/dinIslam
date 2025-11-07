@@ -10,6 +10,8 @@ import SwiftUI
 struct ExamResultView: View {
     let result: ExamResult
     let viewModel: ExamViewModel
+    let onRetake: () -> Void
+    let onBackToMenu: () -> Void
     @Environment(\.dismiss) private var dismiss
     @State private var showingDetailedStats = false
     
@@ -29,21 +31,19 @@ struct ExamResultView: View {
                 ExamBreakdownView(result: result)
                 
                 // Action buttons
-                ExamResultActionsView(viewModel: viewModel)
+                ExamResultActionsView(
+                    viewModel: viewModel,
+                    onRetake: onRetake,
+                    onBackToMenu: onBackToMenu
+                )
             }
             .padding(.horizontal, 20)
             .padding(.bottom, 20)
         }
         .navigationTitle("exam.result.title".localized)
         .navigationBarTitleDisplayMode(.large)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button("exam.result.done".localized) {
-                    dismiss()
-                }
-                .fontWeight(.semibold)
-            }
-        }
+        .navigationBarBackButtonHidden(true)
+        .interactiveDismissDisabled(true)
     }
 }
 
@@ -253,13 +253,13 @@ struct ExamBreakdownRow: View {
 // MARK: - Exam Result Actions
 struct ExamResultActionsView: View {
     let viewModel: ExamViewModel
+    let onRetake: () -> Void
+    let onBackToMenu: () -> Void
     
     var body: some View {
         VStack(spacing: 16) {
             // Retake exam button
-            Button(action: {
-                viewModel.restartExam()
-            }) {
+            Button(action: onRetake) {
                 HStack {
                     Image(systemName: "arrow.clockwise")
                     Text("exam.result.retake".localized)
@@ -272,49 +272,18 @@ struct ExamResultActionsView: View {
                 .background(.blue.gradient, in: RoundedRectangle(cornerRadius: 16))
             }
             
-            // Share result button
-            Button(action: {
-                shareResult()
-            }) {
+            Button(action: onBackToMenu) {
                 HStack {
-                    Image(systemName: "square.and.arrow.up")
-                    Text("exam.result.share".localized)
+                    Image(systemName: "house.fill")
+                    LocalizedText("result.backToStart")
                 }
                 .font(.headline)
+                .fontWeight(.semibold)
                 .foregroundColor(.blue)
                 .frame(maxWidth: .infinity)
-                .frame(height: 50)
-                .background(.blue.opacity(0.1), in: RoundedRectangle(cornerRadius: 12))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(.blue.opacity(0.3), lineWidth: 1)
-                )
+                .frame(height: 56)
+                .background(.blue.opacity(0.1), in: RoundedRectangle(cornerRadius: 16))
             }
-        }
-    }
-    
-    private func shareResult() {
-        guard let result = viewModel.examResult else { return }
-        
-        let shareText = """
-        \("exam.result.share.title".localized)
-        
-        \("exam.result.share.grade".localized) \(result.grade.localizedName)
-        \("exam.result.share.correctAnswers".localized) \(result.correctAnswers)/\(result.totalQuestions)
-        \("exam.result.share.percentage".localized) \(Int(result.percentage))%
-        \("exam.result.share.time".localized) \(formatTime(result.totalTimeSpent))
-        
-        \("exam.result.share.footer".localized)
-        """
-        
-        let activityViewController = UIActivityViewController(
-            activityItems: [shareText],
-            applicationActivities: nil
-        )
-        
-        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-           let window = windowScene.windows.first {
-            window.rootViewController?.present(activityViewController, animated: true)
         }
     }
     
@@ -348,7 +317,9 @@ struct ExamResultActionsView: View {
                 ),
                 examStatisticsManager: ExamStatisticsManager(),
                 settingsManager: SettingsManager()
-            )
+            ),
+            onRetake: {},
+            onBackToMenu: {}
         )
     }
 }

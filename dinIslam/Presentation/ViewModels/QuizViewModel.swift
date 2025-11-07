@@ -42,6 +42,7 @@ class QuizViewModel {
     // Мемоизация для избежания повторных вычислений
     private var memoizedProgress: Double?
     private var memoizedCurrentQuestion: Question?
+    private var nextQuestionTask: Task<Void, Never>?
     
     // MARK: - Computed Properties
     var currentQuestion: Question? {
@@ -141,9 +142,10 @@ class QuizViewModel {
         }
         
         // Show result briefly before moving to next question
-        Task { @MainActor in
+        nextQuestionTask?.cancel()
+        nextQuestionTask = Task { @MainActor [weak self] in
             try? await Task.sleep(nanoseconds: 1_500_000_000) // 1.5 seconds
-            nextQuestion()
+            self?.nextQuestion()
         }
     }
     
@@ -159,6 +161,7 @@ class QuizViewModel {
                 break
             }
         } else {
+            nextQuestionTask?.cancel()
             currentQuestionIndex += 1
             selectedAnswerIndex = nil
             isAnswerSelected = false
@@ -220,6 +223,8 @@ class QuizViewModel {
         quizResult = nil
         errorMessage = nil
         questionResults.removeAll()
+        nextQuestionTask?.cancel()
+        nextQuestionTask = nil
         
         // Сброс мемоизации при перезапуске
         memoizedProgress = nil
@@ -295,6 +300,10 @@ class QuizViewModel {
     // MARK: - Achievement Methods
     func clearNewAchievements() {
         achievementManager.clearNewAchievements()
+    }
+
+    deinit {
+        nextQuestionTask?.cancel()
     }
 }
 

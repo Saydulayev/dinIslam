@@ -10,6 +10,7 @@ import Observation
 import UIKit
 import AudioToolbox
 
+@MainActor
 @Observable
 class ExamViewModel {
     // MARK: - Properties
@@ -30,12 +31,13 @@ class ExamViewModel {
     // Timer properties
     var timeRemaining: TimeInterval = 0
     var isTimerActive: Bool = false
-    private var timer: Timer?
+    private var timerTask: Task<Void, Never>?
     private var questionStartTime: Date?
     
     // Progress tracking
     private var examStartTime: Date?
     private var totalTimeSpent: TimeInterval = 0
+    private var nextQuestionTask: Task<Void, Never>?
     
     // MARK: - Computed Properties
     var currentQuestion: Question? {
@@ -135,6 +137,7 @@ class ExamViewModel {
         let answer = ExamAnswer(
             questionId: currentQuestion.id,
             selectedAnswerIndex: index,
+            correctAnswerIndex: currentQuestion.correctIndex,
             timeSpent: timeSpent
         )
         
@@ -151,9 +154,10 @@ class ExamViewModel {
         }
         
         // Move to next question after brief delay
-        Task { @MainActor in
+        nextQuestionTask?.cancel()
+        nextQuestionTask = Task { @MainActor [weak self] in
             try? await Task.sleep(nanoseconds: 1_500_000_000) // 1.5 seconds
-            nextQuestion()
+            self?.nextQuestion()
         }
     }
     
@@ -171,6 +175,7 @@ class ExamViewModel {
         // Create skipped answer
         let answer = ExamAnswer(
             questionId: currentQuestion.id,
+            correctAnswerIndex: currentQuestion.correctIndex,
             isSkipped: true,
             timeSpent: timeSpent
         )
@@ -182,6 +187,7 @@ class ExamViewModel {
         soundManager.playSelectionSound()
         
         // Move to next question
+        nextQuestionTask?.cancel()
         nextQuestion()
     }
     
@@ -240,6 +246,7 @@ class ExamViewModel {
     
     func stopExam() {
         stopQuestionTimer()
+        nextQuestionTask?.cancel()
         
         // Calculate total time spent
         if let startTime = examStartTime {
@@ -273,37 +280,48 @@ class ExamViewModel {
         timeRemaining = 0
         isTimerActive = false
         stopQuestionTimer()
+        nextQuestionTask?.cancel()
+        nextQuestionTask = nil
     }
     
     // MARK: - Timer Methods
     private func startQuestionTimer() {
         guard currentQuestion != nil else { return }
         
+        stopQuestionTimer()
+        
         timeRemaining = configuration.timePerQuestion
         isTimerActive = true
         questionStartTime = Date()
         
-        timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
-            Task { @MainActor [weak self] in
-                self?.updateTimer()
-            }
+        timerTask = Task { [weak self] in
+            guard let self else { return }
+            await self.runTimerLoop()
         }
     }
     
     private func stopQuestionTimer() {
-        timer?.invalidate()
-        timer = nil
         isTimerActive = false
+        timerTask?.cancel()
+        timerTask = nil
     }
     
-    private func updateTimer() {
-        guard isTimerActive else { return }
-        
-        timeRemaining -= 0.1
-        
-        if timeRemaining <= 0 {
-            timeRemaining = 0
-            handleTimeUp()
+    @MainActor
+    private func runTimerLoop() async {
+        let interval: UInt64 = 100_000_000 // 0.1 секунды
+        while isTimerActive && !Task.isCancelled {
+            do {
+                try await Task.sleep(nanoseconds: interval)
+            } catch {
+                break
+            }
+            guard isTimerActive else { break }
+            timeRemaining = max(0, timeRemaining - 0.1)
+            if timeRemaining <= 0 {
+                timeRemaining = 0
+                handleTimeUp()
+                break
+            }
         }
     }
     
@@ -318,6 +336,7 @@ class ExamViewModel {
         // Create time expired answer
         let answer = ExamAnswer(
             questionId: currentQuestion.id,
+            correctAnswerIndex: currentQuestion.correctIndex,
             timeSpent: timeSpent,
             isTimeExpired: true
         )
@@ -332,24 +351,28 @@ class ExamViewModel {
         state = .active(.timeUp)
         
         // Auto-submit if enabled, otherwise move to next question
-        Task { @MainActor in
+        nextQuestionTask?.cancel()
+        nextQuestionTask = Task { @MainActor [weak self] in
             try? await Task.sleep(nanoseconds: 1_000_000_000) // 1 second
+            guard let self else { return }
             
-            if configuration.autoSubmit {
-                if isLastQuestion {
-                    finishExam()
+            if self.configuration.autoSubmit {
+                if self.isLastQuestion {
+                    self.finishExam()
                 } else {
-                    currentQuestionIndex += 1
-                    state = .active(.playing)
-                    startQuestionTimer()
+                    self.currentQuestionIndex += 1
+                    self.state = .active(.playing)
+                    self.startQuestionTimer()
                 }
             } else {
-                nextQuestion()
+                self.nextQuestion()
             }
         }
     }
     
+    @MainActor
     deinit {
         stopQuestionTimer()
+        nextQuestionTask?.cancel()
     }
 }

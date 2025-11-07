@@ -12,7 +12,7 @@ struct MistakesReviewView: View {
     @State private var showingStopConfirm: Bool = false
     
     init(viewModel: QuizViewModel) {
-        self.viewModel = viewModel
+        _viewModel = State(initialValue: viewModel)
     }
     
     var body: some View {

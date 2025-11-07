@@ -20,6 +20,34 @@ struct Particle: Identifiable {
     var life: Double
 }
 
+enum StartRoute: Hashable {
+    case quiz
+    case result(ResultSnapshot)
+    
+    struct ResultSnapshot: Hashable {
+        let totalQuestions: Int
+        let correctAnswers: Int
+        let percentage: Double
+        let timeSpent: Double
+        
+        init(from result: QuizResult) {
+            totalQuestions = result.totalQuestions
+            correctAnswers = result.correctAnswers
+            percentage = result.percentage
+            timeSpent = result.timeSpent
+        }
+        
+        func makeQuizResult() -> QuizResult {
+            QuizResult(
+                totalQuestions: totalQuestions,
+                correctAnswers: correctAnswers,
+                percentage: percentage,
+                timeSpent: timeSpent
+            )
+        }
+    }
+}
+
 struct StartView: View {
     @State private var viewModel: QuizViewModel
     @EnvironmentObject private var settingsManager: SettingsManager
@@ -34,6 +62,7 @@ struct StartView: View {
     @State private var logoGlowIntensity: Double = 0.5
     @State private var particles: [Particle] = []
     @State private var isGlowAnimationStarted: Bool = false
+    @State private var navigationPath = NavigationPath()
     
     // Кэшированный код языка для избежания синхронных операций
     @State private var cachedLanguageCode: String = "ru"
@@ -42,184 +71,47 @@ struct StartView: View {
     @State private var startQuizTask: Task<Void, Never>?
     
     // Particle animation timer
-    @State private var particleTimer: Timer?
+    @State private var particleTask: Task<Void, Never>?
     
     init(viewModel: QuizViewModel) {
-        self.viewModel = viewModel
+        _viewModel = State(initialValue: viewModel)
     }
     
     init(quizUseCase: QuizUseCaseProtocol, statsManager: StatsManager, settingsManager: SettingsManager) {
-        self.viewModel = QuizViewModel(quizUseCase: quizUseCase, statsManager: statsManager, settingsManager: settingsManager)
+        _viewModel = State(initialValue: QuizViewModel(quizUseCase: quizUseCase, statsManager: statsManager, settingsManager: settingsManager))
     }
     
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $navigationPath) {
             VStack(spacing: 0) {
-                // App Title - по центру экрана
-                VStack(spacing: 16) {
-                    ZStack {
-                        // Фоновое свечение
-                        Circle()
-                            .fill(
-                                RadialGradient(
-                                    colors: [.blue.opacity(0.2 * logoGlowIntensity), .purple.opacity(0.1 * logoGlowIntensity), .clear],
-                                    center: .center,
-                                    startRadius: 30,
-                                    endRadius: 80
-                                )
-                            )
-                            .frame(width: 160, height: 160)
-                            .blur(radius: 20)
-                        
-                        // Основное изображение
-                        Image("image")
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 120, height: 120)
-                            .clipShape(Circle())
-                            .shadow(color: .blue.opacity(0.4 * logoGlowIntensity), radius: 20, x: 0, y: 10)
-                            .shadow(color: .purple.opacity(0.3 * logoGlowIntensity), radius: 30, x: 0, y: 0)
-                        
-                        // Магические частицы
-                        ForEach(particles) { particle in
-                            Circle()
-                                .fill(.yellow.opacity(particle.opacity))
-                                .frame(width: particle.size, height: particle.size)
-                                .offset(x: particle.x, y: particle.y)
-                                .blur(radius: 1)
-                        }
-                    }
-                    
-                    LocalizedText("app.name")
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
-                        .foregroundStyle(.primary)
-                    
-                    LocalizedText("start.description")
-                        .font(.title3)
-                        .foregroundStyle(.secondary)
-                        .multilineTextAlignment(.center)
-                        .padding(.horizontal)
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                
-                // Bottom section with average score and buttons
-                VStack(spacing: 0) {
-                    // Average Score
-                    if statsManager.hasRecentGames() {
-                        VStack(spacing: 8) {
-                            LocalizedText("start.averageScore")
-                                .font(.headline)
-                                .foregroundStyle(.secondary)
-                            
-                            Text("\(Int(statsManager.getAverageRecentScore()))%")
-                                .font(.title)
-                                .fontWeight(.bold)
-                                .foregroundStyle(.blue)
-                            
-                            Text("start.basedOnGames".localized(count: statsManager.getRecentGamesCount(), arguments: statsManager.getRecentGamesCount()))
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        }
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                    } else {
-                        VStack(spacing: 8) {
-                            LocalizedText("start.noGamesYet")
-                                .font(.headline)
-                                .foregroundStyle(.secondary)
-                            
-                            Text("—")
-                                .font(.title)
-                                .fontWeight(.bold)
-                                .foregroundStyle(.gray)
-                        }
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                    }
-                    
-                    // Divider
-                    Divider()
-                        .background(adaptiveBorderColor)
-                    
-                    // Action Buttons
-                    VStack(spacing: 12) {
-                        // Regular Quiz Button
-                        Button(action: {
-                            startQuizTask?.cancel()
-                            startQuizTask = Task {
-                                await viewModel.startQuiz(language: cachedLanguageCode)
-                            }
-                        }) {
-                            HStack(spacing: 12) {
-                                if viewModel.isLoading {
-                                    ProgressView()
-                                        .progressViewStyle(CircularProgressViewStyle(tint: .blue))
-                                        .scaleEffect(0.8)
-                                } else {
-                                    Image(systemName: "play.fill")
-                                        .foregroundColor(.blue)
-                                        .font(.title2)
-                                }
-                                
-                                LocalizedText(viewModel.isLoading ? "start.loading" : "start.begin")
-                                    .font(.headline)
-                                    .fontWeight(.semibold)
-                                    .foregroundStyle(.primary)
-                                
-                                Spacer()
-                            }
-                            .padding()
-                            .frame(maxWidth: .infinity)
-                            .background(Color.blue.opacity(0.1), in: RoundedRectangle(cornerRadius: 12))
-                        }
-                        .buttonStyle(.plain)
-                        .disabled(viewModel.isLoading)
-                        
-                        // Exam Mode Button
-                        Button(action: {
-                            showingExamSettings = true
-                        }) {
-                            HStack(spacing: 12) {
-                                Image(systemName: "timer")
-                                    .foregroundColor(.orange)
-                                    .font(.title2)
-                                
-                                LocalizedText("start.examMode")
-                                    .font(.headline)
-                                    .fontWeight(.semibold)
-                                    .foregroundStyle(.primary)
-                                
-                                Spacer()
-                            }
-                            .padding()
-                            .frame(maxWidth: .infinity)
-                            .background(Color.orange.opacity(0.1), in: RoundedRectangle(cornerRadius: 12))
-                        }
-                        .buttonStyle(.plain)
-                    }
-                    .padding(.vertical, 12)
-                }
-                .padding()
-                .background(.regularMaterial.opacity(0.3), in: RoundedRectangle(cornerRadius: 16))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 16)
-                        .stroke(adaptiveBorderColor, lineWidth: 0.5)
-                )
-                .padding(.horizontal)
+                heroSection
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                summarySection
+                    .padding(.horizontal)
             }
             .padding()
-            .navigationDestination(isPresented: .constant({
-                if case .active(.playing) = viewModel.state { return true }
-                return false
-            }())) {
-                QuizView(viewModel: viewModel)
-            }
-            .navigationDestination(isPresented: .constant({
-                if case .completed(.finished) = viewModel.state { return true }
-                return false
-            }())) {
-                ResultView(viewModel: viewModel)
+            .navigationDestination(for: StartRoute.self) { route in
+                switch route {
+                case .quiz:
+                    QuizView(viewModel: viewModel)
+                case .result(let snapshot):
+                    ResultView(
+                        result: snapshot.makeQuizResult(),
+                        newAchievements: viewModel.newAchievements,
+                        onPlayAgain: {
+                            navigationPath = NavigationPath()
+                            viewModel.restartQuiz()
+                            startQuiz()
+                        },
+                        onBackToStart: {
+                            navigationPath = NavigationPath()
+                            viewModel.restartQuiz()
+                        },
+                        onAchievementsCleared: {
+                            viewModel.clearNewAchievements()
+                        }
+                    )
+                }
             }
             .sheet(isPresented: $showingSettings) {
                 NavigationStack {
@@ -236,7 +128,11 @@ struct StartView: View {
             }
             .navigationDestination(isPresented: $showingExam) {
                 if let examViewModel = examViewModel {
-                    ExamView(viewModel: examViewModel)
+                    ExamView(viewModel: examViewModel) {
+                        showingExam = false
+                        examViewModel.restartExam()
+                        self.examViewModel = nil
+                    }
                 }
             }
             .navigationDestination(isPresented: $showingStats) {
@@ -289,10 +185,7 @@ struct StartView: View {
                     UIApplication.shared.applicationIconBadgeNumber = 0
                 }
                 
-                // Кэширование кода языка асинхронно
-                Task {
-                    cachedLanguageCode = settingsManager.settings.language.locale?.language.languageCode?.identifier ?? "ru"
-                }
+                cachedLanguageCode = currentLanguageCode
                 
                 // Предзагрузка вопросов для улучшения UX
                 Task {
@@ -314,8 +207,8 @@ struct StartView: View {
                     createParticles()
                 }
                 
-                // Анимация частиц (только если таймер не запущен)
-                if particleTimer == nil {
+                // Анимация частиц (только если задача не запущена)
+                if particleTask == nil {
                     startParticleAnimation()
                 }
             }
@@ -324,9 +217,15 @@ struct StartView: View {
             // Cancel pending tasks when view disappears
             startQuizTask?.cancel()
             
-            // Останавливаем таймер частиц
-            particleTimer?.invalidate()
-            particleTimer = nil
+            // Останавливаем задачу обновления частиц
+            particleTask?.cancel()
+            particleTask = nil
+        }
+        .onChange(of: settingsManager.settings.language) { _, _ in
+            cachedLanguageCode = currentLanguageCode
+        }
+        .onChange(of: viewModel.state) { _, newValue in
+            handleStateChange(newValue)
         }
     }
     
@@ -358,6 +257,188 @@ struct StartView: View {
         }
     }
     
+    private var currentLanguageCode: String {
+        settingsManager.settings.language.locale?.language.languageCode?.identifier ?? "ru"
+    }
+    
+    // MARK: - View Sections
+    private var heroSection: some View {
+        VStack(spacing: 16) {
+            ZStack {
+                Circle()
+                    .fill(
+                        RadialGradient(
+                            colors: [.blue.opacity(0.2 * logoGlowIntensity), .purple.opacity(0.1 * logoGlowIntensity), .clear],
+                            center: .center,
+                            startRadius: 30,
+                            endRadius: 80
+                        )
+                    )
+                    .frame(width: 160, height: 160)
+                    .blur(radius: 20)
+                
+                Image("image")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 120, height: 120)
+                    .clipShape(Circle())
+                    .shadow(color: .blue.opacity(0.4 * logoGlowIntensity), radius: 20, x: 0, y: 10)
+                    .shadow(color: .purple.opacity(0.3 * logoGlowIntensity), radius: 30, x: 0, y: 0)
+                
+                ForEach(particles) { particle in
+                    Circle()
+                        .fill(.yellow.opacity(particle.opacity))
+                        .frame(width: particle.size, height: particle.size)
+                        .offset(x: particle.x, y: particle.y)
+                        .blur(radius: 1)
+                }
+            }
+            
+            VStack(spacing: 8) {
+                LocalizedText("app.name")
+                    .font(.largeTitle)
+                    .fontWeight(.bold)
+                    .foregroundStyle(.primary)
+                
+                LocalizedText("start.description")
+                    .font(.title3)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal)
+            }
+        }
+    }
+    
+    private var summarySection: some View {
+        VStack(spacing: 0) {
+            statsCard
+            Divider()
+                .background(adaptiveBorderColor)
+            actionsSection
+        }
+        .padding()
+        .background(.regularMaterial.opacity(0.3), in: RoundedRectangle(cornerRadius: 16))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(adaptiveBorderColor, lineWidth: 0.5)
+        )
+    }
+    
+    private var statsCard: some View {
+        Group {
+            if statsManager.hasRecentGames() {
+                VStack(spacing: 8) {
+                    LocalizedText("start.averageScore")
+                        .font(.headline)
+                        .foregroundStyle(.secondary)
+                    
+                    Text("\(Int(statsManager.getAverageRecentScore()))%")
+                        .font(.title)
+                        .fontWeight(.bold)
+                        .foregroundStyle(.blue)
+                    
+                    Text("start.basedOnGames".localized(count: statsManager.getRecentGamesCount(), arguments: statsManager.getRecentGamesCount()))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                .padding()
+                .frame(maxWidth: .infinity)
+            } else {
+                VStack(spacing: 8) {
+                    LocalizedText("start.noGamesYet")
+                        .font(.headline)
+                        .foregroundStyle(.secondary)
+                    
+                    Text("—")
+                        .font(.title)
+                        .fontWeight(.bold)
+                        .foregroundStyle(.gray)
+                }
+                .padding()
+                .frame(maxWidth: .infinity)
+            }
+        }
+    }
+    
+    private var actionsSection: some View {
+        VStack(spacing: 12) {
+            quizButton
+            examButton
+        }
+        .padding(.vertical, 12)
+    }
+    
+    private var quizButton: some View {
+        Button(action: startQuiz) {
+            HStack(spacing: 12) {
+                if viewModel.isLoading {
+                    ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle(tint: .blue))
+                        .scaleEffect(0.8)
+                } else {
+                    Image(systemName: "play.fill")
+                        .foregroundColor(.blue)
+                        .font(.title2)
+                }
+                
+                LocalizedText(viewModel.isLoading ? "start.loading" : "start.begin")
+                    .font(.headline)
+                    .fontWeight(.semibold)
+                    .foregroundStyle(.primary)
+                
+                Spacer()
+            }
+            .padding()
+            .frame(maxWidth: .infinity)
+            .background(Color.blue.opacity(0.1), in: RoundedRectangle(cornerRadius: 12))
+        }
+        .buttonStyle(.plain)
+        .disabled(viewModel.isLoading)
+    }
+    
+    private var examButton: some View {
+        Button(action: {
+            showingExamSettings = true
+        }) {
+            HStack(spacing: 12) {
+                Image(systemName: "timer")
+                    .foregroundColor(.orange)
+                    .font(.title2)
+                
+                LocalizedText("start.examMode")
+                    .font(.headline)
+                    .fontWeight(.semibold)
+                    .foregroundStyle(.primary)
+                
+                Spacer()
+            }
+            .padding()
+            .frame(maxWidth: .infinity)
+            .background(Color.orange.opacity(0.1), in: RoundedRectangle(cornerRadius: 12))
+        }
+        .buttonStyle(.plain)
+    }
+    
+    private func startQuiz() {
+        navigationPath = NavigationPath()
+        startQuizTask?.cancel()
+        navigationPath.append(StartRoute.quiz)
+        startQuizTask = Task {
+            await viewModel.startQuiz(language: cachedLanguageCode)
+        }
+    }
+    
+    private func handleStateChange(_ state: QuizState) {
+        switch state {
+        case .completed(.finished), .completed(.mistakesFinished):
+            guard let quizResult = viewModel.quizResult else { return }
+            let snapshot = StartRoute.ResultSnapshot(from: quizResult)
+            navigationPath.append(StartRoute.result(snapshot))
+        default:
+            break
+        }
+    }
+    
     // MARK: - Particle Functions
     private func createParticles() {
         particles = (0..<12).map { _ in
@@ -374,12 +455,16 @@ struct StartView: View {
     }
     
     private func startParticleAnimation() {
-        // Останавливаем существующий таймер, если он есть
-        particleTimer?.invalidate()
-        
-        // Создаем новый таймер
-        particleTimer = Timer.scheduledTimer(withTimeInterval: 0.016, repeats: true) { _ in
-            updateParticles()
+        particleTask?.cancel()
+        particleTask = Task {
+            // Используем частоту ~60 FPS
+            let interval = UInt64(16_000_000) // 16 мс
+            while !Task.isCancelled {
+                await MainActor.run {
+                    updateParticles()
+                }
+                try? await Task.sleep(nanoseconds: interval)
+            }
         }
     }
     

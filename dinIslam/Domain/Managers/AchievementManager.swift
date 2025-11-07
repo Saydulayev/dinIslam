@@ -17,9 +17,10 @@ class AchievementManager: ObservableObject {
     
     private let userDefaults = UserDefaults.standard
     private let achievementsKey = "UserAchievements"
-    private let notificationManager = NotificationManager()
+    private var notificationManager: NotificationManager
     
-    private init() {
+    private init(notificationManager: NotificationManager = NotificationManager()) {
+        self.notificationManager = notificationManager
         loadAchievements()
         initializeDefaultAchievements()
         
@@ -32,6 +33,10 @@ class AchievementManager: ObservableObject {
         )
     }
     
+    func configureDependencies(notificationManager: NotificationManager) {
+        self.notificationManager = notificationManager
+    }
+
     deinit {
         NotificationCenter.default.removeObserver(self)
     }

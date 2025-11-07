@@ -42,31 +42,31 @@ enum Difficulty: String, Codable, CaseIterable {
     }
 }
 
-enum QuizState {
+enum QuizState: Equatable {
     case idle
     case active(ActiveState)
     case completed(CompletedState)
     case error(ErrorState)
 }
 
-enum ActiveState {
+enum ActiveState: Equatable {
     case loading
     case playing
     case mistakesReview
 }
 
-enum CompletedState {
+enum CompletedState: Equatable {
     case finished
     case mistakesFinished
 }
 
-enum ErrorState {
+enum ErrorState: Equatable {
     case networkError
     case dataError
     case unknownError
 }
 
-struct QuizResult {
+struct QuizResult: Equatable, Hashable {
     let totalQuestions: Int
     let correctAnswers: Int
     let percentage: Double

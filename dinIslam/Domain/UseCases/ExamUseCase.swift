@@ -24,24 +24,36 @@ protocol ExamUseCaseProtocol {
 struct ExamAnswer: Codable, Equatable {
     let questionId: String
     let selectedAnswerIndex: Int?
+    let correctAnswerIndex: Int?
     let isSkipped: Bool
     let timeSpent: TimeInterval
     let isTimeExpired: Bool
     
-    init(questionId: String, selectedAnswerIndex: Int? = nil, isSkipped: Bool = false, timeSpent: TimeInterval = 0, isTimeExpired: Bool = false) {
+    init(
+        questionId: String,
+        selectedAnswerIndex: Int? = nil,
+        correctAnswerIndex: Int? = nil,
+        isSkipped: Bool = false,
+        timeSpent: TimeInterval = 0,
+        isTimeExpired: Bool = false
+    ) {
         self.questionId = questionId
         self.selectedAnswerIndex = selectedAnswerIndex
+        self.correctAnswerIndex = correctAnswerIndex
         self.isSkipped = isSkipped
         self.timeSpent = timeSpent
         self.isTimeExpired = isTimeExpired
     }
     
     var isCorrect: Bool {
-        guard let _ = selectedAnswerIndex, !isSkipped, !isTimeExpired else {
+        guard
+            let selectedAnswerIndex,
+            let correctAnswerIndex,
+            !isSkipped,
+            !isTimeExpired else {
             return false
         }
-        // This will be determined by comparing with the correct answer index
-        return true // Placeholder - will be set by ExamUseCase
+        return selectedAnswerIndex == correctAnswerIndex
     }
 }
 
@@ -93,20 +105,21 @@ class ExamUseCase: ExamUseCaseProtocol {
         
         for question in questions {
             guard let answer = answers[question.id] else {
-                skippedQuestions += 1
                 continue
             }
             
             totalQuestionTime += answer.timeSpent
             
-            if answer.isTimeExpired {
+            if answer.isSkipped {
+                skippedQuestions += 1
+            } else if answer.isTimeExpired {
                 timeExpiredQuestions += 1
-                skippedQuestions += 1
-            } else if answer.isSkipped {
-                skippedQuestions += 1
+                answeredQuestions += 1
+                incorrectAnswers += 1
             } else if let selectedIndex = answer.selectedAnswerIndex {
                 answeredQuestions += 1
-                if selectedIndex == question.correctIndex {
+                let isAnswerCorrect = answer.correctAnswerIndex != nil ? answer.isCorrect : selectedIndex == question.correctIndex
+                if isAnswerCorrect {
                     correctAnswers += 1
                 } else {
                     incorrectAnswers += 1

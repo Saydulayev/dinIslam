@@ -8,13 +8,10 @@
 import SwiftUI
 
 struct MistakesResultView: View {
-    @State private var viewModel: QuizViewModel
+    let result: QuizResult
+    let onRepeat: () -> Void
+    let onBackToStart: () -> Void
     @ObservedObject private var localizationManager = LocalizationManager.shared
-    @Environment(\.dismiss) private var dismiss
-    
-    init(viewModel: QuizViewModel) {
-        self.viewModel = viewModel
-    }
     
     var body: some View {
         VStack(spacing: 32) {
@@ -36,7 +33,7 @@ struct MistakesResultView: View {
             VStack(spacing: 20) {
                 // Main score
                 VStack(spacing: 8) {
-                    Text("\(Int(viewModel.quizResult?.percentage ?? 0))%")
+                    Text("\(Int(result.percentage))%")
                         .font(.system(size: 60, weight: .bold, design: .rounded))
                         .foregroundStyle(resultColor)
                     
@@ -49,17 +46,17 @@ struct MistakesResultView: View {
                 VStack(spacing: 12) {
                     StatRow(
                         title: localizationManager.localizedString(for: "mistakes.result.totalQuestions"),
-                        value: "\(viewModel.quizResult?.totalQuestions ?? 0)"
+                        value: "\(result.totalQuestions)"
                     )
                     
                     StatRow(
                         title: localizationManager.localizedString(for: "mistakes.result.correctAnswers"),
-                        value: "\(viewModel.quizResult?.correctAnswers ?? 0)"
+                        value: "\(result.correctAnswers)"
                     )
                     
                     StatRow(
                         title: localizationManager.localizedString(for: "mistakes.result.timeSpent"),
-                        value: formatTime(viewModel.quizResult?.timeSpent ?? 0)
+                        value: formatTime(result.timeSpent)
                     )
                 }
                 .padding()
@@ -67,7 +64,7 @@ struct MistakesResultView: View {
             }
             
             // Improvement badge
-            if let result = viewModel.quizResult, result.percentage >= 70 {
+            if result.percentage >= 70 {
                 HStack {
                     Image(systemName: "arrow.up.circle.fill")
                         .foregroundColor(.green)
@@ -77,7 +74,7 @@ struct MistakesResultView: View {
                 }
                 .padding()
                 .background(.green.opacity(0.1), in: RoundedRectangle(cornerRadius: 12))
-            } else if let result = viewModel.quizResult, result.percentage < 50 {
+            } else if result.percentage < 50 {
                 HStack {
                     Image(systemName: "arrow.down.circle.fill")
                         .foregroundColor(.orange)
@@ -93,9 +90,7 @@ struct MistakesResultView: View {
             
             // Action buttons
             VStack(spacing: 16) {
-                Button(action: {
-                    viewModel.restartQuiz()
-                }) {
+                Button(action: onRepeat) {
                     HStack {
                         Image(systemName: "arrow.clockwise")
                         LocalizedText("mistakes.result.repeatAgain")
@@ -107,10 +102,7 @@ struct MistakesResultView: View {
                     .background(.red.gradient, in: RoundedRectangle(cornerRadius: 16))
                 }
                 
-                Button(action: {
-                    // Navigate back to start
-                    dismiss()
-                }) {
+                Button(action: onBackToStart) {
                     HStack {
                         Image(systemName: "house.fill")
                         LocalizedText("mistakes.result.backToStart")
@@ -130,9 +122,7 @@ struct MistakesResultView: View {
     }
     
     private var resultIcon: String {
-        guard let percentage = viewModel.quizResult?.percentage else { return "questionmark.circle" }
-        
-        switch percentage {
+        switch result.percentage {
         case 80...:
             return "checkmark.circle.fill"
         case 60..<80:
@@ -145,9 +135,7 @@ struct MistakesResultView: View {
     }
     
     private var resultColor: Color {
-        guard let percentage = viewModel.quizResult?.percentage else { return .gray }
-        
-        switch percentage {
+        switch result.percentage {
         case 80...:
             return .green
         case 60..<80:
@@ -172,6 +160,6 @@ struct MistakesResultView: View {
 }
 
 #Preview {
-    let viewModel = QuizViewModel(quizUseCase: QuizUseCase(questionsRepository: QuestionsRepository()), statsManager: StatsManager(), settingsManager: SettingsManager())
-    MistakesResultView(viewModel: viewModel)
+    let result = QuizResult(totalQuestions: 10, correctAnswers: 7, percentage: 70, timeSpent: 80)
+    MistakesResultView(result: result, onRepeat: {}, onBackToStart: {})
 }

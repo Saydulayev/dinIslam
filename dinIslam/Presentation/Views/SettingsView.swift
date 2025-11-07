@@ -9,12 +9,12 @@ import SwiftUI
 import MessageUI
 
 struct SettingsView: View {
-    @State private var viewModel: SettingsViewModel
+    @Bindable var viewModel: SettingsViewModel
     @Environment(\.dismiss) private var dismiss
     @State private var showingNotificationSettings = false
     
     init(viewModel: SettingsViewModel) {
-        self.viewModel = viewModel
+        _viewModel = Bindable(viewModel)
     }
     
     var body: some View {
@@ -276,11 +276,11 @@ struct SettingsView: View {
     }
     
     struct LanguagePickerView: View {
-        @State private var viewModel: SettingsViewModel
+        @Bindable var viewModel: SettingsViewModel
         @Environment(\.dismiss) private var dismiss
         
         init(viewModel: SettingsViewModel) {
-            self.viewModel = viewModel
+            _viewModel = Bindable(viewModel)
         }
         
         var body: some View {

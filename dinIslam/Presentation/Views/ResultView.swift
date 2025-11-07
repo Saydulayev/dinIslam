@@ -9,13 +9,15 @@ import SwiftUI
 import UserNotifications
 
 struct ResultView: View {
-    @State private var viewModel: QuizViewModel
+    let result: QuizResult
+    let newAchievements: [Achievement]
+    let onPlayAgain: () -> Void
+    let onBackToStart: () -> Void
+    let onAchievementsCleared: () -> Void
+    
     @State private var showingAchievementNotification = false
     @State private var currentAchievement: Achievement?
-    
-    init(viewModel: QuizViewModel) {
-        self.viewModel = viewModel
-    }
+    @State private var achievementsCleared = false
     
     var body: some View {
         VStack(spacing: 32) {
@@ -37,7 +39,7 @@ struct ResultView: View {
             VStack(spacing: 20) {
                 // Main score
                 VStack(spacing: 8) {
-                    Text("\(Int(viewModel.quizResult?.percentage ?? 0))%")
+                    Text("\(Int(result.percentage))%")
                         .font(.system(size: 60, weight: .bold, design: .rounded))
                         .foregroundStyle(resultColor)
                     
@@ -50,17 +52,17 @@ struct ResultView: View {
                 VStack(spacing: 12) {
                     StatRow(
                         title: "result.totalQuestions".localized,
-                        value: "\(viewModel.quizResult?.totalQuestions ?? 0)"
+                        value: "\(result.totalQuestions)"
                     )
                     
                     StatRow(
                         title: "result.correctAnswers".localized,
-                        value: "\(viewModel.quizResult?.correctAnswers ?? 0)"
+                        value: "\(result.correctAnswers)"
                     )
                     
                     StatRow(
                         title: "result.timeSpent".localized,
-                        value: formatTime(viewModel.quizResult?.timeSpent ?? 0)
+                        value: formatTime(result.timeSpent)
                     )
                 }
                 .padding()
@@ -68,7 +70,7 @@ struct ResultView: View {
             }
             
             // New record badge
-            if let result = viewModel.quizResult, result.isNewRecord {
+            if result.isNewRecord {
                 HStack {
                     Image(systemName: "star.fill")
                         .foregroundColor(.yellow)
@@ -84,9 +86,7 @@ struct ResultView: View {
             
             // Action buttons
             VStack(spacing: 16) {
-                Button(action: {
-                    viewModel.restartQuiz()
-                }) {
+                Button(action: onPlayAgain) {
                     HStack {
                         Image(systemName: "arrow.clockwise")
                         LocalizedText("result.playAgain")
@@ -98,10 +98,7 @@ struct ResultView: View {
                     .background(.blue.gradient, in: RoundedRectangle(cornerRadius: 16))
                 }
                 
-                Button(action: {
-                    // Navigate back to start
-                    viewModel.restartQuiz()
-                }) {
+                Button(action: onBackToStart) {
                     HStack {
                         Image(systemName: "house.fill")
                         LocalizedText("result.backToStart")
@@ -135,17 +132,20 @@ struct ResultView: View {
             }
         )
         .onAppear {
-            checkForNewAchievements()
+            prepareAchievements()
             
             // Clear app badge when results are shown (iOS 17+ API)
             UNUserNotificationCenter.current().setBadgeCount(0, withCompletionHandler: { _ in })
         }
+        .onChange(of: showingAchievementNotification) { _, newValue in
+            if !newValue {
+                clearAchievementsOnce()
+            }
+        }
     }
     
     private var resultIcon: String {
-        guard let percentage = viewModel.quizResult?.percentage else { return "questionmark.circle" }
-        
-        switch percentage {
+        switch result.percentage {
         case 80...:
             return "trophy.fill"
         case 60..<80:
@@ -158,9 +158,7 @@ struct ResultView: View {
     }
     
     private var resultColor: Color {
-        guard let percentage = viewModel.quizResult?.percentage else { return .gray }
-        
-        switch percentage {
+        switch result.percentage {
         case 80...:
             return .yellow
         case 60..<80:
@@ -183,19 +181,19 @@ struct ResultView: View {
         }
     }
     
-    private func checkForNewAchievements() {
-        let newAchievements = viewModel.newAchievements
-        
-        if !newAchievements.isEmpty {
-            // Show the first new achievement
-            currentAchievement = newAchievements.first
-            showingAchievementNotification = true
-            
-            // Clear the achievement from the view model after showing
-            Task { @MainActor in
-                try? await Task.sleep(nanoseconds: 500_000_000) // 0.5 seconds
-                viewModel.clearNewAchievements()
-            }
+    private func prepareAchievements() {
+        guard !newAchievements.isEmpty else { return }
+        currentAchievement = newAchievements.first
+        showingAchievementNotification = true
+        clearAchievementsOnce()
+    }
+    
+    private func clearAchievementsOnce() {
+        guard !achievementsCleared else { return }
+        achievementsCleared = true
+        Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 500_000_000)
+            onAchievementsCleared()
         }
     }
 }
@@ -219,6 +217,12 @@ struct StatRow: View {
 }
 
 #Preview {
-    let viewModel = QuizViewModel(quizUseCase: QuizUseCase(questionsRepository: QuestionsRepository()), statsManager: StatsManager(), settingsManager: SettingsManager())
-    ResultView(viewModel: viewModel)
+    let result = QuizResult(totalQuestions: 20, correctAnswers: 18, percentage: 90, timeSpent: 120)
+    ResultView(
+        result: result,
+        newAchievements: [],
+        onPlayAgain: {},
+        onBackToStart: {},
+        onAchievementsCleared: {}
+    )
 }

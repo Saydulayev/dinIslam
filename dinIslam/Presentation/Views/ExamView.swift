@@ -9,122 +9,136 @@ import SwiftUI
 
 struct ExamView: View {
     @State private var viewModel: ExamViewModel
+    let onExit: () -> Void
     @Environment(\.dismiss) private var dismiss
     @State private var showingPauseAlert = false
     @State private var showingStopAlert = false
     @State private var showingResult = false
     
-    init(viewModel: ExamViewModel) {
-        self.viewModel = viewModel
+    init(viewModel: ExamViewModel, onExit: @escaping () -> Void) {
+        _viewModel = State(initialValue: viewModel)
+        self.onExit = onExit
     }
     
     var body: some View {
-        NavigationStack {
-            VStack(spacing: 0) {
-                // Header with timer and progress
-                ExamHeaderView(viewModel: viewModel)
-                
-                // Main content
-                ScrollView {
-                    VStack(spacing: 24) {
-                        // Question content
-                        ExamQuestionView(viewModel: viewModel)
-                        
-                        // Answer options
-                        ExamAnswersView(viewModel: viewModel)
-                        
-                        // Skip button (if available) - only skip button here
-                        if viewModel.canSkipQuestion {
-                            Button(action: {
-                                viewModel.skipQuestion()
-                            }) {
-                                HStack {
-                                    Image(systemName: "forward.fill")
-                                    Text("exam.skip".localized)
-                                }
-                                .font(.headline)
-                                .foregroundColor(.orange)
-                                .frame(maxWidth: .infinity)
-                                .frame(height: 50)
-                                .background(.orange.opacity(0.1), in: RoundedRectangle(cornerRadius: 12))
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 12)
-                                        .stroke(.orange.opacity(0.3), lineWidth: 1)
-                                )
-                            }
-                        }
-                    }
-                    .padding(.horizontal, 20)
-                    .padding(.top, 16)
-                    .padding(.bottom, 20)
-                }
-                
-                // Fixed finish button at the bottom (like in QuizView)
-                VStack(spacing: 0) {
-                    Divider()
-                        .background(.separator)
+        VStack(spacing: 0) {
+            // Header with timer and progress
+            ExamHeaderView(viewModel: viewModel)
+            
+            // Main content
+            ScrollView {
+                VStack(spacing: 24) {
+                    // Question content
+                    ExamQuestionView(viewModel: viewModel)
                     
-                    Button(action: {
-                        showingStopAlert = true
-                    }) {
-                        HStack {
-                            Image(systemName: "checkmark.circle.fill")
-                            Text("exam.finish".localized)
-                                .fontWeight(.semibold)
-                        }
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 52)
-                        .background(Color.green.gradient, in: RoundedRectangle(cornerRadius: 14))
-                        .padding(.horizontal)
-                        .padding(.vertical, 12)
-                    }
-                    .accessibilityLabel("Finish exam")
-                    .accessibilityHint("Double tap to finish the current exam")
-                    .background(.ultraThinMaterial)
-                }
-            }
-            .navigationTitle("exam.title".localized)
-            .navigationBarTitleDisplayMode(.inline)
-            .navigationBarBackButtonHidden(true)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(viewModel.state == .active(.paused) ? "exam.resume".localized : "exam.pause".localized) {
-                        if viewModel.state == .active(.paused) {
-                            viewModel.resumeExam()
-                        } else {
-                            showingPauseAlert = true
+                    // Answer options
+                    ExamAnswersView(viewModel: viewModel)
+                    
+                    // Skip button (if available) - only skip button here
+                    if viewModel.canSkipQuestion {
+                        Button(action: {
+                            viewModel.skipQuestion()
+                        }) {
+                            HStack {
+                                Image(systemName: "forward.fill")
+                                Text("exam.skip".localized)
+                            }
+                            .font(.headline)
+                            .foregroundColor(.orange)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 50)
+                            .background(.orange.opacity(0.1), in: RoundedRectangle(cornerRadius: 12))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(.orange.opacity(0.3), lineWidth: 1)
+                            )
                         }
                     }
-                    .foregroundColor(.blue)
                 }
+                .padding(.horizontal, 20)
+                .padding(.top, 16)
+                .padding(.bottom, 20)
             }
-            .navigationDestination(isPresented: $showingResult) {
-                if let result = viewModel.examResult {
-                    ExamResultView(result: result, viewModel: viewModel)
+            
+            // Fixed finish button at the bottom (like in QuizView)
+            VStack(spacing: 0) {
+                Divider()
+                    .background(.separator)
+                
+                Button(action: {
+                    showingStopAlert = true
+                }) {
+                    HStack {
+                        Image(systemName: "checkmark.circle.fill")
+                        Text("exam.finish".localized)
+                            .fontWeight(.semibold)
+                    }
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 52)
+                    .background(Color.green.gradient, in: RoundedRectangle(cornerRadius: 14))
+                    .padding(.horizontal)
+                    .padding(.vertical, 12)
                 }
+                .accessibilityLabel("Finish exam")
+                .accessibilityHint("Double tap to finish the current exam")
+                .background(.ultraThinMaterial)
             }
-            .alert("exam.pause.title".localized, isPresented: $showingPauseAlert) {
-                Button("exam.pause.cancel".localized, role: .cancel) { }
-                Button("exam.pause.confirm".localized) {
-                    viewModel.pauseExam()
+        }
+        .navigationTitle("exam.title".localized)
+        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(true)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button(viewModel.state == .active(.paused) ? "exam.resume".localized : "exam.pause".localized) {
+                    if viewModel.state == .active(.paused) {
+                        viewModel.resumeExam()
+                    } else {
+                        showingPauseAlert = true
+                    }
                 }
-            } message: {
-                Text("exam.pause.message".localized)
+                .foregroundColor(.blue)
             }
-            .alert("exam.finish.title".localized, isPresented: $showingStopAlert) {
-                Button("exam.finish.cancel".localized, role: .cancel) { }
-                Button("exam.finish.confirm".localized, role: .destructive) {
-                    viewModel.finishExam()
-                    showingResult = true
-                }
-            } message: {
-                Text("exam.finish.message".localized)
+        }
+        .navigationDestination(isPresented: $showingResult) {
+            if let result = viewModel.examResult {
+                ExamResultView(
+                    result: result,
+                    viewModel: viewModel,
+                    onRetake: {
+                        showingResult = false
+                        viewModel.restartExam()
+                    },
+                    onBackToMenu: {
+                        showingResult = false
+                        onExit()
+                    }
+                )
             }
-            .onChange(of: viewModel.state) { _, newState in
-                if case .completed = newState {
-                    showingResult = true
-                }
+        }
+        .alert("exam.pause.title".localized, isPresented: $showingPauseAlert) {
+            Button("exam.pause.cancel".localized, role: .cancel) { }
+            Button("exam.pause.confirm".localized) {
+                viewModel.pauseExam()
+            }
+        } message: {
+            Text("exam.pause.message".localized)
+        }
+        .alert("exam.finish.title".localized, isPresented: $showingStopAlert) {
+            Button("exam.finish.cancel".localized, role: .cancel) { }
+            Button("exam.finish.confirm".localized, role: .destructive) {
+                viewModel.finishExam()
+                showingResult = true
+            }
+        } message: {
+            Text("exam.finish.message".localized)
+        }
+        .onChange(of: viewModel.state) { _, newState in
+            switch newState {
+            case .completed:
+                showingResult = true
+            default:
+                break
             }
         }
     }
@@ -350,5 +364,5 @@ struct ExamAnswerButton: View {
         ),
         examStatisticsManager: ExamStatisticsManager(),
         settingsManager: SettingsManager()
-    ))
+    ), onExit: {})
 }

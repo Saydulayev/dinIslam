@@ -19,7 +19,7 @@ struct EnhancedQuizView: View {
     @Environment(\.layoutDirection) private var layoutDirection
     
     init(viewModel: QuizViewModel) {
-        self.viewModel = viewModel
+        _viewModel = State(initialValue: viewModel)
     }
     
     // MARK: - Computed Properties

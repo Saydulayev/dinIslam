@@ -39,7 +39,9 @@ class EnhancedDIContainer {
     }()
     
     lazy var achievementManager: AchievementManager = {
-        AchievementManager.shared
+        let manager = AchievementManager.shared
+        manager.configureDependencies(notificationManager: notificationManager)
+        return manager
     }()
     
     lazy var localizationManager: LocalizationManager = {

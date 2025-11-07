@@ -11,8 +11,22 @@ struct MistakesReviewNavigationView: View {
     @State private var viewModel: QuizViewModel
     @Environment(\.dismiss) private var dismiss
     
+    private var mistakesResultBinding: Binding<Bool> {
+        Binding(
+            get: {
+                if case .completed(.mistakesFinished) = viewModel.state { return true }
+                return false
+            },
+            set: { newValue in
+                if !newValue {
+                    viewModel.restartQuiz()
+                }
+            }
+        )
+    }
+    
     init(viewModel: QuizViewModel) {
-        self.viewModel = viewModel
+        _viewModel = State(initialValue: viewModel)
     }
     
     var body: some View {
@@ -29,15 +43,34 @@ struct MistakesReviewNavigationView: View {
                     
                 case .active(.mistakesReview):
                     MistakesReviewView(viewModel: viewModel)
-                        .navigationDestination(isPresented: .constant({
-                            if case .completed(.mistakesFinished) = viewModel.state { return true }
-                            return false
-                        }())) {
-                            MistakesResultView(viewModel: viewModel)
+                        .navigationDestination(isPresented: mistakesResultBinding) {
+                            if let result = viewModel.quizResult {
+                                MistakesResultView(
+                                    result: result,
+                                    onRepeat: {
+                                        viewModel.restartQuiz()
+                                    },
+                                    onBackToStart: {
+                                        viewModel.restartQuiz()
+                                        dismiss()
+                                    }
+                                )
+                            }
                         }
                     
                 case .completed(.mistakesFinished):
-                    MistakesResultView(viewModel: viewModel)
+                    if let result = viewModel.quizResult {
+                        MistakesResultView(
+                            result: result,
+                            onRepeat: {
+                                viewModel.restartQuiz()
+                            },
+                            onBackToStart: {
+                                viewModel.restartQuiz()
+                                dismiss()
+                            }
+                        )
+                    }
                     
                 case .idle:
                     // User stopped the mistakes review, go back
