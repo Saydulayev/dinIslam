@@ -34,6 +34,10 @@ final class StartViewModel {
     private let examStatisticsManager: ExamStatisticsManager
     private let enhancedContainer: EnhancedDIContainer
 
+    // MARK: - Configuration
+    private let particleVelocityRange: ClosedRange<Double> = -0.35...0.35
+    private let particleSpeedMultiplier: Double = 0.65
+
     // MARK: - UI State
     var navigationPath = NavigationPath()
     var showingSettings = false
@@ -184,8 +188,8 @@ final class StartViewModel {
                 y: Double.random(in: -80...80),
                 opacity: Double.random(in: 0.3...0.8),
                 size: Double.random(in: 2...6),
-                velocityX: Double.random(in: -0.5...0.5),
-                velocityY: Double.random(in: -0.5...0.5),
+                velocityX: Double.random(in: particleVelocityRange),
+                velocityY: Double.random(in: particleVelocityRange),
                 life: Double.random(in: 0.5...1.0)
             )
         }
@@ -211,8 +215,8 @@ final class StartViewModel {
         let frameFactor = min(delta * 60.0, 1.0)
 
         for index in particles.indices {
-            particles[index].x += particles[index].velocityX * frameFactor
-            particles[index].y += particles[index].velocityY * frameFactor
+            particles[index].x += particles[index].velocityX * frameFactor * particleSpeedMultiplier
+            particles[index].y += particles[index].velocityY * frameFactor * particleSpeedMultiplier
             particles[index].life -= 0.01 * frameFactor
             particles[index].opacity = max(0, particles[index].life * 0.8)
 
@@ -222,8 +226,8 @@ final class StartViewModel {
                     y: Double.random(in: -80...80),
                     opacity: Double.random(in: 0.3...0.8),
                     size: Double.random(in: 2...6),
-                    velocityX: Double.random(in: -0.5...0.5),
-                    velocityY: Double.random(in: -0.5...0.5),
+                    velocityX: Double.random(in: particleVelocityRange),
+                    velocityY: Double.random(in: particleVelocityRange),
                     life: Double.random(in: 0.5...1.0)
                 )
             }
