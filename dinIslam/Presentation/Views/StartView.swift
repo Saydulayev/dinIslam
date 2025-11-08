@@ -118,13 +118,14 @@ struct StartView: View {
                     VStack(spacing: 24) {
                         heroSection(model: model)
                             .frame(maxWidth: .infinity)
+                            .padding(.vertical, 32)
                         summarySection(model: model)
                             .padding(.horizontal)
                     }
-                    .padding(.vertical, 32)
-                    .padding(.bottom, 16)
+                    .padding(.bottom)
                     .frame(minHeight: proxy.size.height, alignment: .bottom)
                 }
+                .scrollDisabled(true)
                 .padding(.horizontal)
             }
             .navigationDestination(for: StartRoute.self) { route in
