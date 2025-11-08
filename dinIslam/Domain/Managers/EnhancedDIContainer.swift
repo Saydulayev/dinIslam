@@ -38,6 +38,10 @@ class EnhancedDIContainer {
         StatsManager()
     }()
     
+    lazy var examStatisticsManager: ExamStatisticsManaging = {
+        ExamStatisticsManager()
+    }()
+    
     lazy var achievementManager: AchievementManager = {
         let manager = AchievementManager.shared
         manager.configureDependencies(notificationManager: notificationManager)
@@ -67,6 +71,10 @@ class EnhancedDIContainer {
             questionsRepository: enhancedQuestionsRepository,
             networkManager: networkManager
         )
+    }()
+    
+    lazy var examUseCase: ExamUseCaseProtocol = {
+        ExamUseCase(questionsRepository: questionsRepository, examStatisticsManager: examStatisticsManager)
     }()
     
     // MARK: - Repositories

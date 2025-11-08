@@ -57,13 +57,18 @@ struct ExamAnswer: Codable, Equatable {
     }
 }
 
+// MARK: - Supporting Protocols
+protocol ExamStatisticsManaging {
+    func updateStatistics(with result: ExamResult)
+}
+
 // MARK: - Exam Use Case Implementation
 @MainActor
 class ExamUseCase: ExamUseCaseProtocol {
     private let questionsRepository: QuestionsRepositoryProtocol
-    private let examStatisticsManager: ExamStatisticsManager
+    private let examStatisticsManager: ExamStatisticsManaging
     
-    init(questionsRepository: QuestionsRepositoryProtocol, examStatisticsManager: ExamStatisticsManager) {
+    init(questionsRepository: QuestionsRepositoryProtocol, examStatisticsManager: ExamStatisticsManaging) {
         self.questionsRepository = questionsRepository
         self.examStatisticsManager = examStatisticsManager
     }
@@ -169,7 +174,7 @@ class ExamUseCase: ExamUseCaseProtocol {
 // MARK: - Exam Statistics Manager
 @MainActor
 @Observable
-class ExamStatisticsManager {
+class ExamStatisticsManager: ExamStatisticsManaging {
     var statistics: ExamStatistics
     private let userDefaults = UserDefaults.standard
     private let statisticsKey = "ExamStatistics"

@@ -65,16 +65,17 @@ class EnhancedQuestionsRepository: EnhancedQuestionsRepositoryProtocol {
     }
     
     func preloadQuestions(for languages: [String]) async {
-        print("🚀 Preloading questions for languages: \(languages)")
+        let uniqueLanguages = Array(Set(languages))
+        guard !uniqueLanguages.isEmpty else {
+            return
+        }
         
-        await withTaskGroup(of: Void.self) { group in
-            for language in languages {
-                group.addTask {
-                    let appLanguage: AppLanguage = language == "en" ? .english : .russian
-                    _ = await self.remoteService.fetchQuestions(for: appLanguage)
-                    print("✅ Preloaded questions for \(language)")
-                }
-            }
+        print("🚀 Preloading questions for languages: \(uniqueLanguages)")
+        
+        for language in uniqueLanguages {
+            let appLanguage: AppLanguage = language == "en" ? .english : .russian
+            _ = await remoteService.fetchQuestions(for: appLanguage, manageLoadingState: false)
+            print("✅ Preloaded questions for \(language)")
         }
     }
     

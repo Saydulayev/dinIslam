@@ -8,6 +8,10 @@
 import SwiftUI
 import UserNotifications
 
+private var isRunningUnderTests: Bool {
+    ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
+}
+
 // MARK: - Particle Structure
 struct Particle: Identifiable {
     let id = UUID()
@@ -81,7 +85,16 @@ struct StartView: View {
         _viewModel = State(initialValue: QuizViewModel(quizUseCase: quizUseCase, statsManager: statsManager, settingsManager: settingsManager))
     }
     
+    @ViewBuilder
     var body: some View {
+        if isRunningUnderTests {
+            EmptyView()
+        } else {
+            liveContent
+        }
+    }
+    
+    private var liveContent: some View {
         NavigationStack(path: $navigationPath) {
             VStack(spacing: 0) {
                 heroSection
@@ -188,10 +201,12 @@ struct StartView: View {
                 cachedLanguageCode = currentLanguageCode
                 
                 // Предзагрузка вопросов для улучшения UX
-                Task {
-                    await EnhancedDIContainer.shared.enhancedQuizUseCase.preloadQuestions(
-                        for: ["ru", "en"]
-                    )
+                if !isRunningUnderTests {
+                    Task {
+                        await EnhancedDIContainer.shared.enhancedQuizUseCase.preloadQuestions(
+                            for: ["ru", "en"]
+                        )
+                    }
                 }
                 
                 // Анимация свечения логотипа (только если еще не запущена)
@@ -203,13 +218,15 @@ struct StartView: View {
                 }
                 
                 // Создание частиц (только если их еще нет)
-                if particles.isEmpty {
-                    createParticles()
-                }
-                
-                // Анимация частиц (только если задача не запущена)
-                if particleTask == nil {
-                    startParticleAnimation()
+                if !isRunningUnderTests {
+                    if particles.isEmpty {
+                        createParticles()
+                    }
+                    
+                    // Анимация частиц (только если задача не запущена)
+                    if particleTask == nil {
+                        startParticleAnimation()
+                    }
                 }
             }
         }

@@ -26,7 +26,9 @@ struct dinIslamApp: App {
     
     init() {
         // Настройка улучшенной сетевой архитектуры
-        configureEnhancedNetworking()
+        if ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] == nil {
+            configureEnhancedNetworking()
+        }
     }
     
     private func configureEnhancedNetworking() {

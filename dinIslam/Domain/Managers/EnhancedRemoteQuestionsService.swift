@@ -157,14 +157,21 @@ class EnhancedRemoteQuestionsService: ObservableObject {
     
     // MARK: - Public Methods
     
-    func fetchQuestions(for language: AppLanguage) async -> [Question] {
-        await MainActor.run {
-            isLoading = true
+    func fetchQuestions(
+        for language: AppLanguage,
+        manageLoadingState: Bool = true
+    ) async -> [Question] {
+        if manageLoadingState {
+            await MainActor.run {
+                isLoading = true
+            }
         }
         
         defer {
-            Task { @MainActor in
-                isLoading = false
+            if manageLoadingState {
+                Task { @MainActor in
+                    isLoading = false
+                }
             }
         }
         

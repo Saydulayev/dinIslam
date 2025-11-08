@@ -32,11 +32,11 @@
       <Testables>
          <TestableReference
             skipped = "NO"
-            parallelizable = "YES">
+            parallelizable = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "C282B4EE2EB9088D00024B17"
-               BuildableName = "dinIslamTests.xctest"
+               BuildableName = "dinIslamTests"
                BlueprintName = "dinIslamTests"
                ReferencedContainer = "container:dinIslam.xcodeproj">
             </BuildableReference>
