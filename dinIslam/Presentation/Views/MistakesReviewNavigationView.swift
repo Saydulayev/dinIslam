@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct MistakesReviewNavigationView: View {
-    @State private var viewModel: QuizViewModel
+    @Bindable var viewModel: QuizViewModel
     @Environment(\.dismiss) private var dismiss
     
     private var mistakesResultBinding: Binding<Bool> {
@@ -26,7 +26,7 @@ struct MistakesReviewNavigationView: View {
     }
     
     init(viewModel: QuizViewModel) {
-        _viewModel = State(initialValue: viewModel)
+        _viewModel = Bindable(viewModel)
     }
     
     var body: some View {

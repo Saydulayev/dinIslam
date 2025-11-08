@@ -12,10 +12,19 @@ private struct StatsManagerKey: EnvironmentKey {
     static let defaultValue = StatsManager()
 }
 
+private struct SettingsManagerKey: EnvironmentKey {
+    static let defaultValue = SettingsManager()
+}
+
 extension EnvironmentValues {
     var statsManager: StatsManager {
         get { self[StatsManagerKey.self] }
         set { self[StatsManagerKey.self] = newValue }
+    }
+
+    var settingsManager: SettingsManager {
+        get { self[SettingsManagerKey.self] }
+        set { self[SettingsManagerKey.self] = newValue }
     }
 }
 
@@ -52,9 +61,11 @@ struct dinIslamApp: App {
             StartView(
                 quizUseCase: container.quizUseCase,
                 statsManager: container.statsManager,
-                settingsManager: container.settingsManager
+                settingsManager: container.settingsManager,
+                examUseCase: container.examUseCase,
+                examStatisticsManager: container.examStatisticsManager
             )
-            .environmentObject(container.settingsManager)
+            .environment(\.settingsManager, container.settingsManager)
             .environmentObject(container.achievementManager)
             .environmentObject(container.remoteQuestionsService)
             .environmentObject(container.notificationManager)

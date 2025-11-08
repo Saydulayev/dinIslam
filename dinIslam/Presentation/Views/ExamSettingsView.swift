@@ -17,7 +17,7 @@ struct ExamSettingsView: View {
     @State private var isCustomMode: Bool = false
     
     @Environment(\.dismiss) private var dismiss
-    @EnvironmentObject private var settingsManager: SettingsManager
+    @Environment(\.settingsManager) private var settingsManager
     
     let onStartExam: (ExamConfiguration) -> Void
     
@@ -402,5 +402,5 @@ struct ExamPreviewCard: View {
 
 #Preview {
     ExamSettingsView { _ in }
-        .environmentObject(SettingsManager())
+        .environment(\.settingsManager, SettingsManager())
 }

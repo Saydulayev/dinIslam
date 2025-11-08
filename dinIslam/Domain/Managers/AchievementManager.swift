@@ -23,25 +23,13 @@ class AchievementManager: ObservableObject {
         self.notificationManager = notificationManager
         loadAchievements()
         initializeDefaultAchievements()
-        
-        // Listen for language changes
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(languageChanged),
-            name: .languageChanged,
-            object: nil
-        )
     }
     
     func configureDependencies(notificationManager: NotificationManager) {
         self.notificationManager = notificationManager
     }
-
-    deinit {
-        NotificationCenter.default.removeObserver(self)
-    }
     
-    @objc private func languageChanged() {
+    func refreshLocalization() {
         // Update achievement titles and descriptions when language changes
         for i in 0..<achievements.count {
             achievements[i] = Achievement(

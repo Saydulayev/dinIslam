@@ -9,7 +9,7 @@ import SwiftUI
 import UserNotifications
 
 struct EnhancedQuizView: View {
-    @State private var viewModel: QuizViewModel
+    @Bindable var viewModel: QuizViewModel
     @State private var showingStopConfirm: Bool = false
     
     // Accessibility and UX enhancements
@@ -19,7 +19,7 @@ struct EnhancedQuizView: View {
     @Environment(\.layoutDirection) private var layoutDirection
     
     init(viewModel: QuizViewModel) {
-        _viewModel = State(initialValue: viewModel)
+        _viewModel = Bindable(viewModel)
     }
     
     // MARK: - Computed Properties

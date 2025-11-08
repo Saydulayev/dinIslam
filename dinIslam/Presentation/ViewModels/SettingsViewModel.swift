@@ -54,6 +54,7 @@ class SettingsViewModel {
         LocalizationManager.shared.setLanguage(languageCode)
         refreshTrigger = UUID()
         hapticManager.selectionChanged()
+        AchievementManager.shared.refreshLocalization()
     }
     
     // MARK: - Sound Settings
@@ -134,6 +135,6 @@ class SettingsViewModel {
         settingsManager.updateSoundEnabled(defaultSettings.soundEnabled)
         settingsManager.updateHapticEnabled(defaultSettings.hapticEnabled)
         settingsManager.updateNotificationsEnabled(defaultSettings.notificationsEnabled)
-
+        AchievementManager.shared.refreshLocalization()
     }
 }

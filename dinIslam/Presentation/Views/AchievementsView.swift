@@ -10,7 +10,7 @@ import SwiftUI
 struct AchievementsView: View {
     @EnvironmentObject private var achievementManager: AchievementManager
     @Environment(\.dismiss) private var dismiss
-    @EnvironmentObject private var settingsManager: SettingsManager
+    @Environment(\.settingsManager) private var settingsManager
     @Environment(\.statsManager) private var statsManager: StatsManager
     @State private var showingResetAlert = false
     @State private var selectedAchievement: Achievement?
@@ -82,7 +82,7 @@ struct AchievementCard: View {
     let achievement: Achievement
     let onTap: () -> Void
     @ObservedObject private var localizationManager = LocalizationManager.shared
-    @EnvironmentObject private var settingsManager: SettingsManager
+    @Environment(\.settingsManager) private var settingsManager
     @EnvironmentObject private var achievementManager: AchievementManager
     @Environment(\.statsManager) private var statsManager: StatsManager
     
@@ -435,6 +435,6 @@ struct ShareableAchievementCardView: View {
     NavigationStack {
         AchievementsView()
             .environmentObject(AchievementManager.shared)
-            .environmentObject(SettingsManager())
+            .environment(\.settingsManager, SettingsManager())
     }
 }

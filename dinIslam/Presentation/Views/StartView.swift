@@ -6,27 +6,18 @@
 //
 
 import SwiftUI
-import UserNotifications
+import Observation
 
 private var isRunningUnderTests: Bool {
     ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
 }
 
-// MARK: - Particle Structure
-struct Particle: Identifiable {
-    let id = UUID()
-    var x: Double
-    var y: Double
-    var opacity: Double
-    var size: Double
-    var velocityX: Double
-    var velocityY: Double
-    var life: Double
-}
-
 enum StartRoute: Hashable {
     case quiz
     case result(ResultSnapshot)
+    case stats
+    case achievements
+    case exam
     
     struct ResultSnapshot: Hashable {
         let totalQuestions: Int
@@ -53,212 +44,191 @@ enum StartRoute: Hashable {
 }
 
 struct StartView: View {
-    @State private var viewModel: QuizViewModel
-    @EnvironmentObject private var settingsManager: SettingsManager
-    @Environment(\.statsManager) private var statsManager: StatsManager
     @Environment(\.colorScheme) private var colorScheme
-    @State private var showingSettings = false
-    @State private var showingStats = false
-    @State private var showingAchievements = false
-    @State private var showingExamSettings = false
-    @State private var showingExam = false
-    @State private var examViewModel: ExamViewModel?
-    @State private var logoGlowIntensity: Double = 0.5
-    @State private var particles: [Particle] = []
-    @State private var isGlowAnimationStarted: Bool = false
-    @State private var navigationPath = NavigationPath()
+    @State private var model: StartViewModel
     
-    // Кэшированный код языка для избежания синхронных операций
-    @State private var cachedLanguageCode: String = "ru"
-    
-    // Task cancellation
-    @State private var startQuizTask: Task<Void, Never>?
-    
-    // Particle animation timer
-    @State private var particleTask: Task<Void, Never>?
-    
-    init(viewModel: QuizViewModel) {
-        _viewModel = State(initialValue: viewModel)
+    init(model: StartViewModel) {
+        _model = State(initialValue: model)
     }
     
-    init(quizUseCase: QuizUseCaseProtocol, statsManager: StatsManager, settingsManager: SettingsManager) {
-        _viewModel = State(initialValue: QuizViewModel(quizUseCase: quizUseCase, statsManager: statsManager, settingsManager: settingsManager))
+    init(
+        quizUseCase: QuizUseCaseProtocol,
+        statsManager: StatsManager,
+        settingsManager: SettingsManager,
+        examUseCase: ExamUseCaseProtocol,
+        examStatisticsManager: ExamStatisticsManager,
+        enhancedContainer: EnhancedDIContainer
+    ) {
+        let quizViewModel = QuizViewModel(
+            quizUseCase: quizUseCase,
+            statsManager: statsManager,
+            settingsManager: settingsManager
+        )
+        _model = State(
+            initialValue: StartViewModel(
+                quizViewModel: quizViewModel,
+                statsManager: statsManager,
+                settingsManager: settingsManager,
+                examUseCase: examUseCase,
+                examStatisticsManager: examStatisticsManager,
+                enhancedContainer: enhancedContainer
+            )
+        )
     }
     
-    @ViewBuilder
+    init(
+        quizUseCase: QuizUseCaseProtocol,
+        statsManager: StatsManager,
+        settingsManager: SettingsManager,
+        examUseCase: ExamUseCaseProtocol,
+        examStatisticsManager: ExamStatisticsManager
+    ) {
+        let quizViewModel = QuizViewModel(
+            quizUseCase: quizUseCase,
+            statsManager: statsManager,
+            settingsManager: settingsManager
+        )
+        _model = State(
+            initialValue: StartViewModel(
+                quizViewModel: quizViewModel,
+                statsManager: statsManager,
+                settingsManager: settingsManager,
+                examUseCase: examUseCase,
+                examStatisticsManager: examStatisticsManager,
+                enhancedContainer: EnhancedDIContainer.shared
+            )
+        )
+    }
+    
     var body: some View {
-        if isRunningUnderTests {
-            EmptyView()
-        } else {
-            liveContent
+        Group {
+            if isRunningUnderTests {
+                EmptyView()
+            } else {
+                navigationContent(bindingModel: $model)
+            }
         }
     }
-    
-    private var liveContent: some View {
-        NavigationStack(path: $navigationPath) {
-            VStack(spacing: 0) {
-                heroSection
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                summarySection
-                    .padding(.horizontal)
+
+    private func navigationContent(bindingModel: Binding<StartViewModel>) -> some View {
+        let model = bindingModel.wrappedValue
+        return NavigationStack(path: bindingModel.navigationPath) {
+            GeometryReader { proxy in
+                ScrollView {
+                    VStack(spacing: 24) {
+                        heroSection(model: model)
+                            .frame(maxWidth: .infinity)
+                        summarySection(model: model)
+                            .padding(.horizontal)
+                    }
+                    .padding(.vertical, 32)
+                    .padding(.bottom, 16)
+                    .frame(minHeight: proxy.size.height, alignment: .bottom)
+                }
+                .padding(.horizontal)
             }
-            .padding()
             .navigationDestination(for: StartRoute.self) { route in
+                @Bindable var quizViewModel = model.quizViewModel
                 switch route {
                 case .quiz:
-                    QuizView(viewModel: viewModel)
+                    QuizView(viewModel: quizViewModel)
                 case .result(let snapshot):
                     ResultView(
                         result: snapshot.makeQuizResult(),
-                        newAchievements: viewModel.newAchievements,
+                        newAchievements: quizViewModel.newAchievements,
                         onPlayAgain: {
-                            navigationPath = NavigationPath()
-                            viewModel.restartQuiz()
-                            startQuiz()
+                            model.resetQuiz()
+                            model.startQuiz()
                         },
                         onBackToStart: {
-                            navigationPath = NavigationPath()
-                            viewModel.restartQuiz()
+                            model.resetQuiz()
                         },
                         onAchievementsCleared: {
-                            viewModel.clearNewAchievements()
+                            model.clearNewAchievements()
                         }
                     )
+                case .stats:
+                    StatsView(statsManager: model.statsManager)
+                case .achievements:
+                    AchievementsView()
+                case .exam:
+                    if let examViewModel = model.examViewModel {
+                        ExamView(viewModel: examViewModel) {
+                            model.finishExamSession()
+                        }
+                    }
                 }
             }
-            .sheet(isPresented: $showingSettings) {
+            .sheet(isPresented: bindingModel.showingSettings) {
                 NavigationStack {
-                    SettingsView(viewModel: SettingsViewModel(settingsManager: settingsManager))
+                    SettingsView(viewModel: SettingsViewModel(settingsManager: model.settingsManager))
                 }
                 .presentationDetents([.large])
                 .presentationDragIndicator(.visible)
             }
-            .sheet(isPresented: $showingExamSettings) {
+            .sheet(isPresented: bindingModel.showingExamSettings) {
                 ExamSettingsView { configuration in
-                    startExam(with: configuration)
+                    model.startExam(with: configuration)
                 }
-                .environmentObject(settingsManager)
-            }
-            .navigationDestination(isPresented: $showingExam) {
-                if let examViewModel = examViewModel {
-                    ExamView(viewModel: examViewModel) {
-                        showingExam = false
-                        examViewModel.restartExam()
-                        self.examViewModel = nil
-                    }
-                }
-            }
-            .navigationDestination(isPresented: $showingStats) {
-                StatsView(statsManager: statsManager)
-            }
-            .navigationDestination(isPresented: $showingAchievements) {
-                AchievementsView()
+                .environment(\.settingsManager, model.settingsManager)
             }
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button(action: {
-                        showingStats = true
+                        model.showStats()
                     }) {
                         Image(systemName: "chart.bar.fill")
                             .foregroundColor(.blue)
                     }
                 }
-                
+
                 ToolbarItem(placement: .topBarLeading) {
                     Button(action: {
-                        showingAchievements = true
+                        model.showAchievements()
                     }) {
                         Image(systemName: "trophy.fill")
                             .foregroundColor(.orange)
                     }
                 }
-                
+
                 ToolbarItem(placement: .topBarTrailing) {
                     Button(action: {
-                        showingSettings = true
+                        model.showingSettings = true
                     }) {
                         Image(systemName: "gearshape.fill")
                             .foregroundColor(.blue)
                     }
                 }
             }
-            .alert("error.title".localized,
-                   isPresented: .constant(viewModel.errorMessage != nil)) {
+            .alert(
+                "error.title".localized,
+                isPresented: Binding(
+                    get: { model.quizViewModel.errorMessage != nil },
+                    set: { newValue in
+                        if !newValue {
+                            model.quizViewModel.errorMessage = nil
+                        }
+                    }
+                )
+            ) {
                 Button("error.ok".localized) {
-                    viewModel.errorMessage = nil
+                    model.quizViewModel.errorMessage = nil
                 }
             } message: {
-                Text(viewModel.errorMessage ?? "")
+                Text(model.quizViewModel.errorMessage ?? "")
             }
             .onAppear {
-                // Clear app badge when app is opened
-                if #available(iOS 17.0, *) {
-                    UNUserNotificationCenter.current().setBadgeCount(0, withCompletionHandler: { _ in })
-                } else {
-                    UIApplication.shared.applicationIconBadgeNumber = 0
-                }
-                
-                cachedLanguageCode = currentLanguageCode
-                
-                // Предзагрузка вопросов для улучшения UX
-                if !isRunningUnderTests {
-                    Task {
-                        await EnhancedDIContainer.shared.enhancedQuizUseCase.preloadQuestions(
-                            for: ["ru", "en"]
-                        )
-                    }
-                }
-                
-                // Анимация свечения логотипа (только если еще не запущена)
-                if !isGlowAnimationStarted {
-                    withAnimation(.easeInOut(duration: 2.0).repeatForever(autoreverses: true)) {
-                        logoGlowIntensity = 1.0
-                    }
-                    isGlowAnimationStarted = true
-                }
-                
-                // Создание частиц (только если их еще нет)
-                if !isRunningUnderTests {
-                    if particles.isEmpty {
-                        createParticles()
-                    }
-                    
-                    // Анимация частиц (только если задача не запущена)
-                    if particleTask == nil {
-                        startParticleAnimation()
-                    }
-                }
+                model.onAppear(isRunningUnderTests: isRunningUnderTests)
             }
         }
         .onDisappear {
-            // Cancel pending tasks when view disappears
-            startQuizTask?.cancel()
-            
-            // Останавливаем задачу обновления частиц
-            particleTask?.cancel()
-            particleTask = nil
+            model.onDisappear()
         }
-        .onChange(of: settingsManager.settings.language) { _, _ in
-            cachedLanguageCode = currentLanguageCode
+        .onChange(of: model.settingsManager.settings.language) { _, _ in
+            model.onLanguageChange()
         }
-        .onChange(of: viewModel.state) { _, newValue in
-            handleStateChange(newValue)
-        }
-    }
-    
-    private func startExam(with configuration: ExamConfiguration) {
-        let container = DIContainer.shared
-        let examViewModel = ExamViewModel(
-            examUseCase: container.examUseCase,
-            examStatisticsManager: container.examStatisticsManager,
-            settingsManager: settingsManager
-        )
-        
-        self.examViewModel = examViewModel
-        showingExam = true
-        
-        Task {
-            await examViewModel.startExam(configuration: configuration, language: cachedLanguageCode)
+        .onChange(of: model.quizViewModel.state) { _, newValue in
+            model.onQuizStateChange(newValue)
         }
     }
     
@@ -274,18 +244,14 @@ struct StartView: View {
         }
     }
     
-    private var currentLanguageCode: String {
-        settingsManager.settings.language.locale?.language.languageCode?.identifier ?? "ru"
-    }
-    
     // MARK: - View Sections
-    private var heroSection: some View {
+    private func heroSection(model: StartViewModel) -> some View {
         VStack(spacing: 16) {
             ZStack {
                 Circle()
                     .fill(
                         RadialGradient(
-                            colors: [.blue.opacity(0.2 * logoGlowIntensity), .purple.opacity(0.1 * logoGlowIntensity), .clear],
+                            colors: [.blue.opacity(0.2 * model.logoGlowIntensity), .purple.opacity(0.1 * model.logoGlowIntensity), .clear],
                             center: .center,
                             startRadius: 30,
                             endRadius: 80
@@ -299,15 +265,11 @@ struct StartView: View {
                     .aspectRatio(contentMode: .fit)
                     .frame(width: 120, height: 120)
                     .clipShape(Circle())
-                    .shadow(color: .blue.opacity(0.4 * logoGlowIntensity), radius: 20, x: 0, y: 10)
-                    .shadow(color: .purple.opacity(0.3 * logoGlowIntensity), radius: 30, x: 0, y: 0)
+                    .shadow(color: .blue.opacity(0.4 * model.logoGlowIntensity), radius: 20, x: 0, y: 10)
+                    .shadow(color: .purple.opacity(0.3 * model.logoGlowIntensity), radius: 30, x: 0, y: 0)
                 
-                ForEach(particles) { particle in
-                    Circle()
-                        .fill(.yellow.opacity(particle.opacity))
-                        .frame(width: particle.size, height: particle.size)
-                        .offset(x: particle.x, y: particle.y)
-                        .blur(radius: 1)
+                TimelineView(.animation) { timeline in
+                    ParticleFieldView(particles: model.particlesSnapshot(for: timeline.date))
                 }
             }
             
@@ -326,12 +288,12 @@ struct StartView: View {
         }
     }
     
-    private var summarySection: some View {
+    private func summarySection(model: StartViewModel) -> some View {
         VStack(spacing: 0) {
-            statsCard
+            statsCard(model: model)
             Divider()
                 .background(adaptiveBorderColor)
-            actionsSection
+            actionsSection(model: model)
         }
         .padding()
         .background(.regularMaterial.opacity(0.3), in: RoundedRectangle(cornerRadius: 16))
@@ -341,20 +303,20 @@ struct StartView: View {
         )
     }
     
-    private var statsCard: some View {
+    private func statsCard(model: StartViewModel) -> some View {
         Group {
-            if statsManager.hasRecentGames() {
+            if model.statsManager.hasRecentGames() {
                 VStack(spacing: 8) {
                     LocalizedText("start.averageScore")
                         .font(.headline)
                         .foregroundStyle(.secondary)
                     
-                    Text("\(Int(statsManager.getAverageRecentScore()))%")
+                    Text("\(Int(model.statsManager.getAverageRecentScore()))%")
                         .font(.title)
                         .fontWeight(.bold)
                         .foregroundStyle(.blue)
                     
-                    Text("start.basedOnGames".localized(count: statsManager.getRecentGamesCount(), arguments: statsManager.getRecentGamesCount()))
+                    Text("start.basedOnGames".localized(count: model.statsManager.getRecentGamesCount(), arguments: model.statsManager.getRecentGamesCount()))
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -377,18 +339,20 @@ struct StartView: View {
         }
     }
     
-    private var actionsSection: some View {
+    private func actionsSection(model: StartViewModel) -> some View {
         VStack(spacing: 12) {
-            quizButton
-            examButton
+            quizButton(model: model)
+            examButton(model: model)
         }
         .padding(.vertical, 12)
     }
     
-    private var quizButton: some View {
-        Button(action: startQuiz) {
+    private func quizButton(model: StartViewModel) -> some View {
+        Button(action: {
+            model.startQuiz()
+        }) {
             HStack(spacing: 12) {
-                if viewModel.isLoading {
+                if model.quizViewModel.isLoading {
                     ProgressView()
                         .progressViewStyle(CircularProgressViewStyle(tint: .blue))
                         .scaleEffect(0.8)
@@ -398,7 +362,7 @@ struct StartView: View {
                         .font(.title2)
                 }
                 
-                LocalizedText(viewModel.isLoading ? "start.loading" : "start.begin")
+                LocalizedText(model.quizViewModel.isLoading ? "start.loading" : "start.begin")
                     .font(.headline)
                     .fontWeight(.semibold)
                     .foregroundStyle(.primary)
@@ -410,13 +374,13 @@ struct StartView: View {
             .background(Color.blue.opacity(0.1), in: RoundedRectangle(cornerRadius: 12))
         }
         .buttonStyle(.plain)
-        .disabled(viewModel.isLoading)
+        .disabled(model.quizViewModel.isLoading)
     }
     
-    private var examButton: some View {
-        Button(action: {
-            showingExamSettings = true
-        }) {
+    private func examButton(model: StartViewModel) -> some View {
+        Button {
+            model.showingExamSettings = true
+        } label: {
             HStack(spacing: 12) {
                 Image(systemName: "timer")
                     .foregroundColor(.orange)
@@ -435,84 +399,39 @@ struct StartView: View {
         }
         .buttonStyle(.plain)
     }
-    
-    private func startQuiz() {
-        navigationPath = NavigationPath()
-        startQuizTask?.cancel()
-        navigationPath.append(StartRoute.quiz)
-        startQuizTask = Task {
-            await viewModel.startQuiz(language: cachedLanguageCode)
-        }
-    }
-    
-    private func handleStateChange(_ state: QuizState) {
-        switch state {
-        case .completed(.finished), .completed(.mistakesFinished):
-            guard let quizResult = viewModel.quizResult else { return }
-            let snapshot = StartRoute.ResultSnapshot(from: quizResult)
-            navigationPath.append(StartRoute.result(snapshot))
-        default:
-            break
-        }
-    }
-    
-    // MARK: - Particle Functions
-    private func createParticles() {
-        particles = (0..<12).map { _ in
-            Particle(
-                x: Double.random(in: -80...80),
-                y: Double.random(in: -80...80),
-                opacity: Double.random(in: 0.3...0.8),
-                size: Double.random(in: 2...6),
-                velocityX: Double.random(in: -0.5...0.5),
-                velocityY: Double.random(in: -0.5...0.5),
-                life: Double.random(in: 0.5...1.0)
-            )
-        }
-    }
-    
-    private func startParticleAnimation() {
-        particleTask?.cancel()
-        particleTask = Task {
-            // Используем частоту ~60 FPS
-            let interval = UInt64(16_000_000) // 16 мс
-            while !Task.isCancelled {
-                await MainActor.run {
-                    updateParticles()
-                }
-                try? await Task.sleep(nanoseconds: interval)
-            }
-        }
-    }
-    
-    private func updateParticles() {
-        for i in particles.indices {
-            particles[i].x += particles[i].velocityX
-            particles[i].y += particles[i].velocityY
-            particles[i].life -= 0.01
-            particles[i].opacity = particles[i].life * 0.8
-            
-            // Если частица угасла, создаем новую
-            if particles[i].life <= 0 {
-                particles[i] = Particle(
-                    x: Double.random(in: -80...80),
-                    y: Double.random(in: -80...80),
-                    opacity: Double.random(in: 0.3...0.8),
-                    size: Double.random(in: 2...6),
-                    velocityX: Double.random(in: -0.5...0.5),
-                    velocityY: Double.random(in: -0.5...0.5),
-                    life: Double.random(in: 0.5...1.0)
-                )
+}
+
+private struct ParticleFieldView: View {
+    let particles: [StartViewModel.Particle]
+
+    var body: some View {
+        ZStack {
+            ForEach(particles) { particle in
+                Circle()
+                    .fill(.yellow.opacity(particle.opacity))
+                    .frame(width: particle.size, height: particle.size)
+                    .offset(x: particle.x, y: particle.y)
+                    .blur(radius: 1)
             }
         }
     }
 }
 
 #Preview {
-    StartView(
-        quizUseCase: QuizUseCase(questionsRepository: QuestionsRepository()),
-        statsManager: StatsManager(),
-        settingsManager: SettingsManager()
+    let statsManager = StatsManager()
+    let settingsManager = SettingsManager()
+    let examStatsManager = ExamStatisticsManager()
+    let quizUseCase = QuizUseCase(questionsRepository: QuestionsRepository())
+    let examUseCase = ExamUseCase(questionsRepository: QuestionsRepository(), examStatisticsManager: examStatsManager)
+
+    return StartView(
+        quizUseCase: quizUseCase,
+        statsManager: statsManager,
+        settingsManager: settingsManager,
+        examUseCase: examUseCase,
+        examStatisticsManager: examStatsManager
     )
-    .environmentObject(SettingsManager())
+    .environment(\.settingsManager, settingsManager)
+    .environment(\.statsManager, statsManager)
 }
+

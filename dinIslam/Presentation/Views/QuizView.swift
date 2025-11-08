@@ -9,12 +9,12 @@ import SwiftUI
 import UserNotifications
 
 struct QuizView: View {
-    @State private var viewModel: QuizViewModel
+    @Bindable var viewModel: QuizViewModel
     @State private var showingStopConfirm: Bool = false
     @State private var showingFinishConfirm: Bool = false
     
     init(viewModel: QuizViewModel) {
-        _viewModel = State(initialValue: viewModel)
+        _viewModel = Bindable(viewModel)
     }
     
     // MARK: - Computed Properties

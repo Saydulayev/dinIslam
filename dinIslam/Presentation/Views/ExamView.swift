@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ExamView: View {
-    @State private var viewModel: ExamViewModel
+    @Bindable var viewModel: ExamViewModel
     let onExit: () -> Void
     @Environment(\.dismiss) private var dismiss
     @State private var showingPauseAlert = false
@@ -16,7 +16,7 @@ struct ExamView: View {
     @State private var showingResult = false
     
     init(viewModel: ExamViewModel, onExit: @escaping () -> Void) {
-        _viewModel = State(initialValue: viewModel)
+        _viewModel = Bindable(viewModel)
         self.onExit = onExit
     }
     

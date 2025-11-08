@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct EnhancedStatsView: View {
-    @State private var statsManager: StatsManager
-    @EnvironmentObject private var settingsManager: SettingsManager
+    @Bindable var statsManager: StatsManager
+    @Environment(\.settingsManager) private var settingsManager
     @EnvironmentObject private var remoteService: RemoteQuestionsService
     @Environment(\.dismiss) private var dismiss
     @State private var mistakesViewModel: QuizViewModel?
@@ -28,7 +28,7 @@ struct EnhancedStatsView: View {
     @State private var loadQuestionsTask: Task<Void, Never>?
     
     init(statsManager: StatsManager) {
-        self._statsManager = State(initialValue: statsManager)
+        self._statsManager = Bindable(statsManager)
     }
     
     var body: some View {
@@ -416,6 +416,6 @@ struct EnhancedStatCard: View {
 
 #Preview {
     EnhancedStatsView(statsManager: StatsManager())
-        .environmentObject(SettingsManager())
+        .environment(\.settingsManager, SettingsManager())
         .environmentObject(RemoteQuestionsService())
 }
