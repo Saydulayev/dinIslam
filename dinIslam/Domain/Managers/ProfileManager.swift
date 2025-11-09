@@ -172,7 +172,7 @@ final class ProfileManager {
             email: credential.email ?? profile.email,
             localeIdentifier: Locale.current.identifier,
             avatarURL: profile.avatarURL,
-            progress: profile.progress,
+            progress: ProfileProgress(),
             preferences: profile.preferences,
             metadata: UserProfile.Metadata(
                 createdAt: profile.metadata.createdAt,
@@ -183,12 +183,19 @@ final class ProfileManager {
         )
 
         do {
+            var hasRemoteProfile = false
             if let remoteProfile = try await cloudService.fetchProfile(for: userId) {
                 signedInProfile = mergeProfile(local: signedInProfile, remote: remoteProfile, strategy: .newest)
+                hasRemoteProfile = true
             }
 
             profile = signedInProfile
-            rebuildProgressFromLocalStats()
+            
+            if !hasRemoteProfile {
+                statsManager.resetStats()
+                examStatisticsManager.resetStatistics()
+            }
+            
             localStore.saveProfile(profile)
             await performSync()
             errorMessage = nil
