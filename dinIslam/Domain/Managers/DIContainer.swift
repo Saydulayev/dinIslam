@@ -23,6 +23,18 @@ class DIContainer {
     lazy var examStatisticsManager: ExamStatisticsManager = {
         ExamStatisticsManager()
     }()
+
+    lazy var adaptiveLearningEngine: AdaptiveLearningEngine = {
+        AdaptiveLearningEngine()
+    }()
+
+    lazy var profileManager: ProfileManager = {
+        ProfileManager(
+            adaptiveEngine: adaptiveLearningEngine,
+            statsManager: statsManager,
+            examStatisticsManager: examStatisticsManager
+        )
+    }()
     
     lazy var achievementManager: AchievementManager = {
         let manager = AchievementManager.shared
@@ -36,7 +48,11 @@ class DIContainer {
     
     // MARK: - Use Cases
     lazy var quizUseCase: QuizUseCaseProtocol = {
-        QuizUseCase(questionsRepository: questionsRepository)
+        QuizUseCase(
+            questionsRepository: questionsRepository,
+            adaptiveEngine: adaptiveLearningEngine,
+            profileManager: profileManager
+        )
     }()
     
     lazy var examUseCase: ExamUseCaseProtocol = {
@@ -75,7 +91,17 @@ class DIContainer {
         settingsManager = SettingsManager()
         statsManager = StatsManager()
         achievementManager = AchievementManager.shared
-        quizUseCase = QuizUseCase(questionsRepository: questionsRepository)
+        adaptiveLearningEngine = AdaptiveLearningEngine()
+        profileManager = ProfileManager(
+            adaptiveEngine: adaptiveLearningEngine,
+            statsManager: statsManager,
+            examStatisticsManager: examStatisticsManager
+        )
+        quizUseCase = QuizUseCase(
+            questionsRepository: questionsRepository,
+            adaptiveEngine: adaptiveLearningEngine,
+            profileManager: profileManager
+        )
         questionsRepository = QuestionsRepository()
         hapticManager = HapticManager(settingsManager: settingsManager)
         soundManager = SoundManager(settingsManager: settingsManager)

@@ -175,24 +175,34 @@ class QuizViewModel {
     @MainActor
     func finishQuiz(isComplete: Bool = true) {
         let timeSpent = Date().timeIntervalSince(startTime ?? Date())
-        quizResult = quizUseCase.calculateResult(
+        let result = quizUseCase.calculateResult(
             correctAnswers: correctAnswers,
             totalQuestions: questions.count,
             timeSpent: timeSpent
         )
+        quizResult = result
         
         // Обновляем статистику только если викторина завершена полностью
         if isComplete {
-            let wrongQuestionIds = questionResults.compactMap { (questionId, isCorrect) in
-                return isCorrect ? nil : questionId
+            let outcomes = questions.map { question in
+                QuizQuestionOutcome(
+                    questionId: question.id,
+                    category: question.category,
+                    difficulty: question.difficulty,
+                    isCorrect: questionResults[question.id] ?? false
+                )
             }
-            
-            statsManager.updateStats(
-                correctCount: correctAnswers,
-                totalCount: questions.count,
-                wrongQuestionIds: wrongQuestionIds,
-                percentage: quizResult?.percentage ?? 0
+
+            let summary = QuizSessionSummary(
+                correctAnswers: correctAnswers,
+                totalQuestions: questions.count,
+                percentage: quizResult?.percentage ?? 0,
+                duration: timeSpent,
+                completedAt: Date(),
+                outcomes: outcomes
             )
+            
+            statsManager.recordQuizSession(summary)
             
             // Check for new achievements
             achievementManager.checkAchievements(for: statsManager.stats, quizResult: quizResult)

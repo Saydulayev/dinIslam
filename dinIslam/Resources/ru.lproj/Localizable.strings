@@ -1,3 +1,38 @@
+"profile.title" = "Профиль";
+"profile.done" = "Готово";
+"profile.anonymous" = "Гость";
+"profile.signout" = "Выйти";
+"profile.mastery.novice" = "Ученик";
+"profile.mastery.learning" = "В процессе";
+"profile.mastery.proficient" = "Уверенный";
+"profile.mastery.expert" = "Мастер";
+"profile.progress.title" = "Прогресс";
+"profile.progress.questions" = "Изучено вопросов";
+"profile.progress.correct" = "Правильных ответов";
+"profile.progress.accuracy" = "Средний результат";
+"profile.progress.streak" = "Серия";
+"profile.exams.title" = "Экзамены";
+"profile.exams.completed" = "Пройдено";
+"profile.exams.passed" = "Сдано";
+"profile.exams.passRate" = "Процент успеха";
+"profile.recommendations.title" = "Рекомендации";
+"profile.recommendations.nextSteps" = "Следующие шаги";
+"profile.recommendations.empty" = "Рекомендаций пока нет — продолжайте обучение, и мы подскажем, что изучать дальше.";
+"profile.recommendations.topic" = "Тема: %@";
+"profile.recommendation.focusTopic.title" = "Сфокусируйтесь на теме";
+"profile.recommendation.focusTopic" = "Рекомендуем повторить тему \"%@\" — здесь есть пространство для роста.";
+"profile.recommendation.challenge.title" = "Новый вызов";
+"profile.recommendation.challenge" = "Вы отлично справляетесь с уровнем %@. Попробуйте более сложные вопросы!";
+"profile.recommendation.maintainStreak.title" = "Держите темп";
+"profile.recommendation.maintainStreak" = "Отличная серия! Продолжайте в том же духе, чтобы закрепить успех.";
+"profile.sync.title" = "Синхронизация";
+"profile.sync.refresh" = "Синхронизировать";
+"profile.sync.ready" = "Синхронизировано";
+"profile.sync.guest" = "Гостевой режим";
+"profile.sync.lastSync" = "Последняя синхронизация: %@";
+"profile.sync.never" = "Пока не синхронизировалось с iCloud";
+"profile.sync.inProgress" = "Синхронизация...";
+"profile.sync.failed" = "Ошибка синхронизации: %@";
 /* 
   Localizable.strings (Russian)
   dinIslam

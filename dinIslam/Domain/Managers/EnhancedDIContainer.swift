@@ -35,11 +35,19 @@ class EnhancedDIContainer {
     }()
     
     lazy var statsManager: StatsManager = {
-        StatsManager()
+        DIContainer.shared.statsManager
     }()
     
-    lazy var examStatisticsManager: ExamStatisticsManaging = {
-        ExamStatisticsManager()
+    lazy var examStatisticsManager: ExamStatisticsManager = {
+        DIContainer.shared.examStatisticsManager
+    }()
+
+    lazy var adaptiveLearningEngine: AdaptiveLearningEngine = {
+        DIContainer.shared.adaptiveLearningEngine
+    }()
+
+    lazy var profileManager: ProfileManager = {
+        DIContainer.shared.profileManager
     }()
     
     lazy var achievementManager: AchievementManager = {
@@ -63,13 +71,19 @@ class EnhancedDIContainer {
     
     // MARK: - Use Cases
     lazy var quizUseCase: QuizUseCaseProtocol = {
-        QuizUseCase(questionsRepository: questionsRepository)
+        QuizUseCase(
+            questionsRepository: questionsRepository,
+            adaptiveEngine: adaptiveLearningEngine,
+            profileManager: profileManager
+        )
     }()
     
     lazy var enhancedQuizUseCase: EnhancedQuizUseCaseProtocol = {
         EnhancedQuizUseCase(
             questionsRepository: enhancedQuestionsRepository,
-            networkManager: networkManager
+            networkManager: networkManager,
+            adaptiveEngine: adaptiveLearningEngine,
+            profileManager: profileManager
         )
     }()
     
@@ -145,17 +159,26 @@ class EnhancedDIContainer {
     // MARK: - Reset
     func reset() {
         settingsManager = SettingsManager()
-        statsManager = StatsManager()
+        statsManager = DIContainer.shared.statsManager
+        examStatisticsManager = DIContainer.shared.examStatisticsManager
         achievementManager = AchievementManager.shared
         networkManager = NetworkManager()
         cacheManager = CacheManager()
         enhancedRemoteQuestionsService = EnhancedRemoteQuestionsService()
         // Fix: pass QuestionsRepositoryProtocol to QuizUseCase
         questionsRepository = QuestionsRepository()
-        quizUseCase = QuizUseCase(questionsRepository: questionsRepository)
+        adaptiveLearningEngine = DIContainer.shared.adaptiveLearningEngine
+        profileManager = DIContainer.shared.profileManager
+        quizUseCase = QuizUseCase(
+            questionsRepository: questionsRepository,
+            adaptiveEngine: adaptiveLearningEngine,
+            profileManager: profileManager
+        )
         enhancedQuizUseCase = EnhancedQuizUseCase(
             questionsRepository: EnhancedQuestionsRepository(),
-            networkManager: networkManager
+            networkManager: networkManager,
+            adaptiveEngine: adaptiveLearningEngine,
+            profileManager: profileManager
         )
         enhancedQuestionsRepository = EnhancedQuestionsRepository()
         hapticManager = HapticManager(settingsManager: settingsManager)
@@ -179,39 +202,51 @@ protocol EnhancedQuizUseCaseProtocol {
 class EnhancedQuizUseCase: EnhancedQuizUseCaseProtocol {
     private let questionsRepository: EnhancedQuestionsRepositoryProtocol
     private let networkManager: NetworkManager
+    private let adaptiveEngine: AdaptiveLearningEngine
+    private let profileManager: ProfileManager
     private let questionPoolVersion = 1
     
     init(
         questionsRepository: EnhancedQuestionsRepositoryProtocol,
-        networkManager: NetworkManager
+        networkManager: NetworkManager,
+        adaptiveEngine: AdaptiveLearningEngine,
+        profileManager: ProfileManager
     ) {
         self.questionsRepository = questionsRepository
         self.networkManager = networkManager
+        self.adaptiveEngine = adaptiveEngine
+        self.profileManager = profileManager
     }
     
     func startQuiz(language: String) async throws -> [Question] {
         let allQuestions = try await questionsRepository.loadQuestions(language: language)
         let progress = QuestionPoolProgress(version: questionPoolVersion)
         let used = progress.usedIds
-        let unusedQuestions = allQuestions.filter { !used.contains($0.id) }
         
         let sessionCount = min(20, allQuestions.count)
-        var selected: [Question] = []
+        var selected = adaptiveEngine.selectQuestions(
+            from: allQuestions,
+            progress: profileManager.progress,
+            usedQuestionIds: used,
+            sessionCount: sessionCount
+        )
         
-        if unusedQuestions.count >= sessionCount {
-            selected = Array(unusedQuestions.shuffled().prefix(sessionCount))
-            print("📚 Using \(selected.count) new questions")
-        } else if unusedQuestions.count > 0 {
-            selected = Array(unusedQuestions.shuffled())
-            let remaining = sessionCount - unusedQuestions.count
-            let repeatedQuestions = allQuestions.filter { used.contains($0.id) }
-            let additional = Array(repeatedQuestions.shuffled().prefix(remaining))
-            selected.append(contentsOf: additional)
-            print("📚 Using \(unusedQuestions.count) new + \(additional.count) repeated questions")
-        } else {
-            progress.reset(for: questionPoolVersion)
-            selected = Array(allQuestions.shuffled().prefix(sessionCount))
-            print("🔄 All questions completed, starting fresh with \(selected.count) questions")
+        if selected.count < sessionCount {
+            let remainingNewQuestions = allQuestions.filter { question in
+                !used.contains(question.id) && !selected.contains(where: { $0.id == question.id })
+            }
+            if !remainingNewQuestions.isEmpty {
+                let remainingNeeded = sessionCount - selected.count
+                selected.append(contentsOf: Array(remainingNewQuestions.shuffled().prefix(remainingNeeded)))
+            }
+        }
+        
+        if selected.count < sessionCount {
+            let fallback = allQuestions.filter { question in
+                !selected.contains(where: { $0.id == question.id })
+            }
+            let remainingNeeded = sessionCount - selected.count
+            selected.append(contentsOf: Array(fallback.shuffled().prefix(remainingNeeded)))
         }
         
         progress.markUsed(selected.map { $0.id })

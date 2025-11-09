@@ -175,6 +175,7 @@ class ExamUseCase: ExamUseCaseProtocol {
 @MainActor
 @Observable
 class ExamStatisticsManager: ExamStatisticsManaging {
+    weak var profileSyncDelegate: ProfileExamSyncDelegate?
     var statistics: ExamStatistics
     private let userDefaults = UserDefaults.standard
     private let statisticsKey = "ExamStatistics"
@@ -186,11 +187,18 @@ class ExamStatisticsManager: ExamStatisticsManaging {
     func updateStatistics(with result: ExamResult) {
         statistics.updateStatistics(with: result)
         saveStatistics()
+        let summary = ExamSessionSummary(
+            result: result,
+            duration: result.totalTimeSpent,
+            completedAt: result.completedAt
+        )
+        profileSyncDelegate?.examStatisticsManager(self, didRecord: summary)
     }
     
     func resetStatistics() {
         statistics = ExamStatistics()
         saveStatistics()
+        profileSyncDelegate?.examStatisticsManagerDidReset(self)
     }
     
     private func saveStatistics() {
@@ -206,4 +214,9 @@ class ExamStatisticsManager: ExamStatisticsManaging {
         }
         return statistics
     }
+}
+
+protocol ProfileExamSyncDelegate: AnyObject {
+    func examStatisticsManager(_ manager: ExamStatisticsManager, didRecord summary: ExamSessionSummary)
+    func examStatisticsManagerDidReset(_ manager: ExamStatisticsManager)
 }

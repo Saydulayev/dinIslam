@@ -16,6 +16,13 @@ private struct SettingsManagerKey: EnvironmentKey {
     static let defaultValue = SettingsManager()
 }
 
+private struct ProfileManagerKey: EnvironmentKey {
+    static let defaultValue = ProfileManager(
+        statsManager: StatsManager(),
+        examStatisticsManager: ExamStatisticsManager()
+    )
+}
+
 extension EnvironmentValues {
     var statsManager: StatsManager {
         get { self[StatsManagerKey.self] }
@@ -25,6 +32,11 @@ extension EnvironmentValues {
     var settingsManager: SettingsManager {
         get { self[SettingsManagerKey.self] }
         set { self[SettingsManagerKey.self] = newValue }
+    }
+
+    var profileManager: ProfileManager {
+        get { self[ProfileManagerKey.self] }
+        set { self[ProfileManagerKey.self] = newValue }
     }
 }
 
@@ -60,6 +72,7 @@ struct dinIslamApp: App {
                 quizUseCase: container.quizUseCase,
                 statsManager: container.statsManager,
                 settingsManager: container.settingsManager,
+                profileManager: container.profileManager,
                 examUseCase: container.examUseCase,
                 examStatisticsManager: container.examStatisticsManager
             )
@@ -68,6 +81,7 @@ struct dinIslamApp: App {
             .environmentObject(container.remoteQuestionsService)
             .environmentObject(container.notificationManager)
             .environment(\.statsManager, container.statsManager)
+            .environment(\.profileManager, container.profileManager)
         }
     }
 }

@@ -51,6 +51,7 @@ struct StartView: View {
         quizUseCase: QuizUseCaseProtocol,
         statsManager: StatsManager,
         settingsManager: SettingsManager,
+        profileManager: ProfileManager,
         examUseCase: ExamUseCaseProtocol,
         examStatisticsManager: ExamStatisticsManager,
         enhancedContainer: EnhancedDIContainer
@@ -65,6 +66,7 @@ struct StartView: View {
                 quizViewModel: quizViewModel,
                 statsManager: statsManager,
                 settingsManager: settingsManager,
+                profileManager: profileManager,
                 examUseCase: examUseCase,
                 examStatisticsManager: examStatisticsManager,
                 enhancedContainer: enhancedContainer
@@ -76,6 +78,7 @@ struct StartView: View {
         quizUseCase: QuizUseCaseProtocol,
         statsManager: StatsManager,
         settingsManager: SettingsManager,
+        profileManager: ProfileManager,
         examUseCase: ExamUseCaseProtocol,
         examStatisticsManager: ExamStatisticsManager
     ) {
@@ -89,6 +92,7 @@ struct StartView: View {
                 quizViewModel: quizViewModel,
                 statsManager: statsManager,
                 settingsManager: settingsManager,
+                profileManager: profileManager,
                 examUseCase: examUseCase,
                 examStatisticsManager: examStatisticsManager,
                 enhancedContainer: EnhancedDIContainer.shared
@@ -115,7 +119,7 @@ struct StartView: View {
                     .padding(.bottom)
                     .frame(minHeight: proxy.size.height, alignment: .bottom)
                 }
-                .scrollDisabled(true)
+                .scrollDisabled(false)
                 .padding(.horizontal)
             }
             .navigationDestination(for: StartRoute.self) { route in
@@ -157,6 +161,13 @@ struct StartView: View {
                 .presentationDetents([.large])
                 .presentationDragIndicator(.visible)
             }
+            .sheet(isPresented: bindingModel.showingProfile) {
+                NavigationStack {
+                    ProfileView()
+                }
+                .presentationDetents([.large])
+                .presentationDragIndicator(.visible)
+            }
             .sheet(isPresented: bindingModel.showingExamSettings) {
                 ExamSettingsView { configuration in
                     model.startExam(with: configuration)
@@ -179,6 +190,15 @@ struct StartView: View {
                     }) {
                         Image(systemName: "trophy.fill")
                             .foregroundColor(.orange)
+                    }
+                }
+
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button(action: {
+                        model.showProfile()
+                    }) {
+                        Image(systemName: "person.crop.circle")
+                            .foregroundColor(.blue)
                     }
                 }
 
@@ -280,7 +300,7 @@ struct StartView: View {
     }
     
     private func summarySection(model: StartViewModel) -> some View {
-        VStack(spacing: 0) {
+        VStack(spacing: 16) {
             statsCard(model: model)
             Divider()
                 .background(adaptiveBorderColor)
@@ -412,17 +432,32 @@ private struct ParticleFieldView: View {
     let statsManager = StatsManager()
     let settingsManager = SettingsManager()
     let examStatsManager = ExamStatisticsManager()
-    let quizUseCase = QuizUseCase(questionsRepository: QuestionsRepository())
-    let examUseCase = ExamUseCase(questionsRepository: QuestionsRepository(), examStatisticsManager: examStatsManager)
+    let adaptiveEngine = AdaptiveLearningEngine()
+    let profileManager = ProfileManager(
+        adaptiveEngine: adaptiveEngine,
+        statsManager: statsManager,
+        examStatisticsManager: examStatsManager
+    )
+    let quizUseCase = QuizUseCase(
+        questionsRepository: QuestionsRepository(),
+        adaptiveEngine: adaptiveEngine,
+        profileManager: profileManager
+    )
+    let examUseCase = ExamUseCase(
+        questionsRepository: QuestionsRepository(),
+        examStatisticsManager: examStatsManager
+    )
 
     return StartView(
         quizUseCase: quizUseCase,
         statsManager: statsManager,
         settingsManager: settingsManager,
+        profileManager: profileManager,
         examUseCase: examUseCase,
         examStatisticsManager: examStatsManager
     )
     .environment(\.settingsManager, settingsManager)
     .environment(\.statsManager, statsManager)
+    .environment(\.profileManager, profileManager)
 }
 

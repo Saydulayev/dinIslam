@@ -16,42 +16,48 @@ protocol QuizUseCaseProtocol {
 
 class QuizUseCase: QuizUseCaseProtocol {
     private let questionsRepository: QuestionsRepositoryProtocol
+    private let adaptiveEngine: AdaptiveLearningEngine
+    private let profileManager: ProfileManager
     private let questionPoolVersion = 1
     
-    init(questionsRepository: QuestionsRepositoryProtocol) {
+    init(
+        questionsRepository: QuestionsRepositoryProtocol,
+        adaptiveEngine: AdaptiveLearningEngine,
+        profileManager: ProfileManager
+    ) {
         self.questionsRepository = questionsRepository
+        self.adaptiveEngine = adaptiveEngine
+        self.profileManager = profileManager
     }
     
     func startQuiz(language: String) async throws -> [Question] {
         let allQuestions = try await questionsRepository.loadQuestions(language: language)
         let progress = QuestionPoolProgress(version: questionPoolVersion)
         let used = progress.usedIds
-        let unusedQuestions = allQuestions.filter { !used.contains($0.id) }
-        
         let sessionCount = min(20, allQuestions.count) // Адаптивный размер сессии
-        var selected: [Question] = []
+        var selected = adaptiveEngine.selectQuestions(
+            from: allQuestions,
+            progress: profileManager.progress,
+            usedQuestionIds: used,
+            sessionCount: sessionCount
+        )
         
-        if unusedQuestions.count >= sessionCount {
-            // Достаточно новых вопросов - берем только их
-            selected = Array(unusedQuestions.shuffled().prefix(sessionCount))
-            print("📚 Using \(selected.count) new questions")
-            print("📋 New question IDs: \(selected.map { $0.id }.joined(separator: ", "))")
-        } else if unusedQuestions.count > 0 {
-            // Частично новые + некоторые повторные
-            selected = Array(unusedQuestions.shuffled())
-            let remaining = sessionCount - unusedQuestions.count
-            let repeatedQuestions = allQuestions.filter { used.contains($0.id) }
-            let additional = Array(repeatedQuestions.shuffled().prefix(remaining))
-            selected.append(contentsOf: additional)
-            print("📚 Using \(unusedQuestions.count) new + \(additional.count) repeated questions")
-            print("📋 New question IDs: \(unusedQuestions.map { $0.id }.joined(separator: ", "))")
-            print("📋 Repeated question IDs: \(additional.map { $0.id }.joined(separator: ", "))")
-        } else {
-            // Все вопросы пройдены - начинаем заново
-            progress.reset(for: questionPoolVersion)
-            selected = Array(allQuestions.shuffled().prefix(sessionCount))
-            print("🔄 All questions completed, starting fresh with \(selected.count) questions")
-            print("📋 Fresh question IDs: \(selected.map { $0.id }.joined(separator: ", "))")
+        if selected.count < sessionCount {
+            let remainingNewQuestions = allQuestions.filter { question in
+                !used.contains(question.id) && !selected.contains(where: { $0.id == question.id })
+            }
+            if !remainingNewQuestions.isEmpty {
+                let remainingNeeded = sessionCount - selected.count
+                selected.append(contentsOf: Array(remainingNewQuestions.shuffled().prefix(remainingNeeded)))
+            }
+        }
+        
+        if selected.count < sessionCount {
+            let fallback = allQuestions.filter { question in
+                !selected.contains(where: { $0.id == question.id })
+            }
+            let remainingNeeded = sessionCount - selected.count
+            selected.append(contentsOf: Array(fallback.shuffled().prefix(remainingNeeded)))
         }
         
         progress.markUsed(selected.map { $0.id })

@@ -1,3 +1,38 @@
+"profile.title" = "Profile";
+"profile.done" = "Done";
+"profile.anonymous" = "Guest";
+"profile.signout" = "Sign Out";
+"profile.mastery.novice" = "Novice";
+"profile.mastery.learning" = "Learning";
+"profile.mastery.proficient" = "Proficient";
+"profile.mastery.expert" = "Expert";
+"profile.progress.title" = "Progress";
+"profile.progress.questions" = "Questions Studied";
+"profile.progress.correct" = "Correct Answers";
+"profile.progress.accuracy" = "Average Score";
+"profile.progress.streak" = "Streak";
+"profile.exams.title" = "Exams";
+"profile.exams.completed" = "Completed";
+"profile.exams.passed" = "Passed";
+"profile.exams.passRate" = "Pass Rate";
+"profile.recommendations.title" = "Recommendations";
+"profile.recommendations.nextSteps" = "Next Steps";
+"profile.recommendations.empty" = "No recommendations yet—keep practicing and we will suggest what to learn next.";
+"profile.recommendations.topic" = "Topic: %@";
+"profile.recommendation.focusTopic.title" = "Focus Topic";
+"profile.recommendation.focusTopic" = "We suggest revisiting \"%@\" — there is room to improve.";
+"profile.recommendation.challenge.title" = "New Challenge";
+"profile.recommendation.challenge" = "You are handling %@ questions well. Try increasing the difficulty!";
+"profile.recommendation.maintainStreak.title" = "Keep the Momentum";
+"profile.recommendation.maintainStreak" = "Great streak! Stay on track to reinforce your progress.";
+"profile.sync.title" = "Cloud Sync";
+"profile.sync.refresh" = "Sync Now";
+"profile.sync.ready" = "Synced";
+"profile.sync.guest" = "Guest Mode";
+"profile.sync.lastSync" = "Last sync: %@";
+"profile.sync.never" = "Not synced with iCloud yet";
+"profile.sync.inProgress" = "Syncing...";
+"profile.sync.failed" = "Sync failed: %@";
 /* 
   Localizable.strings (English)
   dinIslam

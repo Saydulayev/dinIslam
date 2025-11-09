@@ -29,6 +29,7 @@ final class StartViewModel {
     let quizViewModel: QuizViewModel
     let statsManager: StatsManager
     let settingsManager: SettingsManager
+    let profileManager: ProfileManager
 
     private let examUseCase: ExamUseCaseProtocol
     private let examStatisticsManager: ExamStatisticsManager
@@ -42,6 +43,7 @@ final class StartViewModel {
     var navigationPath = NavigationPath()
     var showingSettings = false
     var showingExamSettings = false
+    var showingProfile = false
 
     var examViewModel: ExamViewModel?
 
@@ -59,6 +61,7 @@ final class StartViewModel {
         quizViewModel: QuizViewModel,
         statsManager: StatsManager,
         settingsManager: SettingsManager,
+        profileManager: ProfileManager,
         examUseCase: ExamUseCaseProtocol,
         examStatisticsManager: ExamStatisticsManager,
         enhancedContainer: EnhancedDIContainer
@@ -66,6 +69,7 @@ final class StartViewModel {
         self.quizViewModel = quizViewModel
         self.statsManager = statsManager
         self.settingsManager = settingsManager
+        self.profileManager = profileManager
         self.examUseCase = examUseCase
         self.examStatisticsManager = examStatisticsManager
         self.enhancedContainer = enhancedContainer
@@ -76,6 +80,7 @@ final class StartViewModel {
         quizViewModel: QuizViewModel,
         statsManager: StatsManager,
         settingsManager: SettingsManager,
+        profileManager: ProfileManager,
         examUseCase: ExamUseCaseProtocol,
         examStatisticsManager: ExamStatisticsManager
     ) {
@@ -83,6 +88,7 @@ final class StartViewModel {
             quizViewModel: quizViewModel,
             statsManager: statsManager,
             settingsManager: settingsManager,
+            profileManager: profileManager,
             examUseCase: examUseCase,
             examStatisticsManager: examStatisticsManager,
             enhancedContainer: EnhancedDIContainer.shared
@@ -96,6 +102,11 @@ final class StartViewModel {
         preloadQuestions()
         startGlowAnimationIfNeeded()
         createParticlesIfNeeded()
+        if profileManager.isSignedIn {
+            Task {
+                await profileManager.refreshFromCloud(mergeStrategy: .newest)
+            }
+        }
     }
 
     func onDisappear() {
@@ -166,6 +177,14 @@ final class StartViewModel {
 
     func showAchievements() {
         navigationPath.append(StartRoute.achievements)
+    }
+
+    func showProfile() {
+        showingProfile = true
+    }
+
+    func hideProfile() {
+        showingProfile = false
     }
 
     // MARK: - Particles & Animations
