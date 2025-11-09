@@ -25,6 +25,8 @@
 "profile.recommendation.challenge" = "You are handling %@ questions well. Try increasing the difficulty!";
 "profile.recommendation.maintainStreak.title" = "Keep the Momentum";
 "profile.recommendation.maintainStreak" = "Great streak! Stay on track to reinforce your progress.";
+"profile.avatar.select" = "Choose Photo";
+"profile.avatar.change" = "Change Photo";
 "profile.sync.title" = "Cloud Sync";
 "profile.sync.refresh" = "Sync Now";
 "profile.sync.ready" = "Synced";

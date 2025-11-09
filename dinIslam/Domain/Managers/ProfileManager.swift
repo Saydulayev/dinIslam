@@ -54,13 +54,13 @@ final class ProfileManager {
 
     init(
         localStore: ProfileLocalStore = ProfileLocalStore(),
-        cloudService: CloudKitProfileService = CloudKitProfileService(),
+        cloudService: CloudKitProfileService? = nil,
         adaptiveEngine: AdaptiveLearningEngine = AdaptiveLearningEngine(),
         statsManager: StatsManager,
         examStatisticsManager: ExamStatisticsManager
     ) {
         self.localStore = localStore
-        self.cloudService = cloudService
+        self.cloudService = cloudService ?? CloudKitProfileService(localStore: localStore)
         self.adaptiveEngine = adaptiveEngine
         self.statsManager = statsManager
         self.examStatisticsManager = examStatisticsManager
@@ -109,6 +109,7 @@ final class ProfileManager {
 
     func signOut() {
         guard isSignedIn else { return }
+        let signedInProfileId = profile.id
         profile = localStore.loadOrCreateAnonymousProfile()
         statsManager.resetStats()
         examStatisticsManager.resetStatistics()
@@ -116,6 +117,19 @@ final class ProfileManager {
         localStore.saveProfile(profile)
         syncState = .idle
         errorMessage = nil
+        localStore.deleteAvatar(for: signedInProfileId)
+    }
+
+    func updateAvatar(with data: Data, fileExtension: String = "dat") async {
+        guard let savedURL = localStore.saveAvatarData(data, for: profile.id, fileExtension: fileExtension) else {
+            return
+        }
+        profile.avatarURL = savedURL
+        profile.metadata.updatedAt = Date()
+        localStore.saveProfile(profile)
+        if isSignedIn {
+            await performSync()
+        }
     }
 
     // MARK: - Sync Management
@@ -282,15 +296,20 @@ final class ProfileManager {
             merged.email = local.email ?? remote.email
             merged.preferences = mergePreferences(remote: remote.preferences, local: local.preferences, preferLocal: true)
             merged.progress = mergeProgress(remote: remote.progress, local: local.progress, preferLocal: true)
+            merged.avatarURL = local.avatarURL ?? merged.avatarURL
         case .preferRemote:
             merged.preferences = mergePreferences(remote: remote.preferences, local: local.preferences, preferLocal: false)
             merged.progress = mergeProgress(remote: remote.progress, local: local.progress, preferLocal: false)
+            merged.avatarURL = remote.avatarURL ?? local.avatarURL
         case .newest:
             let preferLocal = (local.metadata.updatedAt > remote.metadata.updatedAt)
             merged.fullName = preferLocal ? (local.fullName ?? remote.fullName) : remote.fullName
             merged.email = preferLocal ? (local.email ?? remote.email) : remote.email
             merged.preferences = mergePreferences(remote: remote.preferences, local: local.preferences, preferLocal: preferLocal)
             merged.progress = mergeProgress(remote: remote.progress, local: local.progress, preferLocal: preferLocal)
+            merged.avatarURL = preferLocal
+                ? (local.avatarURL ?? remote.avatarURL)
+                : (remote.avatarURL ?? local.avatarURL)
         }
 
         merged.metadata.updatedAt = Date()

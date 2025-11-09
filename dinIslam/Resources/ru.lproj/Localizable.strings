@@ -25,6 +25,8 @@
 "profile.recommendation.challenge" = "Вы отлично справляетесь с уровнем %@. Попробуйте более сложные вопросы!";
 "profile.recommendation.maintainStreak.title" = "Держите темп";
 "profile.recommendation.maintainStreak" = "Отличная серия! Продолжайте в том же духе, чтобы закрепить успех.";
+"profile.avatar.select" = "Выбрать фото";
+"profile.avatar.change" = "Сменить фото";
 "profile.sync.title" = "Синхронизация";
 "profile.sync.refresh" = "Синхронизировать";
 "profile.sync.ready" = "Синхронизировано";

@@ -7,12 +7,17 @@
 
 import AuthenticationServices
 import Observation
+import PhotosUI
 import SwiftUI
+#if os(iOS)
+import UIKit
+#endif
 
 struct ProfileView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.profileManager) private var profileManager
     @Environment(\.colorScheme) private var colorScheme
+    @State private var avatarPickerItem: PhotosPickerItem?
 
     var body: some View {
         @Bindable var manager = profileManager
@@ -43,12 +48,25 @@ struct ProfileView: View {
         VStack(spacing: 16) {
             ZStack {
                 Circle()
-                    .fill(LinearGradient(colors: [.blue.opacity(0.3), .purple.opacity(0.3)], startPoint: .topLeading, endPoint: .bottomTrailing))
-                    .frame(width: 120, height: 120)
+                    .fill(LinearGradient(colors: [.blue.opacity(0.2), .purple.opacity(0.2)], startPoint: .topLeading, endPoint: .bottomTrailing))
+                    .frame(width: 132, height: 132)
                     .shadow(color: .blue.opacity(0.2), radius: 12, x: 0, y: 6)
-                Image(systemName: manager.isSignedIn ? "person.crop.circle.badge.checkmark" : "person.crop.circle")
-                    .font(.system(size: 60))
-                    .foregroundStyle(.white)
+                if let image = avatarImage(for: manager) {
+                    image
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 120, height: 120)
+                        .clipShape(Circle())
+                        .overlay(
+                            Circle()
+                                .strokeBorder(Color.white.opacity(colorScheme == .dark ? 0.2 : 0.6), lineWidth: 2)
+                        )
+                        .shadow(radius: 4)
+                } else {
+                    Image(systemName: manager.isSignedIn ? "person.crop.circle.badge.plus" : "person.crop.circle")
+                        .font(.system(size: 60))
+                        .foregroundStyle(.white.opacity(0.85))
+                }
             }
 
             VStack(spacing: 6) {
@@ -66,6 +84,16 @@ struct ProfileView: View {
 
             VStack(spacing: 12) {
                 if manager.isSignedIn {
+                    PhotosPicker(selection: $avatarPickerItem, matching: .images) {
+                        Label(
+                            manager.profile.avatarURL == nil ? "profile.avatar.select".localized : "profile.avatar.change".localized,
+                            systemImage: "camera.fill"
+                        )
+                        .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.bordered)
+                    .controlSize(.large)
+
                     Button(role: .destructive) {
                         manager.signOut()
                     } label: {
@@ -90,6 +118,15 @@ struct ProfileView: View {
             RoundedRectangle(cornerRadius: 20)
                 .fill(Color(.secondarySystemBackground))
         )
+        .onChange(of: avatarPickerItem) { newValue in
+            guard let item = newValue else { return }
+            Task {
+                if let data = try? await item.loadTransferable(type: Data.self) {
+                    let fileExtension = item.supportedContentTypes.first?.preferredFilenameExtension ?? "dat"
+                    await manager.updateAvatar(with: data, fileExtension: fileExtension)
+                }
+            }
+        }
     }
 
     private func progressSection(progress: ProfileProgress) -> some View {
@@ -223,6 +260,25 @@ struct ProfileView: View {
             )
         }
     }
+
+    #if os(iOS)
+    private func avatarImage(for manager: ProfileManager) -> Image? {
+        guard let url = manager.profile.avatarURL,
+              let uiImage = UIImage(contentsOfFile: url.path) else {
+            return nil
+        }
+        return Image(uiImage: uiImage)
+    }
+    #else
+    private func avatarImage(for manager: ProfileManager) -> Image? {
+        guard let url = manager.profile.avatarURL,
+              let data = try? Data(contentsOf: url),
+              let nsImage = NSImage(data: data) else {
+            return nil
+        }
+        return Image(nsImage: nsImage)
+    }
+    #endif
 }
 
 #Preview {

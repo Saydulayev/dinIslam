@@ -31,8 +31,10 @@ final class CloudKitProfileService {
     private let encoder: JSONEncoder
     private let decoder: JSONDecoder
     private let recordType = "UserProfile"
+    private let localStore: ProfileLocalStore
+    private let fileManager = FileManager.default
 
-    init(containerIdentifier: String? = nil) {
+    init(containerIdentifier: String? = nil, localStore: ProfileLocalStore = ProfileLocalStore()) {
         if let identifier = containerIdentifier {
             container = CKContainer(identifier: identifier)
         } else if let configuredIdentifier = Bundle.main.object(forInfoDictionaryKey: "CloudKitContainerIdentifier") as? String {
@@ -42,6 +44,7 @@ final class CloudKitProfileService {
         }
 
         database = container.privateCloudDatabase
+        self.localStore = localStore
 
         encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .iso8601
@@ -95,6 +98,12 @@ final class CloudKitProfileService {
         record["createdAt"] = profile.metadata.createdAt as CKRecordValue
         record["authMethod"] = profile.authMethod.rawValue as CKRecordValue
         record["locale"] = profile.localeIdentifier as CKRecordValue
+
+        if let avatarURL = profile.avatarURL, fileManager.fileExists(atPath: avatarURL.path) {
+            record["avatar"] = CKAsset(fileURL: avatarURL)
+        } else {
+            record["avatar"] = nil
+        }
     }
 
     private func decodeProfile(from record: CKRecord) throws -> UserProfile {
@@ -104,6 +113,17 @@ final class CloudKitProfileService {
 
         guard var profile = try? decoder.decode(UserProfile.self, from: data) else {
             throw CloudKitProfileError.decodingFailed
+        }
+
+        if let asset = record["avatar"] as? CKAsset,
+           let assetURL = asset.fileURL,
+           let avatarData = try? Data(contentsOf: assetURL) {
+            let fileExtension = assetURL.pathExtension.isEmpty ? "dat" : assetURL.pathExtension
+            profile.avatarURL = localStore.saveAvatarData(avatarData, for: profile.id, fileExtension: fileExtension)
+        } else if let existingAvatar = localStore.loadAvatar(for: profile.id) {
+            profile.avatarURL = existingAvatar
+        } else {
+            profile.avatarURL = nil
         }
 
         profile.metadata.lastSyncedAt = record.modificationDate
