@@ -53,22 +53,43 @@ final class ProfileManager {
     @ObservationIgnored private var currentNonce: String?
 
     init(
-        localStore: ProfileLocalStore = ProfileLocalStore(),
-        cloudService: CloudKitProfileService? = nil,
-        adaptiveEngine: AdaptiveLearningEngine = AdaptiveLearningEngine(),
+        localStore localStoreOverride: ProfileLocalStore? = nil,
+        cloudService cloudServiceOverride: CloudKitProfileService? = nil,
+        adaptiveEngine adaptiveEngineOverride: AdaptiveLearningEngine? = nil,
         statsManager: StatsManager,
         examStatisticsManager: ExamStatisticsManager
     ) {
-        self.localStore = localStore
-        self.cloudService = cloudService ?? CloudKitProfileService(localStore: localStore)
-        self.adaptiveEngine = adaptiveEngine
+        let resolvedLocalStore: ProfileLocalStore
+        if let override = localStoreOverride {
+            resolvedLocalStore = override
+        } else {
+            resolvedLocalStore = ProfileLocalStore()
+        }
+
+        let resolvedCloudService: CloudKitProfileService
+        if let override = cloudServiceOverride {
+            resolvedCloudService = override
+        } else {
+            resolvedCloudService = CloudKitProfileService(localStore: resolvedLocalStore)
+        }
+
+        let resolvedAdaptiveEngine: AdaptiveLearningEngine
+        if let override = adaptiveEngineOverride {
+            resolvedAdaptiveEngine = override
+        } else {
+            resolvedAdaptiveEngine = AdaptiveLearningEngine()
+        }
+
+        self.localStore = resolvedLocalStore
+        self.cloudService = resolvedCloudService
+        self.adaptiveEngine = resolvedAdaptiveEngine
         self.statsManager = statsManager
         self.examStatisticsManager = examStatisticsManager
 
-        if let storedProfile = localStore.loadCurrentProfile() {
+        if let storedProfile = resolvedLocalStore.loadCurrentProfile() {
             profile = storedProfile
         } else {
-            profile = localStore.loadOrCreateAnonymousProfile()
+            profile = resolvedLocalStore.loadOrCreateAnonymousProfile()
         }
 
         self.statsManager.profileSyncDelegate = self
@@ -555,4 +576,3 @@ extension ProfileManager: ProfileExamSyncDelegate {
         scheduleSync()
     }
 }
-

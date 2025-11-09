@@ -59,7 +59,9 @@ struct ProfileView: View {
 
     // MARK: - Sections
     private func profileHeader(manager: ProfileManager) -> some View {
-        VStack(spacing: 16) {
+        let hasAvatar = manager.profile.avatarURL != nil
+
+        return VStack(spacing: 16) {
             ZStack {
                 Circle()
                     .fill(LinearGradient(colors: [.blue.opacity(0.2), .purple.opacity(0.2)], startPoint: .topLeading, endPoint: .bottomTrailing))
@@ -100,7 +102,7 @@ struct ProfileView: View {
                 if manager.isSignedIn {
                     PhotosPicker(selection: $avatarPickerItem, matching: .images) {
                         Label(
-                            manager.profile.avatarURL == nil ? "profile.avatar.select".localized : "profile.avatar.change".localized,
+                            hasAvatar ? "profile.avatar.change".localized : "profile.avatar.select".localized,
                             systemImage: "camera.fill"
                         )
                         .frame(maxWidth: .infinity)
@@ -132,8 +134,8 @@ struct ProfileView: View {
             RoundedRectangle(cornerRadius: 20)
                 .fill(Color(.secondarySystemBackground))
         )
-        .onChange(of: avatarPickerItem) { newValue in
-            guard let item = newValue else { return }
+        .onChange(of: avatarPickerItem) { previous, current in
+            guard let item = current, previous != current else { return }
             Task {
                 if let data = try? await item.loadTransferable(type: Data.self) {
                     let fileExtension = item.supportedContentTypes.first?.preferredFilenameExtension ?? "dat"
