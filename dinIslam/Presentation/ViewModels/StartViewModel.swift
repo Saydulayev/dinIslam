@@ -90,15 +90,12 @@ final class StartViewModel {
     }
 
     // MARK: - Lifecycle
-    func onAppear(isRunningUnderTests: Bool) {
+    func onAppear() {
         clearBadge()
         cachedLanguageCode = Self.languageCode(from: settingsManager)
-
-        if !isRunningUnderTests {
-            preloadQuestions()
-            startGlowAnimationIfNeeded()
-            createParticlesIfNeeded()
-        }
+        preloadQuestions()
+        startGlowAnimationIfNeeded()
+        createParticlesIfNeeded()
     }
 
     func onDisappear() {

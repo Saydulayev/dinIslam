@@ -8,10 +8,6 @@
 import SwiftUI
 import Observation
 
-private var isRunningUnderTests: Bool {
-    ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
-}
-
 enum StartRoute: Hashable {
     case quiz
     case result(ResultSnapshot)
@@ -101,13 +97,7 @@ struct StartView: View {
     }
     
     var body: some View {
-        Group {
-            if isRunningUnderTests {
-                EmptyView()
-            } else {
-                navigationContent(bindingModel: $model)
-            }
-        }
+        navigationContent(bindingModel: $model)
     }
 
     private func navigationContent(bindingModel: Binding<StartViewModel>) -> some View {
@@ -219,7 +209,7 @@ struct StartView: View {
                 Text(model.quizViewModel.errorMessage ?? "")
             }
             .onAppear {
-                model.onAppear(isRunningUnderTests: isRunningUnderTests)
+                model.onAppear()
             }
         }
         .onDisappear {

@@ -7,10 +7,6 @@
 
 import SwiftUI
 
-private var isRunningUnderTests: Bool {
-    ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
-}
-
 struct StatsView: View {
     @Bindable var statsManager: StatsManager
     @Environment(\.settingsManager) private var settingsManager
@@ -182,7 +178,6 @@ struct StatsView: View {
                             
                             HStack(spacing: 12) {
                                 Button(action: {
-                                    guard !isRunningUnderTests else { return }
                                     updateTask?.cancel()
                                     updateTask = Task {
                                         await checkForUpdates()
@@ -203,7 +198,6 @@ struct StatsView: View {
                                 
                                 if remoteService.hasUpdates {
                                     Button(action: {
-                                        guard !isRunningUnderTests else { return }
                                         syncTask?.cancel()
                                         syncTask = Task {
                                             await syncQuestions()
@@ -247,9 +241,7 @@ struct StatsView: View {
                 }
             }
         .onAppear {
-            if !isRunningUnderTests {
-                loadTotalQuestionsCount()
-            }
+            loadTotalQuestionsCount()
         }
         .onDisappear {
             // Cancel all pending tasks when view disappears
@@ -315,7 +307,6 @@ struct StatsView: View {
     }
     
     private func startMistakesReview() {
-        guard !isRunningUnderTests else { return }
         // Используем существующие экземпляры из DI контейнера
         let container = DIContainer.shared
         let viewModel = QuizViewModel(

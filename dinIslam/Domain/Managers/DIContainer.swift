@@ -67,22 +67,19 @@ class DIContainer {
     
     private init() {}
     
-    // MARK: - Reset for Testing
+    // MARK: - Reset
     func reset() {
-        // Reset all lazy properties for testing by recreating the container
-        // This is a simplified approach - in production you might want to use
-        // a more sophisticated dependency injection framework
-        if ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil {
-            // Only reset during testing
-            settingsManager = SettingsManager()
-            statsManager = StatsManager()
-            achievementManager = AchievementManager.shared
-            quizUseCase = QuizUseCase(questionsRepository: questionsRepository)
-            questionsRepository = QuestionsRepository()
-            hapticManager = HapticManager(settingsManager: settingsManager)
-            soundManager = SoundManager(settingsManager: settingsManager)
-            remoteQuestionsService = RemoteQuestionsService()
-            notificationManager = NotificationManager()
-        }
+        // Reset all lazy properties by recreating the container
+        // This is a simplified approach - in production вы можете использовать
+        // более сложный DI-фреймворк
+        settingsManager = SettingsManager()
+        statsManager = StatsManager()
+        achievementManager = AchievementManager.shared
+        quizUseCase = QuizUseCase(questionsRepository: questionsRepository)
+        questionsRepository = QuestionsRepository()
+        hapticManager = HapticManager(settingsManager: settingsManager)
+        soundManager = SoundManager(settingsManager: settingsManager)
+        remoteQuestionsService = RemoteQuestionsService()
+        notificationManager = NotificationManager()
     }
 }

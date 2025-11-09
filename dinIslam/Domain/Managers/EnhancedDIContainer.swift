@@ -142,28 +142,25 @@ class EnhancedDIContainer {
         cacheManager = CacheManager(configuration: config)
     }
     
-    // MARK: - Reset for Testing
+    // MARK: - Reset
     func reset() {
-        if ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil {
-            // Only reset during testing
-            settingsManager = SettingsManager()
-            statsManager = StatsManager()
-            achievementManager = AchievementManager.shared
-            networkManager = NetworkManager()
-            cacheManager = CacheManager()
-            enhancedRemoteQuestionsService = EnhancedRemoteQuestionsService()
-            // Fix: pass QuestionsRepositoryProtocol to QuizUseCase
-            questionsRepository = QuestionsRepository()
-            quizUseCase = QuizUseCase(questionsRepository: questionsRepository)
-            enhancedQuizUseCase = EnhancedQuizUseCase(
-                questionsRepository: EnhancedQuestionsRepository(),
-                networkManager: networkManager
-            )
-            enhancedQuestionsRepository = EnhancedQuestionsRepository()
-            hapticManager = HapticManager(settingsManager: settingsManager)
-            soundManager = SoundManager(settingsManager: settingsManager)
-            notificationManager = NotificationManager()
-        }
+        settingsManager = SettingsManager()
+        statsManager = StatsManager()
+        achievementManager = AchievementManager.shared
+        networkManager = NetworkManager()
+        cacheManager = CacheManager()
+        enhancedRemoteQuestionsService = EnhancedRemoteQuestionsService()
+        // Fix: pass QuestionsRepositoryProtocol to QuizUseCase
+        questionsRepository = QuestionsRepository()
+        quizUseCase = QuizUseCase(questionsRepository: questionsRepository)
+        enhancedQuizUseCase = EnhancedQuizUseCase(
+            questionsRepository: EnhancedQuestionsRepository(),
+            networkManager: networkManager
+        )
+        enhancedQuestionsRepository = EnhancedQuestionsRepository()
+        hapticManager = HapticManager(settingsManager: settingsManager)
+        soundManager = SoundManager(settingsManager: settingsManager)
+        notificationManager = NotificationManager()
     }
 }
 
