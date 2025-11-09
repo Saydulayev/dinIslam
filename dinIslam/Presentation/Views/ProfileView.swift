@@ -21,7 +21,6 @@ struct ProfileView: View {
                 profileHeader(manager: manager)
                 progressSection(progress: manager.progress)
                 examSection(progress: manager.progress)
-                recommendationsSection(recommendations: manager.recommendations)
                 syncSection(manager: manager)
             }
             .padding(.horizontal)
@@ -122,52 +121,6 @@ struct ProfileView: View {
                 metricView(title: "profile.exams.passed".localized, value: "\(progress.examsPassed)")
                 let passRate = progress.examsTaken > 0 ? Int(Double(progress.examsPassed) / Double(progress.examsTaken) * 100) : 0
                 metricView(title: "profile.exams.passRate".localized, value: "\(passRate)%")
-            }
-        }
-        .padding()
-        .background(
-            RoundedRectangle(cornerRadius: 20)
-                .fill(Color(.secondarySystemBackground))
-        )
-    }
-
-    private func recommendationsSection(recommendations: [LearningRecommendation]) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("profile.recommendations.title".localized)
-                .font(.headline)
-
-            if recommendations.isEmpty {
-                Text("profile.recommendations.empty".localized)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .padding()
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(
-                        RoundedRectangle(cornerRadius: 16)
-                            .fill(Color(.tertiarySystemBackground))
-                    )
-            } else {
-                ForEach(recommendations) { recommendation in
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text(recommendation.title)
-                            .font(.subheadline)
-                            .fontWeight(.semibold)
-                        Text(recommendation.message)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                        if let topicId = recommendation.topicId {
-                            Text("profile.recommendations.topic".localized(arguments: topicId))
-                                .font(.caption2)
-                                .foregroundStyle(.secondary)
-                        }
-                    }
-                    .padding()
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(
-                        RoundedRectangle(cornerRadius: 16)
-                            .fill(Color(.tertiarySystemBackground))
-                    )
-                }
             }
         }
         .padding()

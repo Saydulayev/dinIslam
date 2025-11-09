@@ -110,6 +110,8 @@ final class ProfileManager {
     func signOut() {
         guard isSignedIn else { return }
         profile = localStore.loadOrCreateAnonymousProfile()
+        statsManager.resetStats()
+        examStatisticsManager.resetStatistics()
         rebuildProgressFromLocalStats()
         localStore.saveProfile(profile)
         syncState = .idle
