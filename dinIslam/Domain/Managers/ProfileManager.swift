@@ -120,6 +120,38 @@ final class ProfileManager {
         localStore.deleteAvatar(for: signedInProfileId)
     }
 
+    func resetProfileData() async {
+        isLoading = true
+        syncTask?.cancel()
+        let profileId = profile.id
+        errorMessage = nil
+
+        statsManager.resetStats()
+        examStatisticsManager.resetStatistics()
+        lastRecommendations = []
+        profile.progress = ProfileProgress()
+        profile.avatarURL = nil
+        profile.metadata.updatedAt = Date()
+        profile.metadata.lastSyncedAt = nil
+        localStore.deleteAvatar(for: profileId)
+        rebuildProgressFromLocalStats()
+        localStore.saveProfile(profile)
+
+        if isSignedIn {
+            do {
+                try await cloudService.deleteProfile(with: profileId)
+                await performSync()
+            } catch {
+                errorMessage = error.localizedDescription
+                syncState = .failed(error.localizedDescription)
+            }
+        } else {
+            syncState = .idle
+        }
+
+        isLoading = false
+    }
+
     func updateAvatar(with data: Data, fileExtension: String = "dat") async {
         guard let savedURL = localStore.saveAvatarData(data, for: profile.id, fileExtension: fileExtension) else {
             return

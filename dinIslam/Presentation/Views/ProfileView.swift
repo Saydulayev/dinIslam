@@ -18,6 +18,8 @@ struct ProfileView: View {
     @Environment(\.profileManager) private var profileManager
     @Environment(\.colorScheme) private var colorScheme
     @State private var avatarPickerItem: PhotosPickerItem?
+    @State private var showResetConfirmation = false
+    @State private var isResettingProfile = false
 
     var body: some View {
         @Bindable var manager = profileManager
@@ -40,6 +42,18 @@ struct ProfileView: View {
                     dismiss()
                 }
             }
+        }
+        .alert("profile.sync.reset.title".localized, isPresented: $showResetConfirmation) {
+            Button("profile.sync.reset.confirm".localized, role: .destructive) {
+                Task {
+                    isResettingProfile = true
+                    await manager.resetProfileData()
+                    isResettingProfile = false
+                }
+            }
+            Button("profile.sync.reset.cancel".localized, role: .cancel) { }
+        } message: {
+            Text("profile.sync.reset.message".localized)
         }
     }
 
@@ -181,15 +195,32 @@ struct ProfileView: View {
             }
 
             if manager.isSignedIn {
-                Button {
-                    Task {
-                        await manager.refreshFromCloud(mergeStrategy: .newest)
+                VStack(alignment: .leading, spacing: 8) {
+                    Button {
+                        Task {
+                            await manager.refreshFromCloud(mergeStrategy: .newest)
+                        }
+                    } label: {
+                        Label("profile.sync.refresh".localized, systemImage: "arrow.clockwise.circle")
+                            .frame(maxWidth: .infinity)
                     }
-                } label: {
-                    Label("profile.sync.refresh".localized, systemImage: "arrow.clockwise.circle")
-                        .frame(maxWidth: .infinity)
+                    .buttonStyle(.borderedProminent)
+                    .disabled(isResettingProfile || manager.isLoading)
+
+                    Button(role: .destructive) {
+                        showResetConfirmation = true
+                    } label: {
+                        Label("profile.sync.reset".localized, systemImage: "trash")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.bordered)
+                    .disabled(isResettingProfile || manager.isLoading)
                 }
-                .buttonStyle(.borderedProminent)
+            }
+
+            if isResettingProfile {
+                ProgressView("profile.sync.reset.inProgress".localized)
+                    .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
         .padding()
