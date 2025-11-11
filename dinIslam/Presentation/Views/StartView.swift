@@ -178,17 +178,23 @@ struct StartView: View {
                             Label("start.menu.stats".localized, systemImage: "chart.bar.fill")
                         }
                         
+                        Divider()
+                        
                         Button(action: {
                             model.showAchievements()
                         }) {
                             Label("start.menu.achievements".localized, systemImage: "trophy.fill")
                         }
                         
+                        Divider()
+                        
                         Button(action: {
                             model.showProfile()
                         }) {
                             Label("start.menu.profile".localized, systemImage: "person.crop.circle")
                         }
+                        
+                        Divider()
                         
                         Button(action: {
                             model.showSettings()
