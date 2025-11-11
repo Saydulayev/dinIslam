@@ -196,7 +196,7 @@ struct StartView: View {
                             Label("start.menu.settings".localized, systemImage: "gearshape.fill")
                         }
                     } label: {
-                        Image(systemName: "ellipsis.circle.fill")
+                        Image(systemName: "ellipsis")
                             .foregroundColor(.blue)
                     }
                 }
