@@ -24,14 +24,21 @@ struct ProfileView: View {
     var body: some View {
         @Bindable var manager = profileManager
         ScrollView {
-            VStack(spacing: 24) {
+            VStack(spacing: 0) {
                 profileHeader(manager: manager)
+                    .padding(.top, 8)
+                
                 progressSection(progress: manager.progress)
+                    .padding(.top, 16)
+                
                 examSection(progress: manager.progress)
+                    .padding(.top, 16)
+                
                 syncSection(manager: manager)
+                    .padding(.top, 16)
+                    .padding(.bottom, 32)
             }
-            .padding(.horizontal)
-            .padding(.bottom, 32)
+            .padding(.horizontal, 20)
         }
         .background(Color(.systemGroupedBackground).ignoresSafeArea())
         .navigationTitle("profile.title".localized)
@@ -41,6 +48,7 @@ struct ProfileView: View {
                 Button("profile.done".localized) {
                     dismiss()
                 }
+                .fontWeight(.medium)
             }
         }
         .onAppear {
@@ -65,76 +73,99 @@ struct ProfileView: View {
     private func profileHeader(manager: ProfileManager) -> some View {
         let hasAvatar = avatarExists(for: manager)
 
-        return VStack(spacing: 16) {
+        return VStack(spacing: 24) {
+            // Аватар
             ZStack {
-                Circle()
-                    .fill(LinearGradient(colors: [.blue.opacity(0.2), .purple.opacity(0.2)], startPoint: .topLeading, endPoint: .bottomTrailing))
-                    .frame(width: 132, height: 132)
-                    .shadow(color: .blue.opacity(0.2), radius: 12, x: 0, y: 6)
                 if let image = avatarImage(for: manager) {
                     image
                         .resizable()
                         .scaledToFill()
-                        .frame(width: 120, height: 120)
+                        .frame(width: 100, height: 100)
                         .clipShape(Circle())
                         .overlay(
                             Circle()
-                                .strokeBorder(Color.white.opacity(colorScheme == .dark ? 0.2 : 0.6), lineWidth: 2)
+                                .strokeBorder(
+                                    Color.primary.opacity(colorScheme == .dark ? 0.15 : 0.1),
+                                    lineWidth: 1
+                                )
                         )
-                        .shadow(radius: 4)
                 } else {
-                    Image(systemName: manager.isSignedIn ? "person.crop.circle.badge.plus" : "person.crop.circle")
-                        .font(.system(size: 60))
-                        .foregroundStyle(.white.opacity(0.85))
+                    Circle()
+                        .fill(Color(.tertiarySystemFill))
+                        .frame(width: 100, height: 100)
+                        .overlay(
+                            Image(systemName: manager.isSignedIn ? "person.crop.circle.fill" : "person.circle.fill")
+                                .font(.system(size: 50))
+                                .foregroundStyle(Color(.tertiaryLabel))
+                        )
                 }
             }
 
-            VStack(spacing: 6) {
+            // Имя и email
+            VStack(spacing: 4) {
                 Text(manager.displayName)
-                    .font(.title2)
-                    .fontWeight(.semibold)
+                    .font(.system(size: 24, weight: .semibold, design: .rounded))
                     .foregroundStyle(.primary)
 
                 if let email = manager.email {
                     Text(email)
-                        .font(.subheadline)
+                        .font(.system(size: 15, weight: .regular))
                         .foregroundStyle(.secondary)
                 }
             }
 
-            VStack(spacing: 12) {
+            // Кнопки действий
+            VStack(spacing: 10) {
                 if manager.isSignedIn {
                     PhotosPicker(selection: $avatarPickerItem, matching: .images) {
-                        Label(
-                            hasAvatar ? "profile.avatar.change".localized : "profile.avatar.select".localized,
-                            systemImage: "camera.fill"
-                        )
+                        HStack(spacing: 8) {
+                            Image(systemName: hasAvatar ? "photo" : "camera.fill")
+                                .font(.system(size: 16, weight: .medium))
+                            Text(hasAvatar ? "profile.avatar.change".localized : "profile.avatar.select".localized)
+                                .font(.system(size: 16, weight: .medium))
+                        }
                         .frame(maxWidth: .infinity)
+                        .frame(height: 44)
+                        .foregroundStyle(.primary)
+                        .background(Color(.tertiarySystemFill))
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
                     }
-                    .buttonStyle(.bordered)
-                    .controlSize(.large)
 
                     if hasAvatar {
-                        Button(role: .destructive) {
+                        Button {
                             Task {
                                 await manager.deleteAvatar()
                             }
                         } label: {
-                            Label("profile.avatar.delete".localized, systemImage: "trash")
-                                .frame(maxWidth: .infinity)
+                            HStack(spacing: 8) {
+                                Image(systemName: "trash")
+                                    .font(.system(size: 16, weight: .medium))
+                                Text("profile.avatar.delete".localized)
+                                    .font(.system(size: 16, weight: .medium))
+                            }
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 44)
+                            .foregroundStyle(.red)
+                            .background(Color.red.opacity(0.1))
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
                         }
-                        .buttonStyle(.bordered)
-                        .controlSize(.large)
                     }
 
-                    Button(role: .destructive) {
+                    Button {
                         manager.signOut()
                     } label: {
-                        Label("profile.signout".localized, systemImage: "rectangle.portrait.and.arrow.right")
-                            .frame(maxWidth: .infinity)
+                        HStack(spacing: 8) {
+                            Image(systemName: "rectangle.portrait.and.arrow.right")
+                                .font(.system(size: 16, weight: .medium))
+                            Text("profile.signout".localized)
+                                .font(.system(size: 16, weight: .semibold))
+                        }
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 44)
+                        .foregroundStyle(.white)
+                        .background(Color.red)
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
                     }
-                    .buttonStyle(.borderedProminent)
-                    .tint(.red)
                 } else {
                     SignInWithAppleButton(.signIn) { request in
                         manager.prepareSignInRequest(request)
@@ -146,9 +177,10 @@ struct ProfileView: View {
                 }
             }
         }
-        .padding()
+        .padding(.vertical, 32)
+        .padding(.horizontal, 20)
         .background(
-            RoundedRectangle(cornerRadius: 20)
+            RoundedRectangle(cornerRadius: 16)
                 .fill(Color(.secondarySystemBackground))
         )
         .onChange(of: avatarPickerItem) { previous, current in
@@ -163,107 +195,220 @@ struct ProfileView: View {
     }
 
     private func progressSection(progress: ProfileProgress) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 16) {
             Text("profile.progress.title".localized)
-                .font(.headline)
+                .font(.system(size: 20, weight: .semibold, design: .rounded))
+                .foregroundStyle(.primary)
+                .padding(.horizontal, 4)
 
-            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 12), count: 2), spacing: 12) {
-                metricView(title: "profile.progress.questions".localized, value: "\(progress.totalQuestionsAnswered)")
-                metricView(title: "profile.progress.correct".localized, value: "\(progress.correctAnswers)")
-                metricView(title: "profile.progress.accuracy".localized, value: "\(Int(progress.averageQuizScore))%")
-                metricView(title: "profile.progress.streak".localized, value: "\(progress.currentStreak) 🔥")
+            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 10), count: 2), spacing: 10) {
+                metricView(
+                    title: "profile.progress.questions".localized,
+                    value: "\(progress.totalQuestionsAnswered)",
+                    icon: "questionmark.circle.fill",
+                    color: .blue
+                )
+                metricView(
+                    title: "profile.progress.correct".localized,
+                    value: "\(progress.correctAnswers)",
+                    icon: "checkmark.circle.fill",
+                    color: .green
+                )
+                metricView(
+                    title: "profile.progress.accuracy".localized,
+                    value: "\(Int(progress.averageQuizScore))%",
+                    icon: "chart.bar.fill",
+                    color: .purple
+                )
+                metricView(
+                    title: "profile.progress.streak".localized,
+                    value: "\(progress.currentStreak)",
+                    icon: "flame.fill",
+                    color: .orange
+                )
             }
         }
-        .padding()
+        .padding(20)
         .background(
-            RoundedRectangle(cornerRadius: 20)
+            RoundedRectangle(cornerRadius: 16)
                 .fill(Color(.secondarySystemBackground))
         )
     }
 
     private func examSection(progress: ProfileProgress) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
+        let passRate = progress.examsTaken > 0 ? Int(Double(progress.examsPassed) / Double(progress.examsTaken) * 100) : 0
+        
+        return VStack(alignment: .leading, spacing: 16) {
             Text("profile.exams.title".localized)
-                .font(.headline)
+                .font(.system(size: 20, weight: .semibold, design: .rounded))
+                .foregroundStyle(.primary)
+                .padding(.horizontal, 4)
 
-            HStack(spacing: 12) {
-                metricView(title: "profile.exams.completed".localized, value: "\(progress.examsTaken)")
-                metricView(title: "profile.exams.passed".localized, value: "\(progress.examsPassed)")
-                let passRate = progress.examsTaken > 0 ? Int(Double(progress.examsPassed) / Double(progress.examsTaken) * 100) : 0
-                metricView(title: "profile.exams.passRate".localized, value: "\(passRate)%")
+            VStack(spacing: 10) {
+                examMetricView(
+                    title: "profile.exams.completed".localized,
+                    value: "\(progress.examsTaken)",
+                    icon: "doc.text.fill",
+                    color: .indigo
+                )
+                examMetricView(
+                    title: "profile.exams.passed".localized,
+                    value: "\(progress.examsPassed)",
+                    icon: "checkmark.seal.fill",
+                    color: .green
+                )
+                examMetricView(
+                    title: "profile.exams.passRate".localized,
+                    value: "\(passRate)%",
+                    icon: "percent",
+                    color: .teal
+                )
             }
         }
-        .padding()
+        .padding(20)
         .background(
-            RoundedRectangle(cornerRadius: 20)
+            RoundedRectangle(cornerRadius: 16)
                 .fill(Color(.secondarySystemBackground))
         )
     }
 
     private func syncSection(manager: ProfileManager) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 16) {
             Text("profile.sync.title".localized)
-                .font(.headline)
+                .font(.system(size: 20, weight: .semibold, design: .rounded))
+                .foregroundStyle(.primary)
+                .padding(.horizontal, 4)
 
-            HStack {
+            // Статус синхронизации
+            HStack(spacing: 10) {
                 Image(systemName: syncIcon(for: manager.syncState))
+                    .font(.system(size: 16, weight: .medium))
                     .foregroundColor(syncColor(for: manager.syncState))
                 Text(syncMessage(for: manager))
-                    .font(.subheadline)
+                    .font(.system(size: 15, weight: .regular))
                     .foregroundStyle(.secondary)
             }
+            .padding(.horizontal, 4)
 
             if manager.isSignedIn {
-                VStack(alignment: .leading, spacing: 8) {
+                VStack(spacing: 10) {
                     Button {
                         Task {
                             await manager.refreshFromCloud(mergeStrategy: .newest)
                         }
                     } label: {
-                        Label("profile.sync.refresh".localized, systemImage: "arrow.clockwise.circle")
-                            .frame(maxWidth: .infinity)
+                        HStack(spacing: 8) {
+                            Image(systemName: "arrow.clockwise")
+                                .font(.system(size: 16, weight: .medium))
+                            Text("profile.sync.refresh".localized)
+                                .font(.system(size: 16, weight: .semibold))
+                        }
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 44)
+                        .foregroundStyle(.white)
+                        .background(Color.accentColor)
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
                     }
-                    .buttonStyle(.borderedProminent)
                     .disabled(isResettingProfile || manager.isLoading)
+                    .opacity((isResettingProfile || manager.isLoading) ? 0.6 : 1.0)
 
-                    Button(role: .destructive) {
+                    Button {
                         showResetConfirmation = true
                     } label: {
-                        Label("profile.sync.reset".localized, systemImage: "trash")
-                            .frame(maxWidth: .infinity)
+                        HStack(spacing: 8) {
+                            Image(systemName: "trash")
+                                .font(.system(size: 16, weight: .medium))
+                            Text("profile.sync.reset".localized)
+                                .font(.system(size: 16, weight: .medium))
+                        }
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 44)
+                        .foregroundStyle(.red)
+                        .background(Color.red.opacity(0.1))
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
                     }
-                    .buttonStyle(.bordered)
                     .disabled(isResettingProfile || manager.isLoading)
+                    .opacity((isResettingProfile || manager.isLoading) ? 0.6 : 1.0)
                 }
             }
 
             if isResettingProfile {
-                ProgressView("profile.sync.reset.inProgress".localized)
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                HStack(spacing: 10) {
+                    ProgressView()
+                        .scaleEffect(0.8)
+                    Text("profile.sync.reset.inProgress".localized)
+                        .font(.system(size: 14, weight: .regular))
+                        .foregroundStyle(.secondary)
+                }
+                .padding(.top, 4)
             }
         }
-        .padding()
+        .padding(20)
         .background(
-            RoundedRectangle(cornerRadius: 20)
+            RoundedRectangle(cornerRadius: 16)
                 .fill(Color(.secondarySystemBackground))
         )
     }
 
     // MARK: - Helpers
-    private func metricView(title: String, value: String) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Text(value)
-                .font(.title2)
-                .fontWeight(.semibold)
-                .foregroundStyle(.primary)
+    private func examMetricView(title: String, value: String, icon: String, color: Color) -> some View {
+        HStack(spacing: 16) {
+            // Иконка
+            ZStack {
+                Circle()
+                    .fill(color.opacity(0.15))
+                    .frame(width: 48, height: 48)
+                
+                Image(systemName: icon)
+                    .font(.system(size: 20, weight: .medium))
+                    .foregroundStyle(color)
+            }
+            
+            // Значение и заголовок
+            VStack(alignment: .leading, spacing: 4) {
+                Text(value)
+                    .font(.system(size: 28, weight: .bold, design: .rounded))
+                    .foregroundStyle(.primary)
+                
+                Text(title)
+                    .font(.system(size: 14, weight: .regular))
+                    .foregroundStyle(.secondary)
+            }
+            
+            Spacer()
+        }
+        .padding(16)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color(.tertiarySystemBackground))
+        )
+    }
+    
+    private func metricView(title: String, value: String, icon: String, color: Color) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 8) {
+                Image(systemName: icon)
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundStyle(color)
+                    .frame(width: 20)
+                
+                Text(value)
+                    .font(.system(size: 24, weight: .bold, design: .rounded))
+                    .foregroundStyle(.primary)
+            }
+            
             Text(title)
-                .font(.caption)
+                .font(.system(size: 13, weight: .regular))
                 .foregroundStyle(.secondary)
+                .lineLimit(2)
+                .multilineTextAlignment(.leading)
+                .minimumScaleFactor(0.9)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding()
+        .frame(height: 110)
+        .padding(16)
         .background(
-            RoundedRectangle(cornerRadius: 16)
+            RoundedRectangle(cornerRadius: 12)
                 .fill(Color(.tertiarySystemBackground))
         )
     }
