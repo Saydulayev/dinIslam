@@ -61,6 +61,11 @@
 "start.basedOnGames_2" = "на основе %d игр";
 "start.basedOnGames_5" = "на основе %d игр";
 "start.noGamesYet" = "Пока нет данных";
+"start.menu.stats" = "Статистика";
+"start.menu.achievements" = "Достижения";
+"start.menu.profile" = "Профиль";
+"start.menu.settings" = "Настройки";
+"start.menu.info" = "Инфо";
 
 // Quiz View
 "quiz.question" = "Вопрос";

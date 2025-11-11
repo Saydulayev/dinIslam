@@ -16,6 +16,8 @@ enum StartRoute: Hashable {
     case result(ResultSnapshot)
     case stats
     case achievements
+    case settings
+    case profile
     case exam
     
     struct ResultSnapshot: Hashable {
@@ -149,6 +151,10 @@ struct StartView: View {
                     StatsView(statsManager: model.statsManager)
                 case .achievements:
                     AchievementsView()
+                case .settings:
+                    SettingsView(viewModel: SettingsViewModel(settingsManager: model.settingsManager))
+                case .profile:
+                    ProfileView()
                 case .exam:
                     if let examViewModel = model.examViewModel {
                         ExamView(viewModel: examViewModel) {
@@ -157,20 +163,6 @@ struct StartView: View {
                     }
                 }
             }
-            .sheet(isPresented: bindingModel.showingSettings) {
-                NavigationStack {
-                    SettingsView(viewModel: SettingsViewModel(settingsManager: model.settingsManager))
-                }
-                .presentationDetents([.large])
-                .presentationDragIndicator(.visible)
-            }
-            .sheet(isPresented: bindingModel.showingProfile) {
-                NavigationStack {
-                    ProfileView()
-                }
-                .presentationDetents([.large])
-                .presentationDragIndicator(.visible)
-            }
             .sheet(isPresented: bindingModel.showingExamSettings) {
                 ExamSettingsView { configuration in
                     model.startExam(with: configuration)
@@ -178,37 +170,33 @@ struct StartView: View {
                 .environment(\.settingsManager, model.settingsManager)
             }
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button(action: {
-                        model.showStats()
-                    }) {
-                        Image(systemName: "chart.bar.fill")
-                            .foregroundColor(.blue)
-                    }
-                }
-
-                ToolbarItem(placement: .topBarLeading) {
-                    Button(action: {
-                        model.showAchievements()
-                    }) {
-                        Image(systemName: "trophy.fill")
-                            .foregroundColor(.orange)
-                    }
-                }
-
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button(action: {
-                        model.showProfile()
-                    }) {
-                        profileIconView(model: model)
-                    }
-                }
-
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button(action: {
-                        model.showingSettings = true
-                    }) {
-                        Image(systemName: "gearshape.fill")
+                    Menu {
+                        Button(action: {
+                            model.showStats()
+                        }) {
+                            Label("start.menu.stats".localized, systemImage: "chart.bar.fill")
+                        }
+                        
+                        Button(action: {
+                            model.showAchievements()
+                        }) {
+                            Label("start.menu.achievements".localized, systemImage: "trophy.fill")
+                        }
+                        
+                        Button(action: {
+                            model.showProfile()
+                        }) {
+                            Label("start.menu.profile".localized, systemImage: "person.crop.circle")
+                        }
+                        
+                        Button(action: {
+                            model.showSettings()
+                        }) {
+                            Label("start.menu.settings".localized, systemImage: "gearshape.fill")
+                        }
+                    } label: {
+                        Image(systemName: "ellipsis.circle.fill")
                             .foregroundColor(.blue)
                     }
                 }

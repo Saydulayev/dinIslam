@@ -60,6 +60,11 @@
 "start.basedOnGames" = "based on %d game";
 "start.basedOnGames_other" = "based on %d games";
 "start.noGamesYet" = "No data yet";
+"start.menu.stats" = "Statistics";
+"start.menu.achievements" = "Achievements";
+"start.menu.profile" = "Profile";
+"start.menu.settings" = "Settings";
+"start.menu.info" = "Info";
 
 // Quiz View
 "quiz.question" = "Question";

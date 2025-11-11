@@ -41,9 +41,7 @@ final class StartViewModel {
 
     // MARK: - UI State
     var navigationPath = NavigationPath()
-    var showingSettings = false
     var showingExamSettings = false
-    var showingProfile = false
 
     var examViewModel: ExamViewModel?
 
@@ -178,13 +176,13 @@ final class StartViewModel {
     func showAchievements() {
         navigationPath.append(StartRoute.achievements)
     }
-
-    func showProfile() {
-        showingProfile = true
+    
+    func showSettings() {
+        navigationPath.append(StartRoute.settings)
     }
 
-    func hideProfile() {
-        showingProfile = false
+    func showProfile() {
+        navigationPath.append(StartRoute.profile)
     }
 
     // MARK: - Particles & Animations
