@@ -593,6 +593,10 @@ final class ProfileManager {
         let merged = dictionary.values.sorted { $0.date > $1.date }
         return Array(merged.prefix(20))
     }
+    
+    deinit {
+        syncTask?.cancel()
+    }
 }
 
 // MARK: - Delegates

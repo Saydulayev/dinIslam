@@ -101,8 +101,9 @@ final class StartViewModel {
         startGlowAnimationIfNeeded()
         createParticlesIfNeeded()
         if profileManager.isSignedIn {
-            Task {
-                await profileManager.refreshFromCloud(mergeStrategy: .newest)
+            Task { [weak self] in
+                guard let self = self else { return }
+                await self.profileManager.refreshFromCloud(mergeStrategy: .newest)
             }
         }
     }
@@ -132,8 +133,9 @@ final class StartViewModel {
         navigationPath = NavigationPath()
         startQuizTask?.cancel()
         navigationPath.append(StartRoute.quiz)
-        startQuizTask = Task { [cachedLanguageCode, quizViewModel] in
-            await quizViewModel.startQuiz(language: cachedLanguageCode)
+        startQuizTask = Task { [weak self, cachedLanguageCode] in
+            guard let self = self else { return }
+            await self.quizViewModel.startQuiz(language: cachedLanguageCode)
         }
     }
 
@@ -152,7 +154,7 @@ final class StartViewModel {
         examViewModel = viewModel
         navigationPath.append(StartRoute.exam)
 
-        Task {
+        Task { [cachedLanguageCode] in
             await viewModel.startExam(configuration: configuration, language: cachedLanguageCode)
         }
     }
@@ -255,8 +257,9 @@ final class StartViewModel {
 
     // MARK: - Helpers
     private func preloadQuestions() {
-        Task {
-            await enhancedContainer.enhancedQuizUseCase.preloadQuestions(for: ["ru", "en"])
+        Task { [weak self] in
+            guard let self = self else { return }
+            await self.enhancedContainer.enhancedQuizUseCase.preloadQuestions(for: ["ru", "en"])
         }
     }
 

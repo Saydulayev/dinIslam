@@ -46,8 +46,10 @@ class NotificationManager: ObservableObject {
     }
     
     private func checkNotificationPermission() {
-        center.getNotificationSettings { settings in
-            Task { @MainActor in
+        center.getNotificationSettings { [weak self] settings in
+            guard let self = self else { return }
+            Task { @MainActor [weak self] in
+                guard let self = self else { return }
                 self.hasPermission = settings.authorizationStatus == .authorized
             }
         }
@@ -116,7 +118,8 @@ class NotificationManager: ObservableObject {
         // Check permission asynchronously and schedule if needed
         center.getNotificationSettings { [weak self] settings in
             guard let self = self else { return }
-            Task { @MainActor in
+            Task { @MainActor [weak self] in
+                guard let self = self else { return }
                 self.hasPermission = settings.authorizationStatus == .authorized
                 if self.hasPermission && self.isNotificationEnabled {
                     self.scheduleDailyReminder()

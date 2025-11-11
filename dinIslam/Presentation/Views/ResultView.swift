@@ -191,7 +191,7 @@ struct ResultView: View {
     private func clearAchievementsOnce() {
         guard !achievementsCleared else { return }
         achievementsCleared = true
-        Task { @MainActor in
+        Task { @MainActor [onAchievementsCleared] in
             try? await Task.sleep(nanoseconds: 500_000_000)
             onAchievementsCleared()
         }

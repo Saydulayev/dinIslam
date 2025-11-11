@@ -59,7 +59,7 @@ struct ProfileView: View {
         }
         .alert("profile.sync.reset.title".localized, isPresented: $showResetConfirmation) {
             Button("profile.sync.reset.confirm".localized, role: .destructive) {
-                Task {
+                Task { @MainActor [manager] in
                     isResettingProfile = true
                     await manager.resetProfileData()
                     isResettingProfile = false
@@ -162,7 +162,7 @@ struct ProfileView: View {
 
                     if hasAvatar {
                         Button {
-                            Task {
+                            Task { @MainActor [manager] in
                                 await manager.deleteAvatar()
                             }
                         } label: {
@@ -214,7 +214,7 @@ struct ProfileView: View {
         )
         .onChange(of: avatarPickerItem) { previous, current in
             guard let item = current, previous != current else { return }
-            Task {
+            Task { @MainActor [manager] in
                 if let data = try? await item.loadTransferable(type: Data.self) {
                     let fileExtension = item.supportedContentTypes.first?.preferredFilenameExtension ?? "dat"
                     await manager.updateAvatar(with: data, fileExtension: fileExtension)
@@ -297,7 +297,7 @@ struct ProfileView: View {
             if manager.isSignedIn {
                 VStack(spacing: 10) {
                     Button {
-                        Task {
+                        Task { @MainActor [manager] in
                             await manager.refreshFromCloud(mergeStrategy: .newest)
                         }
                     } label: {

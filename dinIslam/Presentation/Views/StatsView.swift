@@ -179,7 +179,7 @@ struct StatsView: View {
                             HStack(spacing: 12) {
                                 Button(action: {
                                     updateTask?.cancel()
-                                    updateTask = Task {
+                                    updateTask = Task { @MainActor in
                                         await checkForUpdates()
                                     }
                                 }) {
@@ -199,7 +199,7 @@ struct StatsView: View {
                                 if remoteService.hasUpdates {
                                     Button(action: {
                                         syncTask?.cancel()
-                                        syncTask = Task {
+                                        syncTask = Task { @MainActor in
                                             await syncQuestions()
                                         }
                                     }) {
@@ -267,7 +267,7 @@ struct StatsView: View {
     
     private func loadTotalQuestionsCount() {
         loadQuestionsTask?.cancel()
-        loadQuestionsTask = Task {
+        loadQuestionsTask = Task { @MainActor [settingsManager] in
             do {
                 let questionsRepository = QuestionsRepository()
                 let currentLanguage = settingsManager.settings.language.rawValue
