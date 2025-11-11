@@ -95,6 +95,10 @@
 "settings.language.system" = "System";
 "settings.language.russian" = "Русский";
 "settings.language.english" = "English";
+"settings.theme.title" = "Theme";
+"settings.theme.system" = "System";
+"settings.theme.light" = "Light";
+"settings.theme.dark" = "Dark";
 "settings.sound.title" = "Sound";
 "settings.haptic.title" = "Haptic Feedback";
 "settings.notifications.title" = "Notifications";

@@ -44,6 +44,7 @@ extension EnvironmentValues {
 struct dinIslamApp: App {
     private let container = DIContainer.shared
     private let enhancedContainer = EnhancedDIContainer.shared
+    @State private var colorScheme: ColorScheme?
     
     init() {
         // Настройка улучшенной сетевой архитектуры
@@ -82,6 +83,17 @@ struct dinIslamApp: App {
             .environmentObject(container.notificationManager)
             .environment(\.statsManager, container.statsManager)
             .environment(\.profileManager, container.profileManager)
+            .preferredColorScheme(colorScheme)
+            .onAppear {
+                updateColorScheme()
+            }
+            .onChange(of: container.settingsManager.settings.theme) { _, _ in
+                updateColorScheme()
+            }
         }
+    }
+    
+    private func updateColorScheme() {
+        colorScheme = container.settingsManager.settings.theme.colorScheme
     }
 }

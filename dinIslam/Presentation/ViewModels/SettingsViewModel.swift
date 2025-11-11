@@ -23,6 +23,7 @@ class SettingsViewModel {
     }
     
     var showingLanguagePicker = false
+    var showingThemePicker = false
     var showingPrivacyPolicy = false
     var showingTermsOfService = false
     var refreshTrigger = UUID()
@@ -82,6 +83,13 @@ class SettingsViewModel {
         hapticManager.selectionChanged()
     }
     
+    // MARK: - Theme Settings
+    func updateTheme(_ theme: AppTheme) {
+        settingsManager.updateTheme(theme)
+        hapticManager.selectionChanged()
+        refreshTrigger = UUID()
+    }
+    
     
     
     func requestAppReview() {
@@ -135,6 +143,7 @@ class SettingsViewModel {
         settingsManager.updateSoundEnabled(defaultSettings.soundEnabled)
         settingsManager.updateHapticEnabled(defaultSettings.hapticEnabled)
         settingsManager.updateNotificationsEnabled(defaultSettings.notificationsEnabled)
+        settingsManager.updateTheme(defaultSettings.theme)
         AchievementManager.shared.refreshLocalization()
     }
 }

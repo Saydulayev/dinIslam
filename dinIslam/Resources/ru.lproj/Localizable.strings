@@ -96,6 +96,10 @@
 "settings.language.system" = "Системный";
 "settings.language.russian" = "Русский";
 "settings.language.english" = "English";
+"settings.theme.title" = "Тема";
+"settings.theme.system" = "Системная";
+"settings.theme.light" = "Светлая";
+"settings.theme.dark" = "Темная";
 "settings.sound.title" = "Звук";
 "settings.haptic.title" = "Тактильная обратная связь";
 "settings.notifications.title" = "Уведомления";

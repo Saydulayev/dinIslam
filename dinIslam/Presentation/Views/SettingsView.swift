@@ -46,6 +46,31 @@ struct SettingsView: View {
                     viewModel.showingLanguagePicker = true
                 }
                 
+                // Theme Setting
+                HStack {
+                    Image(systemName: "paintbrush")
+                        .foregroundColor(.purple)
+                        .frame(width: 24)
+                    
+                    VStack(alignment: .leading, spacing: 2) {
+                        LocalizedText("settings.theme.title")
+                            .font(.body)
+                        Text(viewModel.settings.theme.displayName)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    
+                    Spacer()
+                    
+                    Image(systemName: "chevron.right")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    viewModel.showingThemePicker = true
+                }
+                
                 // Sound Setting
                 HStack {
                     Image(systemName: "speaker.wave.2")
@@ -223,6 +248,11 @@ struct SettingsView: View {
                 LanguagePickerView(viewModel: viewModel)
             }
         }
+        .sheet(isPresented: $viewModel.showingThemePicker) {
+            NavigationStack {
+                ThemePickerView(viewModel: viewModel)
+            }
+        }
         .sheet(isPresented: $showingNotificationSettings) {
             NotificationSettingsView()
         }
@@ -305,6 +335,48 @@ struct SettingsView: View {
                 }
             }
             .navigationTitle("settings.language.title".localized)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("settings.done".localized) {
+                        dismiss()
+                    }
+                    .fontWeight(.semibold)
+                }
+            }
+        }
+    }
+    
+    struct ThemePickerView: View {
+        @Bindable var viewModel: SettingsViewModel
+        @Environment(\.dismiss) private var dismiss
+        
+        init(viewModel: SettingsViewModel) {
+            _viewModel = Bindable(viewModel)
+        }
+        
+        var body: some View {
+            List {
+                ForEach(AppTheme.allCases, id: \.self) { theme in
+                    HStack {
+                        Text(theme.displayName)
+                            .font(.body)
+                        
+                        Spacer()
+                        
+                        if viewModel.settings.theme == theme {
+                            Image(systemName: "checkmark")
+                                .foregroundColor(.blue)
+                        }
+                    }
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        viewModel.updateTheme(theme)
+                        dismiss()
+                    }
+                }
+            }
+            .navigationTitle("settings.theme.title".localized)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {

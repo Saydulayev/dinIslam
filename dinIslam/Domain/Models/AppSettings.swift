@@ -7,18 +7,67 @@
 
 import Foundation
 import Observation
+import SwiftUI
 
 struct AppSettings: Codable {
     var language: AppLanguage
     var soundEnabled: Bool
     var hapticEnabled: Bool
     var notificationsEnabled: Bool
+    var theme: AppTheme
+    
+    enum CodingKeys: String, CodingKey {
+        case language
+        case soundEnabled
+        case hapticEnabled
+        case notificationsEnabled
+        case theme
+    }
     
     init() {
         self.language = .system
         self.soundEnabled = true
         self.hapticEnabled = true
         self.notificationsEnabled = true
+        self.theme = .system
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        language = try container.decode(AppLanguage.self, forKey: .language)
+        soundEnabled = try container.decode(Bool.self, forKey: .soundEnabled)
+        hapticEnabled = try container.decode(Bool.self, forKey: .hapticEnabled)
+        notificationsEnabled = try container.decode(Bool.self, forKey: .notificationsEnabled)
+        // Обработка обратной совместимости - если theme отсутствует, используем .system
+        theme = try container.decodeIfPresent(AppTheme.self, forKey: .theme) ?? .system
+    }
+}
+
+enum AppTheme: String, CaseIterable, Codable {
+    case system = "system"
+    case light = "light"
+    case dark = "dark"
+    
+    var displayName: String {
+        switch self {
+        case .system:
+            return LocalizationManager.shared.localizedString(for: "settings.theme.system")
+        case .light:
+            return LocalizationManager.shared.localizedString(for: "settings.theme.light")
+        case .dark:
+            return LocalizationManager.shared.localizedString(for: "settings.theme.dark")
+        }
+    }
+    
+    var colorScheme: ColorScheme? {
+        switch self {
+        case .system:
+            return nil
+        case .light:
+            return .light
+        case .dark:
+            return .dark
+        }
     }
 }
 
@@ -83,6 +132,11 @@ final class SettingsManager {
     
     func updateNotificationsEnabled(_ enabled: Bool) {
         settings.notificationsEnabled = enabled
+        saveSettings()
+    }
+    
+    func updateTheme(_ theme: AppTheme) {
+        settings.theme = theme
         saveSettings()
     }
     
