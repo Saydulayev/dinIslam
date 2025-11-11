@@ -185,6 +185,17 @@ final class ProfileManager {
         }
     }
 
+    func deleteAvatar() async {
+        guard profile.avatarURL != nil else { return }
+        localStore.deleteAvatar(for: profile.id)
+        profile.avatarURL = nil
+        profile.metadata.updatedAt = Date()
+        localStore.saveProfile(profile)
+        if isSignedIn {
+            await performSync()
+        }
+    }
+
     // MARK: - Sync Management
     func refreshFromCloud(mergeStrategy: ProfileMergeStrategy = .newest) async {
         guard isSignedIn else { return }

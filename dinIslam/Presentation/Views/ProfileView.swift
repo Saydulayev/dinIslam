@@ -110,6 +110,19 @@ struct ProfileView: View {
                     .buttonStyle(.bordered)
                     .controlSize(.large)
 
+                    if hasAvatar {
+                        Button(role: .destructive) {
+                            Task {
+                                await manager.deleteAvatar()
+                            }
+                        } label: {
+                            Label("profile.avatar.delete".localized, systemImage: "trash")
+                                .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(.bordered)
+                        .controlSize(.large)
+                    }
+
                     Button(role: .destructive) {
                         manager.signOut()
                     } label: {

@@ -27,6 +27,7 @@
 "profile.recommendation.maintainStreak" = "Great streak! Stay on track to reinforce your progress.";
 "profile.avatar.select" = "Choose Photo";
 "profile.avatar.change" = "Change Photo";
+"profile.avatar.delete" = "Delete Photo";
 "profile.sync.reset" = "Reset Data";
 "profile.sync.reset.title" = "Reset progress?";
 "profile.sync.reset.message" = "This will remove all profile data locally and in iCloud. Continue?";

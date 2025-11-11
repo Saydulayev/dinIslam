@@ -27,6 +27,7 @@
 "profile.recommendation.maintainStreak" = "Отличная серия! Продолжайте в том же духе, чтобы закрепить успех.";
 "profile.avatar.select" = "Выбрать фото";
 "profile.avatar.change" = "Сменить фото";
+"profile.avatar.delete" = "Удалить фото";
 "profile.sync.reset" = "Сбросить данные";
 "profile.sync.reset.title" = "Сбросить прогресс?";
 "profile.sync.reset.message" = "Все локальные и облачные данные профиля будут удалены. Продолжить?";
