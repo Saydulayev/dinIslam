@@ -43,6 +43,10 @@ struct ProfileView: View {
                 }
             }
         }
+        .onAppear {
+            // Валидация аватара при открытии профиля
+            manager.validateAvatar()
+        }
         .alert("profile.sync.reset.title".localized, isPresented: $showResetConfirmation) {
             Button("profile.sync.reset.confirm".localized, role: .destructive) {
                 Task {
@@ -59,7 +63,7 @@ struct ProfileView: View {
 
     // MARK: - Sections
     private func profileHeader(manager: ProfileManager) -> some View {
-        let hasAvatar = manager.profile.avatarURL != nil
+        let hasAvatar = avatarExists(for: manager)
 
         return VStack(spacing: 16) {
             ZStack {
@@ -307,9 +311,16 @@ struct ProfileView: View {
         }
     }
 
+    private func avatarExists(for manager: ProfileManager) -> Bool {
+        guard let url = manager.profile.avatarURL else { return false }
+        let fileManager = FileManager.default
+        return fileManager.fileExists(atPath: url.path)
+    }
+
     #if os(iOS)
     private func avatarImage(for manager: ProfileManager) -> Image? {
         guard let url = manager.profile.avatarURL,
+              FileManager.default.fileExists(atPath: url.path),
               let uiImage = UIImage(contentsOfFile: url.path) else {
             return nil
         }
@@ -318,6 +329,7 @@ struct ProfileView: View {
     #else
     private func avatarImage(for manager: ProfileManager) -> Image? {
         guard let url = manager.profile.avatarURL,
+              FileManager.default.fileExists(atPath: url.path),
               let data = try? Data(contentsOf: url),
               let nsImage = NSImage(data: data) else {
             return nil

@@ -92,6 +92,9 @@ final class ProfileManager {
             profile = resolvedLocalStore.loadOrCreateAnonymousProfile()
         }
 
+        // Валидация аватара при загрузке профиля
+        validateAvatar()
+
         self.statsManager.profileSyncDelegate = self
         self.examStatisticsManager.profileSyncDelegate = self
 
@@ -196,6 +199,30 @@ final class ProfileManager {
         }
     }
 
+    func validateAvatar() {
+        // Проверяем существование файла аватара
+        if let avatarURL = profile.avatarURL {
+            let fileManager = FileManager.default
+            if !fileManager.fileExists(atPath: avatarURL.path) {
+                // Файл не существует, пытаемся найти его в локальном хранилище
+                if let existingAvatar = localStore.loadAvatar(for: profile.id) {
+                    profile.avatarURL = existingAvatar
+                    localStore.saveProfile(profile)
+                } else {
+                    // Файл не найден, очищаем avatarURL
+                    profile.avatarURL = nil
+                    localStore.saveProfile(profile)
+                }
+            }
+        } else {
+            // Если avatarURL отсутствует, но файл существует, восстанавливаем ссылку
+            if let existingAvatar = localStore.loadAvatar(for: profile.id) {
+                profile.avatarURL = existingAvatar
+                localStore.saveProfile(profile)
+            }
+        }
+    }
+
     // MARK: - Sync Management
     func refreshFromCloud(mergeStrategy: ProfileMergeStrategy = .newest) async {
         guard isSignedIn else { return }
@@ -203,6 +230,8 @@ final class ProfileManager {
             if let remoteProfile = try await cloudService.fetchProfile(for: profile.id) {
                 profile = mergeProfile(local: profile, remote: remoteProfile, strategy: mergeStrategy)
                 profile.metadata.lastSyncedAt = Date()
+                // Валидация аватара после синхронизации
+                validateAvatar()
                 localStore.saveProfile(profile)
             }
         } catch {
@@ -231,7 +260,9 @@ final class ProfileManager {
             profileToSync.metadata.lastSyncedAt = Date()
             let savedProfile = try await cloudService.saveProfile(profileToSync)
             profile = savedProfile
-            localStore.saveProfile(savedProfile)
+            // Валидация аватара после синхронизации
+            validateAvatar()
+            localStore.saveProfile(profile)
             syncState = .idle
         } catch {
             errorMessage = error.localizedDescription
@@ -276,6 +307,8 @@ final class ProfileManager {
                 examStatisticsManager.resetStatistics()
             }
             
+            // Валидация аватара после входа
+            validateAvatar()
             localStore.saveProfile(profile)
             await performSync()
             errorMessage = nil
