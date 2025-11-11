@@ -401,59 +401,6 @@ struct StartView: View {
         .buttonStyle(.plain)
     }
     
-    @ViewBuilder
-    private func profileIconView(model: StartViewModel) -> some View {
-        let profileManager = model.profileManager
-        
-        if profileManager.isSignedIn {
-            if avatarExists(for: profileManager) {
-                // Показываем аватар пользователя
-                avatarImageView(for: profileManager)
-                    .resizable()
-                    .scaledToFill()
-                    .frame(width: 28, height: 28)
-                    .clipShape(Circle())
-                    .overlay(
-                        Circle()
-                            .strokeBorder(Color.blue, lineWidth: 1.5)
-                    )
-            } else {
-                // Показываем иконку с галочкой, если пользователь вошел, но нет аватара
-                Image(systemName: "person.crop.circle.badge.checkmark")
-                    .foregroundColor(.blue)
-            }
-        } else {
-            // Обычная иконка, если пользователь не вошел
-            Image(systemName: "person.crop.circle")
-                .foregroundColor(.blue)
-        }
-    }
-    
-    private func avatarExists(for profileManager: ProfileManager) -> Bool {
-        guard let url = profileManager.profile.avatarURL else { return false }
-        return FileManager.default.fileExists(atPath: url.path)
-    }
-    
-    #if os(iOS)
-    private func avatarImageView(for profileManager: ProfileManager) -> Image {
-        guard let url = profileManager.profile.avatarURL,
-              FileManager.default.fileExists(atPath: url.path),
-              let uiImage = UIImage(contentsOfFile: url.path) else {
-            return Image(systemName: "person.crop.circle.fill")
-        }
-        return Image(uiImage: uiImage)
-    }
-    #else
-    private func avatarImageView(for profileManager: ProfileManager) -> Image {
-        guard let url = profileManager.profile.avatarURL,
-              FileManager.default.fileExists(atPath: url.path),
-              let data = try? Data(contentsOf: url),
-              let nsImage = NSImage(data: data) else {
-            return Image(systemName: "person.crop.circle.fill")
-        }
-        return Image(nsImage: nsImage)
-    }
-    #endif
 }
 
 private struct ParticleFieldView: View {
