@@ -9,6 +9,8 @@
 "profile.progress.title" = "Прогресс";
 "profile.progress.questions" = "Изучено вопросов";
 "profile.progress.correct" = "Правильных ответов";
+"profile.progress.incorrect" = "Неправильных ответов";
+"profile.progress.corrected" = "Исправлено ошибок";
 "profile.progress.accuracy" = "Средний результат";
 "profile.progress.streak" = "Серия";
 "profile.recommendations.title" = "Рекомендации";
@@ -38,6 +40,9 @@
 "profile.sync.never" = "Пока не синхронизировалось с iCloud";
 "profile.sync.inProgress" = "Синхронизация...";
 "profile.sync.failed" = "Ошибка синхронизации: %@";
+"profile.sync.signin.required" = "Войдите в аккаунт для синхронизации прогресса на всех устройствах";
+"profile.signin.prompt.title" = "Синхронизация прогресса";
+"profile.signin.prompt.message" = "Войдите в аккаунт, чтобы сохранять прогресс на всех ваших устройствах и не потерять данные";
 /* 
   Localizable.strings (Russian)
   dinIslam

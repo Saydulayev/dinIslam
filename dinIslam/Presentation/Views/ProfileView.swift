@@ -28,8 +28,13 @@ struct ProfileView: View {
                 profileHeader(manager: manager)
                     .padding(.top, 8)
                 
-                progressSection(progress: manager.progress)
-                    .padding(.top, 16)
+                if manager.isSignedIn {
+                    progressSection(progress: manager.progress)
+                        .padding(.top, 16)
+                } else {
+                    signInPromptView()
+                        .padding(.top, 16)
+                }
                 
                 syncSection(manager: manager)
                     .padding(.top, 16)
@@ -67,6 +72,33 @@ struct ProfileView: View {
     }
 
     // MARK: - Sections
+    private func signInPromptView() -> some View {
+        VStack(spacing: 16) {
+            HStack(spacing: 12) {
+                Image(systemName: "icloud.fill")
+                    .font(.system(size: 24, weight: .medium))
+                    .foregroundStyle(Color.accentColor)
+                
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("profile.signin.prompt.title".localized)
+                        .font(.system(size: 17, weight: .semibold, design: .rounded))
+                        .foregroundStyle(.primary)
+                    
+                    Text("profile.signin.prompt.message".localized)
+                        .font(.system(size: 15, weight: .regular))
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .padding(20)
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color(.secondarySystemBackground))
+        )
+    }
+    
     private func profileHeader(manager: ProfileManager) -> some View {
         let hasAvatar = avatarExists(for: manager)
 
@@ -197,7 +229,7 @@ struct ProfileView: View {
                 .font(.system(size: 20, weight: .semibold, design: .rounded))
                 .foregroundStyle(.primary)
                 .padding(.horizontal, 4)
-
+            
             LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 10), count: 2), spacing: 10) {
                 metricView(
                     title: "profile.progress.questions".localized,
@@ -210,6 +242,18 @@ struct ProfileView: View {
                     value: "\(progress.correctAnswers)",
                     icon: "checkmark.circle.fill",
                     color: .green
+                )
+                metricView(
+                    title: "profile.progress.incorrect".localized,
+                    value: "\(progress.incorrectAnswers)",
+                    icon: "xmark.circle.fill",
+                    color: .red
+                )
+                metricView(
+                    title: "profile.progress.corrected".localized,
+                    value: "\(progress.correctedMistakes)",
+                    icon: "checkmark.circle.badge.xmark",
+                    color: .orange
                 )
                 metricView(
                     title: "profile.progress.accuracy".localized,
@@ -290,6 +334,20 @@ struct ProfileView: View {
                     .disabled(isResettingProfile || manager.isLoading)
                     .opacity((isResettingProfile || manager.isLoading) ? 0.6 : 1.0)
                 }
+            } else {
+                // Информационное сообщение для неавторизованных пользователей
+                HStack(spacing: 12) {
+                    Image(systemName: "info.circle.fill")
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundStyle(Color.accentColor)
+                    
+                    Text("profile.sync.signin.required".localized)
+                        .font(.system(size: 14, weight: .regular))
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.vertical, 8)
             }
 
             if isResettingProfile {

@@ -67,6 +67,7 @@ struct ProfileProgress: Codable, Equatable {
     var totalQuestionsAnswered: Int
     var correctAnswers: Int
     var incorrectAnswers: Int
+    var correctedMistakes: Int
     var examsPassed: Int
     var examsTaken: Int
     var currentStreak: Int
@@ -80,10 +81,30 @@ struct ProfileProgress: Codable, Equatable {
     var examHistory: [ExamHistoryEntry]
     var lastActivityAt: Date?
 
+    enum CodingKeys: String, CodingKey {
+        case totalQuestionsAnswered
+        case correctAnswers
+        case incorrectAnswers
+        case correctedMistakes
+        case examsPassed
+        case examsTaken
+        case currentStreak
+        case longestStreak
+        case averageQuizScore
+        case masteryLevel
+        case difficultyStats
+        case topicProgress
+        case recommendations
+        case quizHistory
+        case examHistory
+        case lastActivityAt
+    }
+
     init(
         totalQuestionsAnswered: Int = 0,
         correctAnswers: Int = 0,
         incorrectAnswers: Int = 0,
+        correctedMistakes: Int = 0,
         examsPassed: Int = 0,
         examsTaken: Int = 0,
         currentStreak: Int = 0,
@@ -100,6 +121,7 @@ struct ProfileProgress: Codable, Equatable {
         self.totalQuestionsAnswered = totalQuestionsAnswered
         self.correctAnswers = correctAnswers
         self.incorrectAnswers = incorrectAnswers
+        self.correctedMistakes = correctedMistakes
         self.examsPassed = examsPassed
         self.examsTaken = examsTaken
         self.currentStreak = currentStreak
@@ -112,6 +134,47 @@ struct ProfileProgress: Codable, Equatable {
         self.quizHistory = quizHistory
         self.examHistory = examHistory
         self.lastActivityAt = lastActivityAt
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        totalQuestionsAnswered = try container.decode(Int.self, forKey: .totalQuestionsAnswered)
+        correctAnswers = try container.decode(Int.self, forKey: .correctAnswers)
+        incorrectAnswers = try container.decode(Int.self, forKey: .incorrectAnswers)
+        // Обработка отсутствующего поля для обратной совместимости
+        correctedMistakes = try container.decodeIfPresent(Int.self, forKey: .correctedMistakes) ?? 0
+        examsPassed = try container.decode(Int.self, forKey: .examsPassed)
+        examsTaken = try container.decode(Int.self, forKey: .examsTaken)
+        currentStreak = try container.decode(Int.self, forKey: .currentStreak)
+        longestStreak = try container.decode(Int.self, forKey: .longestStreak)
+        averageQuizScore = try container.decode(Double.self, forKey: .averageQuizScore)
+        masteryLevel = try container.decode(MasteryLevel.self, forKey: .masteryLevel)
+        difficultyStats = try container.decode([DifficultyPerformance].self, forKey: .difficultyStats)
+        topicProgress = try container.decode([TopicProgress].self, forKey: .topicProgress)
+        recommendations = try container.decode([LearningRecommendation].self, forKey: .recommendations)
+        quizHistory = try container.decode([QuizHistoryEntry].self, forKey: .quizHistory)
+        examHistory = try container.decode([ExamHistoryEntry].self, forKey: .examHistory)
+        lastActivityAt = try container.decodeIfPresent(Date.self, forKey: .lastActivityAt)
+    }
+    
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(totalQuestionsAnswered, forKey: .totalQuestionsAnswered)
+        try container.encode(correctAnswers, forKey: .correctAnswers)
+        try container.encode(incorrectAnswers, forKey: .incorrectAnswers)
+        try container.encode(correctedMistakes, forKey: .correctedMistakes)
+        try container.encode(examsPassed, forKey: .examsPassed)
+        try container.encode(examsTaken, forKey: .examsTaken)
+        try container.encode(currentStreak, forKey: .currentStreak)
+        try container.encode(longestStreak, forKey: .longestStreak)
+        try container.encode(averageQuizScore, forKey: .averageQuizScore)
+        try container.encode(masteryLevel, forKey: .masteryLevel)
+        try container.encode(difficultyStats, forKey: .difficultyStats)
+        try container.encode(topicProgress, forKey: .topicProgress)
+        try container.encode(recommendations, forKey: .recommendations)
+        try container.encode(quizHistory, forKey: .quizHistory)
+        try container.encode(examHistory, forKey: .examHistory)
+        try container.encodeIfPresent(lastActivityAt, forKey: .lastActivityAt)
     }
 }
 

@@ -9,6 +9,8 @@
 "profile.progress.title" = "Progress";
 "profile.progress.questions" = "Questions Studied";
 "profile.progress.correct" = "Correct Answers";
+"profile.progress.incorrect" = "Incorrect Answers";
+"profile.progress.corrected" = "Mistakes Corrected";
 "profile.progress.accuracy" = "Average Score";
 "profile.progress.streak" = "Streak";
 "profile.recommendations.title" = "Recommendations";
@@ -38,6 +40,9 @@
 "profile.sync.never" = "Not synced with iCloud yet";
 "profile.sync.inProgress" = "Syncing...";
 "profile.sync.failed" = "Sync failed: %@";
+"profile.sync.signin.required" = "Sign in to sync your progress across all devices";
+"profile.signin.prompt.title" = "Sync Your Progress";
+"profile.signin.prompt.message" = "Sign in to save your progress across all your devices and never lose your data";
 /* 
   Localizable.strings (English)
   dinIslam

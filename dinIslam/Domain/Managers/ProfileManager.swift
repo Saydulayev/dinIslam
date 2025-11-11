@@ -326,6 +326,7 @@ final class ProfileManager {
         progress.totalQuestionsAnswered = stats.totalQuestionsStudied
         progress.correctAnswers = stats.correctAnswers
         progress.incorrectAnswers = stats.incorrectAnswers
+        progress.correctedMistakes = stats.correctedMistakes
         progress.currentStreak = stats.currentStreak
         progress.longestStreak = stats.longestStreak
         progress.averageQuizScore = stats.averageRecentScore
@@ -432,6 +433,7 @@ final class ProfileManager {
             merged.totalQuestionsAnswered = max(remote.totalQuestionsAnswered, local.totalQuestionsAnswered)
             merged.correctAnswers = max(remote.correctAnswers, local.correctAnswers)
             merged.incorrectAnswers = max(remote.incorrectAnswers, local.incorrectAnswers)
+            merged.correctedMistakes = max(remote.correctedMistakes, local.correctedMistakes)
             merged.examsTaken = max(remote.examsTaken, local.examsTaken)
             merged.examsPassed = max(remote.examsPassed, local.examsPassed)
             merged.currentStreak = max(remote.currentStreak, local.currentStreak)
@@ -441,6 +443,7 @@ final class ProfileManager {
             merged.totalQuestionsAnswered = max(remote.totalQuestionsAnswered, local.totalQuestionsAnswered)
             merged.correctAnswers = max(remote.correctAnswers, local.correctAnswers)
             merged.incorrectAnswers = max(remote.incorrectAnswers, local.incorrectAnswers)
+            merged.correctedMistakes = max(remote.correctedMistakes, local.correctedMistakes)
             merged.examsTaken = max(remote.examsTaken, local.examsTaken)
             merged.examsPassed = max(remote.examsPassed, local.examsPassed)
             merged.currentStreak = max(remote.currentStreak, local.currentStreak)
