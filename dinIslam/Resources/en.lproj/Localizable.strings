@@ -308,6 +308,7 @@
 "notification.body" = "Time for new knowledge!";
 "notification.permission.title" = "Allow Notifications";
 "notification.permission.message" = "Get reminders for daily study";
+"notification.permission.request" = "Allow";
 "notification.settings.title" = "Configure";
 "notification.settings.enabled" = "Enable Reminders";
 "notification.settings.time" = "Reminder Time";

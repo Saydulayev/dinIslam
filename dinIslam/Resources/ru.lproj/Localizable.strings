@@ -324,6 +324,7 @@
 "notification.body" = "Время для новых знаний!";
 "notification.permission.title" = "Разрешить уведомления";
 "notification.permission.message" = "Получайте напоминания о ежедневном изучении";
+"notification.permission.request" = "Разрешить";
 "notification.settings.title" = "Настроить";
 "notification.settings.enabled" = "Включить напоминания";
 "notification.settings.time" = "Время напоминания";

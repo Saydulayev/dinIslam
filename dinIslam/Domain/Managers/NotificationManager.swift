@@ -32,6 +32,10 @@ class NotificationManager: ObservableObject {
                 self.hasPermission = granted
                 if granted {
                     self.isNotificationEnabled = true
+                    // Schedule notifications if enabled
+                    if self.isNotificationEnabled {
+                        self.scheduleDailyReminder()
+                    }
                 }
             }
             return granted
@@ -54,8 +58,8 @@ class NotificationManager: ObservableObject {
     func scheduleDailyReminder() {
         guard hasPermission && isNotificationEnabled else { return }
         
-        // Remove existing notifications
-        center.removeAllPendingNotificationRequests()
+        // Remove existing daily reminder notifications only
+        center.removePendingNotificationRequests(withIdentifiers: ["daily_reminder"])
         
         let content = UNMutableNotificationContent()
         content.title = LocalizationManager.shared.localizedString(for: "notification.title")
@@ -88,7 +92,8 @@ class NotificationManager: ObservableObject {
     }
     
     func cancelDailyReminder() {
-        center.removeAllPendingNotificationRequests()
+        // Remove only daily reminder notifications, not achievement notifications
+        center.removePendingNotificationRequests(withIdentifiers: ["daily_reminder", "streak_reminder"])
     }
     
     // MARK: - Settings Management
@@ -105,6 +110,18 @@ class NotificationManager: ObservableObject {
             components.hour = 20
             components.minute = 0
             reminderTime = calendar.date(from: components) ?? Date()
+        }
+        
+        // Schedule notifications if enabled and permission is granted
+        // Check permission asynchronously and schedule if needed
+        center.getNotificationSettings { [weak self] settings in
+            guard let self = self else { return }
+            Task { @MainActor in
+                self.hasPermission = settings.authorizationStatus == .authorized
+                if self.hasPermission && self.isNotificationEnabled {
+                    self.scheduleDailyReminder()
+                }
+            }
         }
     }
     
