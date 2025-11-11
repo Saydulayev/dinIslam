@@ -11,10 +11,6 @@
 "profile.progress.correct" = "Correct Answers";
 "profile.progress.accuracy" = "Average Score";
 "profile.progress.streak" = "Streak";
-"profile.exams.title" = "Exams";
-"profile.exams.completed" = "Completed";
-"profile.exams.passed" = "Passed";
-"profile.exams.passRate" = "Pass Rate";
 "profile.recommendations.title" = "Recommendations";
 "profile.recommendations.nextSteps" = "Next Steps";
 "profile.recommendations.empty" = "No recommendations yet—keep practicing and we will suggest what to learn next.";

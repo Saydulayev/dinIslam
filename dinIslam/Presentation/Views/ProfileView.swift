@@ -31,9 +31,6 @@ struct ProfileView: View {
                 progressSection(progress: manager.progress)
                     .padding(.top, 16)
                 
-                examSection(progress: manager.progress)
-                    .padding(.top, 16)
-                
                 syncSection(manager: manager)
                     .padding(.top, 16)
                     .padding(.bottom, 32)
@@ -235,43 +232,6 @@ struct ProfileView: View {
         )
     }
 
-    private func examSection(progress: ProfileProgress) -> some View {
-        let passRate = progress.examsTaken > 0 ? Int(Double(progress.examsPassed) / Double(progress.examsTaken) * 100) : 0
-        
-        return VStack(alignment: .leading, spacing: 16) {
-            Text("profile.exams.title".localized)
-                .font(.system(size: 20, weight: .semibold, design: .rounded))
-                .foregroundStyle(.primary)
-                .padding(.horizontal, 4)
-
-            VStack(spacing: 10) {
-                examMetricView(
-                    title: "profile.exams.completed".localized,
-                    value: "\(progress.examsTaken)",
-                    icon: "doc.text.fill",
-                    color: .indigo
-                )
-                examMetricView(
-                    title: "profile.exams.passed".localized,
-                    value: "\(progress.examsPassed)",
-                    icon: "checkmark.seal.fill",
-                    color: .green
-                )
-                examMetricView(
-                    title: "profile.exams.passRate".localized,
-                    value: "\(passRate)%",
-                    icon: "percent",
-                    color: .teal
-                )
-            }
-        }
-        .padding(20)
-        .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color(.secondarySystemBackground))
-        )
-    }
-
     private func syncSection(manager: ProfileManager) -> some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("profile.sync.title".localized)
@@ -351,39 +311,6 @@ struct ProfileView: View {
     }
 
     // MARK: - Helpers
-    private func examMetricView(title: String, value: String, icon: String, color: Color) -> some View {
-        HStack(spacing: 16) {
-            // Иконка
-            ZStack {
-                Circle()
-                    .fill(color.opacity(0.15))
-                    .frame(width: 48, height: 48)
-                
-                Image(systemName: icon)
-                    .font(.system(size: 20, weight: .medium))
-                    .foregroundStyle(color)
-            }
-            
-            // Значение и заголовок
-            VStack(alignment: .leading, spacing: 4) {
-                Text(value)
-                    .font(.system(size: 28, weight: .bold, design: .rounded))
-                    .foregroundStyle(.primary)
-                
-                Text(title)
-                    .font(.system(size: 14, weight: .regular))
-                    .foregroundStyle(.secondary)
-            }
-            
-            Spacer()
-        }
-        .padding(16)
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(Color(.tertiarySystemBackground))
-        )
-    }
-    
     private func metricView(title: String, value: String, icon: String, color: Color) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 8) {

@@ -14,11 +14,8 @@ struct ExamResultView: View {
     let onRetake: () -> Void
     let onBackToMenu: () -> Void
     @Environment(\.dismiss) private var dismiss
-    @Environment(\.profileManager) private var profileManager
-    @State private var showingDetailedStats = false
     
     var body: some View {
-        @Bindable var manager = profileManager
         ScrollView {
             VStack(spacing: 24) {
                 // Header
@@ -32,10 +29,6 @@ struct ExamResultView: View {
                 
                 // Detailed breakdown
                 ExamBreakdownView(result: result)
-                
-                if manager.isSignedIn {
-                    ExamProfileInsightsView(recommendations: manager.recommendations)
-                }
                 
                 // Action buttons
                 ExamResultActionsView(
@@ -51,53 +44,6 @@ struct ExamResultView: View {
         .navigationBarTitleDisplayMode(.large)
         .navigationBarBackButtonHidden(true)
         .interactiveDismissDisabled(true)
-    }
-}
-
-// MARK: - Exam Profile Insights
-struct ExamProfileInsightsView: View {
-    let recommendations: [LearningRecommendation]
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("profile.recommendations.nextSteps".localized)
-                .font(.headline)
-                .fontWeight(.semibold)
-
-            if recommendations.isEmpty {
-                Text("profile.recommendations.empty".localized)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .padding()
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(
-                        RoundedRectangle(cornerRadius: 16)
-                            .fill(Color(.tertiarySystemBackground))
-                    )
-            } else {
-                ForEach(recommendations.prefix(2)) { recommendation in
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text(recommendation.title)
-                            .font(.subheadline)
-                            .fontWeight(.semibold)
-                        Text(recommendation.message)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    .padding()
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(
-                        RoundedRectangle(cornerRadius: 16)
-                            .fill(Color.blue.opacity(0.08))
-                    )
-                }
-            }
-        }
-        .padding()
-        .background(
-            RoundedRectangle(cornerRadius: 20)
-                .fill(Color(.secondarySystemBackground))
-        )
     }
 }
 
