@@ -16,27 +16,45 @@ struct AchievementsView: View {
     @State private var selectedAchievement: Achievement?
     
     var body: some View {
-        ScrollView {
-            LazyVStack(spacing: 16) {
-                ForEach(achievementManager.achievements) { achievement in
-                    AchievementCard(
-                        achievement: achievement,
-                        onTap: { selectedAchievement = achievement }
-                    )
+        ZStack {
+            // Gradient background
+            LinearGradient(
+                colors: [
+                    DesignTokens.Colors.background1,
+                    DesignTokens.Colors.background2
+                ],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .ignoresSafeArea()
+            
+            ScrollView {
+                LazyVStack(spacing: DesignTokens.Spacing.lg) {
+                    ForEach(achievementManager.achievements) { achievement in
+                        AchievementCard(
+                            achievement: achievement,
+                            onTap: { selectedAchievement = achievement }
+                        )
+                    }
                 }
+                .padding(.horizontal, DesignTokens.Spacing.xxl)
+                .padding(.top, DesignTokens.Spacing.lg)
+                .padding(.bottom, DesignTokens.Spacing.xxxl)
             }
-            .padding()
         }
         .navigationTitle("achievements.title".localized)
-        .navigationBarTitleDisplayMode(.large)
+        .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button("achievements.reset".localized) {
                     showingResetAlert = true
                 }
-                .foregroundColor(.red)
+                .font(DesignTokens.Typography.secondarySemibold)
+                .foregroundColor(DesignTokens.Colors.iconRed)
             }
         }
+        .toolbarBackground(DesignTokens.Colors.background1, for: .navigationBar)
+        .toolbarColorScheme(.dark, for: .navigationBar)
         .alert(
             "achievements.reset.confirm.title".localized,
             isPresented: $showingResetAlert
@@ -56,7 +74,7 @@ struct AchievementsView: View {
             Group {
                 if let achievement = selectedAchievement, achievement.isUnlocked {
                     ZStack {
-                        Color.black.opacity(0.4)
+                        Color.black.opacity(0.7)
                             .ignoresSafeArea()
                             .onTapGesture {
                                 withAnimation {
@@ -91,36 +109,27 @@ struct AchievementCard: View {
     }
     
     private var progress: AchievementProgress {
-        // Используем существующие экземпляры из EnvironmentObject
         return achievementManager.getAchievementProgress(for: achievement.type, stats: statsManager.stats)
-    }
-    
-    private var cardColor: Color {
-        if isUnlocked {
-            return achievement.color
-        } else {
-            return .gray
-        }
     }
     
     private var iconColor: Color {
         if isUnlocked {
-            return cardColor
+            return achievement.color
         } else {
-            return .gray
+            return DesignTokens.Colors.textSecondary
         }
     }
     
     private var iconBackgroundColor: Color {
         if isUnlocked {
-            return cardColor.opacity(0.2)
+            return achievement.color.opacity(0.2)
         } else {
-            return Color.gray.opacity(0.2)
+            return DesignTokens.Colors.textSecondary.opacity(0.2)
         }
     }
     
     var body: some View {
-        HStack(spacing: 16) {
+        HStack(spacing: DesignTokens.Spacing.lg) {
             // Icon
             ZStack {
                 Circle()
@@ -133,35 +142,36 @@ struct AchievementCard: View {
             }
             
             // Content
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: DesignTokens.Spacing.xs) {
                 HStack {
                     Text(achievement.title)
-                        .font(.headline)
+                        .font(DesignTokens.Typography.bodyRegular)
                         .fontWeight(.semibold)
-                        .foregroundColor(isUnlocked ? .primary : .secondary)
+                        .foregroundColor(isUnlocked ? DesignTokens.Colors.textPrimary : DesignTokens.Colors.textSecondary)
                     
                     Spacer()
                     
                     if isUnlocked {
                         Image(systemName: "checkmark.circle.fill")
-                            .foregroundColor(.green)
-                            .font(.title3)
+                            .foregroundColor(DesignTokens.Colors.iconGreen)
+                            .font(.system(size: DesignTokens.Sizes.iconMedium))
                     }
                 }
                 
                 Text(achievement.displayDescription)
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
+                    .font(DesignTokens.Typography.label)
+                    .foregroundColor(DesignTokens.Colors.textSecondary)
                     .multilineTextAlignment(.leading)
                 
                 if isUnlocked, let unlockedDate = achievement.unlockedDate {
                     Text(LocalizationManager.shared.localizedString(for: "achievements.unlocked") + " " + 
                          unlockedDate.formatted(date: .abbreviated, time: .omitted))
-                    .font(.caption)
-                    .foregroundColor(.green)
+                    .font(DesignTokens.Typography.label)
+                    .foregroundColor(DesignTokens.Colors.iconGreen)
                     .fontWeight(.medium)
+                    .padding(.top, DesignTokens.Spacing.xs)
                 } else {
-                    VStack(alignment: .leading, spacing: 4) {
+                    VStack(alignment: .leading, spacing: DesignTokens.Spacing.xs) {
                         // Прогресс-бар
                         ProgressView(value: progress.progressPercentage)
                             .progressViewStyle(LinearProgressViewStyle(tint: achievement.color))
@@ -170,24 +180,33 @@ struct AchievementCard: View {
                         // Текст прогресса
                         HStack {
                             Text("\(progress.currentProgress)/\(progress.requirement)")
-                                .font(.caption)
+                                .font(DesignTokens.Typography.label)
                                 .fontWeight(.semibold)
                                 .foregroundColor(achievement.color)
                             
                             Spacer()
                         }
                     }
+                    .padding(.top, DesignTokens.Spacing.xs)
                 }
             }
         }
-        .padding()
+        .padding(DesignTokens.Spacing.xl)
         .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(.ultraThinMaterial)
+            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.large)
+                .fill(DesignTokens.Colors.cardBackground)
                 .overlay(
-                    RoundedRectangle(cornerRadius: 16)
-                        .stroke(cardColor.opacity(0.3), lineWidth: 1)
+                    RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.large)
+                        .stroke(
+                            isUnlocked ? achievement.color.opacity(0.3) : DesignTokens.Colors.borderSubtle,
+                            lineWidth: 1
+                        )
                 )
+        )
+        .shadow(
+            color: DesignTokens.Shadows.card,
+            radius: DesignTokens.Shadows.cardRadius,
+            y: DesignTokens.Shadows.cardY
         )
         .opacity(isUnlocked ? 1.0 : 0.7)
         .animation(.easeInOut(duration: 0.3), value: isUnlocked)
@@ -199,7 +218,6 @@ struct AchievementCard: View {
             }
         }
     }
-    
 }
 
 struct ExpandedAchievementCard: View {
@@ -208,9 +226,9 @@ struct ExpandedAchievementCard: View {
     @ObservedObject private var localizationManager = LocalizationManager.shared
     
     var body: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: DesignTokens.Spacing.xxl) {
             // Icon and Title
-            VStack(spacing: 16) {
+            VStack(spacing: DesignTokens.Spacing.lg) {
                 ZStack {
                     Circle()
                         .fill(achievement.color.opacity(0.2))
@@ -221,76 +239,92 @@ struct ExpandedAchievementCard: View {
                         .foregroundColor(achievement.color)
                 }
                 
-                VStack(spacing: 8) {
+                VStack(spacing: DesignTokens.Spacing.sm) {
                     Text(achievement.title)
-                        .font(.title)
-                        .fontWeight(.bold)
-                        .foregroundColor(.primary)
+                        .font(.system(size: 24, weight: .bold))
+                        .foregroundColor(DesignTokens.Colors.textPrimary)
                         .multilineTextAlignment(.center)
                     
                     Text(achievement.displayDescription)
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .font(DesignTokens.Typography.secondaryRegular)
+                        .foregroundColor(DesignTokens.Colors.textSecondary)
                         .multilineTextAlignment(.center)
                     
                     if let unlockedDate = achievement.unlockedDate {
                         Text(LocalizationManager.shared.localizedString(for: "achievements.unlocked") + " " + 
                              unlockedDate.formatted(date: .abbreviated, time: .omitted))
-                        .font(.caption)
-                        .foregroundColor(.green)
+                        .font(DesignTokens.Typography.label)
+                        .foregroundColor(DesignTokens.Colors.iconGreen)
                         .fontWeight(.medium)
-                        .padding(.top, 4)
+                        .padding(.top, DesignTokens.Spacing.xs)
                     }
                 }
             }
             
-            // Share Button
-            Button(action: {
-                shareAchievement()
-            }) {
-                HStack {
-                    Image(systemName: "square.and.arrow.up")
-                    Text("achievements.share".localized)
-                }
-                .font(.headline)
-                .fontWeight(.semibold)
-                .foregroundColor(.white)
-                .frame(maxWidth: .infinity)
-                .frame(height: 50)
-                .background(achievement.color.gradient, in: RoundedRectangle(cornerRadius: 12))
-            }
-            .padding(.horizontal)
-            
-            // Close Button
-            Button(action: {
-                withAnimation(.easeInOut(duration: 0.3)) {
-                    isPresented = false
-                }
-            }) {
-                Text(LocalizationManager.shared.localizedString(for: "settings.done"))
-                    .font(.headline)
-                    .fontWeight(.semibold)
+            // Buttons
+            VStack(spacing: DesignTokens.Spacing.sm) {
+                // Share Button - стилизованная
+                Button(action: {
+                    shareAchievement()
+                }) {
+                    HStack(spacing: DesignTokens.Spacing.sm) {
+                        Image(systemName: "square.and.arrow.up")
+                            .font(.system(size: DesignTokens.Sizes.iconSmall))
+                        Text("achievements.share".localized)
+                            .font(DesignTokens.Typography.secondaryRegular)
+                    }
                     .foregroundColor(achievement.color)
                     .frame(maxWidth: .infinity)
-                    .frame(height: 50)
-                    .background(achievement.color.opacity(0.1), in: RoundedRectangle(cornerRadius: 12))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 12)
-                            .stroke(achievement.color.opacity(0.3), lineWidth: 1)
+                    .padding(.horizontal, DesignTokens.Spacing.xl)
+                    .padding(.vertical, DesignTokens.Spacing.md)
+                    .background(
+                        RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
+                            .fill(DesignTokens.Colors.cardBackground)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
+                                    .stroke(achievement.color.opacity(0.5), lineWidth: 1)
+                            )
                     )
+                }
+                
+                // Close Button
+                Button(action: {
+                    withAnimation(.easeInOut(duration: 0.3)) {
+                        isPresented = false
+                    }
+                }) {
+                    Text(LocalizationManager.shared.localizedString(for: "settings.done"))
+                        .font(DesignTokens.Typography.secondaryRegular)
+                        .foregroundColor(DesignTokens.Colors.textSecondary)
+                        .frame(maxWidth: .infinity)
+                        .padding(.horizontal, DesignTokens.Spacing.xl)
+                        .padding(.vertical, DesignTokens.Spacing.md)
+                        .background(
+                            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
+                                .fill(DesignTokens.Colors.cardBackground)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
+                                        .stroke(DesignTokens.Colors.borderSubtle, lineWidth: 1)
+                                )
+                        )
+                }
             }
-            .padding(.horizontal)
         }
-        .padding(24)
+        .padding(DesignTokens.Spacing.xxl)
         .background(
-            RoundedRectangle(cornerRadius: 20)
-                .fill(.ultraThinMaterial)
+            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xlarge)
+                .fill(DesignTokens.Colors.cardBackground)
                 .overlay(
-                    RoundedRectangle(cornerRadius: 20)
-                        .stroke(achievement.color.opacity(0.3), lineWidth: 2)
+                    RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xlarge)
+                        .stroke(achievement.color.opacity(0.5), lineWidth: 2)
                 )
         )
-        .padding(.horizontal, 32)
+        .shadow(
+            color: Color.black.opacity(0.5),
+            radius: 20,
+            y: 10
+        )
+        .padding(.horizontal, DesignTokens.Spacing.xxxl)
         .scaleEffect(isPresented ? 1.0 : 0.8)
         .opacity(isPresented ? 1.0 : 0.0)
         .animation(.spring(response: 0.6, dampingFraction: 0.8), value: isPresented)
@@ -438,3 +472,4 @@ struct ShareableAchievementCardView: View {
             .environment(\.settingsManager, SettingsManager())
     }
 }
+

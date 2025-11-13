@@ -10,6 +10,7 @@
 		C22747742EA631EA00F2199B /* dinIslam.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = dinIslam.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C24927CF2EBFD9FD009A4CC4 /* dinIslam.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = dinIslam.xcodeproj; sourceTree = "<group>"; };
 		C275F25A2EBFD775002BEE44 /* dinIslam.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = dinIslam.xcodeproj; sourceTree = "<group>"; };
+		C2B4017E2EC634070063FCCE /* dinIslam.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = dinIslam.xcodeproj; sourceTree = "<group>"; };
 		C2D3B6042EC0B407009AA1DD /* dinIslam.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = dinIslam.xcodeproj; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -67,6 +68,11 @@
 			sourceTree = "<group>";
 		};
 		C275F25B2EBFD775002BEE44 /* Products */ = {
+			isa = PBXGroup;
+			name = Products;
+			sourceTree = "<group>";
+		};
+		C2B401812EC634070063FCCE /* Products */ = {
 			isa = PBXGroup;
 			name = Products;
 			sourceTree = "<group>";
@@ -141,6 +147,10 @@
 				{
 					ProductGroup = C2D3B6062EC0B407009AA1DD /* Products */;
 					ProjectRef = C2D3B6042EC0B407009AA1DD /* dinIslam.xcodeproj */;
+				},
+				{
+					ProductGroup = C2B401812EC634070063FCCE /* Products */;
+					ProjectRef = C2B4017E2EC634070063FCCE /* dinIslam.xcodeproj */;
 				},
 			);
 			projectRoot = "";

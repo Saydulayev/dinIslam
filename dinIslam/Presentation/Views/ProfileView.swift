@@ -62,6 +62,7 @@ struct ProfileView: View {
             }
         }
         .toolbarBackground(DesignTokens.Colors.background1, for: .navigationBar)
+        .toolbarColorScheme(.dark, for: .navigationBar)
         .onAppear {
             manager.validateAvatar()
         }
@@ -433,81 +434,6 @@ struct ProfileView: View {
         return Image(nsImage: nsImage)
     }
     #endif
-}
-
-// MARK: - Progress Card View
-struct ProgressCardView: View {
-    let icon: String
-    let value: String
-    let label: String
-    let iconColor: Color
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: DesignTokens.Spacing.md) {
-            Image(systemName: icon)
-                .font(.system(size: DesignTokens.Sizes.iconMedium))
-                .foregroundColor(iconColor)
-            
-            Text(value)
-                .font(DesignTokens.Typography.statsValue)
-                .foregroundColor(DesignTokens.Colors.textPrimary)
-            
-            Spacer(minLength: 0)
-            
-            Text(label)
-                .font(DesignTokens.Typography.label)
-                .foregroundColor(DesignTokens.Colors.textSecondary)
-                .lineLimit(2)
-                .fixedSize(horizontal: false, vertical: true)
-        }
-        .frame(maxWidth: .infinity, minHeight: 110, maxHeight: 110, alignment: .leading)
-        .padding(DesignTokens.Sizes.progressCardPadding)
-        .background(
-            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.large)
-                .fill(DesignTokens.Colors.progressCard)
-                .overlay(
-                    RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.large)
-                        .stroke(DesignTokens.Colors.borderSubtle, lineWidth: 1)
-                )
-        )
-        .shadow(
-            color: DesignTokens.Shadows.progress,
-            radius: DesignTokens.Shadows.progressRadius,
-            y: 2
-        )
-    }
-}
-
-// MARK: - Minimal Button
-struct MinimalButton: View {
-    let icon: String
-    let title: String
-    let foregroundColor: Color
-    let action: () -> Void
-    
-    var body: some View {
-        Button(action: action) {
-            HStack(spacing: DesignTokens.Spacing.sm) {
-                Image(systemName: icon)
-                    .font(.system(size: DesignTokens.Sizes.iconSmall))
-                
-                Text(title)
-                    .font(DesignTokens.Typography.secondaryRegular)
-            }
-            .foregroundColor(foregroundColor)
-            .frame(maxWidth: .infinity)
-            .padding(.horizontal, DesignTokens.Spacing.xl)
-            .padding(.vertical, DesignTokens.Spacing.md)
-            .background(
-                RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
-                    .fill(DesignTokens.Colors.cardBackground)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
-                            .stroke(DesignTokens.Colors.borderSubtle, lineWidth: 1)
-                    )
-            )
-        }
-    }
 }
 
 #Preview {
