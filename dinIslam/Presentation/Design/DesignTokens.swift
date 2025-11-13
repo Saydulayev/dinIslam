@@ -41,11 +41,11 @@ struct DesignTokens {
     // MARK: - Colors
     struct Colors {
         // Background colors
-        static let background1 = Color(hex: "#1E1E1E")
-        static let background2 = Color(hex: "#2A2A2A")
-        static let cardBackground = Color(hex: "#252525")
-        static let progressCard = Color(hex: "#2A2A2A")
-        static let hoverBackground = Color(hex: "#2D2525")
+        static let background1 = Color(hex: "#000000")
+        static let background2 = Color(hex: "#000000")
+        static let cardBackground = Color(hex: "#0A0A0A")
+        static let progressCard = Color(hex: "#0A0A0A")
+        static let hoverBackground = Color(hex: "#0A0A0A")
         
         // Text colors
         static let textPrimary = Color.white

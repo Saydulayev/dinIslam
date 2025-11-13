@@ -45,7 +45,6 @@ enum StartRoute: Hashable {
 }
 
 struct StartView: View {
-    @Environment(\.colorScheme) private var colorScheme
     @State private var model: StartViewModel
     
     init(model: StartViewModel) {
@@ -112,20 +111,32 @@ struct StartView: View {
     private func navigationContent(bindingModel: Binding<StartViewModel>) -> some View {
         let model = bindingModel.wrappedValue
         return NavigationStack(path: bindingModel.navigationPath) {
-            GeometryReader { proxy in
-                ScrollView {
-                    VStack(spacing: 24) {
-                        heroSection(model: model)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 32)
-                        summarySection(model: model)
-                            .padding(.horizontal)
+            ZStack {
+                // Gradient Background
+                LinearGradient(
+                    gradient: Gradient(colors: [
+                        DesignTokens.Colors.background1,
+                        DesignTokens.Colors.background2
+                    ]),
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .ignoresSafeArea()
+                
+                GeometryReader { proxy in
+                    ScrollView {
+                        VStack(spacing: DesignTokens.Spacing.xxl) {
+                            heroSection(model: model)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, DesignTokens.Spacing.xxxl)
+                            summarySection(model: model)
+                                .padding(.horizontal, DesignTokens.Spacing.xxl)
+                        }
+                        .padding(.bottom, DesignTokens.Spacing.xxxl)
+                        .frame(minHeight: proxy.size.height, alignment: .bottom)
                     }
-                    .padding(.bottom)
-                    .frame(minHeight: proxy.size.height, alignment: .bottom)
+                    .scrollDisabled(false)
                 }
-                .scrollDisabled(false)
-                .padding(.horizontal)
             }
             .navigationDestination(for: StartRoute.self) { route in
                 @Bindable var quizViewModel = model.quizViewModel
@@ -169,6 +180,11 @@ struct StartView: View {
                 }
                 .environment(\.settingsManager, model.settingsManager)
             }
+            .navigationTitle("app.name".localized)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(DesignTokens.Colors.background1, for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
+            .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
@@ -203,7 +219,7 @@ struct StartView: View {
                         }
                     } label: {
                         Image(systemName: "ellipsis")
-                            .foregroundColor(.blue)
+                            .foregroundColor(DesignTokens.Colors.textPrimary)
                     }
                 }
             }
@@ -239,26 +255,18 @@ struct StartView: View {
         }
     }
     
-    // MARK: - Helper Functions
-    private var adaptiveBorderColor: Color {
-        switch colorScheme {
-        case .light:
-            return .black.opacity(0.2)
-        case .dark:
-            return .white.opacity(0.3)
-        @unknown default:
-            return .primary.opacity(0.2)
-        }
-    }
-    
     // MARK: - View Sections
     private func heroSection(model: StartViewModel) -> some View {
-        VStack(spacing: 16) {
+        VStack(spacing: DesignTokens.Spacing.lg) {
             ZStack {
                 Circle()
                     .fill(
                         RadialGradient(
-                            colors: [.blue.opacity(0.2 * model.logoGlowIntensity), .purple.opacity(0.1 * model.logoGlowIntensity), .clear],
+                            colors: [
+                                DesignTokens.Colors.iconBlue.opacity(0.3 * model.logoGlowIntensity),
+                                DesignTokens.Colors.iconPurple.opacity(0.2 * model.logoGlowIntensity),
+                                .clear
+                            ],
                             center: .center,
                             startRadius: 30,
                             endRadius: 80
@@ -272,113 +280,129 @@ struct StartView: View {
                     .aspectRatio(contentMode: .fit)
                     .frame(width: 120, height: 120)
                     .clipShape(Circle())
-                    .shadow(color: .blue.opacity(0.4 * model.logoGlowIntensity), radius: 20, x: 0, y: 10)
-                    .shadow(color: .purple.opacity(0.3 * model.logoGlowIntensity), radius: 30, x: 0, y: 0)
+                    .shadow(color: DesignTokens.Colors.iconBlue.opacity(0.4 * model.logoGlowIntensity), radius: 20, x: 0, y: 10)
+                    .shadow(color: DesignTokens.Colors.iconPurple.opacity(0.3 * model.logoGlowIntensity), radius: 30, x: 0, y: 0)
                 
                 TimelineView(.animation) { timeline in
                     ParticleFieldView(particles: model.particlesSnapshot(for: timeline.date))
                 }
             }
             
-            VStack(spacing: 8) {
+            VStack(spacing: DesignTokens.Spacing.sm) {
                 LocalizedText("app.name")
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-                    .foregroundStyle(.primary)
+                    .font(DesignTokens.Typography.h1)
+                    .foregroundStyle(DesignTokens.Colors.textPrimary)
                 
                 LocalizedText("start.description")
-                    .font(.title3)
-                    .foregroundStyle(.secondary)
+                    .font(DesignTokens.Typography.bodyRegular)
+                    .foregroundStyle(DesignTokens.Colors.textSecondary)
                     .multilineTextAlignment(.center)
-                    .padding(.horizontal)
+                    .padding(.horizontal, DesignTokens.Spacing.xl)
             }
         }
     }
     
     private func summarySection(model: StartViewModel) -> some View {
-        VStack(spacing: 16) {
+        VStack(spacing: DesignTokens.Spacing.xl) {
             statsCard(model: model)
+            
             Divider()
-                .background(adaptiveBorderColor)
+                .background(DesignTokens.Colors.borderSubtle)
+            
             actionsSection(model: model)
         }
-        .padding()
-        .background(.regularMaterial.opacity(0.3), in: RoundedRectangle(cornerRadius: 16))
-        .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .stroke(adaptiveBorderColor, lineWidth: 0.5)
+        .padding(DesignTokens.Spacing.xxl)
+        .background(
+            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xlarge)
+                .fill(DesignTokens.Colors.cardBackground)
+                .overlay(
+                    RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xlarge)
+                        .stroke(DesignTokens.Colors.borderSubtle, lineWidth: 1)
+                )
+        )
+        .shadow(
+            color: DesignTokens.Shadows.card,
+            radius: DesignTokens.Shadows.cardRadius,
+            y: DesignTokens.Shadows.cardY
         )
     }
     
     private func statsCard(model: StartViewModel) -> some View {
         Group {
             if model.statsManager.hasRecentGames() {
-                VStack(spacing: 8) {
+                VStack(spacing: DesignTokens.Spacing.sm) {
                     LocalizedText("start.averageScore")
-                        .font(.headline)
-                        .foregroundStyle(.secondary)
+                        .font(DesignTokens.Typography.bodyRegular)
+                        .foregroundStyle(DesignTokens.Colors.textSecondary)
                     
                     Text("\(Int(model.statsManager.getAverageRecentScore()))%")
-                        .font(.title)
-                        .fontWeight(.bold)
-                        .foregroundStyle(.blue)
+                        .font(DesignTokens.Typography.h1)
+                        .foregroundStyle(DesignTokens.Colors.iconBlue)
                     
                     Text("start.basedOnGames".localized(count: model.statsManager.getRecentGamesCount(), arguments: model.statsManager.getRecentGamesCount()))
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .font(DesignTokens.Typography.label)
+                        .foregroundStyle(DesignTokens.Colors.textTertiary)
                 }
-                .padding()
+                .padding(DesignTokens.Spacing.lg)
                 .frame(maxWidth: .infinity)
             } else {
-                VStack(spacing: 8) {
+                VStack(spacing: DesignTokens.Spacing.sm) {
                     LocalizedText("start.noGamesYet")
-                        .font(.headline)
-                        .foregroundStyle(.secondary)
+                        .font(DesignTokens.Typography.bodyRegular)
+                        .foregroundStyle(DesignTokens.Colors.textSecondary)
                     
                     Text("—")
-                        .font(.title)
-                        .fontWeight(.bold)
-                        .foregroundStyle(.gray)
+                        .font(DesignTokens.Typography.h1)
+                        .foregroundStyle(DesignTokens.Colors.textTertiary)
                 }
-                .padding()
+                .padding(DesignTokens.Spacing.lg)
                 .frame(maxWidth: .infinity)
             }
         }
     }
     
     private func actionsSection(model: StartViewModel) -> some View {
-        VStack(spacing: 12) {
+        VStack(spacing: DesignTokens.Spacing.md) {
             quizButton(model: model)
             examButton(model: model)
         }
-        .padding(.vertical, 12)
     }
     
     private func quizButton(model: StartViewModel) -> some View {
         Button(action: {
             model.startQuiz()
         }) {
-            HStack(spacing: 12) {
+            HStack(spacing: DesignTokens.Spacing.md) {
                 if model.quizViewModel.isLoading {
                     ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle(tint: .blue))
+                        .progressViewStyle(CircularProgressViewStyle(tint: DesignTokens.Colors.iconBlue))
                         .scaleEffect(0.8)
                 } else {
                     Image(systemName: "play.fill")
-                        .foregroundColor(.blue)
-                        .font(.title2)
+                        .font(.system(size: DesignTokens.Sizes.iconMedium))
+                        .foregroundColor(DesignTokens.Colors.iconBlue)
                 }
                 
                 LocalizedText(model.quizViewModel.isLoading ? "start.loading" : "start.begin")
-                    .font(.headline)
-                    .fontWeight(.semibold)
-                    .foregroundStyle(.primary)
+                    .font(DesignTokens.Typography.secondarySemibold)
+                    .foregroundStyle(DesignTokens.Colors.textPrimary)
                 
                 Spacer()
+                
+                Image(systemName: "chevron.right")
+                    .font(.system(size: DesignTokens.Sizes.iconSmall))
+                    .foregroundColor(DesignTokens.Colors.textSecondary)
             }
-            .padding()
+            .padding(DesignTokens.Spacing.lg)
             .frame(maxWidth: .infinity)
-            .background(Color.blue.opacity(0.1), in: RoundedRectangle(cornerRadius: 12))
+            .background(
+                RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
+                    .fill(DesignTokens.Colors.progressCard)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
+                            .stroke(DesignTokens.Colors.borderSubtle, lineWidth: 1)
+                    )
+            )
         }
         .buttonStyle(.plain)
         .disabled(model.quizViewModel.isLoading)
@@ -388,21 +412,31 @@ struct StartView: View {
         Button {
             model.showingExamSettings = true
         } label: {
-            HStack(spacing: 12) {
+            HStack(spacing: DesignTokens.Spacing.md) {
                 Image(systemName: "timer")
-                    .foregroundColor(.orange)
-                    .font(.title2)
+                    .font(.system(size: DesignTokens.Sizes.iconMedium))
+                    .foregroundColor(DesignTokens.Colors.iconOrange)
                 
                 LocalizedText("start.examMode")
-                    .font(.headline)
-                    .fontWeight(.semibold)
-                    .foregroundStyle(.primary)
+                    .font(DesignTokens.Typography.secondarySemibold)
+                    .foregroundStyle(DesignTokens.Colors.textPrimary)
                 
                 Spacer()
+                
+                Image(systemName: "chevron.right")
+                    .font(.system(size: DesignTokens.Sizes.iconSmall))
+                    .foregroundColor(DesignTokens.Colors.textSecondary)
             }
-            .padding()
+            .padding(DesignTokens.Spacing.lg)
             .frame(maxWidth: .infinity)
-            .background(Color.orange.opacity(0.1), in: RoundedRectangle(cornerRadius: 12))
+            .background(
+                RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
+                    .fill(DesignTokens.Colors.progressCard)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
+                            .stroke(DesignTokens.Colors.borderSubtle, lineWidth: 1)
+                    )
+            )
         }
         .buttonStyle(.plain)
     }
