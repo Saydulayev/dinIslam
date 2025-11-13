@@ -53,42 +53,48 @@ struct StatsView: View {
                             icon: "questionmark.circle",
                             value: "\(statsManager.stats.totalQuestionsStudied)",
                             label: "stats.questionsStudied.title".localized,
-                            iconColor: DesignTokens.Colors.iconBlue
+                            iconColor: DesignTokens.Colors.iconBlue,
+                            backgroundColor: DesignTokens.Colors.iconBlue.opacity(0.2)
                         )
                         
                         ProgressCardView(
                             icon: "checkmark.circle",
                             value: "\(statsManager.stats.correctAnswers)",
                             label: "stats.correctAnswers.title".localized,
-                            iconColor: DesignTokens.Colors.iconGreen
+                            iconColor: DesignTokens.Colors.iconGreen,
+                            backgroundColor: DesignTokens.Colors.iconGreen.opacity(0.2)
                         )
                         
                         ProgressCardView(
                             icon: "xmark.circle",
                             value: "\(statsManager.stats.incorrectAnswers)",
                             label: "stats.incorrectAnswers.title".localized,
-                            iconColor: DesignTokens.Colors.iconRed
+                            iconColor: DesignTokens.Colors.iconRed,
+                            backgroundColor: DesignTokens.Colors.iconRed.opacity(0.2)
                         )
                         
                         ProgressCardView(
                             icon: "exclamationmark.circle",
                             value: "\(statsManager.stats.correctedMistakes)",
                             label: "stats.correctedMistakes.title".localized,
-                            iconColor: DesignTokens.Colors.iconOrange
+                            iconColor: DesignTokens.Colors.iconOrange,
+                            backgroundColor: DesignTokens.Colors.iconOrange.opacity(0.2)
                         )
                         
                         ProgressCardView(
                             icon: "book.closed",
                             value: "\(totalQuestionsCount)",
                             label: "stats.totalQuestions.title".localized,
-                            iconColor: DesignTokens.Colors.iconPurple
+                            iconColor: DesignTokens.Colors.iconPurple,
+                            backgroundColor: DesignTokens.Colors.iconPurple.opacity(0.2)
                         )
                         
                         ProgressCardView(
                             icon: "checkmark.circle",
                             value: "\(statsManager.stats.totalQuizzesCompleted)",
                             label: "stats.quizzesCompleted.title".localized,
-                            iconColor: DesignTokens.Colors.iconBlue
+                            iconColor: DesignTokens.Colors.iconBlue,
+                            backgroundColor: DesignTokens.Colors.iconBlue.opacity(0.2)
                         )
                     }
                     

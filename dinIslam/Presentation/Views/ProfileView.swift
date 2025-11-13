@@ -224,42 +224,48 @@ struct ProfileView: View {
                     icon: "questionmark.circle",
                     value: "\(progress.totalQuestionsAnswered)",
                     label: "profile.progress.questions".localized,
-                    iconColor: DesignTokens.Colors.iconBlue
+                    iconColor: DesignTokens.Colors.iconBlue,
+                    backgroundColor: DesignTokens.Colors.iconBlue.opacity(0.2)
                 )
                 
                 ProgressCardView(
                     icon: "checkmark.circle",
                     value: "\(progress.correctAnswers)",
                     label: "profile.progress.correct".localized,
-                    iconColor: DesignTokens.Colors.iconGreen
+                    iconColor: DesignTokens.Colors.iconGreen,
+                    backgroundColor: DesignTokens.Colors.iconGreen.opacity(0.2)
                 )
                 
                 ProgressCardView(
                     icon: "xmark.circle",
                     value: "\(progress.incorrectAnswers)",
                     label: "profile.progress.incorrect".localized,
-                    iconColor: DesignTokens.Colors.iconRed
+                    iconColor: DesignTokens.Colors.iconRed,
+                    backgroundColor: DesignTokens.Colors.iconRed.opacity(0.2)
                 )
                 
                 ProgressCardView(
                     icon: "exclamationmark.circle",
                     value: "\(progress.correctedMistakes)",
                     label: "profile.progress.corrected".localized,
-                    iconColor: DesignTokens.Colors.iconOrange
+                    iconColor: DesignTokens.Colors.iconOrange,
+                    backgroundColor: DesignTokens.Colors.iconOrange.opacity(0.2)
                 )
                 
                 ProgressCardView(
                     icon: "chart.bar",
                     value: "\(Int(progress.averageQuizScore))%",
                     label: "profile.progress.accuracy".localized,
-                    iconColor: DesignTokens.Colors.iconPurple
+                    iconColor: DesignTokens.Colors.iconPurple,
+                    backgroundColor: DesignTokens.Colors.iconPurple.opacity(0.2)
                 )
                 
                 ProgressCardView(
                     icon: "flame",
                     value: "\(progress.currentStreak)",
                     label: "profile.progress.streak".localized,
-                    iconColor: DesignTokens.Colors.iconOrange
+                    iconColor: DesignTokens.Colors.iconOrange,
+                    backgroundColor: DesignTokens.Colors.iconOrange.opacity(0.2)
                 )
             }
         }

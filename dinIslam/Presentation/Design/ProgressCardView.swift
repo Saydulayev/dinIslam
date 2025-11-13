@@ -12,6 +12,21 @@ struct ProgressCardView: View {
     let value: String
     let label: String
     let iconColor: Color
+    let backgroundColor: Color?
+    
+    init(
+        icon: String,
+        value: String,
+        label: String,
+        iconColor: Color,
+        backgroundColor: Color? = nil
+    ) {
+        self.icon = icon
+        self.value = value
+        self.label = label
+        self.iconColor = iconColor
+        self.backgroundColor = backgroundColor
+    }
     
     var body: some View {
         VStack(alignment: .leading, spacing: DesignTokens.Spacing.md) {
@@ -35,7 +50,8 @@ struct ProgressCardView: View {
         .padding(DesignTokens.Sizes.progressCardPadding)
         .cardStyle(
             cornerRadius: DesignTokens.CornerRadius.large,
-            fillColor: DesignTokens.Colors.progressCard
+            fillColor: backgroundColor ?? DesignTokens.Colors.progressCard,
+            highlightOpacity: backgroundColor == nil ? 0.6 : 0.4
         )
     }
 }
