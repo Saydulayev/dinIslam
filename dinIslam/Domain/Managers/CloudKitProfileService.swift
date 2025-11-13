@@ -115,15 +115,33 @@ final class CloudKitProfileService {
             throw CloudKitProfileError.decodingFailed
         }
 
-        if let asset = record["avatar"] as? CKAsset,
+        // Обработка аватара из CloudKit
+        let avatarValue = record["avatar"]
+        let hasAvatarAsset = avatarValue is CKAsset
+        
+        if let asset = avatarValue as? CKAsset,
            let assetURL = asset.fileURL,
            let avatarData = try? Data(contentsOf: assetURL) {
+            // Аватар есть в CloudKit - сохраняем локально
             let fileExtension = assetURL.pathExtension.isEmpty ? "dat" : assetURL.pathExtension
             profile.avatarURL = localStore.saveAvatarData(avatarData, for: profile.id, fileExtension: fileExtension)
-        } else if let existingAvatar = localStore.loadAvatar(for: profile.id) {
-            profile.avatarURL = existingAvatar
         } else {
-            profile.avatarURL = nil
+            // Аватара нет в CloudKit (либо удален, либо никогда не был)
+            // Если поле "avatar" присутствует в записи, но это не CKAsset - значит оно было установлено в nil (удалено)
+            // Если поле отсутствует - это может быть старая запись или первая синхронизация
+            let avatarWasExplicitlyDeleted = record.allKeys().contains("avatar") && !hasAvatarAsset
+            let wasSyncedBefore = profile.metadata.lastSyncedAt != nil
+            
+            if avatarWasExplicitlyDeleted || (wasSyncedBefore && !hasAvatarAsset) {
+                // Аватар был явно удален в CloudKit или это не первая синхронизация - удаляем локально
+                localStore.deleteAvatar(for: profile.id)
+                profile.avatarURL = nil
+            } else if let existingAvatar = localStore.loadAvatar(for: profile.id) {
+                // Первая синхронизация или аватар был только локально - сохраняем локальный аватар
+                profile.avatarURL = existingAvatar
+            } else {
+                profile.avatarURL = nil
+            }
         }
 
         profile.metadata.lastSyncedAt = record.modificationDate

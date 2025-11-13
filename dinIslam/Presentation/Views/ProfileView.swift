@@ -104,7 +104,7 @@ struct ProfileView: View {
 
         return VStack(spacing: 24) {
             // Аватар
-            ZStack {
+            ZStack(alignment: .bottomTrailing) {
                 if let image = avatarImage(for: manager) {
                     image
                         .resizable()
@@ -128,6 +128,23 @@ struct ProfileView: View {
                                 .foregroundStyle(Color(.tertiaryLabel))
                         )
                 }
+                
+                // Иконка карандаша для смены фото
+                if manager.isSignedIn {
+                    PhotosPicker(selection: $avatarPickerItem, matching: .images) {
+                        ZStack {
+                            Circle()
+                                .fill(Color(.systemBackground))
+                                .frame(width: 32, height: 32)
+                                .shadow(color: Color.black.opacity(0.15), radius: 4, x: 0, y: 2)
+                            
+                            Image(systemName: "pencil")
+                                .font(.system(size: 14, weight: .medium))
+                                .foregroundStyle(Color.primary)
+                        }
+                    }
+                    .offset(x: -2, y: -2)
+                }
             }
 
             // Имя и email
@@ -146,20 +163,6 @@ struct ProfileView: View {
             // Кнопки действий
             VStack(spacing: 10) {
                 if manager.isSignedIn {
-                    PhotosPicker(selection: $avatarPickerItem, matching: .images) {
-                        HStack(spacing: 8) {
-                            Image(systemName: hasAvatar ? "photo" : "camera.fill")
-                                .font(.system(size: 16, weight: .medium))
-                            Text(hasAvatar ? "profile.avatar.change".localized : "profile.avatar.select".localized)
-                                .font(.system(size: 16, weight: .medium))
-                        }
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 44)
-                        .foregroundStyle(.primary)
-                        .background(Color(.tertiarySystemFill))
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
-                    }
-
                     if hasAvatar {
                         Button {
                             Task { @MainActor [manager] in
