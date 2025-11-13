@@ -46,7 +46,7 @@ struct SettingsView: View {
                                 iconColor: DesignTokens.Colors.iconBlue,
                                 title: "settings.language.title".localized,
                                 subtitle: viewModel.settings.language.displayName,
-                                showChevron: true
+                                showChevron: false
                             ) {
                                 viewModel.showingLanguagePicker = true
                             }
@@ -106,7 +106,7 @@ struct SettingsView: View {
                                 iconColor: DesignTokens.Colors.iconPurple,
                                 title: "settings.notifications.title".localized,
                                 subtitle: nil,
-                                showChevron: true
+                                showChevron: false
                             ) {
                                 showingNotificationSettings = true
                             }
@@ -140,7 +140,7 @@ struct SettingsView: View {
                                 iconColor: DesignTokens.Colors.iconBlue,
                                 title: "settings.feedback.title".localized,
                                 subtitle: "settings.feedback.subtitle".localized,
-                                showChevron: true
+                                showChevron: false
                             ) {
                                 if let url = URL(string: "mailto:saydulayev.wien@gmail.com?subject=Feedback&body=") {
                                     UIApplication.shared.open(url)
@@ -156,7 +156,7 @@ struct SettingsView: View {
                                 iconColor: .yellow,
                                 title: "settings.rate.title".localized,
                                 subtitle: "settings.rate.subtitle".localized,
-                                showChevron: true
+                                showChevron: false
                             ) {
                                 viewModel.requestAppReview()
                             }
@@ -170,7 +170,7 @@ struct SettingsView: View {
                                 iconColor: DesignTokens.Colors.iconGreen,
                                 title: "settings.share.title".localized,
                                 subtitle: "settings.share.subtitle".localized,
-                                showChevron: true
+                                showChevron: false
                             ) {
                                 viewModel.shareApp()
                             }
@@ -226,7 +226,7 @@ struct SettingsView: View {
                                 iconColor: DesignTokens.Colors.iconRed,
                                 title: "settings.privacy.title".localized,
                                 subtitle: nil,
-                                showChevron: true
+                                showChevron: false
                             ) {
                                 viewModel.openPrivacyPolicy()
                             }
@@ -240,55 +240,10 @@ struct SettingsView: View {
                                 iconColor: DesignTokens.Colors.textSecondary,
                                 title: "settings.terms.title".localized,
                                 subtitle: nil,
-                                showChevron: true
+                                showChevron: false
                             ) {
                                 viewModel.openTermsOfService()
                             }
-                        }
-                    }
-                    .padding(DesignTokens.Spacing.xxl)
-                    .background(
-                        RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xlarge)
-                            .fill(DesignTokens.Colors.cardBackground)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xlarge)
-                                    .stroke(DesignTokens.Colors.borderSubtle, lineWidth: 1)
-                            )
-                    )
-                    .shadow(
-                        color: DesignTokens.Shadows.card,
-                        radius: DesignTokens.Shadows.cardRadius,
-                        y: DesignTokens.Shadows.cardY
-                    )
-                    
-                    // MARK: - Reset Section
-                    VStack(alignment: .leading, spacing: DesignTokens.Spacing.lg) {
-                        Text("settings.dangerZone".localized)
-                            .font(DesignTokens.Typography.h2)
-                            .foregroundStyle(DesignTokens.Colors.textPrimary)
-                        
-                        VStack(spacing: DesignTokens.Spacing.sm) {
-                            Button(action: {
-                                viewModel.resetSettings()
-                            }) {
-                                HStack(spacing: DesignTokens.Spacing.md) {
-                                    Image(systemName: "arrow.clockwise")
-                                        .foregroundColor(DesignTokens.Colors.iconRed)
-                                        .frame(width: DesignTokens.Sizes.iconLarge)
-                                    
-                                    Text("settings.reset.title".localized)
-                                        .font(DesignTokens.Typography.bodyRegular)
-                                        .foregroundColor(DesignTokens.Colors.iconRed)
-                                    
-                                    Spacer()
-                                }
-                                .padding(.vertical, DesignTokens.Spacing.xs)
-                            }
-                            
-                            Text("settings.reset.footer".localized)
-                                .font(DesignTokens.Typography.label)
-                                .foregroundColor(DesignTokens.Colors.textTertiary)
-                                .padding(.top, DesignTokens.Spacing.xs)
                         }
                     }
                     .padding(DesignTokens.Spacing.xxl)
@@ -358,35 +313,36 @@ struct SettingsView: View {
         let action: () -> Void
         
         var body: some View {
-            Button(action: action) {
-                HStack(spacing: DesignTokens.Spacing.md) {
-                    Image(systemName: icon)
-                        .foregroundColor(iconColor)
-                        .frame(width: DesignTokens.Sizes.iconLarge)
+            HStack(spacing: DesignTokens.Spacing.md) {
+                Image(systemName: icon)
+                    .foregroundColor(iconColor)
+                    .frame(width: DesignTokens.Sizes.iconLarge)
+                
+                VStack(alignment: .leading, spacing: DesignTokens.Spacing.xs) {
+                    Text(title)
+                        .font(DesignTokens.Typography.bodyRegular)
+                        .foregroundColor(DesignTokens.Colors.textPrimary)
                     
-                    VStack(alignment: .leading, spacing: DesignTokens.Spacing.xs) {
-                        Text(title)
-                            .font(DesignTokens.Typography.bodyRegular)
-                            .foregroundColor(DesignTokens.Colors.textPrimary)
-                        
-                        if let subtitle = subtitle {
-                            Text(subtitle)
-                                .font(DesignTokens.Typography.label)
-                                .foregroundColor(DesignTokens.Colors.textSecondary)
-                        }
-                    }
-                    
-                    Spacer()
-                    
-                    if showChevron {
-                        Image(systemName: "chevron.right")
-                            .font(.system(size: DesignTokens.Sizes.iconSmall))
+                    if let subtitle = subtitle {
+                        Text(subtitle)
+                            .font(DesignTokens.Typography.label)
                             .foregroundColor(DesignTokens.Colors.textSecondary)
                     }
                 }
-                .padding(.vertical, DesignTokens.Spacing.xs)
+                
+                Spacer()
+                
+                if showChevron {
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: DesignTokens.Sizes.iconSmall))
+                        .foregroundColor(DesignTokens.Colors.textSecondary)
+                }
             }
-            .buttonStyle(PlainButtonStyle())
+            .padding(.vertical, DesignTokens.Spacing.xs)
+            .contentShape(Rectangle())
+            .onTapGesture {
+                action()
+            }
         }
     }
     
@@ -414,25 +370,24 @@ struct SettingsView: View {
                 ScrollView {
                     VStack(spacing: DesignTokens.Spacing.sm) {
                         ForEach(AppLanguage.allCases, id: \.self) { language in
-                            Button(action: {
+                            HStack {
+                                Text(language.displayName)
+                                    .font(DesignTokens.Typography.bodyRegular)
+                                    .foregroundColor(DesignTokens.Colors.textPrimary)
+                                
+                                Spacer()
+                                
+                                if viewModel.settings.language == language {
+                                    Image(systemName: "checkmark")
+                                        .foregroundColor(DesignTokens.Colors.iconBlue)
+                                }
+                            }
+                            .padding(DesignTokens.Spacing.lg)
+                            .contentShape(Rectangle())
+                            .onTapGesture {
                                 viewModel.updateLanguage(language)
                                 dismiss()
-                            }) {
-                                HStack {
-                                    Text(language.displayName)
-                                        .font(DesignTokens.Typography.bodyRegular)
-                                        .foregroundColor(DesignTokens.Colors.textPrimary)
-                                    
-                                    Spacer()
-                                    
-                                    if viewModel.settings.language == language {
-                                        Image(systemName: "checkmark")
-                                            .foregroundColor(DesignTokens.Colors.iconBlue)
-                                    }
-                                }
-                                .padding(DesignTokens.Spacing.lg)
                             }
-                            .buttonStyle(PlainButtonStyle())
                             
                             if language != AppLanguage.allCases.last {
                                 Divider()
