@@ -9,7 +9,7 @@ import SwiftUI
 import UserNotifications
 
 struct EnhancedQuizView: View {
-    @State private var viewModel: QuizViewModel
+    @Bindable var viewModel: QuizViewModel
     @State private var showingStopConfirm: Bool = false
     
     // Accessibility and UX enhancements
@@ -19,7 +19,7 @@ struct EnhancedQuizView: View {
     @Environment(\.layoutDirection) private var layoutDirection
     
     init(viewModel: QuizViewModel) {
-        self.viewModel = viewModel
+        _viewModel = Bindable(viewModel)
     }
     
     // MARK: - Computed Properties
@@ -205,6 +205,8 @@ struct EnhancedAnswerButton: View {
     let differentiateWithoutColor: Bool
     let action: () -> Void
     
+    @Environment(\.colorScheme) private var colorScheme
+    
     private var buttonColor: Color {
         if !isAnswerSelected {
             return .blue
@@ -214,6 +216,16 @@ struct EnhancedAnswerButton: View {
             return .green
         } else {
             return .gray
+        }
+    }
+    
+    private var checkmarkColor: Color {
+        if isCorrect {
+            // Адаптивный цвет для правильного ответа - более контрастный в светлой теме
+            return colorScheme == .light ? Color(red: 0.0, green: 0.6, blue: 0.2) : .green
+        } else {
+            // Адаптивный цвет для неправильного ответа - более контрастный в светлой теме
+            return colorScheme == .light ? Color(red: 0.8, green: 0.0, blue: 0.0) : .red
         }
     }
     
@@ -239,10 +251,10 @@ struct EnhancedAnswerButton: View {
                 
                 if isAnswerSelected && isCorrect && isSelected {
                     Image(systemName: "checkmark.circle.fill")
-                        .foregroundColor(.white)
+                        .foregroundColor(checkmarkColor)
                 } else if isAnswerSelected && !isCorrect && isSelected {
                     Image(systemName: "xmark.circle.fill")
-                        .foregroundColor(.white)
+                        .foregroundColor(checkmarkColor)
                 }
             }
             .padding()
@@ -281,6 +293,23 @@ struct EnhancedAnswerButtonStyle: ButtonStyle {
 }
 
 #Preview {
-    let viewModel = QuizViewModel(quizUseCase: QuizUseCase(questionsRepository: QuestionsRepository()), statsManager: StatsManager(), settingsManager: SettingsManager())
-    EnhancedQuizView(viewModel: viewModel)
+    let statsManager = StatsManager()
+    let examStatsManager = ExamStatisticsManager()
+    let adaptiveEngine = AdaptiveLearningEngine()
+    let profileManager = ProfileManager(
+        adaptiveEngine: adaptiveEngine,
+        statsManager: statsManager,
+        examStatisticsManager: examStatsManager
+    )
+    let quizUseCase = QuizUseCase(
+        questionsRepository: QuestionsRepository(),
+        adaptiveEngine: adaptiveEngine,
+        profileManager: profileManager
+    )
+    let viewModel = QuizViewModel(
+        quizUseCase: quizUseCase,
+        statsManager: statsManager,
+        settingsManager: SettingsManager()
+    )
+    return EnhancedQuizView(viewModel: viewModel)
 }

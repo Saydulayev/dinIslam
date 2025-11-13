@@ -12,10 +12,31 @@ private struct StatsManagerKey: EnvironmentKey {
     static let defaultValue = StatsManager()
 }
 
+private struct SettingsManagerKey: EnvironmentKey {
+    static let defaultValue = SettingsManager()
+}
+
+private struct ProfileManagerKey: EnvironmentKey {
+    static let defaultValue = ProfileManager(
+        statsManager: StatsManager(),
+        examStatisticsManager: ExamStatisticsManager()
+    )
+}
+
 extension EnvironmentValues {
     var statsManager: StatsManager {
         get { self[StatsManagerKey.self] }
         set { self[StatsManagerKey.self] = newValue }
+    }
+
+    var settingsManager: SettingsManager {
+        get { self[SettingsManagerKey.self] }
+        set { self[SettingsManagerKey.self] = newValue }
+    }
+
+    var profileManager: ProfileManager {
+        get { self[ProfileManagerKey.self] }
+        set { self[ProfileManagerKey.self] = newValue }
     }
 }
 
@@ -50,13 +71,18 @@ struct dinIslamApp: App {
             StartView(
                 quizUseCase: container.quizUseCase,
                 statsManager: container.statsManager,
-                settingsManager: container.settingsManager
+                settingsManager: container.settingsManager,
+                profileManager: container.profileManager,
+                examUseCase: container.examUseCase,
+                examStatisticsManager: container.examStatisticsManager
             )
-            .environmentObject(container.settingsManager)
+            .environment(\.settingsManager, container.settingsManager)
             .environmentObject(container.achievementManager)
             .environmentObject(container.remoteQuestionsService)
             .environmentObject(container.notificationManager)
             .environment(\.statsManager, container.statsManager)
+            .environment(\.profileManager, container.profileManager)
+            .preferredColorScheme(.dark)
         }
     }
 }

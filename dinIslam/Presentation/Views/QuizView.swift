@@ -9,11 +9,12 @@ import SwiftUI
 import UserNotifications
 
 struct QuizView: View {
-    @State private var viewModel: QuizViewModel
+    @Bindable var viewModel: QuizViewModel
     @State private var showingStopConfirm: Bool = false
+    @State private var showingFinishConfirm: Bool = false
     
     init(viewModel: QuizViewModel) {
-        self.viewModel = viewModel
+        _viewModel = Bindable(viewModel)
     }
     
     // MARK: - Computed Properties
@@ -30,124 +31,167 @@ struct QuizView: View {
     }
     
     var body: some View {
-        VStack(spacing: 0) {
-            // Header with progress and score
-            VStack(spacing: 16) {
-                HStack {
-                    LocalizedText("quiz.question")
-                        .font(.headline)
-                        .foregroundStyle(.secondary)
-                    
-                    Spacer()
-                    
-                    LocalizedText("quiz.score")
-                        .font(.headline)
-                        .foregroundStyle(.secondary)
-                }
-                
-                HStack {
-                    Text(progressText)
-                        .font(.title2)
-                        .fontWeight(.bold)
-                    
-                    Spacer()
-                    
-                    Text("\(viewModel.correctAnswers)")
-                        .font(.title2)
-                        .fontWeight(.bold)
-                        .foregroundStyle(.green)
-                }
-                
-                // Progress bar
-                ProgressView(value: viewModel.progress)
-                    .progressViewStyle(LinearProgressViewStyle(tint: .blue))
-                    .scaleEffect(x: 1, y: 2, anchor: .center)
-            }
-            .padding()
-            .background(.ultraThinMaterial)
+        ZStack {
+            // Gradient Background
+            LinearGradient(
+                gradient: Gradient(colors: [
+                    DesignTokens.Colors.background1,
+                    DesignTokens.Colors.background2
+                ]),
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .ignoresSafeArea()
             
-            // Question content
-            ScrollView {
-                VStack(spacing: 24) {
-                    // Question text
-                    if let question = viewModel.currentQuestion {
-                        VStack(spacing: 16) {
-                            Text(question.text)
-                                .font(.title2)
-                                .fontWeight(.medium)
-                                .multilineTextAlignment(.center)
-                                .padding()
-                                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
-                                .accessibilityLabel("Question: \(question.text)")
-                                .accessibilityAddTraits(.isHeader)
-                                .dynamicTypeSize(.large)
-                            
-                            // Category and difficulty
-                            HStack {
-                                Label(question.category, systemImage: "tag")
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                                
-                                Spacer()
-                                
-                                Label(question.difficulty.localizedName, systemImage: "star.fill")
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                            }
-                            .padding(.horizontal)
-                        }
-                        
-                        // Answer options
-                        VStack(spacing: 12) {
-                            ForEach(question.answers, id: \.id) { answer in
-                                let index = answerIndices[answer.id] ?? 0
-                                AnswerButton(
-                                    answer: answer,
-                                    index: index,
-                                    isSelected: viewModel.selectedAnswerIndex == index,
-                                    isCorrect: index == question.correctIndex,
-                                    isAnswerSelected: viewModel.isAnswerSelected,
-                                    action: {
-                                        viewModel.selectAnswer(at: index)
-                                    }
-                                )
-                                .accessibilityLabel("Answer option \(index + 1)")
-                                .accessibilityHint("Double tap to select this answer")
-                                .accessibilityAddTraits(viewModel.selectedAnswerIndex == index ? .isSelected : [])
-                            }
-                        }
-                    }
-                }
-                .padding()
-            }
-            
-            // Stop button at the bottom
             VStack(spacing: 0) {
-                Divider()
-                    .background(.separator)
-                
-                Button(action: {
-                    showingStopConfirm = true
-                }) {
+                // Header with progress and score
+                VStack(spacing: DesignTokens.Spacing.lg) {
                     HStack {
-                        Image(systemName: "stop.fill")
-                        Text("quiz.stop".localized)
-                            .fontWeight(.semibold)
+                        LocalizedText("quiz.question")
+                            .font(DesignTokens.Typography.secondaryRegular)
+                            .foregroundStyle(DesignTokens.Colors.textSecondary)
+                        
+                        Spacer()
+                        
+                        LocalizedText("quiz.score")
+                            .font(DesignTokens.Typography.secondaryRegular)
+                            .foregroundStyle(DesignTokens.Colors.textSecondary)
                     }
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 52)
-                    .background(Color.red.gradient, in: RoundedRectangle(cornerRadius: 14))
-                    .padding(.horizontal)
-                    .padding(.vertical, 12)
+                    
+                    HStack {
+                        Text(progressText)
+                            .font(DesignTokens.Typography.h1)
+                            .foregroundStyle(DesignTokens.Colors.textPrimary)
+                        
+                        Spacer()
+                        
+                        Text("\(viewModel.correctAnswers)")
+                            .font(DesignTokens.Typography.h1)
+                            .foregroundStyle(DesignTokens.Colors.statusGreen)
+                    }
+                    
+                    // Progress bar
+                    ProgressView(value: viewModel.progress)
+                        .progressViewStyle(LinearProgressViewStyle(tint: DesignTokens.Colors.iconBlue))
+                        .scaleEffect(x: 1, y: 2, anchor: .center)
                 }
-                .accessibilityLabel("Stop quiz")
-                .accessibilityHint("Double tap to stop the current quiz")
-                .background(.ultraThinMaterial)
+                .padding(DesignTokens.Spacing.xxl)
+                .background(DesignTokens.Colors.cardBackground)
+            
+                // Question content
+                ScrollView {
+                    VStack(spacing: DesignTokens.Spacing.xxl) {
+                        // Question text
+                        if let question = viewModel.currentQuestion {
+                            VStack(spacing: DesignTokens.Spacing.lg) {
+                                Text(question.text)
+                                    .font(DesignTokens.Typography.h2)
+                                    .foregroundStyle(DesignTokens.Colors.textPrimary)
+                                    .multilineTextAlignment(.center)
+                                    .padding(DesignTokens.Spacing.xxl)
+                                    .frame(maxWidth: .infinity)
+                                    .cardStyle(
+                                        cornerRadius: DesignTokens.CornerRadius.medium,
+                                        borderColor: DesignTokens.Colors.borderDefault,
+                                        shadowColor: Color.black.opacity(0.24),
+                                        shadowRadius: 8,
+                                        shadowYOffset: 4
+                                    )
+                                    .accessibilityLabel("Question: \(question.text)")
+                                    .accessibilityAddTraits(.isHeader)
+                                    .dynamicTypeSize(.large)
+                                
+                                // Category and difficulty
+                                HStack {
+                                    Label(question.category, systemImage: "tag")
+                                        .font(DesignTokens.Typography.label)
+                                        .foregroundStyle(DesignTokens.Colors.textSecondary)
+                                    
+                                    Spacer()
+                                    
+                                    Label(question.difficulty.localizedName, systemImage: "star.fill")
+                                        .font(DesignTokens.Typography.label)
+                                        .foregroundStyle(DesignTokens.Colors.textSecondary)
+                                }
+                                .padding(.horizontal, DesignTokens.Spacing.sm)
+                            }
+                            
+                            // Answer options
+                            VStack(spacing: DesignTokens.Spacing.md) {
+                                ForEach(question.answers, id: \.id) { answer in
+                                    let index = answerIndices[answer.id] ?? 0
+                                    AnswerButton(
+                                        answer: answer,
+                                        index: index,
+                                        isSelected: viewModel.selectedAnswerIndex == index,
+                                        isCorrect: index == question.correctIndex,
+                                        isAnswerSelected: viewModel.isAnswerSelected,
+                                        action: {
+                                            viewModel.selectAnswer(at: index)
+                                        }
+                                    )
+                                    .accessibilityLabel("Answer option \(index + 1)")
+                                    .accessibilityHint("Double tap to select this answer")
+                                    .accessibilityAddTraits(viewModel.selectedAnswerIndex == index ? .isSelected : [])
+                                }
+                            }
+                        }
+                    }
+                    .padding(DesignTokens.Spacing.xxl)
+                }
+            
+                // Finish button at the bottom
+                VStack(spacing: 0) {
+                    Divider()
+                        .background(DesignTokens.Colors.borderSubtle)
+                    
+                    Button(action: {
+                        showingFinishConfirm = true
+                    }) {
+                        HStack(spacing: DesignTokens.Spacing.md) {
+                            Image(systemName: "checkmark.circle.fill")
+                                .font(.system(size: DesignTokens.Sizes.iconMedium))
+                            Text("quiz.finish".localized)
+                                .font(DesignTokens.Typography.secondarySemibold)
+                        }
+                        .foregroundColor(DesignTokens.Colors.textPrimary)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 52)
+                        .cardStyle(
+                            cornerRadius: DesignTokens.CornerRadius.medium,
+                            fillColor: DesignTokens.Colors.statusGreen,
+                            borderColor: DesignTokens.Colors.statusGreen.opacity(0.4),
+                            shadowColor: Color.black.opacity(0.24),
+                            shadowRadius: 8,
+                            shadowYOffset: 4
+                        )
+                        .padding(.horizontal, DesignTokens.Spacing.xxl)
+                        .padding(.vertical, DesignTokens.Spacing.md)
+                    }
+                    .accessibilityLabel("Finish quiz")
+                    .accessibilityHint("Double tap to finish the current quiz")
+                    .background(DesignTokens.Colors.cardBackground)
+                }
             }
         }
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
+        .toolbarBackground(DesignTokens.Colors.background1, for: .navigationBar)
+        .toolbarBackground(.visible, for: .navigationBar)
+        .toolbarColorScheme(.dark, for: .navigationBar)
+        .alert(
+            "quiz.finish.confirm.title".localized,
+            isPresented: $showingFinishConfirm
+        ) {
+            Button("quiz.finish.confirm.cancel".localized, role: .cancel) {
+                showingFinishConfirm = false
+            }
+            Button("quiz.finish.confirm.ok".localized, role: .destructive) {
+                viewModel.forceFinishQuiz()
+            }
+        } message: {
+            Text("quiz.finish.confirm.message".localized)
+        }
         .alert(
             "quiz.stop.confirm.title".localized,
             isPresented: $showingStopConfirm
@@ -182,13 +226,25 @@ struct AnswerButton: View {
     
     private var buttonColor: Color {
         if !isAnswerSelected {
-            return .blue
+            return DesignTokens.Colors.iconBlue
         } else if isSelected {
-            return isCorrect ? .green : .red
+            return isCorrect ? DesignTokens.Colors.statusGreen : DesignTokens.Colors.iconRed
         } else if isCorrect {
-            return .green
+            return DesignTokens.Colors.statusGreen
         } else {
-            return .gray
+            return DesignTokens.Colors.textTertiary
+        }
+    }
+    
+    private var backgroundColor: Color {
+        if !isAnswerSelected {
+            return DesignTokens.Colors.progressCard
+        } else if isSelected {
+            return isCorrect ? DesignTokens.Colors.statusGreen.opacity(0.15) : DesignTokens.Colors.iconRed.opacity(0.15)
+        } else if isCorrect {
+            return DesignTokens.Colors.statusGreen.opacity(0.15)
+        } else {
+            return DesignTokens.Colors.progressCard
         }
     }
     
@@ -202,28 +258,38 @@ struct AnswerButton: View {
     
     var body: some View {
         Button(action: action) {
-            HStack {
+            HStack(spacing: DesignTokens.Spacing.md) {
                 Text(answer.text)
-                    .font(.body)
-                    .fontWeight(.medium)
+                    .font(DesignTokens.Typography.bodyRegular)
+                    .foregroundStyle(DesignTokens.Colors.textPrimary)
                     .multilineTextAlignment(.leading)
                 
                 Spacer()
                 
                 if isAnswerSelected && isCorrect && isSelected {
                     Image(systemName: "checkmark.circle.fill")
-                        .foregroundColor(.white)
+                        .font(.system(size: DesignTokens.Sizes.iconMedium))
+                        .foregroundColor(DesignTokens.Colors.statusGreen)
                 } else if isAnswerSelected && !isCorrect && isSelected {
                     Image(systemName: "xmark.circle.fill")
-                        .foregroundColor(.white)
+                        .font(.system(size: DesignTokens.Sizes.iconMedium))
+                        .foregroundColor(DesignTokens.Colors.iconRed)
                 }
             }
-            .padding()
+            .padding(DesignTokens.Spacing.lg)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(buttonColor.opacity(0.1), in: RoundedRectangle(cornerRadius: 12))
-            .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(buttonColor, lineWidth: isSelected ? 2 : 1)
+            .background(
+                RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
+                    .fill(backgroundColor)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
+                            .stroke(buttonColor, lineWidth: isSelected ? 2 : 1)
+                    )
+            )
+            .shadow(
+                color: isSelected ? buttonColor.opacity(0.3) : DesignTokens.Shadows.card,
+                radius: isSelected ? 8 : DesignTokens.Shadows.cardRadius,
+                y: DesignTokens.Shadows.cardY
             )
         }
         .buttonStyle(buttonStyle)
@@ -245,6 +311,23 @@ struct AnswerButtonStyle: ButtonStyle {
 }
 
 #Preview {
-    let viewModel = QuizViewModel(quizUseCase: QuizUseCase(questionsRepository: QuestionsRepository()), statsManager: StatsManager(), settingsManager: SettingsManager())
-    QuizView(viewModel: viewModel)
+    let statsManager = StatsManager()
+    let examStatsManager = ExamStatisticsManager()
+    let adaptiveEngine = AdaptiveLearningEngine()
+    let profileManager = ProfileManager(
+        adaptiveEngine: adaptiveEngine,
+        statsManager: statsManager,
+        examStatisticsManager: examStatsManager
+    )
+    let quizUseCase = QuizUseCase(
+        questionsRepository: QuestionsRepository(),
+        adaptiveEngine: adaptiveEngine,
+        profileManager: profileManager
+    )
+    let viewModel = QuizViewModel(
+        quizUseCase: quizUseCase,
+        statsManager: statsManager,
+        settingsManager: SettingsManager()
+    )
+    return QuizView(viewModel: viewModel)
 }

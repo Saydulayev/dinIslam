@@ -8,11 +8,11 @@
 import SwiftUI
 
 struct MistakesReviewView: View {
-    @State private var viewModel: QuizViewModel
+    @Bindable var viewModel: QuizViewModel
     @State private var showingStopConfirm: Bool = false
     
     init(viewModel: QuizViewModel) {
-        self.viewModel = viewModel
+        _viewModel = Bindable(viewModel)
     }
     
     var body: some View {
@@ -161,6 +161,23 @@ struct MistakesReviewView: View {
 }
 
 #Preview {
-    let viewModel = QuizViewModel(quizUseCase: QuizUseCase(questionsRepository: QuestionsRepository()), statsManager: StatsManager(), settingsManager: SettingsManager())
-    MistakesReviewView(viewModel: viewModel)
+    let statsManager = StatsManager()
+    let examStatsManager = ExamStatisticsManager()
+    let adaptiveEngine = AdaptiveLearningEngine()
+    let profileManager = ProfileManager(
+        adaptiveEngine: adaptiveEngine,
+        statsManager: statsManager,
+        examStatisticsManager: examStatsManager
+    )
+    let quizUseCase = QuizUseCase(
+        questionsRepository: QuestionsRepository(),
+        adaptiveEngine: adaptiveEngine,
+        profileManager: profileManager
+    )
+    let viewModel = QuizViewModel(
+        quizUseCase: quizUseCase,
+        statsManager: statsManager,
+        settingsManager: SettingsManager()
+    )
+    return MistakesReviewView(viewModel: viewModel)
 }

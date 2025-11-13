@@ -7,6 +7,7 @@
 
 import Foundation
 import Combine
+import OSLog
 
 class RemoteQuestionsService: ObservableObject {
     @Published var isLoading = false
@@ -48,7 +49,7 @@ class RemoteQuestionsService: ObservableObject {
             
             return remoteQuestions
         } catch {
-            print("Failed to fetch remote questions: \(error)")
+            AppLogger.error("Failed to fetch remote questions", error: error, category: AppLogger.network)
             
             // Fallback to cached questions
             if let cachedQuestions = getCachedQuestions(for: language) {
@@ -87,7 +88,7 @@ class RemoteQuestionsService: ObservableObject {
         print("🔄 RemoteQuestionsService: Attempting to fetch from \(urlString)")
         
         guard let url = URL(string: urlString) else {
-            print("❌ RemoteQuestionsError: Invalid URL for \(fileName)")
+            AppLogger.error("RemoteQuestionsError: Invalid URL for \(fileName)", category: AppLogger.network)
             throw RemoteQuestionsError.invalidURL
         }
         
@@ -128,7 +129,7 @@ class RemoteQuestionsService: ObservableObject {
                 print("❌ q31 NOT cached")
             }
         } catch {
-            print("❌ Failed to cache questions: \(error)")
+            AppLogger.error("Failed to cache questions", error: error, category: AppLogger.data)
         }
     }
     
@@ -173,7 +174,7 @@ class RemoteQuestionsService: ObservableObject {
                 print("🔄 Update check: Remote=\(remoteCount), Cached=\(cachedCount), HasUpdates=\(hasUpdates)")
             }
         } catch {
-            print("❌ Failed to check for updates: \(error)")
+            AppLogger.error("Failed to check for updates", error: error, category: AppLogger.network)
             await MainActor.run {
                 hasUpdates = false
             }
@@ -212,7 +213,7 @@ class RemoteQuestionsService: ObservableObject {
             print("✅ Force sync completed: \(remoteQuestions.count) questions")
             return remoteQuestions
         } catch {
-            print("❌ Force sync failed: \(error)")
+            AppLogger.error("Force sync failed", error: error, category: AppLogger.network)
             return getCachedQuestions(for: language) ?? []
         }
     }

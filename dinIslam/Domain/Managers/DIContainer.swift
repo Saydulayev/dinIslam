@@ -20,8 +20,26 @@ class DIContainer {
         StatsManager()
     }()
     
+    lazy var examStatisticsManager: ExamStatisticsManager = {
+        ExamStatisticsManager()
+    }()
+
+    lazy var adaptiveLearningEngine: AdaptiveLearningEngine = {
+        AdaptiveLearningEngine()
+    }()
+
+    lazy var profileManager: ProfileManager = {
+        ProfileManager(
+            adaptiveEngine: adaptiveLearningEngine,
+            statsManager: statsManager,
+            examStatisticsManager: examStatisticsManager
+        )
+    }()
+    
     lazy var achievementManager: AchievementManager = {
-        AchievementManager()
+        let manager = AchievementManager.shared
+        manager.configureDependencies(notificationManager: notificationManager)
+        return manager
     }()
     
     lazy var localizationManager: LocalizationManager = {
@@ -30,7 +48,15 @@ class DIContainer {
     
     // MARK: - Use Cases
     lazy var quizUseCase: QuizUseCaseProtocol = {
-        QuizUseCase(questionsRepository: questionsRepository)
+        QuizUseCase(
+            questionsRepository: questionsRepository,
+            adaptiveEngine: adaptiveLearningEngine,
+            profileManager: profileManager
+        )
+    }()
+    
+    lazy var examUseCase: ExamUseCaseProtocol = {
+        ExamUseCase(questionsRepository: questionsRepository, examStatisticsManager: examStatisticsManager)
     }()
     
     // MARK: - Repositories
@@ -57,22 +83,29 @@ class DIContainer {
     
     private init() {}
     
-    // MARK: - Reset for Testing
+    // MARK: - Reset
     func reset() {
-        // Reset all lazy properties for testing by recreating the container
-        // This is a simplified approach - in production you might want to use
-        // a more sophisticated dependency injection framework
-        if ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil {
-            // Only reset during testing
-            settingsManager = SettingsManager()
-            statsManager = StatsManager()
-            achievementManager = AchievementManager()
-            quizUseCase = QuizUseCase(questionsRepository: questionsRepository)
-            questionsRepository = QuestionsRepository()
-            hapticManager = HapticManager(settingsManager: settingsManager)
-            soundManager = SoundManager(settingsManager: settingsManager)
-            remoteQuestionsService = RemoteQuestionsService()
-            notificationManager = NotificationManager()
-        }
+        // Reset all lazy properties by recreating the container
+        // This is a simplified approach - in production вы можете использовать
+        // более сложный DI-фреймворк
+        settingsManager = SettingsManager()
+        statsManager = StatsManager()
+        achievementManager = AchievementManager.shared
+        adaptiveLearningEngine = AdaptiveLearningEngine()
+        profileManager = ProfileManager(
+            adaptiveEngine: adaptiveLearningEngine,
+            statsManager: statsManager,
+            examStatisticsManager: examStatisticsManager
+        )
+        quizUseCase = QuizUseCase(
+            questionsRepository: questionsRepository,
+            adaptiveEngine: adaptiveLearningEngine,
+            profileManager: profileManager
+        )
+        questionsRepository = QuestionsRepository()
+        hapticManager = HapticManager(settingsManager: settingsManager)
+        soundManager = SoundManager(settingsManager: settingsManager)
+        remoteQuestionsService = RemoteQuestionsService()
+        notificationManager = NotificationManager()
     }
 }

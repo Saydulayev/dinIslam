@@ -1,3 +1,48 @@
+"profile.title" = "Profile";
+"profile.done" = "Done";
+"profile.anonymous" = "Guest";
+"profile.signout" = "Sign Out";
+"profile.mastery.novice" = "Novice";
+"profile.mastery.learning" = "Learning";
+"profile.mastery.proficient" = "Proficient";
+"profile.mastery.expert" = "Expert";
+"profile.progress.title" = "Progress";
+"profile.progress.questions" = "Questions Studied";
+"profile.progress.correct" = "Correct Answers";
+"profile.progress.incorrect" = "Incorrect Answers";
+"profile.progress.corrected" = "Mistakes Corrected";
+"profile.progress.accuracy" = "Average Score";
+"profile.progress.streak" = "Streak";
+"profile.recommendations.title" = "Recommendations";
+"profile.recommendations.nextSteps" = "Next Steps";
+"profile.recommendations.empty" = "No recommendations yet—keep practicing and we will suggest what to learn next.";
+"profile.recommendations.topic" = "Topic: %@";
+"profile.recommendation.focusTopic.title" = "Focus Topic";
+"profile.recommendation.focusTopic" = "We suggest revisiting \"%@\" — there is room to improve.";
+"profile.recommendation.challenge.title" = "New Challenge";
+"profile.recommendation.challenge" = "You are handling %@ questions well. Try increasing the difficulty!";
+"profile.recommendation.maintainStreak.title" = "Keep the Momentum";
+"profile.recommendation.maintainStreak" = "Great streak! Stay on track to reinforce your progress.";
+"profile.avatar.select" = "Choose Photo";
+"profile.avatar.change" = "Change Photo";
+"profile.avatar.delete" = "Delete Photo";
+"profile.sync.reset" = "Reset Data";
+"profile.sync.reset.title" = "Reset progress?";
+"profile.sync.reset.message" = "This will remove all profile data locally and in iCloud. Continue?";
+"profile.sync.reset.confirm" = "Reset";
+"profile.sync.reset.cancel" = "Cancel";
+"profile.sync.reset.inProgress" = "Resetting data…";
+"profile.sync.title" = "Cloud Sync";
+"profile.sync.refresh" = "Sync Now";
+"profile.sync.ready" = "Synced";
+"profile.sync.guest" = "Guest Mode";
+"profile.sync.lastSync" = "Last sync: %@";
+"profile.sync.never" = "Not synced with iCloud yet";
+"profile.sync.inProgress" = "Syncing...";
+"profile.sync.failed" = "Sync failed: %@";
+"profile.sync.signin.required" = "Sign in to sync your progress across all devices";
+"profile.signin.prompt.title" = "Sync Your Progress";
+"profile.signin.prompt.message" = "Sign in to save your progress across all your devices and never lose your data";
 /* 
   Localizable.strings (English)
   dinIslam
@@ -10,6 +55,16 @@
 "start.begin" = "Start Learning";
 "start.loading" = "Loading...";
 "start.bestScore" = "Best Score";
+"start.examMode" = "Exam Mode";
+"start.averageScore" = "Average Score";
+"start.basedOnGames" = "based on %d game";
+"start.basedOnGames_other" = "based on %d games";
+"start.noGamesYet" = "No data yet";
+"start.menu.stats" = "Statistics";
+"start.menu.achievements" = "Achievements";
+"start.menu.profile" = "Profile";
+"start.menu.settings" = "Settings";
+"start.menu.info" = "Info";
 
 // Quiz View
 "quiz.question" = "Question";
@@ -40,6 +95,10 @@
 "settings.language.system" = "System";
 "settings.language.russian" = "Русский";
 "settings.language.english" = "English";
+"settings.theme.title" = "Theme";
+"settings.theme.system" = "System";
+"settings.theme.light" = "Light";
+"settings.theme.dark" = "Dark";
 "settings.sound.title" = "Sound";
 "settings.haptic.title" = "Haptic Feedback";
 "settings.notifications.title" = "Notifications";
@@ -58,7 +117,7 @@
 "settings.rate.later" = "Remind Later";
 "settings.share.title" = "Share";
 "settings.share.subtitle" = "Tell your friends";
-"settings.share.text" = "Learn Islamic knowledge with Tabiin Academy!";
+"settings.share.text" = "Learn your religion with Tabiin Academy";
 
 // About
 "settings.about" = "About";
@@ -78,12 +137,19 @@
 "quiz.stop.confirm.ok" = "Quit";
 "quiz.stop.confirm.cancel" = "Cancel";
 
+// Quiz Finish
+"quiz.finish" = "Finish";
+"quiz.finish.confirm.title" = "Finish Quiz?";
+"quiz.finish.confirm.message" = "Results will be saved.";
+"quiz.finish.confirm.ok" = "Finish";
+"quiz.finish.confirm.cancel" = "Cancel";
+
 // Stats View - Pluralization Support
 "stats.title" = "Statistics";
 "stats.done" = "Done";
 "stats.reset" = "Reset";
 "stats.reset.confirm.title" = "Reset Statistics?";
-"stats.reset.confirm.message" = "This will reset all statistics. This action cannot be undone.";
+"stats.reset.confirm.message" = "This will reset all statistics, including the average score. This action cannot be undone.";
 "stats.reset.confirm.ok" = "Reset";
 "stats.reset.confirm.cancel" = "Cancel";
 
@@ -165,6 +231,8 @@
 "achievements.progress" = "Progress";
 "achievements.newAchievement" = "New Achievement!";
 "achievements.congratulations" = "Congratulations!";
+"achievements.share" = "Share";
+"achievements.share.text" = "Achievement unlocked";
 "achievements.reset" = "Reset";
 "achievements.reset.confirm.title" = "Reset Achievements?";
 "achievements.reset.confirm.message" = "All achievements will be locked. This action cannot be undone.";
@@ -183,7 +251,7 @@
 "achievements.perfectionist.title" = "Successful";
 "achievements.legend.title" = "Wise";
 
-// Achievement Descriptions
+// Achievement Descriptions (Locked)
 "achievements.firstQuiz.description" = "Complete your first quiz";
 "achievements.perfectScore.description" = "Get 100% in any quiz";
 "achievements.speedRunner.description" = "Complete a quiz in under 2 minutes";
@@ -194,6 +262,30 @@
 "achievements.explorer.description" = "Study 500 questions";
 "achievements.perfectionist.description" = "Get 10 perfect scores";
 "achievements.legend.description" = "Complete 100 quizzes";
+
+// Achievement Descriptions (Unlocked)
+"achievements.firstQuiz.description.unlocked" = "You completed your first quiz";
+"achievements.perfectScore.description.unlocked" = "You got 100% in a quiz";
+"achievements.speedRunner.description.unlocked" = "You completed a quiz in under 2 minutes";
+"achievements.scholar.description.unlocked" = "You studied 100 questions";
+"achievements.dedicated.description.unlocked" = "You completed 10 quizzes";
+"achievements.master.description.unlocked" = "You completed 50 quizzes";
+"achievements.streak.description.unlocked" = "You studied for 5 days in a row";
+"achievements.explorer.description.unlocked" = "You studied 500 questions";
+"achievements.perfectionist.description.unlocked" = "You got 10 perfect scores";
+"achievements.legend.description.unlocked" = "You completed 100 quizzes";
+
+// Achievement Notifications (Unlocked)
+"achievements.firstQuiz.notification" = "You completed your first quiz! Great start.";
+"achievements.perfectScore.notification" = "Excellent! You got a perfect score.";
+"achievements.speedRunner.notification" = "Incredible speed! You know the material perfectly.";
+"achievements.scholar.notification" = "Great work! You've studied 100 questions.";
+"achievements.dedicated.notification" = "Impressive dedication! You completed 10 quizzes.";
+"achievements.master.notification" = "Incredible mastery! You completed 50 quizzes.";
+"achievements.streak.notification" = "Amazing consistency! You've studied for 5 days straight.";
+"achievements.explorer.notification" = "Deep knowledge! You've studied 500 questions.";
+"achievements.perfectionist.notification" = "Excellent precision! You got 10 perfect scores.";
+"achievements.legend.notification" = "Legendary achievement! You completed 100 quizzes.";
 
 // Achievement Progress Descriptions - Pluralization
 "achievements.progress.quiz" = "%d quiz";
@@ -213,9 +305,10 @@
 
 // Notifications
 "notification.title" = "Study Time";
-"notification.body" = "Don't forget to learn new Islamic knowledge today!";
+"notification.body" = "Time for new knowledge!";
 "notification.permission.title" = "Allow Notifications";
 "notification.permission.message" = "Get reminders for daily study";
+"notification.permission.request" = "Allow";
 "notification.settings.title" = "Configure";
 "notification.settings.enabled" = "Enable Reminders";
 "notification.settings.time" = "Reminder Time";
@@ -235,7 +328,7 @@
 
 // Notification Settings
 "notification.settings.about.title" = "About Reminders";
-"notification.settings.about.description" = "Get daily reminders about Islamic learning to maintain consistency in knowledge.";
+"notification.settings.about.description" = "Maintain consistency in learning";
 "notification.settings.features.daily" = "Daily study reminders";
 "notification.settings.features.achievements" = "New achievement notifications";
 "notification.settings.features.streak" = "Streak maintenance reminders";
@@ -291,3 +384,88 @@
 // Error Messages
 "error.title" = "Error";
 "error.ok" = "OK";
+
+// Exam Mode
+"exam.title" = "Exam";
+"exam.stop" = "Stop";
+"exam.pause" = "Pause";
+"exam.resume" = "Resume";
+"exam.skip" = "Skip";
+"exam.finish" = "Finish Exam";
+"exam.finish.title" = "Finish Exam";
+"exam.finish.message" = "Are you sure you want to finish the exam? Results will be saved.";
+"exam.finish.cancel" = "Cancel";
+"exam.finish.confirm" = "Finish";
+
+// Exam Settings
+"exam.settings.title" = "Exam Settings";
+"exam.settings.cancel" = "Cancel";
+"exam.settings.start" = "Start Exam";
+"exam.settings.presets" = "Presets";
+"exam.settings.presets.footer" = "Choose a ready configuration or create your own";
+"exam.settings.custom" = "Custom Settings";
+"exam.settings.custom.footer" = "Configure exam parameters to your liking";
+"exam.settings.timePerQuestion" = "Time per question";
+"exam.settings.totalQuestions" = "Number of questions";
+"exam.settings.allowSkip" = "Allow skip";
+"exam.settings.showTimer" = "Show timer";
+"exam.settings.autoSubmit" = "Auto submit";
+"exam.settings.preview" = "Preview";
+"exam.settings.preview.title" = "Exam Parameters";
+"exam.settings.preview.questions" = "Questions";
+"exam.settings.preview.timePerQuestion" = "Time per question";
+"exam.settings.preview.totalTime" = "Total time";
+"exam.settings.preview.options" = "Options";
+"exam.settings.preview.skip" = "Skip";
+"exam.settings.preview.timer" = "Timer";
+"exam.settings.preview.autoSubmit" = "Auto submit";
+
+// Exam Presets
+"exam.preset.quick" = "Quick";
+"exam.preset.quick.description" = "10 questions, 15 seconds each";
+"exam.preset.standard" = "Standard";
+"exam.preset.standard.description" = "20 questions, 30 seconds each";
+"exam.preset.extended" = "Extended";
+"exam.preset.extended.description" = "30 questions, 60 seconds each";
+"exam.preset.custom" = "Custom";
+"exam.preset.custom.description" = "Configure parameters yourself";
+
+// Exam Alerts
+"exam.pause.title" = "Pause Exam";
+"exam.pause.message" = "Are you sure you want to pause the exam?";
+"exam.pause.cancel" = "Cancel";
+"exam.pause.confirm" = "Pause";
+"exam.stop.title" = "Stop Exam";
+"exam.stop.message" = "Are you sure you want to stop the exam? Results will be saved.";
+"exam.stop.cancel" = "Cancel";
+"exam.stop.confirm" = "Stop";
+
+// Exam Result
+"exam.result.title" = "Exam Result";
+"exam.result.done" = "Done";
+"exam.result.passed" = "Exam Passed!";
+"exam.result.failed" = "Exam Failed";
+"exam.result.grade" = "Grade";
+"exam.result.answered" = "Answered";
+"exam.result.correct" = "Correct";
+"exam.result.incorrect" = "Incorrect";
+"exam.result.skipped" = "Skipped";
+"exam.result.breakdown" = "Breakdown";
+"exam.result.totalQuestions" = "Total questions";
+"exam.result.timeSpent" = "Time spent";
+"exam.result.averageTime" = "Average time";
+"exam.result.timeExpired" = "Time expired";
+"exam.result.retake" = "Retake";
+"exam.result.share" = "Share";
+"exam.result.share.title" = "📚 Islamic Exam Results";
+"exam.result.share.grade" = "Grade:";
+"exam.result.share.correctAnswers" = "Correct answers:";
+"exam.result.share.percentage" = "Percentage:";
+"exam.result.share.time" = "Time:";
+"exam.result.share.footer" = "Download Tabiin Academy app to learn Islamic knowledge!";
+
+// Exam Grades
+"exam.grade.excellent" = "Excellent";
+"exam.grade.good" = "Good";
+"exam.grade.satisfactory" = "Satisfactory";
+"exam.grade.unsatisfactory" = "Unsatisfactory";

@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct EnhancedStatsView: View {
-    @State private var statsManager: StatsManager
-    @EnvironmentObject private var settingsManager: SettingsManager
+    @Bindable var statsManager: StatsManager
+    @Environment(\.settingsManager) private var settingsManager
     @EnvironmentObject private var remoteService: RemoteQuestionsService
     @Environment(\.dismiss) private var dismiss
     @State private var mistakesViewModel: QuizViewModel?
@@ -28,7 +28,7 @@ struct EnhancedStatsView: View {
     @State private var loadQuestionsTask: Task<Void, Never>?
     
     init(statsManager: StatsManager) {
-        self._statsManager = State(initialValue: statsManager)
+        self._statsManager = Bindable(statsManager)
     }
     
     var body: some View {
@@ -210,7 +210,7 @@ struct EnhancedStatsView: View {
                             HStack(spacing: 12) {
                                 Button(action: {
                                     updateTask?.cancel()
-                                    updateTask = Task {
+                                    updateTask = Task { @MainActor in
                                         await checkForUpdates()
                                     }
                                 }) {
@@ -233,7 +233,7 @@ struct EnhancedStatsView: View {
                                 if remoteService.hasUpdates {
                                     Button(action: {
                                         syncTask?.cancel()
-                                        syncTask = Task {
+                                        syncTask = Task { @MainActor in
                                             await syncQuestions()
                                         }
                                     }) {
@@ -307,7 +307,7 @@ struct EnhancedStatsView: View {
     
     private func loadTotalQuestionsCount() {
         loadQuestionsTask?.cancel()
-        loadQuestionsTask = Task {
+        loadQuestionsTask = Task { @MainActor [settingsManager] in
             do {
                 let questionsRepository = QuestionsRepository()
                 let currentLanguage = settingsManager.settings.language.rawValue
@@ -316,10 +316,9 @@ struct EnhancedStatsView: View {
                 
                 await MainActor.run {
                     totalQuestionsCount = questions.count
-                    print("📊 StatsView: Total=\(questions.count) questions")
                 }
             } catch {
-                print("❌ StatsView: Failed to load questions count: \(error)")
+                AppLogger.error("StatsView: Failed to load questions count", error: error, category: AppLogger.data)
                 await MainActor.run {
                     totalQuestionsCount = 0
                 }
@@ -344,14 +343,10 @@ struct EnhancedStatsView: View {
         
         await MainActor.run {
             totalQuestionsCount = questions.count
-            print("🔄 StatsView: Synced \(questions.count) questions")
         }
     }
     
     private func startMistakesReview() {
-        print("DEBUG: Starting mistakes review...")
-        print("DEBUG: Wrong questions count: \(statsManager.stats.wrongQuestionIds.count)")
-        
         // Используем существующие экземпляры из DI контейнера
         let container = DIContainer.shared
         let viewModel = QuizViewModel(
@@ -364,9 +359,7 @@ struct EnhancedStatsView: View {
         showingMistakesReview = true
         
         let mistakesTask = Task {
-            print("DEBUG: Starting async mistakes review...")
             await viewModel.startMistakesReview()
-            print("DEBUG: Mistakes review completed. State: \(viewModel.state)")
         }
         
         // Store task for potential cancellation
@@ -423,6 +416,6 @@ struct EnhancedStatCard: View {
 
 #Preview {
     EnhancedStatsView(statsManager: StatsManager())
-        .environmentObject(SettingsManager())
+        .environment(\.settingsManager, SettingsManager())
         .environmentObject(RemoteQuestionsService())
 }

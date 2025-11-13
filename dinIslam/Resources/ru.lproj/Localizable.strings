@@ -1,3 +1,48 @@
+"profile.title" = "Профиль";
+"profile.done" = "Готово";
+"profile.anonymous" = "Гость";
+"profile.signout" = "Выйти";
+"profile.mastery.novice" = "Ученик";
+"profile.mastery.learning" = "В процессе";
+"profile.mastery.proficient" = "Уверенный";
+"profile.mastery.expert" = "Мастер";
+"profile.progress.title" = "Прогресс";
+"profile.progress.questions" = "Изучено вопросов";
+"profile.progress.correct" = "Правильных ответов";
+"profile.progress.incorrect" = "Неправильных ответов";
+"profile.progress.corrected" = "Исправлено ошибок";
+"profile.progress.accuracy" = "Средний результат";
+"profile.progress.streak" = "Серия";
+"profile.recommendations.title" = "Рекомендации";
+"profile.recommendations.nextSteps" = "Следующие шаги";
+"profile.recommendations.empty" = "Рекомендаций пока нет — продолжайте обучение, и мы подскажем, что изучать дальше.";
+"profile.recommendations.topic" = "Тема: %@";
+"profile.recommendation.focusTopic.title" = "Сфокусируйтесь на теме";
+"profile.recommendation.focusTopic" = "Рекомендуем повторить тему \"%@\" — здесь есть пространство для роста.";
+"profile.recommendation.challenge.title" = "Новый вызов";
+"profile.recommendation.challenge" = "Вы отлично справляетесь с уровнем %@. Попробуйте более сложные вопросы!";
+"profile.recommendation.maintainStreak.title" = "Держите темп";
+"profile.recommendation.maintainStreak" = "Отличная серия! Продолжайте в том же духе, чтобы закрепить успех.";
+"profile.avatar.select" = "Выбрать фото";
+"profile.avatar.change" = "Сменить фото";
+"profile.avatar.delete" = "Удалить фото";
+"profile.sync.reset" = "Сбросить данные";
+"profile.sync.reset.title" = "Сбросить прогресс?";
+"profile.sync.reset.message" = "Все локальные и облачные данные профиля будут удалены. Продолжить?";
+"profile.sync.reset.confirm" = "Сбросить";
+"profile.sync.reset.cancel" = "Отмена";
+"profile.sync.reset.inProgress" = "Сбрасываем данные…";
+"profile.sync.title" = "Синхронизация";
+"profile.sync.refresh" = "Синхронизировать";
+"profile.sync.ready" = "Синхронизировано";
+"profile.sync.guest" = "Гостевой режим";
+"profile.sync.lastSync" = "Последняя синхронизация: %@";
+"profile.sync.never" = "Пока не синхронизировалось с iCloud";
+"profile.sync.inProgress" = "Синхронизация...";
+"profile.sync.failed" = "Ошибка синхронизации: %@";
+"profile.sync.signin.required" = "Войдите в аккаунт для синхронизации прогресса на всех устройствах";
+"profile.signin.prompt.title" = "Синхронизация прогресса";
+"profile.signin.prompt.message" = "Войдите в аккаунт, чтобы сохранять прогресс на всех ваших устройствах и не потерять данные";
 /* 
   Localizable.strings (Russian)
   dinIslam
@@ -10,6 +55,17 @@
 "start.begin" = "Начать изучение";
 "start.loading" = "Загрузка...";
 "start.bestScore" = "Лучший результат";
+"start.examMode" = "Режим экзамена";
+"start.averageScore" = "Средний результат";
+"start.basedOnGames" = "на основе %d игры";
+"start.basedOnGames_2" = "на основе %d игр";
+"start.basedOnGames_5" = "на основе %d игр";
+"start.noGamesYet" = "Пока нет данных";
+"start.menu.stats" = "Статистика";
+"start.menu.achievements" = "Достижения";
+"start.menu.profile" = "Профиль";
+"start.menu.settings" = "Настройки";
+"start.menu.info" = "Инфо";
 
 // Quiz View
 "quiz.question" = "Вопрос";
@@ -40,6 +96,10 @@
 "settings.language.system" = "Системный";
 "settings.language.russian" = "Русский";
 "settings.language.english" = "English";
+"settings.theme.title" = "Тема";
+"settings.theme.system" = "Системная";
+"settings.theme.light" = "Светлая";
+"settings.theme.dark" = "Темная";
 "settings.sound.title" = "Звук";
 "settings.haptic.title" = "Тактильная обратная связь";
 "settings.notifications.title" = "Уведомления";
@@ -58,7 +118,7 @@
 "settings.rate.later" = "Напомнить позже";
 "settings.share.title" = "Поделиться";
 "settings.share.subtitle" = "Расскажите друзьям";
-"settings.share.text" = "Изучайте исламские знания с Tabiin Academy!";
+"settings.share.text" = "Изучайте свою религию с Tabiin Academy";
 
 // About
 "settings.about" = "О приложении";
@@ -78,12 +138,19 @@
 "quiz.stop.confirm.ok" = "Выйти";
 "quiz.stop.confirm.cancel" = "Отмена";
 
+// Quiz Finish
+"quiz.finish" = "Завершить";
+"quiz.finish.confirm.title" = "Завершить викторину?";
+"quiz.finish.confirm.message" = "Результаты будут сохранены.";
+"quiz.finish.confirm.ok" = "Завершить";
+"quiz.finish.confirm.cancel" = "Отмена";
+
 // Stats View - Pluralization Support
 "stats.title" = "Статистика";
 "stats.done" = "Готово";
 "stats.reset" = "Сбросить";
 "stats.reset.confirm.title" = "Сбросить статистику?";
-"stats.reset.confirm.message" = "Это действие сбросит всю статистику. Это действие нельзя отменить.";
+"stats.reset.confirm.message" = "Это действие сбросит всю статистику, включая средний результат. Это действие нельзя отменить.";
 "stats.reset.confirm.ok" = "Сбросить";
 "stats.reset.confirm.cancel" = "Отмена";
 
@@ -173,6 +240,8 @@
 "achievements.progress" = "Прогресс";
 "achievements.newAchievement" = "Новое достижение!";
 "achievements.congratulations" = "Поздравляем!";
+"achievements.share" = "Поделиться";
+"achievements.share.text" = "Достижение разблокировано";
 "achievements.reset" = "Сбросить";
 "achievements.reset.confirm.title" = "Сбросить достижения?";
 "achievements.reset.confirm.message" = "Все достижения будут заблокированы. Это действие нельзя отменить.";
@@ -191,7 +260,7 @@
 "achievements.perfectionist.title" = "Успешный";
 "achievements.legend.title" = "Мудрый";
 
-// Achievement Descriptions
+// Achievement Descriptions (Locked)
 "achievements.firstQuiz.description" = "Пройдите первую викторину";
 "achievements.perfectScore.description" = "Получите 100% в любой викторине";
 "achievements.speedRunner.description" = "Пройдите викторину менее чем за 2 минуты";
@@ -202,6 +271,30 @@
 "achievements.explorer.description" = "Изучите 500 вопросов";
 "achievements.perfectionist.description" = "Получите 10 идеальных результатов";
 "achievements.legend.description" = "Пройдите 100 викторин";
+
+// Achievement Descriptions (Unlocked)
+"achievements.firstQuiz.description.unlocked" = "Вы прошли первую викторину";
+"achievements.perfectScore.description.unlocked" = "Вы получили 100% в викторине";
+"achievements.speedRunner.description.unlocked" = "Вы прошли викторину менее чем за 2 минуты";
+"achievements.scholar.description.unlocked" = "Вы изучили 100 вопросов";
+"achievements.dedicated.description.unlocked" = "Вы прошли 10 викторин";
+"achievements.master.description.unlocked" = "Вы прошли 50 викторин";
+"achievements.streak.description.unlocked" = "Вы изучали 5 дней подряд";
+"achievements.explorer.description.unlocked" = "Вы изучили 500 вопросов";
+"achievements.perfectionist.description.unlocked" = "Вы получили 10 идеальных результатов";
+"achievements.legend.description.unlocked" = "Вы прошли 100 викторин";
+
+// Achievement Notifications (Unlocked)
+"achievements.firstQuiz.notification" = "Вы прошли свою первую викторину! Начало положено.";
+"achievements.perfectScore.notification" = "Превосходно! Вы получили идеальный результат.";
+"achievements.speedRunner.notification" = "Невероятная скорость! Вы знаете материал на отлично.";
+"achievements.scholar.notification" = "Отличная работа! Вы изучили 100 вопросов.";
+"achievements.dedicated.notification" = "Впечатляющая преданность! Вы прошли 10 викторин.";
+"achievements.master.notification" = "Невероятное мастерство! Вы прошли 50 викторин.";
+"achievements.streak.notification" = "Удивительное постоянство! Вы учитесь 5 дней подряд.";
+"achievements.explorer.notification" = "Глубокие знания! Вы изучили 500 вопросов.";
+"achievements.perfectionist.notification" = "Великолепная точность! Вы получили 10 идеальных результатов.";
+"achievements.legend.notification" = "Легендарное достижение! Вы прошли 100 викторин.";
 
 // Achievement Progress Descriptions - Pluralization (Russian)
 "achievements.progress.quiz" = "%d викторина";
@@ -228,9 +321,10 @@
 
 // Notifications
 "notification.title" = "Время изучения";
-"notification.body" = "Не забудьте изучить новые знания об исламе сегодня!";
+"notification.body" = "Время для новых знаний!";
 "notification.permission.title" = "Разрешить уведомления";
 "notification.permission.message" = "Получайте напоминания о ежедневном изучении";
+"notification.permission.request" = "Разрешить";
 "notification.settings.title" = "Настроить";
 "notification.settings.enabled" = "Включить напоминания";
 "notification.settings.time" = "Время напоминания";
@@ -250,7 +344,7 @@
 
 // Notification Settings
 "notification.settings.about.title" = "О напоминаниях";
-"notification.settings.about.description" = "Получайте ежедневные напоминания о изучении ислама для поддержания постоянства в знаниях.";
+"notification.settings.about.description" = "Поддерживайте постоянство в изучении";
 "notification.settings.features.daily" = "Ежедневные напоминания о изучении";
 "notification.settings.features.achievements" = "Уведомления о новых достижениях";
 "notification.settings.features.streak" = "Напоминания о поддержании серии";
@@ -306,3 +400,88 @@
 // Error Messages
 "error.title" = "Ошибка";
 "error.ok" = "ОК";
+
+// Exam Mode
+"exam.title" = "Экзамен";
+"exam.stop" = "Остановить";
+"exam.pause" = "Пауза";
+"exam.resume" = "Продолжить";
+"exam.skip" = "Пропустить";
+"exam.finish" = "Завершить экзамен";
+"exam.finish.title" = "Завершить экзамен";
+"exam.finish.message" = "Вы уверены, что хотите завершить экзамен? Результаты будут сохранены.";
+"exam.finish.cancel" = "Отмена";
+"exam.finish.confirm" = "Завершить";
+
+// Exam Settings
+"exam.settings.title" = "Настройки экзамена";
+"exam.settings.cancel" = "Отмена";
+"exam.settings.start" = "Начать экзамен";
+"exam.settings.presets" = "Предустановки";
+"exam.settings.presets.footer" = "Выберите готовую конфигурацию или создайте свою";
+"exam.settings.custom" = "Пользовательские настройки";
+"exam.settings.custom.footer" = "Настройте параметры экзамена под себя";
+"exam.settings.timePerQuestion" = "Время на вопрос";
+"exam.settings.totalQuestions" = "Количество вопросов";
+"exam.settings.allowSkip" = "Разрешить пропуск";
+"exam.settings.showTimer" = "Показывать таймер";
+"exam.settings.autoSubmit" = "Автозавершение";
+"exam.settings.preview" = "Предварительный просмотр";
+"exam.settings.preview.title" = "Параметры экзамена";
+"exam.settings.preview.questions" = "Вопросов";
+"exam.settings.preview.timePerQuestion" = "Время на вопрос";
+"exam.settings.preview.totalTime" = "Общее время";
+"exam.settings.preview.options" = "Опции";
+"exam.settings.preview.skip" = "Пропуск";
+"exam.settings.preview.timer" = "Таймер";
+"exam.settings.preview.autoSubmit" = "Автозавершение";
+
+// Exam Presets
+"exam.preset.quick" = "Быстрый";
+"exam.preset.quick.description" = "10 вопросов по 15 секунд";
+"exam.preset.standard" = "Стандартный";
+"exam.preset.standard.description" = "20 вопросов по 30 секунд";
+"exam.preset.extended" = "Расширенный";
+"exam.preset.extended.description" = "30 вопросов по 60 секунд";
+"exam.preset.custom" = "Пользовательский";
+"exam.preset.custom.description" = "Настройте параметры самостоятельно";
+
+// Exam Alerts
+"exam.pause.title" = "Пауза экзамена";
+"exam.pause.message" = "Вы уверены, что хотите поставить экзамен на паузу?";
+"exam.pause.cancel" = "Отмена";
+"exam.pause.confirm" = "Пауза";
+"exam.stop.title" = "Остановить экзамен";
+"exam.stop.message" = "Вы уверены, что хотите остановить экзамен? Результаты будут сохранены.";
+"exam.stop.cancel" = "Отмена";
+"exam.stop.confirm" = "Остановить";
+
+// Exam Result
+"exam.result.title" = "Результат экзамена";
+"exam.result.done" = "Готово";
+"exam.result.passed" = "Экзамен сдан!";
+"exam.result.failed" = "Экзамен не сдан";
+"exam.result.grade" = "Оценка";
+"exam.result.answered" = "Отвечено";
+"exam.result.correct" = "Правильно";
+"exam.result.incorrect" = "Неправильно";
+"exam.result.skipped" = "Пропущено";
+"exam.result.breakdown" = "Детализация";
+"exam.result.totalQuestions" = "Всего вопросов";
+"exam.result.timeSpent" = "Время выполнения";
+"exam.result.averageTime" = "Среднее время";
+"exam.result.timeExpired" = "Время истекло";
+"exam.result.retake" = "Пересдать";
+"exam.result.share" = "Поделиться";
+"exam.result.share.title" = "📚 Результат экзамена по исламу";
+"exam.result.share.grade" = "Оценка:";
+"exam.result.share.correctAnswers" = "Правильных ответов:";
+"exam.result.share.percentage" = "Процент:";
+"exam.result.share.time" = "Время:";
+"exam.result.share.footer" = "Скачайте приложение Tabiin Academy для изучения исламских знаний!";
+
+// Exam Grades
+"exam.grade.excellent" = "Отлично";
+"exam.grade.good" = "Хорошо";
+"exam.grade.satisfactory" = "Удовлетворительно";
+"exam.grade.unsatisfactory" = "Неудовлетворительно";

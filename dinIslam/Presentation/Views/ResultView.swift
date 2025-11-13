@@ -9,119 +9,171 @@ import SwiftUI
 import UserNotifications
 
 struct ResultView: View {
-    @State private var viewModel: QuizViewModel
-    @Binding var bestScore: Double
+    let result: QuizResult
+    let newAchievements: [Achievement]
+    let onPlayAgain: () -> Void
+    let onBackToStart: () -> Void
+    let onAchievementsCleared: () -> Void
+    
     @State private var showingAchievementNotification = false
     @State private var currentAchievement: Achievement?
-    
-    init(viewModel: QuizViewModel, bestScore: Binding<Double>) {
-        self.viewModel = viewModel
-        self._bestScore = bestScore
-    }
+    @State private var achievementsCleared = false
     
     var body: some View {
-        VStack(spacing: 32) {
-            Spacer()
+        ZStack {
+            // Gradient Background
+            LinearGradient(
+                gradient: Gradient(colors: [
+                    DesignTokens.Colors.background1,
+                    DesignTokens.Colors.background2
+                ]),
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .ignoresSafeArea()
             
-            // Result icon
-            VStack(spacing: 16) {
-                Image(systemName: resultIcon)
-                    .font(.system(size: 80))
-                    .foregroundStyle(resultColor.gradient)
-                
-                LocalizedText("result.title")
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-                    .foregroundStyle(.primary)
-            }
-            
-            // Score details
-            VStack(spacing: 20) {
-                // Main score
-                VStack(spacing: 8) {
-                    Text("\(Int(viewModel.quizResult?.percentage ?? 0))%")
-                        .font(.system(size: 60, weight: .bold, design: .rounded))
-                        .foregroundStyle(resultColor)
+            ScrollView {
+                VStack(spacing: DesignTokens.Spacing.xxxl) {
+                    Spacer()
+                        .frame(height: DesignTokens.Spacing.xxl)
                     
-                    LocalizedText("result.correctAnswers")
-                        .font(.title3)
-                        .foregroundStyle(.secondary)
-                }
-                
-                // Detailed stats
-                VStack(spacing: 12) {
-                    StatRow(
-                        title: "result.totalQuestions".localized,
-                        value: "\(viewModel.quizResult?.totalQuestions ?? 0)"
-                    )
-                    
-                    StatRow(
-                        title: "result.correctAnswers".localized,
-                        value: "\(viewModel.quizResult?.correctAnswers ?? 0)"
-                    )
-                    
-                    StatRow(
-                        title: "result.timeSpent".localized,
-                        value: formatTime(viewModel.quizResult?.timeSpent ?? 0)
-                    )
-                }
-                .padding()
-                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
-            }
-            
-            // New record badge
-            if let result = viewModel.quizResult, result.isNewRecord {
-                HStack {
-                    Image(systemName: "star.fill")
-                        .foregroundColor(.yellow)
-                    LocalizedText("result.newRecord")
-                        .fontWeight(.semibold)
-                        .foregroundColor(.yellow)
-                }
-                .padding()
-                .background(.yellow.opacity(0.1), in: RoundedRectangle(cornerRadius: 12))
-            }
-            
-            Spacer()
-            
-            // Action buttons
-            VStack(spacing: 16) {
-                Button(action: {
-                    updateBestScore()
-                    viewModel.restartQuiz()
-                }) {
-                    HStack {
-                        Image(systemName: "arrow.clockwise")
-                        LocalizedText("result.playAgain")
-                            .fontWeight(.semibold)
+                    // Result icon
+                    VStack(spacing: DesignTokens.Spacing.lg) {
+                        Image(systemName: resultIcon)
+                            .font(.system(size: 80))
+                            .foregroundStyle(resultColor)
+                        
+                        LocalizedText("result.title")
+                            .font(DesignTokens.Typography.h1)
+                            .foregroundStyle(DesignTokens.Colors.textPrimary)
                     }
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 56)
-                    .background(.blue.gradient, in: RoundedRectangle(cornerRadius: 16))
-                }
-                
-                Button(action: {
-                    updateBestScore()
-                    // Navigate back to start
-                    viewModel.restartQuiz()
-                }) {
-                    HStack {
-                        Image(systemName: "house.fill")
-                        LocalizedText("result.backToStart")
-                            .fontWeight(.semibold)
+                    
+                    // Score details card
+                    VStack(spacing: DesignTokens.Spacing.xl) {
+                        // Main score
+                        VStack(spacing: DesignTokens.Spacing.sm) {
+                            Text("\(Int(result.percentage))%")
+                                .font(.system(size: 60, weight: .bold, design: .rounded))
+                                .foregroundStyle(resultColor)
+                            
+                            LocalizedText("result.correctAnswers")
+                                .font(DesignTokens.Typography.bodyRegular)
+                                .foregroundStyle(DesignTokens.Colors.textSecondary)
+                        }
+                        
+                        Divider()
+                            .background(DesignTokens.Colors.borderSubtle)
+                        
+                        // Detailed stats
+                        VStack(spacing: DesignTokens.Spacing.md) {
+                            StatRow(
+                                title: "result.totalQuestions".localized,
+                                value: "\(result.totalQuestions)"
+                            )
+                            
+                            StatRow(
+                                title: "result.correctAnswers".localized,
+                                value: "\(result.correctAnswers)"
+                            )
+                            
+                            StatRow(
+                                title: "result.timeSpent".localized,
+                                value: formatTime(result.timeSpent)
+                            )
+                        }
                     }
-                    .foregroundColor(.blue)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 56)
-                    .background(.blue.opacity(0.1), in: RoundedRectangle(cornerRadius: 16))
+                    .padding(DesignTokens.Spacing.xxl)
+                    .cardStyle(cornerRadius: DesignTokens.CornerRadius.xlarge)
+                    .padding(.horizontal, DesignTokens.Spacing.xxl)
+                    
+                    // New record badge
+                    if result.isNewRecord {
+                        HStack(spacing: DesignTokens.Spacing.md) {
+                            Image(systemName: "star.fill")
+                                .font(.system(size: DesignTokens.Sizes.iconMedium))
+                                .foregroundColor(DesignTokens.Colors.iconOrange)
+                            LocalizedText("result.newRecord")
+                                .font(DesignTokens.Typography.secondarySemibold)
+                                .foregroundColor(DesignTokens.Colors.iconOrange)
+                        }
+                        .padding(DesignTokens.Spacing.lg)
+                        .frame(maxWidth: .infinity)
+                        .cardStyle(
+                            cornerRadius: DesignTokens.CornerRadius.medium,
+                            fillColor: DesignTokens.Colors.iconOrange.opacity(0.15),
+                            borderColor: DesignTokens.Colors.iconOrange.opacity(0.45),
+                            shadowColor: Color.black.opacity(0.24),
+                            shadowRadius: 6,
+                            shadowYOffset: 3
+                        )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
+                                .stroke(DesignTokens.Colors.iconOrange, lineWidth: 1)
+                        )
+                        .padding(.horizontal, DesignTokens.Spacing.xxl)
+                    }
+                    
+                    Spacer()
+                        .frame(height: DesignTokens.Spacing.xxl)
+                    
+                    // Action buttons
+                    VStack(spacing: DesignTokens.Spacing.md) {
+                        Button(action: onPlayAgain) {
+                            HStack(spacing: DesignTokens.Spacing.md) {
+                                Image(systemName: "arrow.clockwise")
+                                    .font(.system(size: DesignTokens.Sizes.iconMedium))
+                                LocalizedText("result.playAgain")
+                                    .font(DesignTokens.Typography.secondarySemibold)
+                            }
+                            .foregroundColor(DesignTokens.Colors.textPrimary)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 56)
+                            .cardStyle(
+                                cornerRadius: DesignTokens.CornerRadius.medium,
+                                fillColor: DesignTokens.Colors.iconBlue,
+                                borderColor: DesignTokens.Colors.iconBlue.opacity(0.45),
+                                shadowColor: Color.black.opacity(0.24),
+                                shadowRadius: 8,
+                                shadowYOffset: 4
+                            )
+                        }
+                        
+                        Button(action: onBackToStart) {
+                            HStack(spacing: DesignTokens.Spacing.md) {
+                                Image(systemName: "house.fill")
+                                    .font(.system(size: DesignTokens.Sizes.iconMedium))
+                                LocalizedText("result.backToStart")
+                                    .font(DesignTokens.Typography.secondarySemibold)
+                            }
+                            .foregroundColor(DesignTokens.Colors.iconBlue)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 56)
+                            .cardStyle(
+                                cornerRadius: DesignTokens.CornerRadius.medium,
+                                fillColor: DesignTokens.Colors.progressCard,
+                                borderColor: DesignTokens.Colors.borderDefault,
+                                shadowColor: Color.black.opacity(0.24),
+                                shadowRadius: 8,
+                                shadowYOffset: 4
+                            )
+                            .overlay(
+                                RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
+                                    .stroke(DesignTokens.Colors.borderSubtle, lineWidth: 1)
+                            )
+                        }
+                    }
+                    .padding(.horizontal, DesignTokens.Spacing.xxl)
+                    
+                    Spacer()
+                        .frame(height: DesignTokens.Spacing.xxl)
                 }
             }
-            .padding(.horizontal)
         }
-        .padding()
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
+        .toolbarBackground(DesignTokens.Colors.background1, for: .navigationBar)
+        .toolbarBackground(.visible, for: .navigationBar)
+        .toolbarColorScheme(.dark, for: .navigationBar)
         .overlay(
             // Achievement Notification Overlay
             Group {
@@ -139,18 +191,20 @@ struct ResultView: View {
             }
         )
         .onAppear {
-            checkForNewAchievements()
-            updateBestScore()
+            prepareAchievements()
             
             // Clear app badge when results are shown (iOS 17+ API)
             UNUserNotificationCenter.current().setBadgeCount(0, withCompletionHandler: { _ in })
         }
+        .onChange(of: showingAchievementNotification) { _, newValue in
+            if !newValue {
+                clearAchievementsOnce()
+            }
+        }
     }
     
     private var resultIcon: String {
-        guard let percentage = viewModel.quizResult?.percentage else { return "questionmark.circle" }
-        
-        switch percentage {
+        switch result.percentage {
         case 80...:
             return "trophy.fill"
         case 60..<80:
@@ -163,17 +217,15 @@ struct ResultView: View {
     }
     
     private var resultColor: Color {
-        guard let percentage = viewModel.quizResult?.percentage else { return .gray }
-        
-        switch percentage {
+        switch result.percentage {
         case 80...:
-            return .yellow
+            return DesignTokens.Colors.iconOrange
         case 60..<80:
-            return .green
+            return DesignTokens.Colors.statusGreen
         case 40..<60:
-            return .orange
+            return DesignTokens.Colors.iconOrange
         default:
-            return .red
+            return DesignTokens.Colors.iconRed
         }
     }
     
@@ -188,26 +240,19 @@ struct ResultView: View {
         }
     }
     
-    private func updateBestScore() {
-        if let percentage = viewModel.quizResult?.percentage,
-           percentage > bestScore {
-            bestScore = percentage
-        }
+    private func prepareAchievements() {
+        guard !newAchievements.isEmpty else { return }
+        currentAchievement = newAchievements.first
+        showingAchievementNotification = true
+        clearAchievementsOnce()
     }
     
-    private func checkForNewAchievements() {
-        let newAchievements = viewModel.newAchievements
-        
-        if !newAchievements.isEmpty {
-            // Show the first new achievement
-            currentAchievement = newAchievements.first
-            showingAchievementNotification = true
-            
-            // Clear the achievement from the view model after showing
-            Task { @MainActor in
-                try? await Task.sleep(nanoseconds: 500_000_000) // 0.5 seconds
-                viewModel.clearNewAchievements()
-            }
+    private func clearAchievementsOnce() {
+        guard !achievementsCleared else { return }
+        achievementsCleared = true
+        Task { @MainActor [onAchievementsCleared] in
+            try? await Task.sleep(nanoseconds: 500_000_000)
+            onAchievementsCleared()
         }
     }
 }
@@ -219,18 +264,25 @@ struct StatRow: View {
     var body: some View {
         HStack {
             Text(title)
-                .foregroundStyle(.secondary)
+                .font(DesignTokens.Typography.secondaryRegular)
+                .foregroundStyle(DesignTokens.Colors.textSecondary)
             
             Spacer()
             
             Text(value)
-                .fontWeight(.semibold)
-                .foregroundStyle(.primary)
+                .font(DesignTokens.Typography.secondarySemibold)
+                .foregroundStyle(DesignTokens.Colors.textPrimary)
         }
     }
 }
 
 #Preview {
-    let viewModel = QuizViewModel(quizUseCase: QuizUseCase(questionsRepository: QuestionsRepository()), statsManager: StatsManager(), settingsManager: SettingsManager())
-    ResultView(viewModel: viewModel, bestScore: .constant(85.0))
+    let result = QuizResult(totalQuestions: 20, correctAnswers: 18, percentage: 90, timeSpent: 120)
+    ResultView(
+        result: result,
+        newAchievements: [],
+        onPlayAgain: {},
+        onBackToStart: {},
+        onAchievementsCleared: {}
+    )
 }

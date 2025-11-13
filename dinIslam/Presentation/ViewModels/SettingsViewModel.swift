@@ -54,6 +54,7 @@ class SettingsViewModel {
         LocalizationManager.shared.setLanguage(languageCode)
         refreshTrigger = UUID()
         hapticManager.selectionChanged()
+        AchievementManager.shared.refreshLocalization()
     }
     
     // MARK: - Sound Settings
@@ -80,8 +81,6 @@ class SettingsViewModel {
         settingsManager.updateNotificationsEnabled(enabled)
         hapticManager.selectionChanged()
     }
-    
-    
     
     func requestAppReview() {
         if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
@@ -134,6 +133,6 @@ class SettingsViewModel {
         settingsManager.updateSoundEnabled(defaultSettings.soundEnabled)
         settingsManager.updateHapticEnabled(defaultSettings.hapticEnabled)
         settingsManager.updateNotificationsEnabled(defaultSettings.notificationsEnabled)
-
+        AchievementManager.shared.refreshLocalization()
     }
 }

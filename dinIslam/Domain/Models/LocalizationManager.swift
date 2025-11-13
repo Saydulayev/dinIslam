@@ -76,6 +76,11 @@ extension String {
         return LocalizationManager.shared.localizedString(for: self)
     }
     
+    func localized(arguments: CVarArg...) -> String {
+        let format = LocalizationManager.shared.localizedString(for: self)
+        return String(format: format, arguments: arguments)
+    }
+    
     func localized(count: Int) -> String {
         return EnhancedLocalizationManager.shared.localizedString(for: self, count: count)
     }

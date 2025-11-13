@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct StatsView: View {
-    @State private var statsManager: StatsManager
-    @EnvironmentObject private var settingsManager: SettingsManager
+    @Bindable var statsManager: StatsManager
+    @Environment(\.settingsManager) private var settingsManager
     @EnvironmentObject private var remoteService: RemoteQuestionsService
     @Environment(\.dismiss) private var dismiss
     @State private var mistakesViewModel: QuizViewModel?
@@ -23,223 +23,112 @@ struct StatsView: View {
     @State private var loadQuestionsTask: Task<Void, Never>?
     
     init(statsManager: StatsManager) {
-        self._statsManager = State(initialValue: statsManager)
+        self._statsManager = Bindable(statsManager)
     }
     
     var body: some View {
-        ScrollView {
-            LazyVStack(spacing: 20) {
-                // Header - теперь внутри скролла
-                VStack(spacing: 8) {
-                    Image(systemName: "chart.bar.fill")
-                        .font(.system(size: 40))
-                        .foregroundStyle(.blue.gradient)
-                    
-                    Text("stats.title".localized)
-                        .font(.title2)
-                        .fontWeight(.bold)
-                }
-                .padding(.top, 8)
-                .padding(.bottom, 16)
-                
-                // Stats Cards - фиксированная сетка
-                LazyVGrid(columns: [
-                        GridItem(.flexible()),
-                        GridItem(.flexible())
-                    ], spacing: 16) {
-                        StatCard(
-                            title: "stats.questionsStudied.title".localized,
+        ZStack {
+            // Gradient background
+            LinearGradient(
+                colors: [
+                    DesignTokens.Colors.background1,
+                    DesignTokens.Colors.background2
+                ],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .ignoresSafeArea()
+            
+            ScrollView {
+                VStack(spacing: DesignTokens.Spacing.xxxl) {
+                    // Stats Cards
+                    LazyVGrid(
+                        columns: [
+                            GridItem(.flexible(), spacing: DesignTokens.Spacing.md),
+                            GridItem(.flexible(), spacing: DesignTokens.Spacing.md)
+                        ],
+                        spacing: DesignTokens.Spacing.md
+                    ) {
+                        ProgressCardView(
+                            icon: "questionmark.circle",
                             value: "\(statsManager.stats.totalQuestionsStudied)",
-                            icon: "questionmark.circle.fill",
-                            color: .blue,
-                            isCompact: false
+                            label: "stats.questionsStudied.title".localized,
+                            iconColor: DesignTokens.Colors.iconBlue,
+                            backgroundColor: DesignTokens.Colors.iconBlue.opacity(0.2)
                         )
                         
-                        StatCard(
-                            title: "stats.correctAnswers.title".localized,
+                        ProgressCardView(
+                            icon: "checkmark.circle",
                             value: "\(statsManager.stats.correctAnswers)",
-                            icon: "checkmark.circle.fill",
-                            color: .green,
-                            isCompact: false
+                            label: "stats.correctAnswers.title".localized,
+                            iconColor: DesignTokens.Colors.iconGreen,
+                            backgroundColor: DesignTokens.Colors.iconGreen.opacity(0.2)
                         )
                         
-                        StatCard(
-                            title: "stats.incorrectAnswers.title".localized,
+                        ProgressCardView(
+                            icon: "xmark.circle",
                             value: "\(statsManager.stats.incorrectAnswers)",
-                            icon: "xmark.circle.fill",
-                            color: .red,
-                            isCompact: false
+                            label: "stats.incorrectAnswers.title".localized,
+                            iconColor: DesignTokens.Colors.iconRed,
+                            backgroundColor: DesignTokens.Colors.iconRed.opacity(0.2)
                         )
                         
-                        StatCard(
-                            title: "stats.correctedMistakes.title".localized,
+                        ProgressCardView(
+                            icon: "exclamationmark.circle",
                             value: "\(statsManager.stats.correctedMistakes)",
-                            icon: "checkmark.circle.badge.xmark",
-                            color: .orange,
-                            isCompact: false
+                            label: "stats.correctedMistakes.title".localized,
+                            iconColor: DesignTokens.Colors.iconOrange,
+                            backgroundColor: DesignTokens.Colors.iconOrange.opacity(0.2)
                         )
                         
-                        StatCard(
-                            title: "stats.totalQuestions.title".localized,
+                        ProgressCardView(
+                            icon: "book.closed",
                             value: "\(totalQuestionsCount)",
-                            icon: "book.fill",
-                            color: .purple,
-                            isCompact: false
+                            label: "stats.totalQuestions.title".localized,
+                            iconColor: DesignTokens.Colors.iconPurple,
+                            backgroundColor: DesignTokens.Colors.iconPurple.opacity(0.2)
                         )
                         
-                        StatCard(
-                            title: "stats.quizzesCompleted.title".localized,
+                        ProgressCardView(
+                            icon: "checkmark.circle",
                             value: "\(statsManager.stats.totalQuizzesCompleted)",
-                            icon: "checkmark.circle.fill",
-                            color: .blue,
-                            isCompact: false
+                            label: "stats.quizzesCompleted.title".localized,
+                            iconColor: DesignTokens.Colors.iconBlue,
+                            backgroundColor: DesignTokens.Colors.iconBlue.opacity(0.2)
                         )
                     }
                     
-                    // Wrong Questions Section - увеличенная
+                    // Wrong Questions Section
                     if !statsManager.stats.wrongQuestionIds.isEmpty {
-                        VStack(alignment: .leading, spacing: 12) {
-                            Text("stats.wrongQuestions".localized)
-                                .font(.title3)
-                                .fontWeight(.semibold)
-                            
-                            VStack(spacing: 12) {
-                                HStack {
-                                    Text("stats.wrongQuestionsCount.title".localized)
-                                        .font(.body)
-                                        .foregroundColor(.secondary)
-                                    Spacer()
-                                    Text("\(statsManager.stats.wrongQuestionsCount)")
-                                        .font(.body)
-                                        .fontWeight(.semibold)
-                                        .foregroundColor(.red)
-                                }
-                                
-                                Button(action: {
-                                    startMistakesReview()
-                                }) {
-                                    HStack {
-                                        Image(systemName: "arrow.clockwise")
-                                            .font(.body)
-                                        Text("stats.repeatMistakes".localized)
-                                            .font(.body)
-                                    }
-                                    .foregroundColor(.white)
-                                    .frame(maxWidth: .infinity)
-                                    .frame(height: 50)
-                                    .background(.red.gradient, in: RoundedRectangle(cornerRadius: 12))
-                                }
-                            }
-                            .padding(20)
-                            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
-                        }
+                        wrongQuestionsSection()
                     }
                     
-                    // Sync Section - в самом низу
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("stats.sync.title".localized)
-                            .font(.title3)
-                            .fontWeight(.semibold)
-                        
-                        VStack(spacing: 12) {
-                            HStack {
-                                Text("stats.sync.status".localized)
-                                    .font(.body)
-                                    .foregroundColor(.secondary)
-                                Spacer()
-                                if remoteService.isLoading {
-                                    ProgressView()
-                                        .scaleEffect(0.8)
-                                } else if remoteService.hasUpdates {
-                                    Text("stats.sync.available".localized)
-                                        .font(.body)
-                                        .fontWeight(.semibold)
-                                        .foregroundColor(.green)
-                                } else {
-                                    Text("stats.sync.upToDate".localized)
-                                        .font(.body)
-                                        .fontWeight(.semibold)
-                                        .foregroundColor(.blue)
-                                }
-                            }
-                            
-                            if remoteService.hasUpdates {
-                                HStack {
-                                    Text("stats.sync.newQuestions.title".localized)
-                                        .font(.subheadline)
-                                        .foregroundColor(.secondary)
-                                    Spacer()
-                                    Text("+\(remoteService.remoteQuestionsCount - remoteService.cachedQuestionsCount)")
-                                        .font(.subheadline)
-                                        .fontWeight(.semibold)
-                                        .foregroundColor(.green)
-                                }
-                            }
-                            
-                            HStack(spacing: 12) {
-                                Button(action: {
-                                    updateTask?.cancel()
-                                    updateTask = Task {
-                                        await checkForUpdates()
-                                    }
-                                }) {
-                                    HStack {
-                                        Image(systemName: "arrow.clockwise")
-                                            .font(.body)
-                                        Text("stats.sync.check".localized)
-                                            .font(.body)
-                                    }
-                                    .foregroundColor(.white)
-                                    .frame(maxWidth: .infinity)
-                                    .frame(height: 50)
-                                    .background(.blue.gradient, in: RoundedRectangle(cornerRadius: 12))
-                                }
-                                .disabled(remoteService.isLoading)
-                                
-                                if remoteService.hasUpdates {
-                                    Button(action: {
-                                        syncTask?.cancel()
-                                        syncTask = Task {
-                                            await syncQuestions()
-                                        }
-                                    }) {
-                                        HStack {
-                                            Image(systemName: "arrow.down.circle")
-                                                .font(.body)
-                                            Text("stats.sync.sync".localized)
-                                                .font(.body)
-                                        }
-                                        .foregroundColor(.white)
-                                        .frame(maxWidth: .infinity)
-                                        .frame(height: 50)
-                                        .background(.green.gradient, in: RoundedRectangle(cornerRadius: 12))
-                                    }
-                                    .disabled(remoteService.isLoading)
-                                }
-                            }
-                        }
-                        .padding(20)
-                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
-                    }
+                    // Sync Section
+                    syncSection()
                 }
-                .padding(.horizontal, 16)
-                .padding(.bottom, 20)
+                .padding(.horizontal, DesignTokens.Spacing.xxl)
+                .padding(.top, DesignTokens.Spacing.lg)
+                .padding(.bottom, DesignTokens.Spacing.xxxl)
+            }
         }
-            .navigationTitle(LocalizationManager.shared.localizedString(for: "stats.title"))
-            .navigationBarTitleDisplayMode(.large)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(LocalizationManager.shared.localizedString(for: "stats.reset")) {
-                        showingResetAlert = true
-                    }
-                    .foregroundColor(.red)
+        .navigationTitle(LocalizationManager.shared.localizedString(for: "stats.title"))
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button(LocalizationManager.shared.localizedString(for: "stats.reset")) {
+                    showingResetAlert = true
                 }
+                .font(DesignTokens.Typography.secondarySemibold)
+                .foregroundColor(DesignTokens.Colors.iconRed)
             }
-            .navigationDestination(isPresented: $showingMistakesReview) {
-                if let viewModel = mistakesViewModel {
-                    MistakesReviewNavigationView(viewModel: viewModel)
-                }
+        }
+        .toolbarBackground(DesignTokens.Colors.background1, for: .navigationBar)
+        .toolbarColorScheme(.dark, for: .navigationBar)
+        .navigationDestination(isPresented: $showingMistakesReview) {
+            if let viewModel = mistakesViewModel {
+                MistakesReviewNavigationView(viewModel: viewModel)
             }
+        }
         .onAppear {
             loadTotalQuestionsCount()
         }
@@ -249,25 +138,136 @@ struct StatsView: View {
             syncTask?.cancel()
             loadQuestionsTask?.cancel()
         }
-            .alert(
-                "stats.reset.confirm.title".localized,
-                isPresented: $showingResetAlert
-            ) {
-                Button("stats.reset.confirm.cancel".localized, role: .cancel) {
-                    showingResetAlert = false
-                }
-                Button("stats.reset.confirm.ok".localized, role: .destructive) {
-                    statsManager.resetStatsExceptTotalQuestions()
-                    showingResetAlert = false
-                }
-            } message: {
-                Text("stats.reset.confirm.message".localized)
+        .alert(
+            "stats.reset.confirm.title".localized,
+            isPresented: $showingResetAlert
+        ) {
+            Button("stats.reset.confirm.cancel".localized, role: .cancel) {
+                showingResetAlert = false
             }
+            Button("stats.reset.confirm.ok".localized, role: .destructive) {
+                statsManager.resetStatsExceptTotalQuestions()
+                showingResetAlert = false
+            }
+        } message: {
+            Text("stats.reset.confirm.message".localized)
+        }
     }
     
+    // MARK: - Wrong Questions Section
+    private func wrongQuestionsSection() -> some View {
+        VStack(alignment: .leading, spacing: DesignTokens.Spacing.lg) {
+            Text("stats.wrongQuestions".localized)
+                .font(DesignTokens.Typography.h2)
+                .foregroundStyle(DesignTokens.Colors.textPrimary)
+            
+            VStack(spacing: DesignTokens.Spacing.md) {
+                HStack {
+                    Text("stats.wrongQuestionsCount.title".localized)
+                        .font(DesignTokens.Typography.secondaryRegular)
+                        .foregroundColor(DesignTokens.Colors.textSecondary)
+                    Spacer()
+                    Text("\(statsManager.stats.wrongQuestionsCount)")
+                        .font(DesignTokens.Typography.bodyRegular)
+                        .fontWeight(.semibold)
+                        .foregroundColor(DesignTokens.Colors.iconRed)
+                }
+                
+                MinimalButton(
+                    icon: "arrow.clockwise",
+                    title: "stats.repeatMistakes".localized,
+                    foregroundColor: DesignTokens.Colors.iconRed
+                ) {
+                    startMistakesReview()
+                }
+            }
+        }
+        .padding(DesignTokens.Spacing.xxl)
+        .cardStyle(cornerRadius: DesignTokens.CornerRadius.xlarge)
+    }
+    
+    // MARK: - Sync Section
+    private func syncSection() -> some View {
+        VStack(alignment: .leading, spacing: DesignTokens.Spacing.lg) {
+            Text("stats.sync.title".localized)
+                .font(DesignTokens.Typography.h2)
+                .foregroundStyle(DesignTokens.Colors.textPrimary)
+            
+            VStack(spacing: DesignTokens.Spacing.md) {
+                HStack {
+                    Text("stats.sync.status".localized)
+                        .font(DesignTokens.Typography.secondaryRegular)
+                        .foregroundColor(DesignTokens.Colors.textSecondary)
+                    Spacer()
+                    if remoteService.isLoading {
+                        ProgressView()
+                            .scaleEffect(0.8)
+                            .tint(DesignTokens.Colors.textSecondary)
+                    } else if remoteService.hasUpdates {
+                        Text("stats.sync.available".localized)
+                            .font(DesignTokens.Typography.secondaryRegular)
+                            .fontWeight(.semibold)
+                            .foregroundColor(DesignTokens.Colors.iconGreen)
+                    } else {
+                        Text("stats.sync.upToDate".localized)
+                            .font(DesignTokens.Typography.secondaryRegular)
+                            .fontWeight(.semibold)
+                            .foregroundColor(DesignTokens.Colors.iconBlue)
+                    }
+                }
+                
+                if remoteService.hasUpdates {
+                    HStack {
+                        Text("stats.sync.newQuestions.title".localized)
+                            .font(DesignTokens.Typography.label)
+                            .foregroundColor(DesignTokens.Colors.textSecondary)
+                        Spacer()
+                        Text("+\(remoteService.remoteQuestionsCount - remoteService.cachedQuestionsCount)")
+                            .font(DesignTokens.Typography.label)
+                            .fontWeight(.semibold)
+                            .foregroundColor(DesignTokens.Colors.iconGreen)
+                    }
+                }
+                
+                VStack(spacing: DesignTokens.Spacing.sm) {
+                    MinimalButton(
+                        icon: "arrow.clockwise",
+                        title: "stats.sync.check".localized,
+                        foregroundColor: DesignTokens.Colors.iconBlue
+                    ) {
+                        updateTask?.cancel()
+                        updateTask = Task { @MainActor in
+                            await checkForUpdates()
+                        }
+                    }
+                    .disabled(remoteService.isLoading)
+                    .opacity(remoteService.isLoading ? 0.6 : 1.0)
+                    
+                    if remoteService.hasUpdates {
+                        MinimalButton(
+                            icon: "arrow.down.circle",
+                            title: "stats.sync.sync".localized,
+                            foregroundColor: DesignTokens.Colors.iconGreen
+                        ) {
+                            syncTask?.cancel()
+                            syncTask = Task { @MainActor in
+                                await syncQuestions()
+                            }
+                        }
+                        .disabled(remoteService.isLoading)
+                        .opacity(remoteService.isLoading ? 0.6 : 1.0)
+                    }
+                }
+            }
+        }
+        .padding(DesignTokens.Spacing.xxl)
+        .cardStyle(cornerRadius: DesignTokens.CornerRadius.xlarge)
+    }
+    
+    // MARK: - Helper Methods
     private func loadTotalQuestionsCount() {
         loadQuestionsTask?.cancel()
-        loadQuestionsTask = Task {
+        loadQuestionsTask = Task { @MainActor [settingsManager] in
             do {
                 let questionsRepository = QuestionsRepository()
                 let currentLanguage = settingsManager.settings.language.rawValue
@@ -276,10 +276,9 @@ struct StatsView: View {
                 
                 await MainActor.run {
                     totalQuestionsCount = questions.count
-                    print("📊 StatsView: Total=\(questions.count) questions")
                 }
             } catch {
-                print("❌ StatsView: Failed to load questions count: \(error)")
+                AppLogger.error("StatsView: Failed to load questions count", error: error, category: AppLogger.data)
                 await MainActor.run {
                     totalQuestionsCount = 0
                 }
@@ -304,14 +303,10 @@ struct StatsView: View {
         
         await MainActor.run {
             totalQuestionsCount = questions.count
-            print("🔄 StatsView: Synced \(questions.count) questions")
         }
     }
     
     private func startMistakesReview() {
-        print("DEBUG: Starting mistakes review...")
-        print("DEBUG: Wrong questions count: \(statsManager.stats.wrongQuestionIds.count)")
-        
         // Используем существующие экземпляры из DI контейнера
         let container = DIContainer.shared
         let viewModel = QuizViewModel(
@@ -324,69 +319,16 @@ struct StatsView: View {
         showingMistakesReview = true
         
         let mistakesTask = Task {
-            print("DEBUG: Starting async mistakes review...")
             await viewModel.startMistakesReview()
-            print("DEBUG: Mistakes review completed. State: \(viewModel.state)")
         }
         
         // Store task for potential cancellation
         updateTask = mistakesTask
     }
-    
-}
-
-struct StatCard: View {
-    let title: String
-    let value: String
-    let icon: String
-    let color: Color
-    let isCompact: Bool
-    
-    var body: some View {
-        VStack(spacing: 16) {
-            Image(systemName: icon)
-                .font(.system(size: 32))
-                .foregroundColor(color)
-            
-            Text(value)
-                .font(.largeTitle)
-                .fontWeight(.bold)
-            
-            Text(title)
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
-                .lineLimit(2)
-        }
-        .frame(maxWidth: .infinity, minHeight: 140, maxHeight: 140)
-        .padding(20)
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 20))
-    }
-}
-
-struct ProgressRow: View {
-    let title: String
-    let value: Int
-    let color: Color
-    let isCompact: Bool
-    
-    var body: some View {
-        HStack {
-            Text(title)
-                .font(isCompact ? .subheadline : .body)
-                .foregroundColor(.secondary)
-            Spacer()
-            Text("\(value)")
-                .font(isCompact ? .subheadline : .body)
-                .fontWeight(.semibold)
-                .foregroundColor(color)
-        }
-    }
 }
 
 #Preview {
     StatsView(statsManager: StatsManager())
-        .environmentObject(SettingsManager())
+        .environment(\.settingsManager, SettingsManager())
         .environmentObject(RemoteQuestionsService())
 }
-

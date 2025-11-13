@@ -12,7 +12,6 @@ struct NotificationSettingsView: View {
     @EnvironmentObject private var notificationManager: NotificationManager
     @Environment(\.dismiss) private var dismiss
     @State private var showingPermissionAlert = false
-    @State private var showingTestNotification = false
     
     var body: some View {
         List {
@@ -114,29 +113,6 @@ struct NotificationSettingsView: View {
                                 }
                         }
                         .padding(.vertical, 4)
-                        
-                        // Test Notification Button
-                        Button(action: {
-                            sendTestNotification()
-                        }) {
-                            HStack {
-                                Image(systemName: "paperplane")
-                                    .foregroundColor(.blue)
-                                    .frame(width: 24)
-                                
-                                Text("notification.settings.test".localized)
-                                    .font(.body)
-                                    .foregroundColor(.primary)
-                                
-                                Spacer()
-                                
-                                Image(systemName: "chevron.right")
-                                    .foregroundColor(.secondary)
-                                    .font(.caption)
-                            }
-                            .padding(.vertical, 4)
-                        }
-                        .buttonStyle(PlainButtonStyle())
                     }
                 } header: {
                     Text("notification.settings.title".localized)
@@ -165,40 +141,6 @@ struct NotificationSettingsView: View {
             }
         } message: {
             Text("notification.permission.denied.message".localized)
-        }
-        .alert("notification.test.sent.title".localized,
-               isPresented: $showingTestNotification) {
-            Button("error.ok".localized) {
-                showingTestNotification = false
-            }
-        } message: {
-            Text("notification.test.sent.message".localized)
-        }
-    }
-    
-    private func sendTestNotification() {
-        guard notificationManager.hasPermission else { return }
-        
-        let content = UNMutableNotificationContent()
-        content.title = "notification.title".localized
-        content.body = "notification.body".localized
-        content.sound = .default
-        content.badge = 1
-        
-        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
-        
-        let request = UNNotificationRequest(
-            identifier: "test_notification",
-            content: content,
-            trigger: trigger
-        )
-        
-        UNUserNotificationCenter.current().add(request) { error in
-            Task { @MainActor in
-                if error == nil {
-                    showingTestNotification = true
-                }
-            }
         }
     }
 }

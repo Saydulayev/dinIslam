@@ -10,31 +10,26 @@ import Combine
 import SwiftUI
 
 class AchievementManager: ObservableObject {
+    static let shared = AchievementManager()
+    
     @Published var achievements: [Achievement] = []
     @Published var newAchievements: [Achievement] = []
     
     private let userDefaults = UserDefaults.standard
     private let achievementsKey = "UserAchievements"
-    private let notificationManager = NotificationManager()
+    private var notificationManager: NotificationManager
     
-    init() {
+    private init(notificationManager: NotificationManager = NotificationManager()) {
+        self.notificationManager = notificationManager
         loadAchievements()
         initializeDefaultAchievements()
-        
-        // Listen for language changes
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(languageChanged),
-            name: .languageChanged,
-            object: nil
-        )
     }
     
-    deinit {
-        NotificationCenter.default.removeObserver(self)
+    func configureDependencies(notificationManager: NotificationManager) {
+        self.notificationManager = notificationManager
     }
     
-    @objc private func languageChanged() {
+    func refreshLocalization() {
         // Update achievement titles and descriptions when language changes
         for i in 0..<achievements.count {
             achievements[i] = Achievement(
@@ -241,7 +236,8 @@ class AchievementManager: ObservableObject {
         case .firstQuiz:
             return stats.totalQuizzesCompleted >= 1
         case .perfectScore:
-            return quizResult?.percentage == 100.0
+            // Используем >= 99.99 для учета погрешности округления при расчете процента
+            return (quizResult?.percentage ?? 0) >= 99.99
         case .speedRunner:
             return quizResult?.timeSpent ?? 0 < 120 // 2 minutes
         case .scholar:

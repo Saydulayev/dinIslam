@@ -7,6 +7,7 @@
 
 import Foundation
 import UserNotifications
+import OSLog
 import SwiftUI
 import Combine
 
@@ -31,18 +32,24 @@ class NotificationManager: ObservableObject {
                 self.hasPermission = granted
                 if granted {
                     self.isNotificationEnabled = true
+                    // Schedule notifications if enabled
+                    if self.isNotificationEnabled {
+                        self.scheduleDailyReminder()
+                    }
                 }
             }
             return granted
         } catch {
-            print("Error requesting notification permission: \(error)")
+            AppLogger.error("Error requesting notification permission", error: error, category: AppLogger.ui)
             return false
         }
     }
     
     private func checkNotificationPermission() {
-        center.getNotificationSettings { settings in
-            Task { @MainActor in
+        center.getNotificationSettings { [weak self] settings in
+            guard let self = self else { return }
+            Task { @MainActor [weak self] in
+                guard let self = self else { return }
                 self.hasPermission = settings.authorizationStatus == .authorized
             }
         }
@@ -53,8 +60,8 @@ class NotificationManager: ObservableObject {
     func scheduleDailyReminder() {
         guard hasPermission && isNotificationEnabled else { return }
         
-        // Remove existing notifications
-        center.removeAllPendingNotificationRequests()
+        // Remove existing daily reminder notifications only
+        center.removePendingNotificationRequests(withIdentifiers: ["daily_reminder"])
         
         let content = UNMutableNotificationContent()
         content.title = LocalizationManager.shared.localizedString(for: "notification.title")
@@ -79,15 +86,16 @@ class NotificationManager: ObservableObject {
         
         center.add(request) { error in
             if let error = error {
-                print("Error scheduling notification: \(error)")
+                AppLogger.error("Error scheduling notification", error: error, category: AppLogger.ui)
             } else {
-                print("Daily reminder scheduled successfully")
+                AppLogger.ui.info("Daily reminder scheduled successfully")
             }
         }
     }
     
     func cancelDailyReminder() {
-        center.removeAllPendingNotificationRequests()
+        // Remove only daily reminder notifications, not achievement notifications
+        center.removePendingNotificationRequests(withIdentifiers: ["daily_reminder", "streak_reminder"])
     }
     
     // MARK: - Settings Management
@@ -104,6 +112,19 @@ class NotificationManager: ObservableObject {
             components.hour = 20
             components.minute = 0
             reminderTime = calendar.date(from: components) ?? Date()
+        }
+        
+        // Schedule notifications if enabled and permission is granted
+        // Check permission asynchronously and schedule if needed
+        center.getNotificationSettings { [weak self] settings in
+            guard let self = self else { return }
+            Task { @MainActor [weak self] in
+                guard let self = self else { return }
+                self.hasPermission = settings.authorizationStatus == .authorized
+                if self.hasPermission && self.isNotificationEnabled {
+                    self.scheduleDailyReminder()
+                }
+            }
         }
     }
     
@@ -149,7 +170,7 @@ class NotificationManager: ObservableObject {
         
         center.add(request) { error in
             if let error = error {
-                print("Error scheduling achievement notification: \(error)")
+                AppLogger.error("Error scheduling achievement notification", error: error, category: AppLogger.ui)
             }
         }
     }
@@ -183,7 +204,7 @@ class NotificationManager: ObservableObject {
         
         center.add(request) { error in
             if let error = error {
-                print("Error scheduling streak reminder: \(error)")
+                AppLogger.error("Error scheduling streak reminder", error: error, category: AppLogger.ui)
             }
         }
     }

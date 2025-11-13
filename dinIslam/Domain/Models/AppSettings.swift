@@ -6,12 +6,8 @@
 //
 
 import Foundation
-import Combine
-
-// MARK: - Language Change Notification
-extension Notification.Name {
-    static let languageChanged = Notification.Name("languageChanged")
-}
+import Observation
+import SwiftUI
 
 struct AppSettings: Codable {
     var language: AppLanguage
@@ -56,14 +52,18 @@ enum AppLanguage: String, CaseIterable, Codable {
 }
 
 // MARK: - Settings Manager
-class SettingsManager: ObservableObject {
-    @Published var settings: AppSettings
+@MainActor
+@Observable
+final class SettingsManager {
+    var settings: AppSettings
     
-    private let userDefaults = UserDefaults.standard
-    private let settingsKey = "AppSettings"
+    @ObservationIgnored private let userDefaults: UserDefaults
+    @ObservationIgnored private let settingsKey = "AppSettings"
     
-    init() {
-        self.settings = Self.loadSettings()
+    init(userDefaults: UserDefaults = .standard) {
+        self.userDefaults = userDefaults
+        self.settings = Self.loadSettings(from: userDefaults, key: settingsKey)
+        applyLanguageSettings()
     }
     
     func updateLanguage(_ language: AppLanguage) {
@@ -93,8 +93,8 @@ class SettingsManager: ObservableObject {
         }
     }
     
-    private static func loadSettings() -> AppSettings {
-        guard let data = UserDefaults.standard.data(forKey: "AppSettings"),
+    private static func loadSettings(from userDefaults: UserDefaults, key: String) -> AppSettings {
+        guard let data = userDefaults.data(forKey: key),
               let settings = try? JSONDecoder().decode(AppSettings.self, from: data) else {
             return AppSettings()
         }
@@ -116,8 +116,5 @@ class SettingsManager: ObservableObject {
         
         // Update localization manager
         LocalizationManager.shared.setLanguage(languageCode)
-        
-        // Force UI to update by posting notification
-        NotificationCenter.default.post(name: .languageChanged, object: nil)
     }
 }

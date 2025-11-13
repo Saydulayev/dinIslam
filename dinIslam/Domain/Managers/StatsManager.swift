@@ -11,6 +11,7 @@ import Observation
 @MainActor
 @Observable
 class StatsManager {
+    weak var profileSyncDelegate: ProfileProgressSyncDelegate?
     var stats: UserStats
     
     private let userDefaults = UserDefaults.standard
@@ -28,9 +29,10 @@ class StatsManager {
         return stats
     }
     
-    func updateStats(correctCount: Int, totalCount: Int, wrongQuestionIds: [String], percentage: Double = 0) {
-        stats.updateStats(correctCount: correctCount, totalCount: totalCount, wrongQuestionIds: wrongQuestionIds, percentage: percentage)
+    func recordQuizSession(_ summary: QuizSessionSummary) {
+        stats.recordQuizSession(summary)
         saveStats()
+        profileSyncDelegate?.statsManager(self, didRecord: summary)
     }
     
     func clearWrongQuestions() {
@@ -39,17 +41,14 @@ class StatsManager {
     }
     
     func removeWrongQuestion(_ questionId: String) {
-        print("DEBUG: StatsManager.removeWrongQuestion called with ID: \(questionId)")
-        print("DEBUG: Wrong questions before removal: \(stats.wrongQuestionIds.count)")
         stats.removeWrongQuestion(questionId)
-        print("DEBUG: Wrong questions after removal: \(stats.wrongQuestionIds.count)")
         saveStats()
     }
     
     func getWrongQuestions(from allQuestions: [Question]) -> [Question] {
         return allQuestions.filter { stats.wrongQuestionIds.contains($0.id) }
     }
-    
+
     private func saveStats() {
         if let data = try? JSONEncoder().encode(stats) {
             userDefaults.set(data, forKey: statsKey)
@@ -59,14 +58,47 @@ class StatsManager {
     func resetStats() {
         stats = UserStats()
         saveStats()
+        profileSyncDelegate?.statsManagerDidReset(self)
     }
     
     func resetStatsExceptTotalQuestions() {
         stats = UserStats()
         saveStats()
+        profileSyncDelegate?.statsManagerDidReset(self)
     }
     
     func getCorrectedMistakesCount() -> Int {
         return stats.correctedMistakes
     }
+    
+    // MARK: - Recent Score Methods
+    
+    func getAverageRecentScore() -> Double {
+        return stats.averageRecentScore
+    }
+    
+    func getRecentGamesCount() -> Int {
+        return stats.recentGamesCount
+    }
+    
+    func hasRecentGames() -> Bool {
+        return !stats.recentQuizResults.isEmpty
+    }
+
+    // MARK: - Achievements-related reset
+    func resetAchievementProgress() {
+        // Сбрасываем только метрики, влияющие на прогресс достижений
+        stats.totalQuestionsStudied = 0
+        stats.totalQuizzesCompleted = 0
+        stats.currentStreak = 0
+        stats.perfectScores = 0
+        stats.longestStreak = 0
+        saveStats()
+        profileSyncDelegate?.statsManagerDidReset(self)
+    }
+}
+
+protocol ProfileProgressSyncDelegate: AnyObject {
+    func statsManager(_ manager: StatsManager, didRecord summary: QuizSessionSummary)
+    func statsManagerDidReset(_ manager: StatsManager)
 }

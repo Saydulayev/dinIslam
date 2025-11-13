@@ -9,6 +9,7 @@ import Foundation
 import Observation
 import UIKit
 import AudioToolbox
+import OSLog
 
 @Observable
 class QuizViewModel {
@@ -41,6 +42,7 @@ class QuizViewModel {
     // Мемоизация для избежания повторных вычислений
     private var memoizedProgress: Double?
     private var memoizedCurrentQuestion: Question?
+    private var nextQuestionTask: Task<Void, Never>?
     
     // MARK: - Computed Properties
     var currentQuestion: Question? {
@@ -80,7 +82,7 @@ class QuizViewModel {
         self.statsManager = statsManager
         self.hapticManager = HapticManager(settingsManager: settingsManager)
         self.soundManager = SoundManager(settingsManager: settingsManager)
-        self.achievementManager = AchievementManager()
+        self.achievementManager = AchievementManager.shared
     }
     
     // MARK: - Public Methods
@@ -106,6 +108,7 @@ class QuizViewModel {
             state = .active(.playing)
             isLoading = false
         } catch {
+            AppLogger.error("Failed to start quiz", error: error, category: AppLogger.network)
             errorMessage = error.localizedDescription
             state = .error(.networkError)
             isLoading = false
@@ -128,8 +131,6 @@ class QuizViewModel {
             let isCorrect = index == currentQuestion.correctIndex
             questionResults[currentQuestion.id] = isCorrect
             
-            print("DEBUG: Question \(currentQuestion.id) answered \(isCorrect ? "correctly" : "incorrectly")")
-            
             if isCorrect {
                 correctAnswers += 1
                 hapticManager.success()
@@ -141,9 +142,10 @@ class QuizViewModel {
         }
         
         // Show result briefly before moving to next question
-        Task { @MainActor in
+        nextQuestionTask?.cancel()
+        nextQuestionTask = Task { @MainActor [weak self] in
             try? await Task.sleep(nanoseconds: 1_500_000_000) // 1.5 seconds
-            nextQuestion()
+            self?.nextQuestion()
         }
     }
     
@@ -159,6 +161,7 @@ class QuizViewModel {
                 break
             }
         } else {
+            nextQuestionTask?.cancel()
             currentQuestionIndex += 1
             selectedAnswerIndex = nil
             isAnswerSelected = false
@@ -170,30 +173,52 @@ class QuizViewModel {
     }
     
     @MainActor
-    func finishQuiz() {
+    func finishQuiz(isComplete: Bool = true) {
         let timeSpent = Date().timeIntervalSince(startTime ?? Date())
-        quizResult = quizUseCase.calculateResult(
+        let result = quizUseCase.calculateResult(
             correctAnswers: correctAnswers,
             totalQuestions: questions.count,
             timeSpent: timeSpent
         )
+        quizResult = result
         
-        // Обновляем статистику
-        let wrongQuestionIds = questionResults.compactMap { (questionId, isCorrect) in
-            return isCorrect ? nil : questionId
+        // Обновляем статистику только если викторина завершена полностью
+        if isComplete {
+            let outcomes = questions.map { question in
+                QuizQuestionOutcome(
+                    questionId: question.id,
+                    category: question.category,
+                    difficulty: question.difficulty,
+                    isCorrect: questionResults[question.id] ?? false
+                )
+            }
+
+            let summary = QuizSessionSummary(
+                correctAnswers: correctAnswers,
+                totalQuestions: questions.count,
+                percentage: quizResult?.percentage ?? 0,
+                duration: timeSpent,
+                completedAt: Date(),
+                outcomes: outcomes
+            )
+            
+            statsManager.recordQuizSession(summary)
+            
+            // Check for new achievements
+            achievementManager.checkAchievements(for: statsManager.stats, quizResult: quizResult)
         }
         
-        statsManager.updateStats(
-            correctCount: correctAnswers,
-            totalCount: questions.count,
-            wrongQuestionIds: wrongQuestionIds,
-            percentage: quizResult?.percentage ?? 0
-        )
-        
-        // Check for new achievements
-        achievementManager.checkAchievements(for: statsManager.stats, quizResult: quizResult)
-        
         state = .completed(.finished)
+        
+        // Provide completion feedback - same as in exam mode
+        hapticManager.success()
+        soundManager.playSuccessSound()
+    }
+    
+    @MainActor
+    func forceFinishQuiz() {
+        // Force finish quiz with current progress - don't update stats for incomplete quiz
+        finishQuiz(isComplete: false)
     }
     
     @MainActor
@@ -208,6 +233,8 @@ class QuizViewModel {
         quizResult = nil
         errorMessage = nil
         questionResults.removeAll()
+        nextQuestionTask?.cancel()
+        nextQuestionTask = nil
         
         // Сброс мемоизации при перезапуске
         memoizedProgress = nil
@@ -217,7 +244,6 @@ class QuizViewModel {
     // MARK: - Mistakes Review Methods
     @MainActor
     func startMistakesReview() async {
-        print("DEBUG: QuizViewModel.startMistakesReview() called")
         state = .active(.loading)
         isLoading = true
         errorMessage = nil
@@ -225,16 +251,12 @@ class QuizViewModel {
         do {
             // Get all questions to find the wrong ones
             let languageCode = LocalizationManager.shared.currentLanguage
-            print("DEBUG: Loading questions for language: \(languageCode)")
             let allQuestions = try await quizUseCase.loadAllQuestions(language: languageCode)
-            print("DEBUG: Loaded \(allQuestions.count) total questions")
             
             // Filter only wrong questions
             let wrongQuestions = statsManager.getWrongQuestions(from: allQuestions)
-            print("DEBUG: Found \(wrongQuestions.count) wrong questions")
             
             guard !wrongQuestions.isEmpty else {
-                print("DEBUG: No wrong questions found")
                 errorMessage = LocalizationManager.shared.localizedString(for: "mistakes.noWrongQuestions")
                 state = .idle
                 isLoading = false
@@ -250,15 +272,13 @@ class QuizViewModel {
             showResult = false
             startTime = Date()
             state = .active(.mistakesReview)
-            print("DEBUG: Set state to mistakesReview with \(questions.count) questions")
         } catch {
-            print("DEBUG: Error loading questions: \(error)")
+            AppLogger.error("Failed to start mistakes review", error: error, category: AppLogger.data)
             errorMessage = error.localizedDescription
             state = .idle
         }
         
         isLoading = false
-        print("DEBUG: QuizViewModel.startMistakesReview() completed. State: \(state)")
     }
     
     @MainActor
@@ -275,23 +295,25 @@ class QuizViewModel {
             return isCorrect ? questionId : nil
         }
         
-        print("DEBUG: Correctly answered question IDs: \(correctlyAnsweredIds)")
-        print("DEBUG: Total question results: \(questionResults)")
-        
         // Remove correctly answered questions from wrong questions list
         for questionId in correctlyAnsweredIds {
-            print("DEBUG: Removing question \(questionId) from wrong questions list")
             statsManager.removeWrongQuestion(questionId)
         }
         
-        print("DEBUG: Wrong questions after removal: \(statsManager.stats.wrongQuestionIds.count)")
-        
         state = .completed(.mistakesFinished)
+        
+        // Provide completion feedback - same as in exam mode
+        hapticManager.success()
+        soundManager.playSuccessSound()
     }
     
     // MARK: - Achievement Methods
     func clearNewAchievements() {
         achievementManager.clearNewAchievements()
+    }
+
+    deinit {
+        nextQuestionTask?.cancel()
     }
 }
 
