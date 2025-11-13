@@ -177,19 +177,7 @@ struct StatsView: View {
             }
         }
         .padding(DesignTokens.Spacing.xxl)
-        .background(
-            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xlarge)
-                .fill(DesignTokens.Colors.cardBackground)
-                .overlay(
-                    RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xlarge)
-                        .stroke(DesignTokens.Colors.borderSubtle, lineWidth: 1)
-                )
-        )
-        .shadow(
-            color: DesignTokens.Shadows.card,
-            radius: DesignTokens.Shadows.cardRadius,
-            y: DesignTokens.Shadows.cardY
-        )
+        .cardStyle(cornerRadius: DesignTokens.CornerRadius.xlarge)
     }
     
     // MARK: - Sync Section
@@ -267,19 +255,7 @@ struct StatsView: View {
             }
         }
         .padding(DesignTokens.Spacing.xxl)
-        .background(
-            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xlarge)
-                .fill(DesignTokens.Colors.cardBackground)
-                .overlay(
-                    RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xlarge)
-                        .stroke(DesignTokens.Colors.borderSubtle, lineWidth: 1)
-                )
-        )
-        .shadow(
-            color: DesignTokens.Shadows.card,
-            radius: DesignTokens.Shadows.cardRadius,
-            y: DesignTokens.Shadows.cardY
-        )
+        .cardStyle(cornerRadius: DesignTokens.CornerRadius.xlarge)
     }
     
     // MARK: - Helper Methods

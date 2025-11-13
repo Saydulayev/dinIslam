@@ -26,14 +26,7 @@ struct MinimalButton: View {
             .frame(maxWidth: .infinity)
             .padding(.horizontal, DesignTokens.Spacing.xl)
             .padding(.vertical, DesignTokens.Spacing.md)
-            .background(
-                RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
-                    .fill(DesignTokens.Colors.cardBackground)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
-                            .stroke(DesignTokens.Colors.borderSubtle, lineWidth: 1)
-                    )
-            )
+            .cardStyle(cornerRadius: DesignTokens.CornerRadius.medium)
         }
     }
 }

@@ -23,150 +23,210 @@ struct ExamSettingsView: View {
     
     var body: some View {
         NavigationStack {
-            List {
-                // Preset configurations
-                Section {
-                    ForEach(ExamPreset.allCases.filter { $0 != .custom }, id: \.self) { preset in
-                        ExamPresetRow(
-                            preset: preset,
-                            isSelected: selectedConfiguration == preset.configuration && !isCustomMode,
-                            onTap: {
-                                selectedConfiguration = preset.configuration
-                                isCustomMode = false
-                            }
-                        )
-                    }
-                    
-                    // Custom configuration
-                    ExamPresetRow(
-                        preset: .custom,
-                        isSelected: isCustomMode,
-                        onTap: {
-                            isCustomMode = true
-                            // Инициализируем пользовательские параметры значениями по умолчанию
-                            customTimePerQuestion = 30
-                            customTotalQuestions = 20
-                            allowSkip = true
-                            showTimer = true
-                            autoSubmit = true
-                        }
-                    )
-                } header: {
-                    Text("exam.settings.presets".localized)
-                } footer: {
-                    Text("exam.settings.presets.footer".localized)
-                }
+            ZStack {
+                // Gradient Background
+                LinearGradient(
+                    gradient: Gradient(colors: [
+                        DesignTokens.Colors.background1,
+                        DesignTokens.Colors.background2
+                    ]),
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .ignoresSafeArea()
                 
-                // Custom settings
-                if isCustomMode {
-                    Section {
-                        // Time per question
-                        VStack(alignment: .leading, spacing: 8) {
-                            HStack {
-                                Text("exam.settings.timePerQuestion".localized)
-                                    .font(.body)
-                                Spacer()
-                                Text("\(Int(customTimePerQuestion)) сек")
-                                    .font(.body)
-                                    .fontWeight(.semibold)
-                                    .foregroundColor(.blue)
-                            }
+                ScrollView {
+                    VStack(alignment: .leading, spacing: DesignTokens.Spacing.xxl) {
+                        // Preset configurations
+                        VStack(alignment: .leading, spacing: DesignTokens.Spacing.lg) {
+                            Text("exam.settings.presets".localized)
+                                .font(DesignTokens.Typography.h2)
+                                .foregroundStyle(DesignTokens.Colors.textPrimary)
+                                .padding(.horizontal, DesignTokens.Spacing.xxl)
                             
-                            Slider(value: $customTimePerQuestion, in: 10...120, step: 5)
-                                .accentColor(.blue)
+                            VStack(spacing: DesignTokens.Spacing.sm) {
+                                ForEach(ExamPreset.allCases.filter { $0 != .custom }, id: \.self) { preset in
+                                    ExamPresetRow(
+                                        preset: preset,
+                                        isSelected: selectedConfiguration == preset.configuration && !isCustomMode,
+                                        onTap: {
+                                            selectedConfiguration = preset.configuration
+                                            isCustomMode = false
+                                        }
+                                    )
+                                }
+                                
+                                // Custom configuration
+                                ExamPresetRow(
+                                    preset: .custom,
+                                    isSelected: isCustomMode,
+                                    onTap: {
+                                        isCustomMode = true
+                                        // Инициализируем пользовательские параметры значениями по умолчанию
+                                        customTimePerQuestion = 30
+                                        customTotalQuestions = 20
+                                        allowSkip = true
+                                        showTimer = true
+                                        autoSubmit = true
+                                    }
+                                )
+                            }
+                            .padding(DesignTokens.Spacing.xxl)
+                            .cardStyle(cornerRadius: DesignTokens.CornerRadius.xlarge)
+                            .padding(.horizontal, DesignTokens.Spacing.xxl)
+                            
+                            Text("exam.settings.presets.footer".localized)
+                                .font(DesignTokens.Typography.label)
+                                .foregroundStyle(DesignTokens.Colors.textTertiary)
+                                .padding(.horizontal, DesignTokens.Spacing.xxl)
                         }
-                        .padding(.vertical, 4)
-                        
-                        // Total questions
-                        VStack(alignment: .leading, spacing: 8) {
-                            HStack {
-                                Text("exam.settings.totalQuestions".localized)
-                                    .font(.body)
-                                Spacer()
-                                Text("\(customTotalQuestions)")
-                                    .font(.body)
-                                    .fontWeight(.semibold)
-                                    .foregroundColor(.blue)
-                            }
-                            
-                            Slider(value: Binding(
-                                get: { Double(customTotalQuestions) },
-                                set: { customTotalQuestions = Int($0) }
-                            ), in: 5...50, step: 1)
-                            .accentColor(.blue)
-                        }
-                        .padding(.vertical, 4)
-                        
-                        // Additional options
-                        VStack(spacing: 16) {
-                            HStack {
-                                Image(systemName: "forward.fill")
-                                    .foregroundColor(.orange)
-                                    .frame(width: 24)
-                                
-                                Text("exam.settings.allowSkip".localized)
-                                    .font(.body)
-                                
-                                Spacer()
-                                
-                                Toggle("", isOn: $allowSkip)
-                            }
-                            
-                            HStack {
-                                Image(systemName: "timer")
-                                    .foregroundColor(.blue)
-                                    .frame(width: 24)
-                                
-                                Text("exam.settings.showTimer".localized)
-                                    .font(.body)
-                                
-                                Spacer()
-                                
-                                Toggle("", isOn: $showTimer)
-                            }
-                            
-                            HStack {
-                                Image(systemName: "checkmark.circle.fill")
-                                    .foregroundColor(.green)
-                                    .frame(width: 24)
-                                
-                                Text("exam.settings.autoSubmit".localized)
-                                    .font(.body)
-                                
-                                Spacer()
-                                
-                                Toggle("", isOn: $autoSubmit)
-                            }
-                        }
-                    } header: {
-                        Text("exam.settings.custom".localized)
-                    } footer: {
-                        Text("exam.settings.custom.footer".localized)
-                    }
-                }
                 
-                // Preview
-                Section {
-                    ExamPreviewCard(configuration: currentConfiguration)
-                } header: {
-                    Text("exam.settings.preview".localized)
+                        // Custom settings
+                        if isCustomMode {
+                            VStack(alignment: .leading, spacing: DesignTokens.Spacing.lg) {
+                                Text("exam.settings.custom".localized)
+                                    .font(DesignTokens.Typography.h2)
+                                    .foregroundStyle(DesignTokens.Colors.textPrimary)
+                                    .padding(.horizontal, DesignTokens.Spacing.xxl)
+                                
+                                VStack(spacing: DesignTokens.Spacing.xl) {
+                                    // Time per question
+                                    VStack(alignment: .leading, spacing: DesignTokens.Spacing.sm) {
+                                        HStack {
+                                            Text("exam.settings.timePerQuestion".localized)
+                                                .font(DesignTokens.Typography.bodyRegular)
+                                                .foregroundStyle(DesignTokens.Colors.textPrimary)
+                                            Spacer()
+                                            Text("\(Int(customTimePerQuestion)) сек")
+                                                .font(DesignTokens.Typography.secondarySemibold)
+                                                .foregroundColor(DesignTokens.Colors.iconBlue)
+                                        }
+                                        
+                                        Slider(value: $customTimePerQuestion, in: 10...120, step: 5)
+                                            .tint(DesignTokens.Colors.iconBlue)
+                                    }
+                                    
+                                    Divider()
+                                        .background(DesignTokens.Colors.borderSubtle)
+                                    
+                                    // Total questions
+                                    VStack(alignment: .leading, spacing: DesignTokens.Spacing.sm) {
+                                        HStack {
+                                            Text("exam.settings.totalQuestions".localized)
+                                                .font(DesignTokens.Typography.bodyRegular)
+                                                .foregroundStyle(DesignTokens.Colors.textPrimary)
+                                            Spacer()
+                                            Text("\(customTotalQuestions)")
+                                                .font(DesignTokens.Typography.secondarySemibold)
+                                                .foregroundColor(DesignTokens.Colors.iconBlue)
+                                        }
+                                        
+                                        Slider(value: Binding(
+                                            get: { Double(customTotalQuestions) },
+                                            set: { customTotalQuestions = Int($0) }
+                                        ), in: 5...50, step: 1)
+                                        .tint(DesignTokens.Colors.iconBlue)
+                                    }
+                                    
+                                    Divider()
+                                        .background(DesignTokens.Colors.borderSubtle)
+                                    
+                                    // Additional options
+                                    VStack(spacing: DesignTokens.Spacing.md) {
+                                        HStack {
+                                            Image(systemName: "forward.fill")
+                                                .font(.system(size: DesignTokens.Sizes.iconMedium))
+                                                .foregroundColor(DesignTokens.Colors.iconOrange)
+                                                .frame(width: DesignTokens.Sizes.iconLarge)
+                                            
+                                            Text("exam.settings.allowSkip".localized)
+                                                .font(DesignTokens.Typography.bodyRegular)
+                                                .foregroundStyle(DesignTokens.Colors.textPrimary)
+                                            
+                                            Spacer()
+                                            
+                                            Toggle("", isOn: $allowSkip)
+                                                .tint(DesignTokens.Colors.iconBlue)
+                                        }
+                                        
+                                        HStack {
+                                            Image(systemName: "timer")
+                                                .font(.system(size: DesignTokens.Sizes.iconMedium))
+                                                .foregroundColor(DesignTokens.Colors.iconBlue)
+                                                .frame(width: DesignTokens.Sizes.iconLarge)
+                                            
+                                            Text("exam.settings.showTimer".localized)
+                                                .font(DesignTokens.Typography.bodyRegular)
+                                                .foregroundStyle(DesignTokens.Colors.textPrimary)
+                                            
+                                            Spacer()
+                                            
+                                            Toggle("", isOn: $showTimer)
+                                                .tint(DesignTokens.Colors.iconBlue)
+                                        }
+                                        
+                                        HStack {
+                                            Image(systemName: "checkmark.circle.fill")
+                                                .font(.system(size: DesignTokens.Sizes.iconMedium))
+                                                .foregroundColor(DesignTokens.Colors.statusGreen)
+                                                .frame(width: DesignTokens.Sizes.iconLarge)
+                                            
+                                            Text("exam.settings.autoSubmit".localized)
+                                                .font(DesignTokens.Typography.bodyRegular)
+                                                .foregroundStyle(DesignTokens.Colors.textPrimary)
+                                            
+                                            Spacer()
+                                            
+                                            Toggle("", isOn: $autoSubmit)
+                                                .tint(DesignTokens.Colors.iconBlue)
+                                        }
+                                    }
+                                }
+                                .padding(DesignTokens.Spacing.xxl)
+                                .cardStyle(cornerRadius: DesignTokens.CornerRadius.xlarge)
+                                .padding(.horizontal, DesignTokens.Spacing.xxl)
+                                
+                                Text("exam.settings.custom.footer".localized)
+                                    .font(DesignTokens.Typography.label)
+                                    .foregroundStyle(DesignTokens.Colors.textTertiary)
+                                    .padding(.horizontal, DesignTokens.Spacing.xxl)
+                            }
+                        }
+                
+                        // Preview
+                        VStack(alignment: .leading, spacing: DesignTokens.Spacing.lg) {
+                            Text("exam.settings.preview".localized)
+                                .font(DesignTokens.Typography.h2)
+                                .foregroundStyle(DesignTokens.Colors.textPrimary)
+                                .padding(.horizontal, DesignTokens.Spacing.xxl)
+                            
+                            ExamPreviewCard(configuration: currentConfiguration)
+                                .padding(.horizontal, DesignTokens.Spacing.xxl)
+                        }
+                    }
+                    .padding(.top, DesignTokens.Spacing.lg)
+                    .padding(.bottom, DesignTokens.Spacing.xxxl)
                 }
             }
             .navigationTitle("exam.settings.title".localized)
-            .navigationBarTitleDisplayMode(.large)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(DesignTokens.Colors.background1, for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
+            .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button("exam.settings.cancel".localized) {
                         dismiss()
                     }
+                    .foregroundColor(DesignTokens.Colors.textPrimary)
                 }
                 
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("exam.settings.start".localized) {
                         startExam()
                     }
-                    .fontWeight(.semibold)
-                    .foregroundColor(.blue)
+                    .font(DesignTokens.Typography.secondarySemibold)
+                    .foregroundColor(DesignTokens.Colors.iconBlue)
                 }
             }
         }
@@ -266,13 +326,13 @@ enum ExamPreset: CaseIterable {
     var color: Color {
         switch self {
         case .quick:
-            return .orange
+            return DesignTokens.Colors.iconOrange
         case .standard:
-            return .blue
+            return DesignTokens.Colors.iconBlue
         case .extended:
-            return .purple
+            return DesignTokens.Colors.iconPurple
         case .custom:
-            return .green
+            return DesignTokens.Colors.statusGreen
         }
     }
 }
@@ -285,22 +345,22 @@ struct ExamPresetRow: View {
     
     var body: some View {
         Button(action: onTap) {
-            HStack(spacing: 16) {
+            HStack(spacing: DesignTokens.Spacing.lg) {
                 // Icon
                 Image(systemName: preset.icon)
-                    .font(.title2)
+                    .font(.system(size: DesignTokens.Sizes.iconMedium))
                     .foregroundColor(preset.color)
-                    .frame(width: 32)
+                    .frame(width: DesignTokens.Sizes.iconLarge)
                 
                 // Content
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: DesignTokens.Spacing.xs) {
                     Text(preset.title)
-                        .font(.headline)
-                        .foregroundColor(.primary)
+                        .font(DesignTokens.Typography.bodyRegular)
+                        .foregroundColor(DesignTokens.Colors.textPrimary)
                     
                     Text(preset.description)
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .font(DesignTokens.Typography.label)
+                        .foregroundColor(DesignTokens.Colors.textSecondary)
                         .multilineTextAlignment(.leading)
                 }
                 
@@ -309,11 +369,11 @@ struct ExamPresetRow: View {
                 // Selection indicator
                 if isSelected {
                     Image(systemName: "checkmark.circle.fill")
-                        .foregroundColor(.blue)
-                        .font(.title2)
+                        .foregroundColor(DesignTokens.Colors.iconBlue)
+                        .font(.system(size: DesignTokens.Sizes.iconMedium))
                 }
             }
-            .padding(.vertical, 8)
+            .padding(.vertical, DesignTokens.Spacing.sm)
         }
         .buttonStyle(PlainButtonStyle())
     }
@@ -324,56 +384,55 @@ struct ExamPreviewCard: View {
     let configuration: ExamConfiguration
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: DesignTokens.Spacing.lg) {
             Text("exam.settings.preview.title".localized)
-                .font(.headline)
-                .fontWeight(.semibold)
+                .font(DesignTokens.Typography.secondarySemibold)
+                .foregroundColor(DesignTokens.Colors.textPrimary)
             
-            VStack(spacing: 8) {
+            VStack(spacing: DesignTokens.Spacing.md) {
                 HStack {
                     Text("exam.settings.preview.questions".localized)
-                        .font(.body)
-                        .foregroundColor(.secondary)
+                        .font(DesignTokens.Typography.secondaryRegular)
+                        .foregroundColor(DesignTokens.Colors.textSecondary)
                     Spacer()
                     Text("\(configuration.totalQuestions)")
-                        .font(.body)
-                        .fontWeight(.semibold)
+                        .font(DesignTokens.Typography.secondarySemibold)
+                        .foregroundColor(DesignTokens.Colors.textPrimary)
                 }
                 
                 HStack {
                     Text("exam.settings.preview.timePerQuestion".localized)
-                        .font(.body)
-                        .foregroundColor(.secondary)
+                        .font(DesignTokens.Typography.secondaryRegular)
+                        .foregroundColor(DesignTokens.Colors.textSecondary)
                     Spacer()
                     Text("\(Int(configuration.timePerQuestion)) сек")
-                        .font(.body)
-                        .fontWeight(.semibold)
+                        .font(DesignTokens.Typography.secondarySemibold)
+                        .foregroundColor(DesignTokens.Colors.textPrimary)
                 }
                 
                 HStack {
                     Text("exam.settings.preview.totalTime".localized)
-                        .font(.body)
-                        .foregroundColor(.secondary)
+                        .font(DesignTokens.Typography.secondaryRegular)
+                        .foregroundColor(DesignTokens.Colors.textSecondary)
                     Spacer()
                     Text(formatTotalTime())
-                        .font(.body)
-                        .fontWeight(.semibold)
+                        .font(DesignTokens.Typography.secondarySemibold)
+                        .foregroundColor(DesignTokens.Colors.textPrimary)
                 }
                 
                 HStack {
                     Text("exam.settings.preview.options".localized)
-                        .font(.body)
-                        .foregroundColor(.secondary)
+                        .font(DesignTokens.Typography.secondaryRegular)
+                        .foregroundColor(DesignTokens.Colors.textSecondary)
                     Spacer()
                     Text(optionsText())
-                        .font(.body)
-                        .fontWeight(.semibold)
-                        .foregroundColor(.blue)
+                        .font(DesignTokens.Typography.secondarySemibold)
+                        .foregroundColor(DesignTokens.Colors.iconBlue)
                 }
             }
         }
-        .padding(16)
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
+        .padding(DesignTokens.Spacing.xxl)
+        .cardStyle(cornerRadius: DesignTokens.CornerRadius.large)
     }
     
     private func formatTotalTime() -> String {

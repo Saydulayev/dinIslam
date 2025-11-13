@@ -113,19 +113,7 @@ struct SettingsView: View {
                         }
                     }
                     .padding(DesignTokens.Spacing.xxl)
-                    .background(
-                        RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xlarge)
-                            .fill(DesignTokens.Colors.cardBackground)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xlarge)
-                                    .stroke(DesignTokens.Colors.borderSubtle, lineWidth: 1)
-                            )
-                    )
-                    .shadow(
-                        color: DesignTokens.Shadows.card,
-                        radius: DesignTokens.Shadows.cardRadius,
-                        y: DesignTokens.Shadows.cardY
-                    )
+                    .cardStyle(cornerRadius: DesignTokens.CornerRadius.xlarge)
                     
                     // MARK: - Support Section
                     VStack(alignment: .leading, spacing: DesignTokens.Spacing.lg) {
@@ -177,19 +165,7 @@ struct SettingsView: View {
                         }
                     }
                     .padding(DesignTokens.Spacing.xxl)
-                    .background(
-                        RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xlarge)
-                            .fill(DesignTokens.Colors.cardBackground)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xlarge)
-                                    .stroke(DesignTokens.Colors.borderSubtle, lineWidth: 1)
-                            )
-                    )
-                    .shadow(
-                        color: DesignTokens.Shadows.card,
-                        radius: DesignTokens.Shadows.cardRadius,
-                        y: DesignTokens.Shadows.cardY
-                    )
+                    .cardStyle(cornerRadius: DesignTokens.CornerRadius.xlarge)
                     
                     // MARK: - About Section
                     VStack(alignment: .leading, spacing: DesignTokens.Spacing.lg) {
@@ -247,19 +223,7 @@ struct SettingsView: View {
                         }
                     }
                     .padding(DesignTokens.Spacing.xxl)
-                    .background(
-                        RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xlarge)
-                            .fill(DesignTokens.Colors.cardBackground)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xlarge)
-                                    .stroke(DesignTokens.Colors.borderSubtle, lineWidth: 1)
-                            )
-                    )
-                    .shadow(
-                        color: DesignTokens.Shadows.card,
-                        radius: DesignTokens.Shadows.cardRadius,
-                        y: DesignTokens.Shadows.cardY
-                    )
+                    .cardStyle(cornerRadius: DesignTokens.CornerRadius.xlarge)
                 }
                 .padding(.horizontal, DesignTokens.Spacing.xxl)
                 .padding(.top, DesignTokens.Spacing.lg)
@@ -396,19 +360,7 @@ struct SettingsView: View {
                         }
                     }
                     .padding(DesignTokens.Spacing.xxl)
-                    .background(
-                        RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xlarge)
-                            .fill(DesignTokens.Colors.cardBackground)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xlarge)
-                                    .stroke(DesignTokens.Colors.borderSubtle, lineWidth: 1)
-                            )
-                    )
-                    .shadow(
-                        color: DesignTokens.Shadows.card,
-                        radius: DesignTokens.Shadows.cardRadius,
-                        y: DesignTokens.Shadows.cardY
-                    )
+                    .cardStyle(cornerRadius: DesignTokens.CornerRadius.xlarge)
                     .padding(.horizontal, DesignTokens.Spacing.xxl)
                     .padding(.top, DesignTokens.Spacing.lg)
                 }

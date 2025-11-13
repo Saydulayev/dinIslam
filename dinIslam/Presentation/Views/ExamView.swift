@@ -21,73 +21,103 @@ struct ExamView: View {
     }
     
     var body: some View {
-        VStack(spacing: 0) {
-            // Header with timer and progress
-            ExamHeaderView(viewModel: viewModel)
+        ZStack {
+            // Gradient Background
+            LinearGradient(
+                gradient: Gradient(colors: [
+                    DesignTokens.Colors.background1,
+                    DesignTokens.Colors.background2
+                ]),
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .ignoresSafeArea()
             
-            // Main content
-            ScrollView {
-                VStack(spacing: 24) {
-                    // Question content
-                    ExamQuestionView(viewModel: viewModel)
-                    
-                    // Answer options
-                    ExamAnswersView(viewModel: viewModel)
-                    
-                    // Skip button (if available) - only skip button here
-                    if viewModel.canSkipQuestion {
-                        Button(action: {
-                            viewModel.skipQuestion()
-                        }) {
-                            HStack {
-                                Image(systemName: "forward.fill")
-                                Text("exam.skip".localized)
+            VStack(spacing: 0) {
+                // Header with timer and progress
+                ExamHeaderView(viewModel: viewModel)
+                
+                // Main content
+                ScrollView {
+                    VStack(spacing: DesignTokens.Spacing.xxl) {
+                        // Question content
+                        ExamQuestionView(viewModel: viewModel)
+                        
+                        // Answer options
+                        ExamAnswersView(viewModel: viewModel)
+                        
+                        // Skip button (if available)
+                        if viewModel.canSkipQuestion {
+                            Button(action: {
+                                viewModel.skipQuestion()
+                            }) {
+                                HStack(spacing: DesignTokens.Spacing.md) {
+                                    Image(systemName: "forward.fill")
+                                        .font(.system(size: DesignTokens.Sizes.iconMedium))
+                                    Text("exam.skip".localized)
+                                        .font(DesignTokens.Typography.secondarySemibold)
+                                }
+                                .foregroundColor(DesignTokens.Colors.iconOrange)
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 50)
+                                .cardStyle(
+                                    cornerRadius: DesignTokens.CornerRadius.medium,
+                                    fillColor: DesignTokens.Colors.progressCard,
+                                    shadowRadius: 10,
+                                    shadowYOffset: 6,
+                                    highlightOpacity: 0.35
+                                )
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
+                                        .stroke(DesignTokens.Colors.iconOrange, lineWidth: 1)
+                                )
                             }
-                            .font(.headline)
-                            .foregroundColor(.orange)
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 50)
-                            .background(.orange.opacity(0.1), in: RoundedRectangle(cornerRadius: 12))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .stroke(.orange.opacity(0.3), lineWidth: 1)
-                            )
                         }
                     }
+                    .padding(.horizontal, DesignTokens.Spacing.xxl)
+                    .padding(.top, DesignTokens.Spacing.lg)
+                    .padding(.bottom, DesignTokens.Spacing.xl)
                 }
-                .padding(.horizontal, 20)
-                .padding(.top, 16)
-                .padding(.bottom, 20)
-            }
-            
-            // Fixed finish button at the bottom (like in QuizView)
-            VStack(spacing: 0) {
-                Divider()
-                    .background(.separator)
                 
-                Button(action: {
-                    showingStopAlert = true
-                }) {
-                    HStack {
-                        Image(systemName: "checkmark.circle.fill")
-                        Text("exam.finish".localized)
-                            .fontWeight(.semibold)
+                // Fixed finish button at the bottom
+                VStack(spacing: 0) {
+                    Divider()
+                        .background(DesignTokens.Colors.borderSubtle)
+                    
+                    Button(action: {
+                        showingStopAlert = true
+                    }) {
+                        HStack(spacing: DesignTokens.Spacing.md) {
+                            Image(systemName: "checkmark.circle.fill")
+                                .font(.system(size: DesignTokens.Sizes.iconMedium))
+                            Text("exam.finish".localized)
+                                .font(DesignTokens.Typography.secondarySemibold)
+                        }
+                        .foregroundColor(DesignTokens.Colors.textPrimary)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 52)
+                        .cardStyle(
+                            cornerRadius: DesignTokens.CornerRadius.medium,
+                            fillColor: DesignTokens.Colors.statusGreen,
+                            shadowRadius: 10,
+                            shadowYOffset: 6,
+                            highlightOpacity: 0.45
+                        )
+                        .padding(.horizontal, DesignTokens.Spacing.xxl)
+                        .padding(.vertical, DesignTokens.Spacing.md)
                     }
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 52)
-                    .background(Color.green.gradient, in: RoundedRectangle(cornerRadius: 14))
-                    .padding(.horizontal)
-                    .padding(.vertical, 12)
+                    .accessibilityLabel("Finish exam")
+                    .accessibilityHint("Double tap to finish the current exam")
+                    .background(DesignTokens.Colors.cardBackground)
                 }
-                .accessibilityLabel("Finish exam")
-                .accessibilityHint("Double tap to finish the current exam")
-                .background(.ultraThinMaterial)
             }
         }
         .navigationTitle("exam.title".localized)
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
+        .toolbarBackground(DesignTokens.Colors.background1, for: .navigationBar)
+        .toolbarBackground(.visible, for: .navigationBar)
+        .toolbarColorScheme(.dark, for: .navigationBar)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(viewModel.state == .active(.paused) ? "exam.resume".localized : "exam.pause".localized) {
@@ -97,7 +127,7 @@ struct ExamView: View {
                         showingPauseAlert = true
                     }
                 }
-                .foregroundColor(.blue)
+                .foregroundColor(DesignTokens.Colors.iconBlue)
             }
         }
         .navigationDestination(isPresented: $showingResult) {
@@ -149,60 +179,63 @@ struct ExamHeaderView: View {
     let viewModel: ExamViewModel
     
     var body: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: DesignTokens.Spacing.lg) {
             // Progress bar
             ProgressView(value: viewModel.progress)
-                .progressViewStyle(LinearProgressViewStyle(tint: .blue))
+                .progressViewStyle(LinearProgressViewStyle(tint: DesignTokens.Colors.iconBlue))
                 .scaleEffect(x: 1, y: 2)
             
             HStack {
                 // Question counter
                 Text("\(viewModel.currentQuestionIndex + 1) / \(viewModel.questions.count)")
-                    .font(.headline)
-                    .fontWeight(.semibold)
+                    .font(DesignTokens.Typography.h1)
+                    .foregroundStyle(DesignTokens.Colors.textPrimary)
                 
                 Spacer()
                 
                 // Timer
                 if viewModel.configuration.showTimer {
-                    HStack(spacing: 8) {
+                    HStack(spacing: DesignTokens.Spacing.sm) {
                         Image(systemName: "timer")
+                            .font(.system(size: DesignTokens.Sizes.iconSmall))
                             .foregroundColor(timerColor)
                         
                         Text(viewModel.timeRemainingFormatted)
-                            .font(.headline)
-                            .fontWeight(.bold)
+                            .font(DesignTokens.Typography.secondarySemibold)
                             .foregroundColor(timerColor)
                             .monospacedDigit()
                     }
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
-                    .background(timerBackgroundColor, in: RoundedRectangle(cornerRadius: 8))
+                    .padding(.horizontal, DesignTokens.Spacing.md)
+                    .padding(.vertical, DesignTokens.Spacing.sm)
+                    .background(
+                        RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.small)
+                            .fill(timerBackgroundColor)
+                    )
                 }
             }
         }
-        .padding(.horizontal, 20)
-        .padding(.vertical, 16)
-        .background(.ultraThinMaterial)
+        .padding(.horizontal, DesignTokens.Spacing.xxl)
+        .padding(.vertical, DesignTokens.Spacing.lg)
+        .background(DesignTokens.Colors.cardBackground)
     }
     
     private var timerColor: Color {
         if viewModel.timeRemaining <= 10 {
-            return .red
+            return DesignTokens.Colors.iconRed
         } else if viewModel.timeRemaining <= 20 {
-            return .orange
+            return DesignTokens.Colors.iconOrange
         } else {
-            return .blue
+            return DesignTokens.Colors.iconBlue
         }
     }
     
     private var timerBackgroundColor: Color {
         if viewModel.timeRemaining <= 10 {
-            return .red.opacity(0.1)
+            return DesignTokens.Colors.iconRed.opacity(0.15)
         } else if viewModel.timeRemaining <= 20 {
-            return .orange.opacity(0.1)
+            return DesignTokens.Colors.iconOrange.opacity(0.15)
         } else {
-            return .blue.opacity(0.1)
+            return DesignTokens.Colors.iconBlue.opacity(0.15)
         }
     }
 }
@@ -212,35 +245,40 @@ struct ExamQuestionView: View {
     let viewModel: ExamViewModel
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: DesignTokens.Spacing.lg) {
             if let question = viewModel.currentQuestion {
                 Text(question.text)
-                    .font(.title2)
-                    .fontWeight(.medium)
-                    .foregroundColor(.primary)
+                    .font(DesignTokens.Typography.h2)
+                    .foregroundColor(DesignTokens.Colors.textPrimary)
                     .multilineTextAlignment(.leading)
                 
                 // Category and difficulty
-                HStack(spacing: 12) {
+                HStack(spacing: DesignTokens.Spacing.md) {
                     Label(question.category, systemImage: "folder")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(.blue.opacity(0.1), in: RoundedRectangle(cornerRadius: 6))
+                        .font(DesignTokens.Typography.label)
+                        .foregroundColor(DesignTokens.Colors.textSecondary)
+                        .padding(.horizontal, DesignTokens.Spacing.sm)
+                        .padding(.vertical, DesignTokens.Spacing.xs)
+                        .background(
+                            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.small)
+                                .fill(DesignTokens.Colors.iconBlue.opacity(0.15))
+                        )
                     
                     Label(question.difficulty.localizedName, systemImage: "star")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(.orange.opacity(0.1), in: RoundedRectangle(cornerRadius: 6))
+                        .font(DesignTokens.Typography.label)
+                        .foregroundColor(DesignTokens.Colors.textSecondary)
+                        .padding(.horizontal, DesignTokens.Spacing.sm)
+                        .padding(.vertical, DesignTokens.Spacing.xs)
+                        .background(
+                            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.small)
+                                .fill(DesignTokens.Colors.iconOrange.opacity(0.15))
+                        )
                 }
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(20)
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
+        .padding(DesignTokens.Spacing.xxl)
+        .cardStyle(cornerRadius: DesignTokens.CornerRadius.large)
     }
 }
 
@@ -249,7 +287,7 @@ struct ExamAnswersView: View {
     let viewModel: ExamViewModel
     
     var body: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: DesignTokens.Spacing.md) {
             if let question = viewModel.currentQuestion {
                 ForEach(Array(question.answers.enumerated()), id: \.element.id) { index, answer in
                     ExamAnswerButton(
@@ -277,29 +315,17 @@ struct ExamAnswerButton: View {
     let isAnswered: Bool
     let onTap: () -> Void
     
-    @Environment(\.colorScheme) private var colorScheme
-    
     private var buttonColor: Color {
         if isAnswered {
             // Показываем цвет только для выбранного ответа
             if isSelected {
-                return isCorrect ? .green : .red
+                return isCorrect ? DesignTokens.Colors.statusGreen : DesignTokens.Colors.iconRed
             } else {
-                // Остальные ответы остаются серыми, правильный ответ не выделяется
-                return .gray
+                // Остальные ответы остаются серыми
+                return DesignTokens.Colors.textTertiary
             }
         } else {
-            return isSelected ? .blue : .gray
-        }
-    }
-    
-    private var checkmarkColor: Color {
-        if isCorrect {
-            // Адаптивный цвет для правильного ответа - более контрастный в светлой теме
-            return colorScheme == .light ? Color(red: 0.0, green: 0.6, blue: 0.2) : .green
-        } else {
-            // Адаптивный цвет для неправильного ответа - более контрастный в светлой теме
-            return colorScheme == .light ? Color(red: 0.8, green: 0.0, blue: 0.0) : .red
+            return isSelected ? DesignTokens.Colors.iconBlue : DesignTokens.Colors.textTertiary
         }
     }
     
@@ -307,31 +333,33 @@ struct ExamAnswerButton: View {
         if isAnswered {
             // Показываем фон только для выбранного ответа
             if isSelected {
-                return isCorrect ? .green.opacity(0.1) : .red.opacity(0.1)
+                return isCorrect ? DesignTokens.Colors.statusGreen.opacity(0.15) : DesignTokens.Colors.iconRed.opacity(0.15)
             } else {
                 // Остальные ответы остаются с обычным фоном
-                return .gray.opacity(0.05)
+                return DesignTokens.Colors.progressCard
             }
         } else {
-            return isSelected ? .blue.opacity(0.1) : .gray.opacity(0.05)
+            return isSelected ? DesignTokens.Colors.iconBlue.opacity(0.15) : DesignTokens.Colors.progressCard
         }
     }
     
     var body: some View {
         Button(action: onTap) {
-            HStack(spacing: 16) {
+            HStack(spacing: DesignTokens.Spacing.lg) {
                 // Answer letter
                 Text(String(Character(UnicodeScalar(65 + index)!)))
-                    .font(.headline)
-                    .fontWeight(.bold)
+                    .font(DesignTokens.Typography.secondarySemibold)
                     .foregroundColor(buttonColor)
                     .frame(width: 32, height: 32)
-                    .background(buttonColor.opacity(0.2), in: Circle())
+                    .background(
+                        Circle()
+                            .fill(buttonColor.opacity(0.2))
+                    )
                 
                 // Answer text
                 Text(answer.text)
-                    .font(.body)
-                    .foregroundColor(.primary)
+                    .font(DesignTokens.Typography.bodyRegular)
+                    .foregroundColor(DesignTokens.Colors.textPrimary)
                     .multilineTextAlignment(.leading)
                 
                 Spacer()
@@ -339,15 +367,23 @@ struct ExamAnswerButton: View {
                 // Status icon - показываем только для выбранного ответа
                 if isAnswered && isSelected {
                     Image(systemName: isCorrect ? "checkmark.circle.fill" : "xmark.circle.fill")
-                        .foregroundColor(checkmarkColor)
-                        .font(.title2)
+                        .foregroundColor(buttonColor)
+                        .font(.system(size: DesignTokens.Sizes.iconMedium))
                 }
             }
-            .padding(16)
-            .background(buttonBackground, in: RoundedRectangle(cornerRadius: 12))
-            .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(buttonColor.opacity(0.3), lineWidth: 1)
+            .padding(DesignTokens.Spacing.lg)
+            .background(
+                RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
+                    .fill(buttonBackground)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
+                            .stroke(buttonColor, lineWidth: isSelected ? 2 : 1)
+                    )
+            )
+            .shadow(
+                color: isSelected ? buttonColor.opacity(0.3) : DesignTokens.Shadows.card,
+                radius: isSelected ? 8 : DesignTokens.Shadows.cardRadius,
+                y: DesignTokens.Shadows.cardY
             )
         }
         .disabled(isAnswered)
@@ -366,3 +402,4 @@ struct ExamAnswerButton: View {
         settingsManager: SettingsManager()
     ), onExit: {})
 }
+

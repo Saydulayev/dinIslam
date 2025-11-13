@@ -16,34 +16,51 @@ struct ExamResultView: View {
     @Environment(\.dismiss) private var dismiss
     
     var body: some View {
-        ScrollView {
-            VStack(spacing: 24) {
-                // Header
-                ExamResultHeaderView(result: result)
-                
-                // Grade and score
-                ExamGradeView(result: result)
-                
-                // Statistics cards
-                ExamStatsCardsView(result: result)
-                
-                // Detailed breakdown
-                ExamBreakdownView(result: result)
-                
-                // Action buttons
-                ExamResultActionsView(
-                    viewModel: viewModel,
-                    onRetake: onRetake,
-                    onBackToMenu: onBackToMenu
-                )
+        ZStack {
+            // Gradient Background
+            LinearGradient(
+                gradient: Gradient(colors: [
+                    DesignTokens.Colors.background1,
+                    DesignTokens.Colors.background2
+                ]),
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .ignoresSafeArea()
+            
+            ScrollView {
+                VStack(spacing: DesignTokens.Spacing.xxl) {
+                    // Header
+                    ExamResultHeaderView(result: result)
+                    
+                    // Grade and score
+                    ExamGradeView(result: result)
+                    
+                    // Statistics cards
+                    ExamStatsCardsView(result: result)
+                    
+                    // Detailed breakdown
+                    ExamBreakdownView(result: result)
+                    
+                    // Action buttons
+                    ExamResultActionsView(
+                        viewModel: viewModel,
+                        onRetake: onRetake,
+                        onBackToMenu: onBackToMenu
+                    )
+                }
+                .padding(.horizontal, DesignTokens.Spacing.xxl)
+                .padding(.top, DesignTokens.Spacing.xl)
+                .padding(.bottom, DesignTokens.Spacing.xxxl)
             }
-            .padding(.horizontal, 20)
-            .padding(.bottom, 20)
         }
         .navigationTitle("exam.result.title".localized)
-        .navigationBarTitleDisplayMode(.large)
+        .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
         .interactiveDismissDisabled(true)
+        .toolbarBackground(DesignTokens.Colors.background1, for: .navigationBar)
+        .toolbarBackground(.visible, for: .navigationBar)
+        .toolbarColorScheme(.dark, for: .navigationBar)
     }
 }
 
@@ -52,24 +69,23 @@ struct ExamResultHeaderView: View {
     let result: ExamResult
     
     var body: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: DesignTokens.Spacing.lg) {
             // Icon
             Image(systemName: result.isPassed ? "checkmark.circle.fill" : "xmark.circle.fill")
                 .font(.system(size: 80))
-                .foregroundStyle(result.isPassed ? .green : .red)
+                .foregroundStyle(result.isPassed ? DesignTokens.Colors.statusGreen : DesignTokens.Colors.iconRed)
             
             // Title
             Text(result.isPassed ? "exam.result.passed".localized : "exam.result.failed".localized)
-                .font(.largeTitle)
-                .fontWeight(.bold)
-                .foregroundColor(.primary)
+                .font(DesignTokens.Typography.h1)
+                .foregroundColor(DesignTokens.Colors.textPrimary)
             
-            // Score - показываем процент от общего количества вопросов
+            // Score
             Text("\(Int(result.percentage))%")
                 .font(.system(size: 48, weight: .bold, design: .rounded))
-                .foregroundStyle(result.isPassed ? .green : .red)
+                .foregroundStyle(result.isPassed ? DesignTokens.Colors.statusGreen : DesignTokens.Colors.iconRed)
         }
-        .padding(.vertical, 20)
+        .padding(.vertical, DesignTokens.Spacing.xl)
     }
 }
 
@@ -78,21 +94,26 @@ struct ExamGradeView: View {
     let result: ExamResult
     
     var body: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: DesignTokens.Spacing.md) {
             Text("exam.result.grade".localized)
-                .font(.headline)
-                .foregroundColor(.secondary)
+                .font(DesignTokens.Typography.bodyRegular)
+                .foregroundColor(DesignTokens.Colors.textSecondary)
             
             Text(result.grade.localizedName)
-                .font(.title)
-                .fontWeight(.bold)
+                .font(DesignTokens.Typography.h1)
                 .foregroundColor(gradeColor)
-                .padding(.horizontal, 20)
-                .padding(.vertical, 12)
-                .background(gradeColor.opacity(0.1), in: RoundedRectangle(cornerRadius: 12))
+                .padding(.horizontal, DesignTokens.Spacing.xl)
+                .padding(.vertical, DesignTokens.Spacing.md)
+                .cardStyle(
+                    cornerRadius: DesignTokens.CornerRadius.medium,
+                    fillColor: gradeColor.opacity(0.18),
+                    shadowRadius: 8,
+                    shadowYOffset: 4,
+                    highlightOpacity: 0.45
+                )
                 .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(gradeColor.opacity(0.3), lineWidth: 1)
+                    RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
+                        .stroke(gradeColor, lineWidth: 1)
                 )
         }
     }
@@ -100,13 +121,13 @@ struct ExamGradeView: View {
     private var gradeColor: Color {
         switch result.grade {
         case .excellent:
-            return .green
+            return DesignTokens.Colors.statusGreen
         case .good:
-            return .blue
+            return DesignTokens.Colors.iconBlue
         case .satisfactory:
-            return .orange
+            return DesignTokens.Colors.iconOrange
         case .unsatisfactory:
-            return .red
+            return DesignTokens.Colors.iconRed
         }
     }
 }
@@ -121,33 +142,33 @@ struct ExamStatsCardsView: View {
     ]
     
     var body: some View {
-        LazyVGrid(columns: columns, spacing: 16) {
+        LazyVGrid(columns: columns, spacing: DesignTokens.Spacing.lg) {
             ExamStatCard(
                 title: "exam.result.answered".localized,
                 value: "\(result.answeredQuestions)",
                 icon: "checkmark.circle.fill",
-                color: .blue
+                color: DesignTokens.Colors.iconBlue
             )
             
             ExamStatCard(
                 title: "exam.result.correct".localized,
                 value: "\(result.correctAnswers)",
                 icon: "checkmark.circle.fill",
-                color: .green
+                color: DesignTokens.Colors.statusGreen
             )
             
             ExamStatCard(
                 title: "exam.result.incorrect".localized,
                 value: "\(result.incorrectAnswers)",
                 icon: "xmark.circle.fill",
-                color: .red
+                color: DesignTokens.Colors.iconRed
             )
             
             ExamStatCard(
                 title: "exam.result.skipped".localized,
                 value: "\(result.skippedQuestions)",
                 icon: "forward.fill",
-                color: .orange
+                color: DesignTokens.Colors.iconOrange
             )
         }
     }
@@ -161,23 +182,23 @@ struct ExamStatCard: View {
     let color: Color
     
     var body: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: DesignTokens.Spacing.md) {
             Image(systemName: icon)
-                .font(.system(size: 24))
+                .font(.system(size: DesignTokens.Sizes.iconMedium))
                 .foregroundColor(color)
             
             Text(value)
-                .font(.title2)
-                .fontWeight(.bold)
+                .font(DesignTokens.Typography.h1)
+                .foregroundColor(DesignTokens.Colors.textPrimary)
             
             Text(title)
-                .font(.caption)
-                .foregroundColor(.secondary)
+                .font(DesignTokens.Typography.label)
+                .foregroundColor(DesignTokens.Colors.textSecondary)
                 .multilineTextAlignment(.center)
         }
         .frame(maxWidth: .infinity)
-        .padding(16)
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
+        .padding(DesignTokens.Spacing.lg)
+        .cardStyle(cornerRadius: DesignTokens.CornerRadius.medium, highlightOpacity: 0.35)
     }
 }
 
@@ -186,39 +207,39 @@ struct ExamBreakdownView: View {
     let result: ExamResult
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: DesignTokens.Spacing.lg) {
             Text("exam.result.breakdown".localized)
-                .font(.headline)
-                .fontWeight(.semibold)
+                .font(DesignTokens.Typography.h2)
+                .foregroundColor(DesignTokens.Colors.textPrimary)
             
-            VStack(spacing: 12) {
+            VStack(spacing: DesignTokens.Spacing.md) {
                 ExamBreakdownRow(
                     title: "exam.result.totalQuestions".localized,
                     value: "\(result.totalQuestions)",
-                    color: .primary
+                    color: DesignTokens.Colors.textPrimary
                 )
                 
                 ExamBreakdownRow(
                     title: "exam.result.timeSpent".localized,
                     value: formatTime(result.totalTimeSpent),
-                    color: .blue
+                    color: DesignTokens.Colors.iconBlue
                 )
                 
                 ExamBreakdownRow(
                     title: "exam.result.averageTime".localized,
                     value: formatTime(result.averageTimePerQuestion),
-                    color: .green
+                    color: DesignTokens.Colors.statusGreen
                 )
                 
                 ExamBreakdownRow(
                     title: "exam.result.timeExpired".localized,
                     value: "\(result.timeExpiredQuestions)",
-                    color: .red
+                    color: DesignTokens.Colors.iconRed
                 )
             }
         }
-        .padding(20)
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
+        .padding(DesignTokens.Spacing.xxl)
+        .cardStyle(cornerRadius: DesignTokens.CornerRadius.xlarge)
     }
     
     private func formatTime(_ timeInterval: TimeInterval) -> String {
@@ -237,14 +258,13 @@ struct ExamBreakdownRow: View {
     var body: some View {
         HStack {
             Text(title)
-                .font(.body)
-                .foregroundColor(.secondary)
+                .font(DesignTokens.Typography.secondaryRegular)
+                .foregroundColor(DesignTokens.Colors.textSecondary)
             
             Spacer()
             
             Text(value)
-                .font(.body)
-                .fontWeight(.semibold)
+                .font(DesignTokens.Typography.secondarySemibold)
                 .foregroundColor(color)
         }
     }
@@ -257,40 +277,50 @@ struct ExamResultActionsView: View {
     let onBackToMenu: () -> Void
     
     var body: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: DesignTokens.Spacing.md) {
             // Retake exam button
             Button(action: onRetake) {
-                HStack {
+                HStack(spacing: DesignTokens.Spacing.md) {
                     Image(systemName: "arrow.clockwise")
+                        .font(.system(size: DesignTokens.Sizes.iconMedium))
                     Text("exam.result.retake".localized)
+                        .font(DesignTokens.Typography.secondarySemibold)
                 }
-                .font(.headline)
-                .fontWeight(.semibold)
-                .foregroundColor(.white)
+                .foregroundColor(DesignTokens.Colors.textPrimary)
                 .frame(maxWidth: .infinity)
                 .frame(height: 56)
-                .background(.blue.gradient, in: RoundedRectangle(cornerRadius: 16))
+                .cardStyle(
+                    cornerRadius: DesignTokens.CornerRadius.medium,
+                    fillColor: DesignTokens.Colors.iconBlue,
+                    shadowRadius: 10,
+                    shadowYOffset: 6,
+                    highlightOpacity: 0.45
+                )
             }
             
             Button(action: onBackToMenu) {
-                HStack {
+                HStack(spacing: DesignTokens.Spacing.md) {
                     Image(systemName: "house.fill")
+                        .font(.system(size: DesignTokens.Sizes.iconMedium))
                     LocalizedText("result.backToStart")
+                        .font(DesignTokens.Typography.secondarySemibold)
                 }
-                .font(.headline)
-                .fontWeight(.semibold)
-                .foregroundColor(.blue)
+                .foregroundColor(DesignTokens.Colors.iconBlue)
                 .frame(maxWidth: .infinity)
                 .frame(height: 56)
-                .background(.blue.opacity(0.1), in: RoundedRectangle(cornerRadius: 16))
+                .cardStyle(
+                    cornerRadius: DesignTokens.CornerRadius.medium,
+                    fillColor: DesignTokens.Colors.progressCard,
+                    shadowRadius: 10,
+                    shadowYOffset: 6,
+                    highlightOpacity: 0.35
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
+                        .stroke(DesignTokens.Colors.borderSubtle, lineWidth: 1)
+                )
             }
         }
-    }
-    
-    private func formatTime(_ timeInterval: TimeInterval) -> String {
-        let minutes = Int(timeInterval) / 60
-        let seconds = Int(timeInterval) % 60
-        return String(format: "%02d:%02d", minutes, seconds)
     }
 }
 

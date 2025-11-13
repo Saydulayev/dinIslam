@@ -83,19 +83,7 @@ struct ResultView: View {
                         }
                     }
                     .padding(DesignTokens.Spacing.xxl)
-                    .background(
-                        RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xlarge)
-                            .fill(DesignTokens.Colors.cardBackground)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xlarge)
-                                    .stroke(DesignTokens.Colors.borderSubtle, lineWidth: 1)
-                            )
-                    )
-                    .shadow(
-                        color: DesignTokens.Shadows.card,
-                        radius: DesignTokens.Shadows.cardRadius,
-                        y: DesignTokens.Shadows.cardY
-                    )
+                    .cardStyle(cornerRadius: DesignTokens.CornerRadius.xlarge)
                     .padding(.horizontal, DesignTokens.Spacing.xxl)
                     
                     // New record badge
@@ -110,13 +98,16 @@ struct ResultView: View {
                         }
                         .padding(DesignTokens.Spacing.lg)
                         .frame(maxWidth: .infinity)
-                        .background(
+                        .cardStyle(
+                            cornerRadius: DesignTokens.CornerRadius.medium,
+                            fillColor: DesignTokens.Colors.iconOrange.opacity(0.15),
+                            shadowRadius: 8,
+                            shadowYOffset: 4,
+                            highlightOpacity: 0.5
+                        )
+                        .overlay(
                             RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
-                                .fill(DesignTokens.Colors.iconOrange.opacity(0.15))
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
-                                        .stroke(DesignTokens.Colors.iconOrange, lineWidth: 1)
-                                )
+                                .stroke(DesignTokens.Colors.iconOrange, lineWidth: 1)
                         )
                         .padding(.horizontal, DesignTokens.Spacing.xxl)
                     }
@@ -136,9 +127,12 @@ struct ResultView: View {
                             .foregroundColor(DesignTokens.Colors.textPrimary)
                             .frame(maxWidth: .infinity)
                             .frame(height: 56)
-                            .background(
-                                RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
-                                    .fill(DesignTokens.Colors.iconBlue)
+                            .cardStyle(
+                                cornerRadius: DesignTokens.CornerRadius.medium,
+                                fillColor: DesignTokens.Colors.iconBlue,
+                                shadowRadius: 10,
+                                shadowYOffset: 6,
+                                highlightOpacity: 0.45
                             )
                         }
                         
@@ -152,13 +146,16 @@ struct ResultView: View {
                             .foregroundColor(DesignTokens.Colors.iconBlue)
                             .frame(maxWidth: .infinity)
                             .frame(height: 56)
-                            .background(
+                            .cardStyle(
+                                cornerRadius: DesignTokens.CornerRadius.medium,
+                                fillColor: DesignTokens.Colors.progressCard,
+                                shadowRadius: 10,
+                                shadowYOffset: 6,
+                                highlightOpacity: 0.35
+                            )
+                            .overlay(
                                 RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
-                                    .fill(DesignTokens.Colors.progressCard)
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
-                                            .stroke(DesignTokens.Colors.borderSubtle, lineWidth: 1)
-                                    )
+                                    .stroke(DesignTokens.Colors.borderSubtle, lineWidth: 1)
                             )
                         }
                     }

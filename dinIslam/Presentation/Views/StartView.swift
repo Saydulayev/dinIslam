@@ -312,19 +312,7 @@ struct StartView: View {
             actionsSection(model: model)
         }
         .padding(DesignTokens.Spacing.xxl)
-        .background(
-            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xlarge)
-                .fill(DesignTokens.Colors.cardBackground)
-                .overlay(
-                    RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xlarge)
-                        .stroke(DesignTokens.Colors.borderSubtle, lineWidth: 1)
-                )
-        )
-        .shadow(
-            color: DesignTokens.Shadows.card,
-            radius: DesignTokens.Shadows.cardRadius,
-            y: DesignTokens.Shadows.cardY
-        )
+        .cardStyle(cornerRadius: DesignTokens.CornerRadius.xlarge)
     }
     
     private func statsCard(model: StartViewModel) -> some View {
@@ -395,13 +383,11 @@ struct StartView: View {
             }
             .padding(DesignTokens.Spacing.lg)
             .frame(maxWidth: .infinity)
-            .background(
-                RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
-                    .fill(DesignTokens.Colors.progressCard)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
-                            .stroke(DesignTokens.Colors.borderSubtle, lineWidth: 1)
-                    )
+            .cardStyle(
+                cornerRadius: DesignTokens.CornerRadius.medium,
+                fillColor: DesignTokens.Colors.progressCard,
+                shadowRadius: 10,
+                shadowYOffset: 6
             )
         }
         .buttonStyle(.plain)
@@ -429,13 +415,11 @@ struct StartView: View {
             }
             .padding(DesignTokens.Spacing.lg)
             .frame(maxWidth: .infinity)
-            .background(
-                RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
-                    .fill(DesignTokens.Colors.progressCard)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
-                            .stroke(DesignTokens.Colors.borderSubtle, lineWidth: 1)
-                    )
+            .cardStyle(
+                cornerRadius: DesignTokens.CornerRadius.medium,
+                fillColor: DesignTokens.Colors.progressCard,
+                shadowRadius: 10,
+                shadowYOffset: 6
             )
         }
         .buttonStyle(.plain)

@@ -192,21 +192,13 @@ struct AchievementCard: View {
             }
         }
         .padding(DesignTokens.Spacing.xl)
-        .background(
+        .cardStyle(cornerRadius: DesignTokens.CornerRadius.large)
+        .overlay(
             RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.large)
-                .fill(DesignTokens.Colors.cardBackground)
-                .overlay(
-                    RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.large)
-                        .stroke(
-                            isUnlocked ? achievement.color.opacity(0.3) : DesignTokens.Colors.borderSubtle,
-                            lineWidth: 1
-                        )
+                .stroke(
+                    isUnlocked ? achievement.color.opacity(0.5) : DesignTokens.Colors.borderSubtle,
+                    lineWidth: 1
                 )
-        )
-        .shadow(
-            color: DesignTokens.Shadows.card,
-            radius: DesignTokens.Shadows.cardRadius,
-            y: DesignTokens.Shadows.cardY
         )
         .opacity(isUnlocked ? 1.0 : 0.7)
         .animation(.easeInOut(duration: 0.3), value: isUnlocked)
@@ -277,13 +269,13 @@ struct ExpandedAchievementCard: View {
                     .frame(maxWidth: .infinity)
                     .padding(.horizontal, DesignTokens.Spacing.xl)
                     .padding(.vertical, DesignTokens.Spacing.md)
-                    .background(
+                    .cardStyle(
+                        cornerRadius: DesignTokens.CornerRadius.medium,
+                        highlightOpacity: 0.4
+                    )
+                    .overlay(
                         RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
-                            .fill(DesignTokens.Colors.cardBackground)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
-                                    .stroke(achievement.color.opacity(0.5), lineWidth: 1)
-                            )
+                            .stroke(achievement.color.opacity(0.5), lineWidth: 1)
                     )
                 }
                 
@@ -299,30 +291,20 @@ struct ExpandedAchievementCard: View {
                         .frame(maxWidth: .infinity)
                         .padding(.horizontal, DesignTokens.Spacing.xl)
                         .padding(.vertical, DesignTokens.Spacing.md)
-                        .background(
-                            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
-                                .fill(DesignTokens.Colors.cardBackground)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
-                                        .stroke(DesignTokens.Colors.borderSubtle, lineWidth: 1)
-                                )
-                        )
+                        .cardStyle(cornerRadius: DesignTokens.CornerRadius.medium, highlightOpacity: 0.3)
                 }
             }
         }
         .padding(DesignTokens.Spacing.xxl)
-        .background(
-            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xlarge)
-                .fill(DesignTokens.Colors.cardBackground)
-                .overlay(
-                    RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xlarge)
-                        .stroke(achievement.color.opacity(0.5), lineWidth: 2)
-                )
+        .cardStyle(
+            cornerRadius: DesignTokens.CornerRadius.xlarge,
+            shadowRadius: 20,
+            shadowYOffset: 12,
+            highlightOpacity: 0.8
         )
-        .shadow(
-            color: Color.black.opacity(0.5),
-            radius: 20,
-            y: 10
+        .overlay(
+            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xlarge)
+                .stroke(achievement.color.opacity(0.5), lineWidth: 2)
         )
         .padding(.horizontal, DesignTokens.Spacing.xxxl)
         .scaleEffect(isPresented ? 1.0 : 0.8)

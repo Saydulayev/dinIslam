@@ -27,24 +27,15 @@ struct ProgressCardView: View {
             
             Text(label)
                 .font(DesignTokens.Typography.label)
-                .foregroundColor(DesignTokens.Colors.textSecondary)
+                .foregroundColor(DesignTokens.Colors.textPrimary)
                 .lineLimit(2)
                 .fixedSize(horizontal: false, vertical: true)
         }
         .frame(maxWidth: .infinity, minHeight: 110, maxHeight: 110, alignment: .leading)
         .padding(DesignTokens.Sizes.progressCardPadding)
-        .background(
-            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.large)
-                .fill(DesignTokens.Colors.progressCard)
-                .overlay(
-                    RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.large)
-                        .stroke(DesignTokens.Colors.borderSubtle, lineWidth: 1)
-                )
-        )
-        .shadow(
-            color: DesignTokens.Shadows.progress,
-            radius: DesignTokens.Shadows.progressRadius,
-            y: 2
+        .cardStyle(
+            cornerRadius: DesignTokens.CornerRadius.large,
+            fillColor: DesignTokens.Colors.progressCard
         )
     }
 }

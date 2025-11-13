@@ -90,19 +90,7 @@ struct QuizView: View {
                                     .multilineTextAlignment(.center)
                                     .padding(DesignTokens.Spacing.xxl)
                                     .frame(maxWidth: .infinity)
-                                    .background(
-                                        RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.large)
-                                            .fill(DesignTokens.Colors.cardBackground)
-                                            .overlay(
-                                                RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.large)
-                                                    .stroke(DesignTokens.Colors.borderSubtle, lineWidth: 1)
-                                            )
-                                    )
-                                    .shadow(
-                                        color: DesignTokens.Shadows.card,
-                                        radius: DesignTokens.Shadows.cardRadius,
-                                        y: DesignTokens.Shadows.cardY
-                                    )
+                                    .cardStyle(cornerRadius: DesignTokens.CornerRadius.large)
                                     .accessibilityLabel("Question: \(question.text)")
                                     .accessibilityAddTraits(.isHeader)
                                     .dynamicTypeSize(.large)
@@ -163,9 +151,12 @@ struct QuizView: View {
                         .foregroundColor(DesignTokens.Colors.textPrimary)
                         .frame(maxWidth: .infinity)
                         .frame(height: 52)
-                        .background(
-                            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
-                                .fill(DesignTokens.Colors.statusGreen)
+                        .cardStyle(
+                            cornerRadius: DesignTokens.CornerRadius.medium,
+                            fillColor: DesignTokens.Colors.statusGreen,
+                            shadowRadius: 10,
+                            shadowYOffset: 6,
+                            highlightOpacity: 0.4
                         )
                         .padding(.horizontal, DesignTokens.Spacing.xxl)
                         .padding(.vertical, DesignTokens.Spacing.md)
