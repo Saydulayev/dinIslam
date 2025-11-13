@@ -35,6 +35,13 @@ final class ProfileManager {
     var email: String? {
         profile.email
     }
+    
+    func isPrivateEmail(_ email: String) -> Bool {
+        // Apple Sign In использует приватные relay адреса с доменом @privaterelay.appleid.com
+        // Эти адреса не должны отображаться пользователю, если он выбрал скрыть email
+        return email.contains("@privaterelay.appleid.com") || 
+               email.contains("@icloud.com") && email.hasPrefix("no-reply")
+    }
 
     var recommendations: [LearningRecommendation] {
         profile.progress.recommendations

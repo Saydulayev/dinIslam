@@ -136,7 +136,7 @@ struct ProfileView: View {
                     .font(.system(size: 24, weight: .semibold, design: .rounded))
                     .foregroundStyle(.primary)
 
-                if let email = manager.email {
+                if let email = manager.email, !manager.isPrivateEmail(email) {
                     Text(email)
                         .font(.system(size: 15, weight: .regular))
                         .foregroundStyle(.secondary)
