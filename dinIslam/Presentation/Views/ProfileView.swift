@@ -16,33 +16,40 @@ import UIKit
 struct ProfileView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.profileManager) private var profileManager
-    @Environment(\.colorScheme) private var colorScheme
     @State private var avatarPickerItem: PhotosPickerItem?
     @State private var showResetConfirmation = false
     @State private var isResettingProfile = false
 
     var body: some View {
         @Bindable var manager = profileManager
-        ScrollView {
-            VStack(spacing: 0) {
-                profileHeader(manager: manager)
-                    .padding(.top, 8)
-                
-                if manager.isSignedIn {
-                    progressSection(progress: manager.progress)
-                        .padding(.top, 16)
-                } else {
-                    signInPromptView()
-                        .padding(.top, 16)
+        
+        ZStack {
+            // Gradient background
+            LinearGradient(
+                colors: [
+                    DesignTokens.Colors.background1,
+                    DesignTokens.Colors.background2
+                ],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .ignoresSafeArea()
+            
+            ScrollView {
+                VStack(spacing: DesignTokens.Spacing.xxxl) {
+                    profileCard(manager: manager)
+                    
+                    if manager.isSignedIn {
+                        progressSection(progress: manager.progress)
+                    }
+                    
+                    syncSection(manager: manager)
                 }
-                
-                syncSection(manager: manager)
-                    .padding(.top, 16)
-                    .padding(.bottom, 32)
+                .padding(.horizontal, DesignTokens.Spacing.xxl)
+                .padding(.top, DesignTokens.Spacing.lg)
+                .padding(.bottom, DesignTokens.Spacing.xxxl)
             }
-            .padding(.horizontal, 20)
         }
-        .background(Color(.systemGroupedBackground).ignoresSafeArea())
         .navigationTitle("profile.title".localized)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -50,11 +57,12 @@ struct ProfileView: View {
                 Button("profile.done".localized) {
                     dismiss()
                 }
-                .fontWeight(.medium)
+                .font(DesignTokens.Typography.secondarySemibold)
+                .foregroundColor(DesignTokens.Colors.textPrimary)
             }
         }
+        .toolbarBackground(DesignTokens.Colors.background1, for: .navigationBar)
         .onAppear {
-            // Валидация аватара при открытии профиля
             manager.validateAvatar()
         }
         .alert("profile.sync.reset.title".localized, isPresented: $showResetConfirmation) {
@@ -69,152 +77,6 @@ struct ProfileView: View {
         } message: {
             Text("profile.sync.reset.message".localized)
         }
-    }
-
-    // MARK: - Sections
-    private func signInPromptView() -> some View {
-        VStack(spacing: 16) {
-            HStack(spacing: 12) {
-                Image(systemName: "icloud.fill")
-                    .font(.system(size: 24, weight: .medium))
-                    .foregroundStyle(Color.accentColor)
-                
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("profile.signin.prompt.title".localized)
-                        .font(.system(size: 17, weight: .semibold, design: .rounded))
-                        .foregroundStyle(.primary)
-                    
-                    Text("profile.signin.prompt.message".localized)
-                        .font(.system(size: 15, weight: .regular))
-                        .foregroundStyle(.secondary)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-        }
-        .padding(20)
-        .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color(.secondarySystemBackground))
-        )
-    }
-    
-    private func profileHeader(manager: ProfileManager) -> some View {
-        let hasAvatar = avatarExists(for: manager)
-
-        return VStack(spacing: 24) {
-            // Аватар
-            ZStack(alignment: .bottomTrailing) {
-                if let image = avatarImage(for: manager) {
-                    image
-                        .resizable()
-                        .scaledToFill()
-                        .frame(width: 100, height: 100)
-                        .clipShape(Circle())
-                        .overlay(
-                            Circle()
-                                .strokeBorder(
-                                    Color.primary.opacity(colorScheme == .dark ? 0.15 : 0.1),
-                                    lineWidth: 1
-                                )
-                        )
-                } else {
-                    Circle()
-                        .fill(Color(.tertiarySystemFill))
-                        .frame(width: 100, height: 100)
-                        .overlay(
-                            Image(systemName: manager.isSignedIn ? "person.crop.circle.fill" : "person.circle.fill")
-                                .font(.system(size: 50))
-                                .foregroundStyle(Color(.tertiaryLabel))
-                        )
-                }
-                
-                // Иконка карандаша для смены фото
-                if manager.isSignedIn {
-                    PhotosPicker(selection: $avatarPickerItem, matching: .images) {
-                        ZStack {
-                            Circle()
-                                .fill(Color(.systemBackground))
-                                .frame(width: 32, height: 32)
-                                .shadow(color: Color.black.opacity(0.15), radius: 4, x: 0, y: 2)
-                            
-                            Image(systemName: "pencil")
-                                .font(.system(size: 14, weight: .medium))
-                                .foregroundStyle(Color.primary)
-                        }
-                    }
-                    .offset(x: -2, y: -2)
-                }
-            }
-
-            // Имя и email
-            VStack(spacing: 4) {
-                Text(manager.displayName)
-                    .font(.system(size: 24, weight: .semibold, design: .rounded))
-                    .foregroundStyle(.primary)
-
-                if let email = manager.email, !manager.isPrivateEmail(email) {
-                    Text(email)
-                        .font(.system(size: 15, weight: .regular))
-                        .foregroundStyle(.secondary)
-                }
-            }
-
-            // Кнопки действий
-            VStack(spacing: 10) {
-                if manager.isSignedIn {
-                    if hasAvatar {
-                        Button {
-                            Task { @MainActor [manager] in
-                                await manager.deleteAvatar()
-                            }
-                        } label: {
-                            HStack(spacing: 8) {
-                                Image(systemName: "trash")
-                                    .font(.system(size: 16, weight: .medium))
-                                Text("profile.avatar.delete".localized)
-                                    .font(.system(size: 16, weight: .medium))
-                            }
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 44)
-                            .foregroundStyle(.red)
-                            .background(Color.red.opacity(0.1))
-                            .clipShape(RoundedRectangle(cornerRadius: 12))
-                        }
-                    }
-
-                    Button {
-                        manager.signOut()
-                    } label: {
-                        HStack(spacing: 8) {
-                            Image(systemName: "rectangle.portrait.and.arrow.right")
-                                .font(.system(size: 16, weight: .medium))
-                            Text("profile.signout".localized)
-                                .font(.system(size: 16, weight: .semibold))
-                        }
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 44)
-                        .foregroundStyle(.white)
-                        .background(Color.red)
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
-                    }
-                } else {
-                    SignInWithAppleButton(.signIn) { request in
-                        manager.prepareSignInRequest(request)
-                    } onCompletion: { result in
-                        manager.handleSignInResult(result)
-                    }
-                    .frame(height: 50)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-                }
-            }
-        }
-        .padding(.vertical, 32)
-        .padding(.horizontal, 20)
-        .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color(.secondarySystemBackground))
-        )
         .onChange(of: avatarPickerItem) { previous, current in
             guard let item = current, previous != current else { return }
             Task { @MainActor [manager] in
@@ -226,181 +88,282 @@ struct ProfileView: View {
         }
     }
 
-    private func progressSection(progress: ProfileProgress) -> some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("profile.progress.title".localized)
-                .font(.system(size: 20, weight: .semibold, design: .rounded))
-                .foregroundStyle(.primary)
-                .padding(.horizontal, 4)
+    // MARK: - Profile Card
+    private func profileCard(manager: ProfileManager) -> some View {
+        let hasAvatar = avatarExists(for: manager)
+        
+        return VStack(spacing: DesignTokens.Spacing.xxl) {
+            // Avatar
+            ZStack(alignment: .bottomTrailing) {
+                if let image = avatarImage(for: manager) {
+                    image
+                        .resizable()
+                        .scaledToFill()
+                        .frame(
+                            width: DesignTokens.Sizes.avatarSize,
+                            height: DesignTokens.Sizes.avatarSize
+                        )
+                        .clipShape(Circle())
+                        .shadow(
+                            color: Color.black.opacity(0.3),
+                            radius: 12,
+                            x: 0,
+                            y: 4
+                        )
+                } else {
+                    Circle()
+                        .fill(DesignTokens.Colors.progressCard)
+                        .frame(
+                            width: DesignTokens.Sizes.avatarSize,
+                            height: DesignTokens.Sizes.avatarSize
+                        )
+                        .overlay(
+                            Image(systemName: manager.isSignedIn ? "person.crop.circle.fill" : "person.circle.fill")
+                                .font(.system(size: 56))
+                                .foregroundStyle(DesignTokens.Colors.textSecondary)
+                        )
+                        .shadow(
+                            color: Color.black.opacity(0.3),
+                            radius: 12,
+                            x: 0,
+                            y: 4
+                        )
+                }
+                
+                // Edit button
+                if manager.isSignedIn {
+                    PhotosPicker(selection: $avatarPickerItem, matching: .images) {
+                        ZStack {
+                            Circle()
+                                .fill(DesignTokens.Colors.cardBackground)
+                                .frame(
+                                    width: DesignTokens.Sizes.editButtonSize,
+                                    height: DesignTokens.Sizes.editButtonSize
+                                )
+                                .overlay(
+                                    Circle()
+                                        .strokeBorder(
+                                            DesignTokens.Colors.borderSubtle,
+                                            lineWidth: 1
+                                        )
+                                )
+                                .shadow(
+                                    color: Color.black.opacity(0.3),
+                                    radius: 6,
+                                    x: 0,
+                                    y: 2
+                                )
+                            
+                            Image(systemName: "pencil")
+                                .font(.system(size: DesignTokens.Sizes.editIconSize))
+                                .foregroundStyle(DesignTokens.Colors.textPrimary)
+                        }
+                    }
+                }
+            }
             
-            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 10), count: 2), spacing: 10) {
-                metricView(
-                    title: "profile.progress.questions".localized,
+            // User name
+            Text(manager.displayName)
+                .font(DesignTokens.Typography.h1)
+                .foregroundStyle(DesignTokens.Colors.textPrimary)
+            
+            // Action buttons
+            VStack(spacing: DesignTokens.Spacing.sm) {
+                if manager.isSignedIn {
+                    if hasAvatar {
+                        MinimalButton(
+                            icon: "trash",
+                            title: "profile.avatar.delete".localized,
+                            foregroundColor: DesignTokens.Colors.textSecondary
+                        ) {
+                            Task { @MainActor [manager] in
+                                await manager.deleteAvatar()
+                            }
+                        }
+                    }
+                    
+                    MinimalButton(
+                        icon: "rectangle.portrait.and.arrow.right",
+                        title: "profile.signout".localized,
+                        foregroundColor: DesignTokens.Colors.iconRed
+                    ) {
+                        manager.signOut()
+                    }
+                } else {
+                    // Sign in with Apple button
+                    SignInWithAppleButton(.signIn) { request in
+                        manager.prepareSignInRequest(request)
+                    } onCompletion: { result in
+                        manager.handleSignInResult(result)
+                    }
+                    .frame(height: 50)
+                    .clipShape(RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium))
+                }
+            }
+        }
+        .padding(DesignTokens.Spacing.xxxl)
+        .background(
+            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xlarge)
+                .fill(DesignTokens.Colors.cardBackground)
+                .overlay(
+                    RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xlarge)
+                        .stroke(DesignTokens.Colors.borderSubtle, lineWidth: 1)
+                )
+        )
+        .shadow(
+            color: DesignTokens.Shadows.card,
+            radius: DesignTokens.Shadows.cardRadius,
+            y: DesignTokens.Shadows.cardY
+        )
+    }
+    
+    // MARK: - Progress Section
+    private func progressSection(progress: ProfileProgress) -> some View {
+        VStack(alignment: .leading, spacing: DesignTokens.Spacing.xxl) {
+            Text("profile.progress.title".localized)
+                .font(DesignTokens.Typography.h2)
+                .foregroundStyle(DesignTokens.Colors.textPrimary)
+            
+            LazyVGrid(
+                columns: Array(
+                    repeating: GridItem(.flexible(), spacing: DesignTokens.Spacing.md),
+                    count: 2
+                ),
+                spacing: DesignTokens.Spacing.md
+            ) {
+                ProgressCardView(
+                    icon: "questionmark.circle",
                     value: "\(progress.totalQuestionsAnswered)",
-                    icon: "questionmark.circle.fill",
-                    color: .blue
+                    label: "profile.progress.questions".localized,
+                    iconColor: DesignTokens.Colors.iconBlue
                 )
-                metricView(
-                    title: "profile.progress.correct".localized,
+                
+                ProgressCardView(
+                    icon: "checkmark.circle",
                     value: "\(progress.correctAnswers)",
-                    icon: "checkmark.circle.fill",
-                    color: .green
+                    label: "profile.progress.correct".localized,
+                    iconColor: DesignTokens.Colors.iconGreen
                 )
-                metricView(
-                    title: "profile.progress.incorrect".localized,
+                
+                ProgressCardView(
+                    icon: "xmark.circle",
                     value: "\(progress.incorrectAnswers)",
-                    icon: "xmark.circle.fill",
-                    color: .red
+                    label: "profile.progress.incorrect".localized,
+                    iconColor: DesignTokens.Colors.iconRed
                 )
-                metricView(
-                    title: "profile.progress.corrected".localized,
+                
+                ProgressCardView(
+                    icon: "exclamationmark.circle",
                     value: "\(progress.correctedMistakes)",
-                    icon: "checkmark.circle.badge.xmark",
-                    color: .orange
+                    label: "profile.progress.corrected".localized,
+                    iconColor: DesignTokens.Colors.iconOrange
                 )
-                metricView(
-                    title: "profile.progress.accuracy".localized,
+                
+                ProgressCardView(
+                    icon: "chart.bar",
                     value: "\(Int(progress.averageQuizScore))%",
-                    icon: "chart.bar.fill",
-                    color: .purple
+                    label: "profile.progress.accuracy".localized,
+                    iconColor: DesignTokens.Colors.iconPurple
                 )
-                metricView(
-                    title: "profile.progress.streak".localized,
+                
+                ProgressCardView(
+                    icon: "flame",
                     value: "\(progress.currentStreak)",
-                    icon: "flame.fill",
-                    color: .orange
+                    label: "profile.progress.streak".localized,
+                    iconColor: DesignTokens.Colors.iconOrange
                 )
             }
         }
-        .padding(20)
+        .padding(DesignTokens.Spacing.xxl)
         .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color(.secondarySystemBackground))
+            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xlarge)
+                .fill(DesignTokens.Colors.cardBackground)
+                .overlay(
+                    RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xlarge)
+                        .stroke(DesignTokens.Colors.borderSubtle, lineWidth: 1)
+                )
+        )
+        .shadow(
+            color: DesignTokens.Shadows.card,
+            radius: DesignTokens.Shadows.cardRadius,
+            y: DesignTokens.Shadows.cardY
         )
     }
-
+    
+    // MARK: - Sync Section
     private func syncSection(manager: ProfileManager) -> some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: DesignTokens.Spacing.xxl) {
             Text("profile.sync.title".localized)
-                .font(.system(size: 20, weight: .semibold, design: .rounded))
-                .foregroundStyle(.primary)
-                .padding(.horizontal, 4)
-
-            // Статус синхронизации
-            HStack(spacing: 10) {
+                .font(DesignTokens.Typography.h2)
+                .foregroundStyle(DesignTokens.Colors.textPrimary)
+            
+            // Sync status
+            HStack(spacing: DesignTokens.Spacing.md) {
                 Image(systemName: syncIcon(for: manager.syncState))
-                    .font(.system(size: 16, weight: .medium))
+                    .font(.system(size: DesignTokens.Sizes.iconSmall))
                     .foregroundColor(syncColor(for: manager.syncState))
+                
                 Text(syncMessage(for: manager))
-                    .font(.system(size: 15, weight: .regular))
-                    .foregroundStyle(.secondary)
+                    .font(DesignTokens.Typography.secondaryRegular)
+                    .foregroundStyle(DesignTokens.Colors.textSecondary)
             }
-            .padding(.horizontal, 4)
-
+            
             if manager.isSignedIn {
-                VStack(spacing: 10) {
-                    Button {
+                VStack(spacing: DesignTokens.Spacing.sm) {
+                    // Sync button
+                    MinimalButton(
+                        icon: "arrow.clockwise",
+                        title: "profile.sync.refresh".localized,
+                        foregroundColor: DesignTokens.Colors.iconBlue
+                    ) {
                         Task { @MainActor [manager] in
                             await manager.refreshFromCloud(mergeStrategy: .newest)
                         }
-                    } label: {
-                        HStack(spacing: 8) {
-                            Image(systemName: "arrow.clockwise")
-                                .font(.system(size: 16, weight: .medium))
-                            Text("profile.sync.refresh".localized)
-                                .font(.system(size: 16, weight: .semibold))
-                        }
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 44)
-                        .foregroundStyle(.white)
-                        .background(Color.accentColor)
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
                     }
                     .disabled(isResettingProfile || manager.isLoading)
                     .opacity((isResettingProfile || manager.isLoading) ? 0.6 : 1.0)
-
-                    Button {
-                        showResetConfirmation = true
-                    } label: {
-                        HStack(spacing: 8) {
-                            Image(systemName: "trash")
-                                .font(.system(size: 16, weight: .medium))
-                            Text("profile.sync.reset".localized)
-                                .font(.system(size: 16, weight: .medium))
-                        }
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 44)
-                        .foregroundStyle(.red)
-                        .background(Color.red.opacity(0.1))
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
-                    }
-                    .disabled(isResettingProfile || manager.isLoading)
-                    .opacity((isResettingProfile || manager.isLoading) ? 0.6 : 1.0)
-                }
-            } else {
-                // Информационное сообщение для неавторизованных пользователей
-                HStack(spacing: 12) {
-                    Image(systemName: "info.circle.fill")
-                        .font(.system(size: 16, weight: .medium))
-                        .foregroundStyle(Color.accentColor)
                     
-                    Text("profile.sync.signin.required".localized)
-                        .font(.system(size: 14, weight: .regular))
-                        .foregroundStyle(.secondary)
-                        .fixedSize(horizontal: false, vertical: true)
+                    // Reset button
+                    MinimalButton(
+                        icon: "trash",
+                        title: "profile.sync.reset".localized,
+                        foregroundColor: DesignTokens.Colors.iconRed
+                    ) {
+                        showResetConfirmation = true
+                    }
+                    .disabled(isResettingProfile || manager.isLoading)
+                    .opacity((isResettingProfile || manager.isLoading) ? 0.6 : 1.0)
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.vertical, 8)
-            }
-
-            if isResettingProfile {
-                HStack(spacing: 10) {
-                    ProgressView()
-                        .scaleEffect(0.8)
-                    Text("profile.sync.reset.inProgress".localized)
-                        .font(.system(size: 14, weight: .regular))
-                        .foregroundStyle(.secondary)
-                }
-                .padding(.top, 4)
-            }
-        }
-        .padding(20)
-        .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color(.secondarySystemBackground))
-        )
-    }
-
-    // MARK: - Helpers
-    private func metricView(title: String, value: String, icon: String, color: Color) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack(spacing: 8) {
-                Image(systemName: icon)
-                    .font(.system(size: 14, weight: .medium))
-                    .foregroundStyle(color)
-                    .frame(width: 20)
-                
-                Text(value)
-                    .font(.system(size: 24, weight: .bold, design: .rounded))
-                    .foregroundStyle(.primary)
             }
             
-            Text(title)
-                .font(.system(size: 13, weight: .regular))
-                .foregroundStyle(.secondary)
-                .lineLimit(2)
-                .multilineTextAlignment(.leading)
-                .minimumScaleFactor(0.9)
+            if isResettingProfile {
+                HStack(spacing: DesignTokens.Spacing.md) {
+                    ProgressView()
+                        .scaleEffect(0.8)
+                        .tint(DesignTokens.Colors.textSecondary)
+                    Text("profile.sync.reset.inProgress".localized)
+                        .font(DesignTokens.Typography.secondaryRegular)
+                        .foregroundStyle(DesignTokens.Colors.textSecondary)
+                }
+            }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .frame(height: 110)
-        .padding(16)
+        .padding(DesignTokens.Spacing.xxl)
         .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(Color(.tertiarySystemBackground))
+            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xlarge)
+                .fill(DesignTokens.Colors.cardBackground)
+                .overlay(
+                    RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xlarge)
+                        .stroke(DesignTokens.Colors.borderSubtle, lineWidth: 1)
+                )
+        )
+        .shadow(
+            color: DesignTokens.Shadows.card,
+            radius: DesignTokens.Shadows.cardRadius,
+            y: DesignTokens.Shadows.cardY
         )
     }
-
+    
+    // MARK: - Helpers
     private func syncIcon(for state: ProfileManager.SyncState) -> String {
         switch state {
         case .idle:
@@ -415,11 +378,11 @@ struct ProfileView: View {
     private func syncColor(for state: ProfileManager.SyncState) -> Color {
         switch state {
         case .idle:
-            return .green
+            return DesignTokens.Colors.statusGreen
         case .syncing:
-            return .blue
+            return DesignTokens.Colors.iconBlue
         case .failed:
-            return .orange
+            return DesignTokens.Colors.iconOrange
         }
     }
 
@@ -472,6 +435,81 @@ struct ProfileView: View {
     #endif
 }
 
+// MARK: - Progress Card View
+struct ProgressCardView: View {
+    let icon: String
+    let value: String
+    let label: String
+    let iconColor: Color
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: DesignTokens.Spacing.md) {
+            Image(systemName: icon)
+                .font(.system(size: DesignTokens.Sizes.iconMedium))
+                .foregroundColor(iconColor)
+            
+            Text(value)
+                .font(DesignTokens.Typography.statsValue)
+                .foregroundColor(DesignTokens.Colors.textPrimary)
+            
+            Spacer(minLength: 0)
+            
+            Text(label)
+                .font(DesignTokens.Typography.label)
+                .foregroundColor(DesignTokens.Colors.textSecondary)
+                .lineLimit(2)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .frame(maxWidth: .infinity, minHeight: 110, maxHeight: 110, alignment: .leading)
+        .padding(DesignTokens.Sizes.progressCardPadding)
+        .background(
+            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.large)
+                .fill(DesignTokens.Colors.progressCard)
+                .overlay(
+                    RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.large)
+                        .stroke(DesignTokens.Colors.borderSubtle, lineWidth: 1)
+                )
+        )
+        .shadow(
+            color: DesignTokens.Shadows.progress,
+            radius: DesignTokens.Shadows.progressRadius,
+            y: 2
+        )
+    }
+}
+
+// MARK: - Minimal Button
+struct MinimalButton: View {
+    let icon: String
+    let title: String
+    let foregroundColor: Color
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: DesignTokens.Spacing.sm) {
+                Image(systemName: icon)
+                    .font(.system(size: DesignTokens.Sizes.iconSmall))
+                
+                Text(title)
+                    .font(DesignTokens.Typography.secondaryRegular)
+            }
+            .foregroundColor(foregroundColor)
+            .frame(maxWidth: .infinity)
+            .padding(.horizontal, DesignTokens.Spacing.xl)
+            .padding(.vertical, DesignTokens.Spacing.md)
+            .background(
+                RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
+                    .fill(DesignTokens.Colors.cardBackground)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
+                            .stroke(DesignTokens.Colors.borderSubtle, lineWidth: 1)
+                    )
+            )
+        }
+    }
+}
+
 #Preview {
     let statsManager = StatsManager()
     let examStatsManager = ExamStatisticsManager()
@@ -486,4 +524,3 @@ struct ProfileView: View {
     }
     .environment(\.profileManager, profileManager)
 }
-
