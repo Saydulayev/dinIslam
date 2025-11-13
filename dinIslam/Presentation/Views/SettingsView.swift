@@ -61,33 +61,6 @@ struct SettingsView: View {
                     }
                     .listRowBackground(DesignTokens.Colors.cardBackground)
                     
-                    // Theme Setting
-                    HStack(spacing: DesignTokens.Spacing.md) {
-                        Image(systemName: "paintbrush")
-                            .foregroundColor(DesignTokens.Colors.iconPurple)
-                            .frame(width: DesignTokens.Sizes.iconLarge)
-                        
-                        VStack(alignment: .leading, spacing: DesignTokens.Spacing.xs) {
-                            LocalizedText("settings.theme.title")
-                                .font(DesignTokens.Typography.bodyRegular)
-                                .foregroundColor(DesignTokens.Colors.textPrimary)
-                            Text(viewModel.settings.theme.displayName)
-                                .font(DesignTokens.Typography.label)
-                                .foregroundColor(DesignTokens.Colors.textSecondary)
-                        }
-                        
-                        Spacer()
-                        
-                        Image(systemName: "chevron.right")
-                            .font(.system(size: DesignTokens.Sizes.iconSmall))
-                            .foregroundColor(DesignTokens.Colors.textSecondary)
-                    }
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        viewModel.showingThemePicker = true
-                    }
-                    .listRowBackground(DesignTokens.Colors.cardBackground)
-                    
                     // Sound Setting
                     HStack(spacing: DesignTokens.Spacing.md) {
                         Image(systemName: "speaker.wave.2")
@@ -299,11 +272,6 @@ struct SettingsView: View {
                 LanguagePickerView(viewModel: viewModel)
             }
         }
-        .sheet(isPresented: $viewModel.showingThemePicker) {
-            NavigationStack {
-                ThemePickerView(viewModel: viewModel)
-            }
-        }
         .sheet(isPresented: $showingNotificationSettings) {
             NavigationStack {
                 NotificationSettingsView()
@@ -406,67 +374,6 @@ struct SettingsView: View {
                 .scrollContentBackground(.hidden)
             }
             .navigationTitle("settings.language.title".localized)
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("settings.done".localized) {
-                        dismiss()
-                    }
-                    .font(DesignTokens.Typography.secondarySemibold)
-                    .foregroundColor(DesignTokens.Colors.textPrimary)
-                }
-            }
-            .toolbarBackground(DesignTokens.Colors.background1, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
-        }
-    }
-    
-    struct ThemePickerView: View {
-        @Bindable var viewModel: SettingsViewModel
-        @Environment(\.dismiss) private var dismiss
-        
-        init(viewModel: SettingsViewModel) {
-            _viewModel = Bindable(viewModel)
-        }
-        
-        var body: some View {
-            ZStack {
-                // Gradient background
-                LinearGradient(
-                    colors: [
-                        DesignTokens.Colors.background1,
-                        DesignTokens.Colors.background2
-                    ],
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-                .ignoresSafeArea()
-                
-                List {
-                    ForEach(AppTheme.allCases, id: \.self) { theme in
-                        HStack {
-                            Text(theme.displayName)
-                                .font(DesignTokens.Typography.bodyRegular)
-                                .foregroundColor(DesignTokens.Colors.textPrimary)
-                            
-                            Spacer()
-                            
-                            if viewModel.settings.theme == theme {
-                                Image(systemName: "checkmark")
-                                    .foregroundColor(DesignTokens.Colors.iconBlue)
-                            }
-                        }
-                        .listRowBackground(DesignTokens.Colors.cardBackground)
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            viewModel.updateTheme(theme)
-                            dismiss()
-                        }
-                    }
-                }
-                .scrollContentBackground(.hidden)
-            }
-            .navigationTitle("settings.theme.title".localized)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
