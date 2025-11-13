@@ -3,22 +3,28 @@ import SwiftUI
 struct CardStyleModifier: ViewModifier {
     let cornerRadius: CGFloat
     let fillColor: Color
+    let borderColor: Color
+    let borderWidth: CGFloat
+    let shadowColor: Color
     let shadowRadius: CGFloat
     let shadowYOffset: CGFloat
-    let highlightOpacity: Double
 
     init(
-        cornerRadius: CGFloat = DesignTokens.CornerRadius.large,
+        cornerRadius: CGFloat = DesignTokens.CornerRadius.medium,
         fillColor: Color = DesignTokens.Colors.cardBackground,
-        shadowRadius: CGFloat = 12,
-        shadowYOffset: CGFloat = 8,
-        highlightOpacity: Double = 0.6
+        borderColor: Color = DesignTokens.Colors.borderDefault,
+        borderWidth: CGFloat = 1,
+        shadowColor: Color = Color.black.opacity(0.28),
+        shadowRadius: CGFloat = 6,
+        shadowYOffset: CGFloat = 3
     ) {
         self.cornerRadius = cornerRadius
         self.fillColor = fillColor
+        self.borderColor = borderColor
+        self.borderWidth = borderWidth
+        self.shadowColor = shadowColor
         self.shadowRadius = shadowRadius
         self.shadowYOffset = shadowYOffset
-        self.highlightOpacity = highlightOpacity
     }
 
     func body(content: Content) -> some View {
@@ -28,51 +34,36 @@ struct CardStyleModifier: ViewModifier {
                     .fill(fillColor)
                     .overlay(
                         RoundedRectangle(cornerRadius: cornerRadius)
-                            .stroke(DesignTokens.Colors.borderLight.opacity(0.7), lineWidth: 1)
-                    )
-                    .overlay(
-                        RoundedRectangle(cornerRadius: cornerRadius)
-                            .stroke(
-                                LinearGradient(
-                                    colors: [
-                                        DesignTokens.Colors.borderSubtle.opacity(0.0),
-                                        DesignTokens.Colors.borderSubtle.opacity(highlightOpacity)
-                                    ],
-                                    startPoint: .top,
-                                    endPoint: .bottom
-                                ),
-                                lineWidth: 1
-                            )
+                            .stroke(borderColor, lineWidth: borderWidth)
                     )
             )
             .shadow(
-                color: DesignTokens.Shadows.card.opacity(0.45),
+                color: shadowColor,
                 radius: shadowRadius,
                 y: shadowYOffset
-            )
-            .shadow(
-                color: DesignTokens.Colors.textPrimary.opacity(0.05),
-                radius: 2,
-                y: 0
             )
     }
 }
 
 extension View {
     func cardStyle(
-        cornerRadius: CGFloat = DesignTokens.CornerRadius.large,
+        cornerRadius: CGFloat = DesignTokens.CornerRadius.medium,
         fillColor: Color = DesignTokens.Colors.cardBackground,
-        shadowRadius: CGFloat = 12,
-        shadowYOffset: CGFloat = 8,
-        highlightOpacity: Double = 0.6
+        borderColor: Color = DesignTokens.Colors.borderDefault,
+        borderWidth: CGFloat = 1,
+        shadowColor: Color = Color.black.opacity(0.28),
+        shadowRadius: CGFloat = 6,
+        shadowYOffset: CGFloat = 3
     ) -> some View {
         modifier(
             CardStyleModifier(
                 cornerRadius: cornerRadius,
                 fillColor: fillColor,
+                borderColor: borderColor,
+                borderWidth: borderWidth,
+                shadowColor: shadowColor,
                 shadowRadius: shadowRadius,
-                shadowYOffset: shadowYOffset,
-                highlightOpacity: highlightOpacity
+                shadowYOffset: shadowYOffset
             )
         )
     }

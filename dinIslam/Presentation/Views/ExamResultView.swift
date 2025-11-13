@@ -107,9 +107,10 @@ struct ExamGradeView: View {
                 .cardStyle(
                     cornerRadius: DesignTokens.CornerRadius.medium,
                     fillColor: gradeColor.opacity(0.18),
-                    shadowRadius: 8,
-                    shadowYOffset: 4,
-                    highlightOpacity: 0.45
+                    borderColor: gradeColor.opacity(0.45),
+                    shadowColor: Color.black.opacity(0.22),
+                    shadowRadius: 6,
+                    shadowYOffset: 3
                 )
                 .overlay(
                     RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
@@ -198,7 +199,10 @@ struct ExamStatCard: View {
         }
         .frame(maxWidth: .infinity)
         .padding(DesignTokens.Spacing.lg)
-        .cardStyle(cornerRadius: DesignTokens.CornerRadius.medium, highlightOpacity: 0.35)
+        .cardStyle(
+            cornerRadius: DesignTokens.CornerRadius.medium,
+            shadowColor: Color.black.opacity(0.24)
+        )
     }
 }
 
@@ -239,7 +243,12 @@ struct ExamBreakdownView: View {
             }
         }
         .padding(DesignTokens.Spacing.xxl)
-        .cardStyle(cornerRadius: DesignTokens.CornerRadius.xlarge)
+        .cardStyle(
+            cornerRadius: DesignTokens.CornerRadius.xlarge,
+            shadowColor: Color.black.opacity(0.24),
+            shadowRadius: 8,
+            shadowYOffset: 4
+        )
     }
     
     private func formatTime(_ timeInterval: TimeInterval) -> String {
@@ -292,9 +301,10 @@ struct ExamResultActionsView: View {
                 .cardStyle(
                     cornerRadius: DesignTokens.CornerRadius.medium,
                     fillColor: DesignTokens.Colors.iconBlue,
-                    shadowRadius: 10,
-                    shadowYOffset: 6,
-                    highlightOpacity: 0.45
+                    borderColor: DesignTokens.Colors.iconBlue.opacity(0.45),
+                    shadowColor: Color.black.opacity(0.24),
+                    shadowRadius: 8,
+                    shadowYOffset: 4
                 )
             }
             
@@ -311,9 +321,10 @@ struct ExamResultActionsView: View {
                 .cardStyle(
                     cornerRadius: DesignTokens.CornerRadius.medium,
                     fillColor: DesignTokens.Colors.progressCard,
-                    shadowRadius: 10,
-                    shadowYOffset: 6,
-                    highlightOpacity: 0.35
+                    borderColor: DesignTokens.Colors.borderDefault,
+                    shadowColor: Color.black.opacity(0.24),
+                    shadowRadius: 8,
+                    shadowYOffset: 4
                 )
                 .overlay(
                     RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)

@@ -65,6 +65,7 @@ struct DesignTokens {
         // Borders
         static let borderSubtle = Color.white.opacity(0.05)
         static let borderLight = Color.white.opacity(0.10)
+        static let borderDefault = Color(hex: "#2B2B2B")
     }
     
     // MARK: - Spacing

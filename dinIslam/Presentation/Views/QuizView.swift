@@ -90,7 +90,13 @@ struct QuizView: View {
                                     .multilineTextAlignment(.center)
                                     .padding(DesignTokens.Spacing.xxl)
                                     .frame(maxWidth: .infinity)
-                                    .cardStyle(cornerRadius: DesignTokens.CornerRadius.large)
+                                    .cardStyle(
+                                        cornerRadius: DesignTokens.CornerRadius.medium,
+                                        borderColor: DesignTokens.Colors.borderDefault,
+                                        shadowColor: Color.black.opacity(0.24),
+                                        shadowRadius: 8,
+                                        shadowYOffset: 4
+                                    )
                                     .accessibilityLabel("Question: \(question.text)")
                                     .accessibilityAddTraits(.isHeader)
                                     .dynamicTypeSize(.large)
@@ -154,9 +160,10 @@ struct QuizView: View {
                         .cardStyle(
                             cornerRadius: DesignTokens.CornerRadius.medium,
                             fillColor: DesignTokens.Colors.statusGreen,
-                            shadowRadius: 10,
-                            shadowYOffset: 6,
-                            highlightOpacity: 0.4
+                            borderColor: DesignTokens.Colors.statusGreen.opacity(0.4),
+                            shadowColor: Color.black.opacity(0.24),
+                            shadowRadius: 8,
+                            shadowYOffset: 4
                         )
                         .padding(.horizontal, DesignTokens.Spacing.xxl)
                         .padding(.vertical, DesignTokens.Spacing.md)

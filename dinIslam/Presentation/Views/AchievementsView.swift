@@ -192,13 +192,12 @@ struct AchievementCard: View {
             }
         }
         .padding(DesignTokens.Spacing.xl)
-        .cardStyle(cornerRadius: DesignTokens.CornerRadius.large)
-        .overlay(
-            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.large)
-                .stroke(
-                    isUnlocked ? achievement.color.opacity(0.5) : DesignTokens.Colors.borderSubtle,
-                    lineWidth: 1
-                )
+        .cardStyle(
+            cornerRadius: DesignTokens.CornerRadius.medium,
+            borderColor: isUnlocked ? achievement.color.opacity(0.45) : DesignTokens.Colors.borderDefault,
+            shadowColor: Color.black.opacity(0.24),
+            shadowRadius: 8,
+            shadowYOffset: 4
         )
         .opacity(isUnlocked ? 1.0 : 0.7)
         .animation(.easeInOut(duration: 0.3), value: isUnlocked)
@@ -271,7 +270,11 @@ struct ExpandedAchievementCard: View {
                     .padding(.vertical, DesignTokens.Spacing.md)
                     .cardStyle(
                         cornerRadius: DesignTokens.CornerRadius.medium,
-                        highlightOpacity: 0.4
+                        borderColor: .clear,
+                        borderWidth: 0,
+                        shadowColor: Color.black.opacity(0.22),
+                        shadowRadius: 6,
+                        shadowYOffset: 3
                     )
                     .overlay(
                         RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
@@ -291,16 +294,24 @@ struct ExpandedAchievementCard: View {
                         .frame(maxWidth: .infinity)
                         .padding(.horizontal, DesignTokens.Spacing.xl)
                         .padding(.vertical, DesignTokens.Spacing.md)
-                        .cardStyle(cornerRadius: DesignTokens.CornerRadius.medium, highlightOpacity: 0.3)
+                        .cardStyle(
+                            cornerRadius: DesignTokens.CornerRadius.medium,
+                            borderColor: DesignTokens.Colors.borderDefault,
+                            shadowColor: Color.black.opacity(0.18),
+                            shadowRadius: 4,
+                            shadowYOffset: 2
+                        )
                 }
             }
         }
         .padding(DesignTokens.Spacing.xxl)
         .cardStyle(
             cornerRadius: DesignTokens.CornerRadius.xlarge,
+            borderColor: .clear,
+            borderWidth: 0,
+            shadowColor: Color.black.opacity(0.35),
             shadowRadius: 20,
-            shadowYOffset: 12,
-            highlightOpacity: 0.8
+            shadowYOffset: 12
         )
         .overlay(
             RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xlarge)

@@ -14,6 +14,21 @@ struct ProgressCardView: View {
     let iconColor: Color
     let backgroundColor: Color?
     
+    private var resolvedBackground: Color {
+        backgroundColor ?? DesignTokens.Colors.progressCard
+    }
+    
+    private var resolvedBorder: Color {
+        if let backgroundColor {
+            return backgroundColor.opacity(0.55)
+        }
+        return DesignTokens.Colors.borderDefault
+    }
+    
+    private var resolvedShadow: Color {
+        backgroundColor == nil ? Color.black.opacity(0.28) : Color.black.opacity(0.22)
+    }
+    
     init(
         icon: String,
         value: String,
@@ -49,9 +64,10 @@ struct ProgressCardView: View {
         .frame(maxWidth: .infinity, minHeight: 110, maxHeight: 110, alignment: .leading)
         .padding(DesignTokens.Sizes.progressCardPadding)
         .cardStyle(
-            cornerRadius: DesignTokens.CornerRadius.large,
-            fillColor: backgroundColor ?? DesignTokens.Colors.progressCard,
-            highlightOpacity: backgroundColor == nil ? 0.6 : 0.4
+            cornerRadius: DesignTokens.CornerRadius.medium,
+            fillColor: resolvedBackground,
+            borderColor: resolvedBorder,
+            shadowColor: resolvedShadow
         )
     }
 }

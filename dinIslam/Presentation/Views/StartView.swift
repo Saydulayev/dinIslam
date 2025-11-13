@@ -386,8 +386,10 @@ struct StartView: View {
             .cardStyle(
                 cornerRadius: DesignTokens.CornerRadius.medium,
                 fillColor: DesignTokens.Colors.progressCard,
-                shadowRadius: 10,
-                shadowYOffset: 6
+                borderColor: DesignTokens.Colors.borderDefault,
+                shadowColor: Color.black.opacity(0.24),
+                shadowRadius: 8,
+                shadowYOffset: 4
             )
         }
         .buttonStyle(.plain)
@@ -418,8 +420,10 @@ struct StartView: View {
             .cardStyle(
                 cornerRadius: DesignTokens.CornerRadius.medium,
                 fillColor: DesignTokens.Colors.progressCard,
-                shadowRadius: 10,
-                shadowYOffset: 6
+                borderColor: DesignTokens.Colors.iconOrange.opacity(0.35),
+                shadowColor: Color.black.opacity(0.24),
+                shadowRadius: 8,
+                shadowYOffset: 4
             )
         }
         .buttonStyle(.plain)

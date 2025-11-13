@@ -63,9 +63,10 @@ struct ExamView: View {
                                 .cardStyle(
                                     cornerRadius: DesignTokens.CornerRadius.medium,
                                     fillColor: DesignTokens.Colors.progressCard,
-                                    shadowRadius: 10,
-                                    shadowYOffset: 6,
-                                    highlightOpacity: 0.35
+                                    borderColor: DesignTokens.Colors.iconOrange.opacity(0.35),
+                                    shadowColor: Color.black.opacity(0.24),
+                                    shadowRadius: 8,
+                                    shadowYOffset: 4
                                 )
                                 .overlay(
                                     RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
@@ -99,9 +100,10 @@ struct ExamView: View {
                         .cardStyle(
                             cornerRadius: DesignTokens.CornerRadius.medium,
                             fillColor: DesignTokens.Colors.statusGreen,
-                            shadowRadius: 10,
-                            shadowYOffset: 6,
-                            highlightOpacity: 0.45
+                            borderColor: DesignTokens.Colors.statusGreen.opacity(0.4),
+                            shadowColor: Color.black.opacity(0.24),
+                            shadowRadius: 8,
+                            shadowYOffset: 4
                         )
                         .padding(.horizontal, DesignTokens.Spacing.xxl)
                         .padding(.vertical, DesignTokens.Spacing.md)

@@ -101,9 +101,10 @@ struct ResultView: View {
                         .cardStyle(
                             cornerRadius: DesignTokens.CornerRadius.medium,
                             fillColor: DesignTokens.Colors.iconOrange.opacity(0.15),
-                            shadowRadius: 8,
-                            shadowYOffset: 4,
-                            highlightOpacity: 0.5
+                            borderColor: DesignTokens.Colors.iconOrange.opacity(0.45),
+                            shadowColor: Color.black.opacity(0.24),
+                            shadowRadius: 6,
+                            shadowYOffset: 3
                         )
                         .overlay(
                             RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
@@ -130,9 +131,10 @@ struct ResultView: View {
                             .cardStyle(
                                 cornerRadius: DesignTokens.CornerRadius.medium,
                                 fillColor: DesignTokens.Colors.iconBlue,
-                                shadowRadius: 10,
-                                shadowYOffset: 6,
-                                highlightOpacity: 0.45
+                                borderColor: DesignTokens.Colors.iconBlue.opacity(0.45),
+                                shadowColor: Color.black.opacity(0.24),
+                                shadowRadius: 8,
+                                shadowYOffset: 4
                             )
                         }
                         
@@ -149,9 +151,10 @@ struct ResultView: View {
                             .cardStyle(
                                 cornerRadius: DesignTokens.CornerRadius.medium,
                                 fillColor: DesignTokens.Colors.progressCard,
-                                shadowRadius: 10,
-                                shadowYOffset: 6,
-                                highlightOpacity: 0.35
+                                borderColor: DesignTokens.Colors.borderDefault,
+                                shadowColor: Color.black.opacity(0.24),
+                                shadowRadius: 8,
+                                shadowYOffset: 4
                             )
                             .overlay(
                                 RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
