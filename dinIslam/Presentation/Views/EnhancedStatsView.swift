@@ -16,6 +16,8 @@ struct EnhancedStatsView: View {
     @State private var showingMistakesReview = false
     @State private var totalQuestionsCount: Int = 0
     @State private var showingResetAlert = false
+    @State private var showingMistakesError = false
+    @State private var mistakesErrorMessage: String?
     
     // Accessibility and UX enhancements
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -26,6 +28,7 @@ struct EnhancedStatsView: View {
     @State private var updateTask: Task<Void, Never>?
     @State private var syncTask: Task<Void, Never>?
     @State private var loadQuestionsTask: Task<Void, Never>?
+    @State private var mistakesTask: Task<Void, Never>?
     
     init(statsManager: StatsManager) {
         self._statsManager = Bindable(statsManager)
@@ -288,6 +291,7 @@ struct EnhancedStatsView: View {
             updateTask?.cancel()
             syncTask?.cancel()
             loadQuestionsTask?.cancel()
+            mistakesTask?.cancel()
         }
             .alert(
                 "stats.reset.confirm.title".localized,
@@ -302,6 +306,19 @@ struct EnhancedStatsView: View {
                 }
             } message: {
                 Text("stats.reset.confirm.message".localized)
+            }
+            .alert(
+                "error.title".localized,
+                isPresented: $showingMistakesError
+            ) {
+                Button("error.ok".localized) {
+                    showingMistakesError = false
+                    mistakesErrorMessage = nil
+                }
+            } message: {
+                if let errorMessage = mistakesErrorMessage {
+                    Text(errorMessage)
+                }
             }
     }
     
@@ -347,6 +364,9 @@ struct EnhancedStatsView: View {
     }
     
     private func startMistakesReview() {
+        // Cancel any existing mistakes review task
+        mistakesTask?.cancel()
+        
         // Используем существующие экземпляры из DI контейнера
         let container = DIContainer.shared
         let viewModel = QuizViewModel(
@@ -358,12 +378,22 @@ struct EnhancedStatsView: View {
         mistakesViewModel = viewModel
         showingMistakesReview = true
         
-        let mistakesTask = Task {
-            await viewModel.startMistakesReview()
+        // Start mistakes review task
+        mistakesTask = Task { @MainActor [viewModel, settingsManager] in
+            // Get current language from settings
+            let currentLanguage: AppLanguage = settingsManager.settings.language == .system ? 
+                (Locale.current.language.languageCode?.identifier == "en" ? .english : .russian) :
+                settingsManager.settings.language
+            
+            await viewModel.startMistakesReview(language: currentLanguage.rawValue)
+            
+            // Check for errors after completion
+            if let errorMessage = viewModel.errorMessage {
+                showingMistakesReview = false
+                mistakesErrorMessage = errorMessage
+                showingMistakesError = true
+            }
         }
-        
-        // Store task for potential cancellation
-        updateTask = mistakesTask
     }
 }
 

@@ -28,11 +28,14 @@ struct UnifiedProfileView: View {
     @State private var showingResetAlert = false
     @State private var isEditingDisplayName = false
     @State private var editingDisplayName = ""
+    @State private var showingMistakesError = false
+    @State private var mistakesErrorMessage: String?
     
     // Task cancellation
     @State private var updateTask: Task<Void, Never>?
     @State private var syncTask: Task<Void, Never>?
     @State private var loadQuestionsTask: Task<Void, Never>?
+    @State private var mistakesTask: Task<Void, Never>?
     
     init(statsManager: StatsManager) {
         self._statsManager = Bindable(statsManager)
@@ -114,6 +117,7 @@ struct UnifiedProfileView: View {
             updateTask?.cancel()
             syncTask?.cancel()
             loadQuestionsTask?.cancel()
+            mistakesTask?.cancel()
         }
         .alert("profile.sync.reset.title".localized, isPresented: $showResetConfirmation) {
             Button("profile.sync.reset.confirm".localized, role: .destructive) {
@@ -140,6 +144,19 @@ struct UnifiedProfileView: View {
             }
         } message: {
             Text("stats.reset.confirm.message".localized)
+        }
+        .alert(
+            "error.title".localized,
+            isPresented: $showingMistakesError
+        ) {
+            Button("error.ok".localized) {
+                showingMistakesError = false
+                mistakesErrorMessage = nil
+            }
+        } message: {
+            if let errorMessage = mistakesErrorMessage {
+                Text(errorMessage)
+            }
         }
         .navigationDestination(isPresented: $showingMistakesReview) {
             if let viewModel = mistakesViewModel {
@@ -621,6 +638,9 @@ struct UnifiedProfileView: View {
     }
     
     private func startMistakesReview() {
+        // Cancel any existing mistakes review task
+        mistakesTask?.cancel()
+        
         // Используем существующие экземпляры из DI контейнера
         let container = DIContainer.shared
         let viewModel = QuizViewModel(
@@ -632,12 +652,22 @@ struct UnifiedProfileView: View {
         mistakesViewModel = viewModel
         showingMistakesReview = true
         
-        let mistakesTask = Task {
-            await viewModel.startMistakesReview()
+        // Start mistakes review task
+        mistakesTask = Task { @MainActor [viewModel, settingsManager] in
+            // Get current language from settings
+            let currentLanguage: AppLanguage = settingsManager.settings.language == .system ? 
+                (Locale.current.language.languageCode?.identifier == "en" ? .english : .russian) :
+                settingsManager.settings.language
+            
+            await viewModel.startMistakesReview(language: currentLanguage.rawValue)
+            
+            // Check for errors after completion
+            if let errorMessage = viewModel.errorMessage {
+                showingMistakesReview = false
+                mistakesErrorMessage = errorMessage
+                showingMistakesError = true
+            }
         }
-        
-        // Store task for potential cancellation
-        updateTask = mistakesTask
     }
     
     private func saveDisplayName(manager: ProfileManager) {

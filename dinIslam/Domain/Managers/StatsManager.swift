@@ -150,11 +150,7 @@ class StatsManager {
         // Вычисляем totalQuizzesCompleted из quizHistory
         stats.totalQuizzesCompleted = quizHistory.count
         
-        // Вычисляем averageRecentScore
-        if !stats.recentQuizResults.isEmpty {
-            let sum = stats.recentQuizResults.reduce(0) { $0 + $1.percentage }
-            // averageRecentScore вычисляется автоматически через computed property
-        }
+        // averageRecentScore вычисляется автоматически через computed property в UserStats
         
         saveStats()
     }

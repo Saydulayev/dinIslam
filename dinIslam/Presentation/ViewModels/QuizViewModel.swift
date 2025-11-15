@@ -243,15 +243,14 @@ class QuizViewModel {
     
     // MARK: - Mistakes Review Methods
     @MainActor
-    func startMistakesReview() async {
+    func startMistakesReview(language: String) async {
         state = .active(.loading)
         isLoading = true
         errorMessage = nil
         
         do {
             // Get all questions to find the wrong ones
-            let languageCode = LocalizationManager.shared.currentLanguage
-            let allQuestions = try await quizUseCase.loadAllQuestions(language: languageCode)
+            let allQuestions = try await quizUseCase.loadAllQuestions(language: language)
             
             // Filter only wrong questions
             let wrongQuestions = statsManager.getWrongQuestions(from: allQuestions)

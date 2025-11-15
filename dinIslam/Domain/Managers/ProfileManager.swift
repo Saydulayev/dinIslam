@@ -316,9 +316,6 @@ final class ProfileManager {
 
         let userId = credential.user
         
-        // Сохраняем текущий профиль во временную переменную для доступа к локальным данным
-        let currentLocalProfile = profile
-        
         var signedInProfile = UserProfile(
             id: userId,
             authMethod: .signInWithApple,
