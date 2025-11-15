@@ -2,6 +2,7 @@
 "profile.done" = "Done";
 "profile.anonymous" = "Guest";
 "profile.signout" = "Sign Out";
+"profile.displayName.placeholder" = "Enter name";
 "profile.mastery.novice" = "Novice";
 "profile.mastery.learning" = "Learning";
 "profile.mastery.proficient" = "Proficient";

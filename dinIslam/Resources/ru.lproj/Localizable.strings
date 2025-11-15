@@ -2,6 +2,7 @@
 "profile.done" = "Готово";
 "profile.anonymous" = "Гость";
 "profile.signout" = "Выйти";
+"profile.displayName.placeholder" = "Введите имя";
 "profile.mastery.novice" = "Ученик";
 "profile.mastery.learning" = "В процессе";
 "profile.mastery.proficient" = "Уверенный";

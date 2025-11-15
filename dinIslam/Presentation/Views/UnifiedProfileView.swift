@@ -26,6 +26,8 @@ struct UnifiedProfileView: View {
     @State private var showingMistakesReview = false
     @State private var totalQuestionsCount: Int = 0
     @State private var showingResetAlert = false
+    @State private var isEditingDisplayName = false
+    @State private var editingDisplayName = ""
     
     // Task cancellation
     @State private var updateTask: Task<Void, Never>?
@@ -102,6 +104,10 @@ struct UnifiedProfileView: View {
         .onAppear {
             manager.validateAvatar()
             loadTotalQuestionsCount()
+            // Инициализируем editingDisplayName текущим значением
+            if !isEditingDisplayName {
+                editingDisplayName = manager.profile.customDisplayName ?? manager.displayName
+            }
         }
         .onDisappear {
             // Cancel all pending tasks when view disappears
@@ -225,10 +231,38 @@ struct UnifiedProfileView: View {
                 }
             }
             
-            // User name
-            Text(manager.displayName)
-                .font(DesignTokens.Typography.h1)
-                .foregroundStyle(DesignTokens.Colors.textPrimary)
+            // User name with edit functionality
+            HStack(spacing: DesignTokens.Spacing.sm) {
+                if isEditingDisplayName {
+                    TextField("profile.displayName.placeholder".localized, text: $editingDisplayName)
+                        .font(DesignTokens.Typography.h1)
+                        .foregroundStyle(DesignTokens.Colors.textPrimary)
+                        .textFieldStyle(.plain)
+                        .multilineTextAlignment(.center)
+                        .onSubmit {
+                            saveDisplayName(manager: manager)
+                        }
+                } else {
+                    Text(manager.displayName)
+                        .font(DesignTokens.Typography.h1)
+                        .foregroundStyle(DesignTokens.Colors.textPrimary)
+                }
+                
+                if manager.isSignedIn {
+                    Button(action: {
+                        if isEditingDisplayName {
+                            saveDisplayName(manager: manager)
+                        } else {
+                            editingDisplayName = manager.profile.customDisplayName ?? manager.displayName
+                            isEditingDisplayName = true
+                        }
+                    }) {
+                        Image(systemName: isEditingDisplayName ? "checkmark" : "pencil")
+                            .font(.system(size: DesignTokens.Sizes.iconSmall))
+                            .foregroundColor(DesignTokens.Colors.textSecondary)
+                    }
+                }
+            }
             
             // Action buttons
             VStack(spacing: DesignTokens.Spacing.sm) {
@@ -606,6 +640,14 @@ struct UnifiedProfileView: View {
         updateTask = mistakesTask
     }
     
+    private func saveDisplayName(manager: ProfileManager) {
+        let trimmedName = editingDisplayName.trimmingCharacters(in: .whitespacesAndNewlines)
+        Task { @MainActor [manager] in
+            await manager.updateDisplayName(trimmedName.isEmpty ? nil : trimmedName)
+            isEditingDisplayName = false
+        }
+    }
+    
     private func syncIcon(for state: ProfileManager.SyncState) -> String {
         switch state {
         case .idle:
@@ -633,19 +675,22 @@ struct UnifiedProfileView: View {
         case .idle:
             if let date = manager.profile.metadata.lastSyncedAt {
                 let formatter = RelativeDateTimeFormatter()
-                return String(
-                    format: NSLocalizedString("profile.sync.lastSync", comment: "Last sync message"),
-                    formatter.localizedString(for: date, relativeTo: Date())
-                )
+                // Устанавливаем локаль в зависимости от текущего языка приложения
+                let currentLanguage = settingsManager.settings.language == .system ? 
+                    (Locale.current.language.languageCode?.identifier ?? "ru") :
+                    settingsManager.settings.language.rawValue
+                formatter.locale = Locale(identifier: currentLanguage == "en" ? "en_US" : "ru_RU")
+                
+                let relativeTime = formatter.localizedString(for: date, relativeTo: Date())
+                let formatString = "profile.sync.lastSync".localized
+                return String(format: formatString, relativeTime)
             }
-            return NSLocalizedString("profile.sync.never", comment: "Never synced")
+            return "profile.sync.never".localized
         case .syncing:
-            return NSLocalizedString("profile.sync.inProgress", comment: "Sync in progress")
+            return "profile.sync.inProgress".localized
         case .failed(let message):
-            return String(
-                format: NSLocalizedString("profile.sync.failed", comment: "Sync failed message"),
-                message
-            )
+            let formatString = "profile.sync.failed".localized
+            return String(format: formatString, message)
         }
     }
 

@@ -29,7 +29,23 @@ final class ProfileManager {
     }
 
     var displayName: String {
-        profile.fullName ?? NSLocalizedString("profile.anonymous", comment: "Anonymous user placeholder")
+        // Сначала используем пользовательское имя, если оно задано
+        if let customName = profile.customDisplayName, !customName.isEmpty {
+            return customName
+        }
+        
+        // Затем пытаемся использовать fullName
+        if let fullName = profile.fullName, !fullName.isEmpty {
+            return fullName
+        }
+        
+        // Если fullName нет, используем email (если он не приватный)
+        if let email = profile.email, !isPrivateEmail(email) {
+            return email
+        }
+        
+        // В последнюю очередь показываем анонимного пользователя
+        return NSLocalizedString("profile.anonymous", comment: "Anonymous user placeholder")
     }
 
     var email: String? {
@@ -211,6 +227,16 @@ final class ProfileManager {
             await performSync()
         }
     }
+    
+    func updateDisplayName(_ newName: String?) async {
+        let trimmedName = newName?.trimmingCharacters(in: .whitespacesAndNewlines)
+        profile.customDisplayName = trimmedName?.isEmpty == false ? trimmedName : nil
+        profile.metadata.updatedAt = Date()
+        localStore.saveProfile(profile)
+        if isSignedIn {
+            await performSync()
+        }
+    }
 
     func validateAvatar() {
         // Проверяем существование файла аватара
@@ -298,6 +324,7 @@ final class ProfileManager {
             authMethod: .signInWithApple,
             fullName: formattedName(from: credential.fullName) ?? profile.fullName,
             email: credential.email ?? profile.email,
+            customDisplayName: profile.customDisplayName, // Сохраняем пользовательское имя
             localeIdentifier: Locale.current.identifier,
             avatarURL: profile.avatarURL,
             progress: ProfileProgress(),
@@ -425,17 +452,29 @@ final class ProfileManager {
         case .preferLocal:
             merged.fullName = local.fullName ?? remote.fullName
             merged.email = local.email ?? remote.email
+            merged.customDisplayName = local.customDisplayName ?? remote.customDisplayName
             merged.preferences = mergePreferences(remote: remote.preferences, local: local.preferences, preferLocal: true)
             merged.progress = mergeProgress(remote: remote.progress, local: local.progress, preferLocal: true)
             merged.avatarURL = local.avatarURL ?? merged.avatarURL
         case .preferRemote:
+            merged.fullName = remote.fullName ?? local.fullName
+            merged.email = remote.email ?? local.email
+            merged.customDisplayName = remote.customDisplayName ?? local.customDisplayName
             merged.preferences = mergePreferences(remote: remote.preferences, local: local.preferences, preferLocal: false)
             merged.progress = mergeProgress(remote: remote.progress, local: local.progress, preferLocal: false)
             merged.avatarURL = remote.avatarURL ?? local.avatarURL
         case .newest:
             let preferLocal = (local.metadata.updatedAt > remote.metadata.updatedAt)
-            merged.fullName = preferLocal ? (local.fullName ?? remote.fullName) : remote.fullName
-            merged.email = preferLocal ? (local.email ?? remote.email) : remote.email
+            // Сохраняем fullName, email и customDisplayName, предпочитая непустые значения
+            merged.fullName = preferLocal ? 
+                (local.fullName ?? remote.fullName) : 
+                (remote.fullName ?? local.fullName)
+            merged.email = preferLocal ? 
+                (local.email ?? remote.email) : 
+                (remote.email ?? local.email)
+            merged.customDisplayName = preferLocal ? 
+                (local.customDisplayName ?? remote.customDisplayName) : 
+                (remote.customDisplayName ?? local.customDisplayName)
             merged.preferences = mergePreferences(remote: remote.preferences, local: local.preferences, preferLocal: preferLocal)
             merged.progress = mergeProgress(remote: remote.progress, local: local.progress, preferLocal: preferLocal)
             merged.avatarURL = preferLocal
