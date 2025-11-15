@@ -458,7 +458,7 @@ struct UnifiedProfileView: View {
                 }
                 
                 MinimalButton(
-                    icon: "arrow.clockwise",
+                    icon: "exclamationmark.triangle",
                     title: "stats.repeatMistakes".localized,
                     foregroundColor: DesignTokens.Colors.iconRed
                 ) {
@@ -553,7 +553,7 @@ struct UnifiedProfileView: View {
                     .opacity(remoteService.isLoading ? 0.6 : 1.0)
                 } else {
                     MinimalButton(
-                        icon: "arrow.clockwise",
+                        icon: "tray.and.arrow.down.fill",
                         title: "stats.sync.check".localized,
                         foregroundColor: DesignTokens.Colors.iconBlue
                     ) {
