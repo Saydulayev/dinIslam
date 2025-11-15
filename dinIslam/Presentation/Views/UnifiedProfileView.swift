@@ -69,13 +69,12 @@ struct UnifiedProfileView: View {
                         wrongQuestionsSection()
                     }
                     
-                    // CloudKit Sync Section (only if signed in)
+                    // Unified Sync Section
                     if manager.isSignedIn {
-                        cloudKitSyncSection(manager: manager)
+                        unifiedSyncSection(manager: manager)
+                    } else {
+                        questionsSyncSection()
                     }
-                    
-                    // Questions Sync Section
-                    questionsSyncSection()
                 }
                 .padding(.horizontal, DesignTokens.Spacing.xxl)
                 .padding(.top, DesignTokens.Spacing.lg)
@@ -471,36 +470,102 @@ struct UnifiedProfileView: View {
         .cardStyle(cornerRadius: DesignTokens.CornerRadius.xlarge)
     }
     
-    // MARK: - CloudKit Sync Section
-    private func cloudKitSyncSection(manager: ProfileManager) -> some View {
+    // MARK: - Unified Sync Section
+    private func unifiedSyncSection(manager: ProfileManager) -> some View {
         VStack(alignment: .leading, spacing: DesignTokens.Spacing.xxl) {
             Text("profile.sync.title".localized)
                 .font(DesignTokens.Typography.h2)
                 .foregroundStyle(DesignTokens.Colors.textPrimary)
             
-            // Sync status
-            HStack(spacing: DesignTokens.Spacing.md) {
-                Image(systemName: syncIcon(for: manager.syncState))
-                    .font(.system(size: DesignTokens.Sizes.iconSmall))
-                    .foregroundColor(syncColor(for: manager.syncState))
+            // CloudKit Statistics Sync Section
+            VStack(alignment: .leading, spacing: DesignTokens.Spacing.md) {
+                HStack(spacing: DesignTokens.Spacing.md) {
+                    Image(systemName: syncIcon(for: manager.syncState))
+                        .font(.system(size: DesignTokens.Sizes.iconSmall))
+                        .foregroundColor(syncColor(for: manager.syncState))
+                    
+                    Text(syncMessage(for: manager))
+                        .font(DesignTokens.Typography.secondaryRegular)
+                        .foregroundStyle(DesignTokens.Colors.textSecondary)
+                }
                 
-                Text(syncMessage(for: manager))
-                    .font(DesignTokens.Typography.secondaryRegular)
-                    .foregroundStyle(DesignTokens.Colors.textSecondary)
+                MinimalButton(
+                    icon: "icloud.fill",
+                    title: "profile.sync.refresh".localized,
+                    foregroundColor: DesignTokens.Colors.iconBlue
+                ) {
+                    Task { @MainActor [manager] in
+                        await manager.refreshFromCloud(mergeStrategy: .newest)
+                    }
+                }
+                .disabled(isResettingProfile || manager.isLoading)
+                .opacity((isResettingProfile || manager.isLoading) ? 0.6 : 1.0)
             }
             
-            // Sync button
-            MinimalButton(
-                icon: "arrow.clockwise",
-                title: "profile.sync.refresh".localized,
-                foregroundColor: DesignTokens.Colors.iconBlue
-            ) {
-                Task { @MainActor [manager] in
-                    await manager.refreshFromCloud(mergeStrategy: .newest)
+            // Divider
+            Divider()
+                .background(DesignTokens.Colors.borderSubtle)
+            
+            // Questions Sync Section
+            VStack(alignment: .leading, spacing: DesignTokens.Spacing.md) {
+                HStack {
+                    Text("stats.sync.questions.status".localized)
+                        .font(DesignTokens.Typography.secondaryRegular)
+                        .foregroundColor(DesignTokens.Colors.textSecondary)
+                    Spacer()
+                    if remoteService.isLoading {
+                        ProgressView()
+                            .scaleEffect(0.8)
+                            .tint(DesignTokens.Colors.textSecondary)
+                    } else if remoteService.hasUpdates {
+                        HStack(spacing: DesignTokens.Spacing.xs) {
+                            Text("stats.sync.available".localized)
+                                .font(DesignTokens.Typography.secondaryRegular)
+                                .fontWeight(.semibold)
+                                .foregroundColor(DesignTokens.Colors.iconGreen)
+                            if remoteService.remoteQuestionsCount > remoteService.cachedQuestionsCount {
+                                Text("+\(remoteService.remoteQuestionsCount - remoteService.cachedQuestionsCount)")
+                                    .font(DesignTokens.Typography.label)
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(DesignTokens.Colors.iconGreen)
+                            }
+                        }
+                    } else {
+                        Text("stats.sync.upToDate".localized)
+                            .font(DesignTokens.Typography.secondaryRegular)
+                            .fontWeight(.semibold)
+                            .foregroundColor(DesignTokens.Colors.iconBlue)
+                    }
+                }
+                
+                if remoteService.hasUpdates {
+                    MinimalButton(
+                        icon: "arrow.down.circle",
+                        title: "stats.sync.sync".localized,
+                        foregroundColor: DesignTokens.Colors.iconGreen
+                    ) {
+                        syncTask?.cancel()
+                        syncTask = Task { @MainActor in
+                            await syncQuestions()
+                        }
+                    }
+                    .disabled(remoteService.isLoading)
+                    .opacity(remoteService.isLoading ? 0.6 : 1.0)
+                } else {
+                    MinimalButton(
+                        icon: "arrow.clockwise",
+                        title: "stats.sync.check".localized,
+                        foregroundColor: DesignTokens.Colors.iconBlue
+                    ) {
+                        updateTask?.cancel()
+                        updateTask = Task { @MainActor in
+                            await checkForUpdates()
+                        }
+                    }
+                    .disabled(remoteService.isLoading)
+                    .opacity(remoteService.isLoading ? 0.6 : 1.0)
                 }
             }
-            .disabled(isResettingProfile || manager.isLoading)
-            .opacity((isResettingProfile || manager.isLoading) ? 0.6 : 1.0)
             
             if isResettingProfile {
                 HStack(spacing: DesignTokens.Spacing.md) {
@@ -517,7 +582,7 @@ struct UnifiedProfileView: View {
         .cardStyle(cornerRadius: DesignTokens.CornerRadius.xlarge)
     }
     
-    // MARK: - Questions Sync Section
+    // MARK: - Questions Sync Section (for non-signed in users)
     private func questionsSyncSection() -> some View {
         VStack(alignment: .leading, spacing: DesignTokens.Spacing.lg) {
             Text("stats.sync.title".localized)
@@ -719,8 +784,8 @@ struct UnifiedProfileView: View {
         case .syncing:
             return "profile.sync.inProgress".localized
         case .failed(let message):
-            let formatString = "profile.sync.failed".localized
-            return String(format: formatString, message)
+            // Message is already user-friendly, no need to format
+            return message
         }
     }
 

@@ -6,6 +6,7 @@
 //
 
 import AuthenticationServices
+import CloudKit
 import CryptoKit
 import Foundation
 
@@ -74,6 +75,9 @@ final class ProfileManager {
     @ObservationIgnored private let examStatisticsManager: ExamStatisticsManager
     @ObservationIgnored private var syncTask: Task<Void, Never>?
     @ObservationIgnored private var currentNonce: String?
+    @ObservationIgnored private var conflictResolutionAttempts: Int = 0
+    @ObservationIgnored private var isSyncing: Bool = false
+    private let maxConflictResolutionAttempts = 1 // Разрешаем конфликт только один раз
 
     init(
         localStore localStoreOverride: ProfileLocalStore? = nil,
@@ -149,8 +153,9 @@ final class ProfileManager {
                 await handleAppleCredential(credential)
             }
         case .failure(let error):
-            errorMessage = error.localizedDescription
-            syncState = .failed(error.localizedDescription)
+            let friendlyMessage = userFriendlyErrorMessage(from: error)
+            errorMessage = friendlyMessage
+            syncState = .failed(friendlyMessage)
         }
     }
 
@@ -195,8 +200,9 @@ final class ProfileManager {
                 try await cloudService.deleteProfile(with: profileId)
                 await performSync()
             } catch {
-                errorMessage = error.localizedDescription
-                syncState = .failed(error.localizedDescription)
+                let friendlyMessage = userFriendlyErrorMessage(from: error)
+                errorMessage = friendlyMessage
+                syncState = .failed(friendlyMessage)
             }
         } else {
             syncState = .idle
@@ -274,8 +280,9 @@ final class ProfileManager {
                 localStore.saveProfile(profile)
             }
         } catch {
-            errorMessage = error.localizedDescription
-            syncState = .failed(error.localizedDescription)
+            let friendlyMessage = userFriendlyErrorMessage(from: error)
+            errorMessage = friendlyMessage
+            syncState = .failed(friendlyMessage)
         }
     }
 
@@ -285,27 +292,122 @@ final class ProfileManager {
 
         syncTask?.cancel()
         syncTask = Task { [weak self] in
+            guard let self = self else { return }
             try? await Task.sleep(nanoseconds: 2_000_000_000) // 2 seconds debounce
-            await self?.performSync()
+            
+            // Проверяем отмену после sleep
+            if Task.isCancelled {
+                return
+            }
+            
+            await self.performSync()
         }
     }
 
     private func performSync() async {
         guard isSignedIn else { return }
+        
+        // Проверяем, не отменен ли Task
+        if Task.isCancelled {
+            return
+        }
+        
+        // Предотвращаем множественные одновременные синхронизации
+        guard !isSyncing else { return }
+        isSyncing = true
+        defer { isSyncing = false }
+        
         syncState = .syncing
         do {
+            // Prepare a copy for saving, but do NOT set lastSyncedAt yet (only after successful save)
             var profileToSync = profile
             profileToSync.metadata.updatedAt = Date()
-            profileToSync.metadata.lastSyncedAt = Date()
             let savedProfile = try await cloudService.saveProfile(profileToSync)
-            profile = savedProfile
+            
+            // Проверяем отмену после async операции
+            if Task.isCancelled {
+                return
+            }
+            
+            var finalProfile = savedProfile
+            // Set lastSyncedAt only after successful save
+            finalProfile.metadata.lastSyncedAt = Date()
+            profile = finalProfile
             // Валидация аватара после синхронизации
             validateAvatar()
             localStore.saveProfile(profile)
             syncState = .idle
+            errorMessage = nil
+            conflictResolutionAttempts = 0 // Сбрасываем счетчик при успехе
         } catch {
-            errorMessage = error.localizedDescription
-            syncState = .failed(error.localizedDescription)
+            // Проверяем отмену после async операции
+            if Task.isCancelled {
+                return
+            }
+            
+            // Detect conflict (serverRecordChanged or oplock text) and resolve once
+            let isConflict: Bool = {
+                if let ck = error as? CKError, ck.code == .serverRecordChanged { return true }
+                let desc = error.localizedDescription.lowercased()
+                return desc.contains("oplock") || desc.contains("server record changed")
+            }()
+
+            if isConflict && conflictResolutionAttempts < maxConflictResolutionAttempts {
+                conflictResolutionAttempts += 1
+                do {
+                    // Fetch latest server profile
+                    if let serverProfile = try await cloudService.fetchProfile(for: profile.id) {
+                        // Проверяем отмену после async операции
+                        if Task.isCancelled {
+                            return
+                        }
+                        
+                        // Merge local vs server using your strategy (newest is appropriate)
+                        let merged = mergeProfile(local: profile, remote: serverProfile, strategy: .newest)
+                        var mergedToSave = merged
+                        // updatedAt now to reflect this reconciliation
+                        mergedToSave.metadata.updatedAt = Date()
+                        // Try saving merged profile once
+                        let savedMerged = try await cloudService.saveProfile(mergedToSave)
+                        
+                        // Проверяем отмену после async операции
+                        if Task.isCancelled {
+                            return
+                        }
+                        
+                        var finalProfile = savedMerged
+                        finalProfile.metadata.lastSyncedAt = Date()
+                        profile = finalProfile
+                        validateAvatar()
+                        localStore.saveProfile(profile)
+                        syncState = .idle
+                        errorMessage = nil
+                        conflictResolutionAttempts = 0 // Сбрасываем при успехе
+                        return
+                    } else {
+                        // No server profile - не пытаемся сохранять снова, просто показываем ошибку
+                        let friendlyMessage = userFriendlyErrorMessage(from: error)
+                        errorMessage = friendlyMessage
+                        syncState = .failed(friendlyMessage)
+                        conflictResolutionAttempts = 0
+                    }
+                } catch {
+                    // Если разрешение конфликта не удалось, показываем ошибку и не пытаемся снова
+                    let friendlyMessage = userFriendlyErrorMessage(from: error)
+                    errorMessage = friendlyMessage
+                    syncState = .failed(friendlyMessage)
+                    conflictResolutionAttempts = 0
+                }
+            } else {
+                // Превышен лимит попыток или это не конфликт - показываем ошибку
+                let friendlyMessage = userFriendlyErrorMessage(from: error)
+                errorMessage = friendlyMessage
+                syncState = .failed(friendlyMessage)
+                // Сбрасываем счетчик только если это не конфликт
+                if !isConflict {
+                    conflictResolutionAttempts = 0
+                }
+            }
         }
     }
 
@@ -363,8 +465,9 @@ final class ProfileManager {
             await performSync()
             errorMessage = nil
         } catch {
-            errorMessage = error.localizedDescription
-            syncState = .failed(error.localizedDescription)
+            let friendlyMessage = userFriendlyErrorMessage(from: error)
+            errorMessage = friendlyMessage
+            syncState = .failed(friendlyMessage)
         }
     }
 
@@ -702,4 +805,65 @@ extension ProfileManager: ProfileExamSyncDelegate {
         localStore.saveProfile(profile)
         scheduleSync()
     }
+    
+    // MARK: - Error Handling
+    private func userFriendlyErrorMessage(from error: Error) -> String {
+        // Log the original error for debugging
+        AppLogger.error("CloudKit sync error", error: error, category: AppLogger.data)
+        
+        // Get error description in lowercase for pattern matching
+        let errorDescription = error.localizedDescription.lowercased()
+        
+        // Check for "oplock" errors first (most common conflict error)
+        if errorDescription.contains("oplock") {
+            AppLogger.info("Detected oplock error, returning conflict message", category: AppLogger.data)
+            return NSLocalizedString("profile.sync.error.conflict", comment: "Sync conflict error")
+        }
+        
+        // Check for CKError first
+        if let ckError = error as? CKError {
+            switch ckError.code {
+            case .serverRecordChanged, .requestRateLimited:
+                return NSLocalizedString("profile.sync.error.conflict", comment: "Sync conflict error")
+            case .networkUnavailable, .networkFailure:
+                return NSLocalizedString("profile.sync.error.network", comment: "Network error")
+            case .quotaExceeded:
+                return NSLocalizedString("profile.sync.error.quota", comment: "Quota exceeded error")
+            case .notAuthenticated:
+                return NSLocalizedString("profile.sync.error.auth", comment: "Authentication error")
+            case .permissionFailure:
+                return NSLocalizedString("profile.sync.error.permission", comment: "Permission error")
+            default:
+                break
+            }
+        }
+        
+        // Check for NSError with CloudKit domain
+        if let nsError = error as NSError? {
+            if nsError.domain == "CKErrorDomain" || nsError.domain.contains("CloudKit") {
+                // This is a CloudKit error
+                if errorDescription.contains("oplock") {
+                    return NSLocalizedString("profile.sync.error.conflict", comment: "Sync conflict error")
+                }
+            }
+        }
+        
+        // Check error description for other patterns
+        if errorDescription.contains("network") || errorDescription.contains("internet") {
+            return NSLocalizedString("profile.sync.error.network", comment: "Network error")
+        }
+        if errorDescription.contains("quota") || errorDescription.contains("limit") {
+            return NSLocalizedString("profile.sync.error.quota", comment: "Quota exceeded error")
+        }
+        if errorDescription.contains("permission") || errorDescription.contains("unauthorized") {
+            return NSLocalizedString("profile.sync.error.permission", comment: "Permission error")
+        }
+        if errorDescription.contains("not authenticated") || errorDescription.contains("authentication") {
+            return NSLocalizedString("profile.sync.error.auth", comment: "Authentication error")
+        }
+        
+        // Generic error message
+        return NSLocalizedString("profile.sync.error.generic", comment: "Generic sync error")
+    }
 }
+
