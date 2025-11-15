@@ -11,23 +11,6 @@ struct MistakesReviewNavigationView: View {
     @Bindable var viewModel: QuizViewModel
     @Environment(\.dismiss) private var dismiss
     
-    @State private var showingResult = false
-    
-    private var mistakesResultBinding: Binding<Bool> {
-        Binding(
-            get: { showingResult },
-            set: { newValue in
-                showingResult = newValue
-                if !newValue {
-                    if case .completed(.mistakesFinished) = viewModel.state {
-                        // Reset when result is dismissed
-                        viewModel.restartQuiz()
-                    }
-                }
-            }
-        )
-    }
-    
     init(viewModel: QuizViewModel) {
         _viewModel = Bindable(viewModel)
     }
@@ -46,42 +29,29 @@ struct MistakesReviewNavigationView: View {
                     
                 case .active(.mistakesReview):
                     MistakesReviewView(viewModel: viewModel)
-                        .navigationDestination(isPresented: mistakesResultBinding) {
-                            if let result = viewModel.quizResult {
-                                MistakesResultView(
-                                    result: result,
-                                    onRepeat: {
-                                        viewModel.restartQuiz()
-                                        showingResult = false
-                                    },
-                                    onBackToStart: {
-                                        viewModel.restartQuiz()
-                                        showingResult = false
-                                        dismiss()
-                                    }
-                                )
-                            }
-                        }
                     
                 case .completed(.mistakesFinished):
-                    // This case should not be reached if navigationDestination works correctly
-                    // But kept as fallback
-                    if let result = viewModel.quizResult, !showingResult {
+                    // Show result screen when mistakes review is finished
+                    if let result = viewModel.quizResult {
                         MistakesResultView(
                             result: result,
                             onRepeat: {
                                 viewModel.restartQuiz()
-                                showingResult = false
                             },
                             onBackToStart: {
                                 viewModel.restartQuiz()
-                                showingResult = false
                                 dismiss()
                             }
                         )
-                        .onAppear {
-                            showingResult = true
+                    } else {
+                        // Fallback if result is not ready yet
+                        VStack(spacing: 20) {
+                            ProgressView()
+                                .scaleEffect(1.5)
+                            Text("mistakes.loading".localized)
+                                .font(.headline)
                         }
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                     }
                     
                 case .idle:
@@ -110,11 +80,6 @@ struct MistakesReviewNavigationView: View {
             .navigationBarTitleDisplayMode(.inline)
             .navigationBarBackButtonHidden(true)
             .onChange(of: viewModel.state) { _, newState in
-                // Show result when mistakes review is finished
-                if case .completed(.mistakesFinished) = newState {
-                    showingResult = true
-                }
-                
                 // Auto-dismiss when user stops the review
                 if case .idle = newState {
                     dismiss()
