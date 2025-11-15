@@ -214,6 +214,41 @@ class ExamStatisticsManager: ExamStatisticsManaging {
         }
         return statistics
     }
+    
+    // MARK: - Profile Progress Sync
+    func updateFromProfileProgress(_ progress: ProfileProgress, examHistory: [ExamHistoryEntry]) {
+        statistics.totalExamsCompleted = progress.examsTaken
+        statistics.examsPassed = progress.examsPassed
+        statistics.examsFailed = progress.examsTaken - progress.examsPassed
+        
+        // Вычисляем bestScore из examHistory
+        if let bestExam = examHistory.max(by: { $0.percentage < $1.percentage }) {
+            statistics.bestScore = bestExam.percentage
+        }
+        
+        // Вычисляем averageScore из examHistory
+        if !examHistory.isEmpty {
+            let sum = examHistory.reduce(0.0) { $0 + $1.percentage }
+            statistics.averageScore = sum / Double(examHistory.count)
+        }
+        
+        // Обновляем lastExamDate
+        if let lastExam = examHistory.max(by: { $0.date < $1.date }) {
+            statistics.lastExamDate = lastExam.date
+        }
+        
+        // Вычисляем totalQuestionsAnswered и totalCorrectAnswers из examHistory
+        statistics.totalQuestionsAnswered = examHistory.reduce(0) { $0 + $1.totalQuestions }
+        statistics.totalCorrectAnswers = examHistory.reduce(0) { $0 + $1.correctAnswers }
+        
+        // Вычисляем totalTimeSpent из examHistory (если есть duration)
+        statistics.totalTimeSpent = examHistory.reduce(0) { $0 + $1.duration }
+        
+        // Обновляем streaks (используем данные из progress, так как в ExamStatistics нет отдельных полей)
+        // currentStreak и longestStreak остаются как есть, так как они относятся к quiz, а не к exam
+        
+        saveStatistics()
+    }
 }
 
 protocol ProfileExamSyncDelegate: AnyObject {

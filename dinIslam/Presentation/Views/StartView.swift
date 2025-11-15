@@ -14,7 +14,6 @@ import UIKit
 enum StartRoute: Hashable {
     case quiz
     case result(ResultSnapshot)
-    case stats
     case achievements
     case settings
     case profile
@@ -158,14 +157,12 @@ struct StartView: View {
                             model.clearNewAchievements()
                         }
                     )
-                case .stats:
-                    StatsView(statsManager: model.statsManager)
                 case .achievements:
                     AchievementsView()
                 case .settings:
                     SettingsView(viewModel: SettingsViewModel(settingsManager: model.settingsManager))
                 case .profile:
-                    ProfileView()
+                    UnifiedProfileView(statsManager: model.statsManager)
                 case .exam:
                     if let examViewModel = model.examViewModel {
                         ExamView(viewModel: examViewModel) {
@@ -189,9 +186,9 @@ struct StartView: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
                         Button(action: {
-                            model.showStats()
+                            model.showProfile()
                         }) {
-                            Label("start.menu.stats".localized, systemImage: "chart.bar.fill")
+                            Label("start.menu.profile".localized, systemImage: "person.crop.circle")
                         }
                         
                         Divider()
@@ -200,14 +197,6 @@ struct StartView: View {
                             model.showAchievements()
                         }) {
                             Label("start.menu.achievements".localized, systemImage: "trophy.fill")
-                        }
-                        
-                        Divider()
-                        
-                        Button(action: {
-                            model.showProfile()
-                        }) {
-                            Label("start.menu.profile".localized, systemImage: "person.crop.circle")
                         }
                         
                         Divider()

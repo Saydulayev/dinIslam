@@ -141,10 +141,16 @@ final class ProfileManager {
     func signOut() {
         guard isSignedIn else { return }
         let signedInProfileId = profile.id
+        
+        // Сохраняем данные из ProfileProgress в локальные StatsManager перед выходом
+        syncProgressToLocalStats()
+        
+        // Переключаемся на анонимный профиль
         profile = localStore.loadOrCreateAnonymousProfile()
-        statsManager.resetStats()
-        examStatisticsManager.resetStatistics()
+        
+        // Восстанавливаем локальные данные в новый анонимный профиль
         rebuildProgressFromLocalStats()
+        
         localStore.saveProfile(profile)
         syncState = .idle
         errorMessage = nil
@@ -283,6 +289,10 @@ final class ProfileManager {
         defer { isLoading = false }
 
         let userId = credential.user
+        
+        // Сохраняем текущий профиль во временную переменную для доступа к локальным данным
+        let currentLocalProfile = profile
+        
         var signedInProfile = UserProfile(
             id: userId,
             authMethod: .signInWithApple,
@@ -299,20 +309,29 @@ final class ProfileManager {
                 lastDeviceIdentifier: UIDeviceIdentifierProvider.currentIdentifier()
             )
         )
+        
+        // Временно устанавливаем signedInProfile как текущий профиль для rebuildProgressFromLocalStats
+        let originalProfile = profile
+        profile = signedInProfile
+        rebuildProgressFromLocalStats()
+        signedInProfile = profile
+        profile = originalProfile
 
         do {
             var hasRemoteProfile = false
             if let remoteProfile = try await cloudService.fetchProfile(for: userId) {
+                // Объединяем локальные данные (уже в signedInProfile.progress) с удаленными
                 signedInProfile = mergeProfile(local: signedInProfile, remote: remoteProfile, strategy: .newest)
                 hasRemoteProfile = true
             }
 
             profile = signedInProfile
             
-            if !hasRemoteProfile {
-                statsManager.resetStats()
-                examStatisticsManager.resetStatistics()
+            // Если есть удаленный профиль, обновляем локальные данные из объединенного профиля
+            if hasRemoteProfile {
+                syncProgressToLocalStats()
             }
+            // Если нет удаленного профиля, локальные данные уже перенесены в ProfileProgress выше
             
             // Валидация аватара после входа
             validateAvatar()
@@ -390,6 +409,13 @@ final class ProfileManager {
 
         profile.progress = progress
         profile.metadata.updatedAt = Date()
+    }
+    
+    // MARK: - Sync Progress to Local Stats
+    private func syncProgressToLocalStats() {
+        // Переносим данные из ProfileProgress обратно в локальные StatsManager и ExamStatisticsManager
+        statsManager.updateFromProfileProgress(profile.progress, quizHistory: profile.progress.quizHistory)
+        examStatisticsManager.updateFromProfileProgress(profile.progress, examHistory: profile.progress.examHistory)
     }
 
     private func mergeProfile(local: UserProfile, remote: UserProfile, strategy: ProfileMergeStrategy) -> UserProfile {
@@ -615,6 +641,13 @@ extension ProfileManager: ProfileProgressSyncDelegate {
     }
 
     func statsManagerDidReset(_ manager: StatsManager) {
+        rebuildProgressFromLocalStats()
+        localStore.saveProfile(profile)
+        scheduleSync()
+    }
+    
+    func statsManagerDidUpdate(_ manager: StatsManager) {
+        // Обновляем progress из локальных данных при изменении статистики (например, при исправлении ошибок)
         rebuildProgressFromLocalStats()
         localStore.saveProfile(profile)
         scheduleSync()

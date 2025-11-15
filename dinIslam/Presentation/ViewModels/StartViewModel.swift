@@ -171,10 +171,6 @@ final class StartViewModel {
         quizViewModel.clearNewAchievements()
     }
 
-    func showStats() {
-        navigationPath.append(StartRoute.stats)
-    }
-
     func showAchievements() {
         navigationPath.append(StartRoute.achievements)
     }

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXFileReference section */
+		C20EB7D12EC89DC700C1BC2F /* dinIslam.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = dinIslam.xcodeproj; sourceTree = "<group>"; };
 		C22747742EA631EA00F2199B /* dinIslam.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = dinIslam.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C24927CF2EBFD9FD009A4CC4 /* dinIslam.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = dinIslam.xcodeproj; sourceTree = "<group>"; };
 		C275F25A2EBFD775002BEE44 /* dinIslam.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = dinIslam.xcodeproj; sourceTree = "<group>"; };
@@ -47,6 +48,11 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		C20EB7D42EC89DC700C1BC2F /* Products */ = {
+			isa = PBXGroup;
+			name = Products;
+			sourceTree = "<group>";
+		};
 		C227476B2EA631EA00F2199B = {
 			isa = PBXGroup;
 			children = (
@@ -142,6 +148,10 @@
 			productRefGroup = C22747752EA631EA00F2199B /* Products */;
 			projectDirPath = "";
 			projectReferences = (
+				{
+					ProductGroup = C20EB7D42EC89DC700C1BC2F /* Products */;
+					ProjectRef = C20EB7D12EC89DC700C1BC2F /* dinIslam.xcodeproj */;
+				},
 				{
 					ProductGroup = C28FBDE22EC681DE0075C1DC /* Products */;
 					ProjectRef = C28FBDDF2EC681DE0075C1DC /* dinIslam.xcodeproj */;
