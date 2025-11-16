@@ -175,13 +175,19 @@ class ExamUseCase: ExamUseCaseProtocol {
 @MainActor
 @Observable
 class ExamStatisticsManager: ExamStatisticsManaging {
-    weak var profileSyncDelegate: ProfileExamSyncDelegate?
+    private var profileProgressSyncer: ProfileProgressSyncing?
     var statistics: ExamStatistics
-    private let userDefaults = UserDefaults.standard
+    private let userDefaults: UserDefaults
     private let statisticsKey = "ExamStatistics"
     
-    init() {
+    init(profileProgressSyncer: ProfileProgressSyncing? = nil) {
+        self.userDefaults = .standard
+        self.profileProgressSyncer = profileProgressSyncer
         self.statistics = Self.loadStatistics()
+    }
+    
+    func setProfileProgressSyncer(_ syncer: ProfileProgressSyncing?) {
+        self.profileProgressSyncer = syncer
     }
     
     func updateStatistics(with result: ExamResult) {
@@ -192,13 +198,13 @@ class ExamStatisticsManager: ExamStatisticsManaging {
             duration: result.totalTimeSpent,
             completedAt: result.completedAt
         )
-        profileSyncDelegate?.examStatisticsManager(self, didRecord: summary)
+        profileProgressSyncer?.syncExamUpdate(summary)
     }
     
     func resetStatistics() {
         statistics = ExamStatistics()
         saveStatistics()
-        profileSyncDelegate?.examStatisticsManagerDidReset(self)
+        profileProgressSyncer?.syncExamReset()
     }
     
     private func saveStatistics() {
@@ -249,9 +255,4 @@ class ExamStatisticsManager: ExamStatisticsManaging {
         
         saveStatistics()
     }
-}
-
-protocol ProfileExamSyncDelegate: AnyObject {
-    func examStatisticsManager(_ manager: ExamStatisticsManager, didRecord summary: ExamSessionSummary)
-    func examStatisticsManagerDidReset(_ manager: ExamStatisticsManager)
 }

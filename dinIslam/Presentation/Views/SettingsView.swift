@@ -382,6 +382,22 @@ struct SettingsView: View {
     }
 }
 
+struct SettingsViewWithDependencies: View {
+    @Environment(\.localizationProvider) private var localizationProvider
+    @Environment(\.achievementManager) private var achievementManager
+    let settingsManager: SettingsManager
+    
+    var body: some View {
+        SettingsView(
+            viewModel: SettingsViewModel(
+                settingsManager: settingsManager,
+                localizationProvider: localizationProvider,
+                achievementManager: achievementManager
+            )
+        )
+    }
+}
+
 #Preview {
     SettingsView(viewModel: SettingsViewModel(settingsManager: SettingsManager()))
 }

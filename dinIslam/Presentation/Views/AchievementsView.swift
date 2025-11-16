@@ -12,6 +12,7 @@ struct AchievementsView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.settingsManager) private var settingsManager
     @Environment(\.statsManager) private var statsManager: StatsManager
+    @Environment(\.localizationProvider) private var localizationProvider
     @State private var showingResetAlert = false
     @State private var selectedAchievement: Achievement?
     
@@ -99,7 +100,7 @@ struct AchievementsView: View {
 struct AchievementCard: View {
     let achievement: Achievement
     let onTap: () -> Void
-    @ObservedObject private var localizationManager = LocalizationManager.shared
+    @Environment(\.localizationProvider) private var localizationProvider
     @Environment(\.settingsManager) private var settingsManager
     @EnvironmentObject private var achievementManager: AchievementManager
     @Environment(\.statsManager) private var statsManager: StatsManager
@@ -158,13 +159,13 @@ struct AchievementCard: View {
                     }
                 }
                 
-                Text(achievement.displayDescription)
+                Text(achievement.displayDescription(using: localizationProvider))
                     .font(DesignTokens.Typography.label)
                     .foregroundColor(DesignTokens.Colors.textSecondary)
                     .multilineTextAlignment(.leading)
                 
                 if isUnlocked, let unlockedDate = achievement.unlockedDate {
-                    Text(LocalizationManager.shared.localizedString(for: "achievements.unlocked") + " " + 
+                    Text(localizationProvider.localizedString(for: "achievements.unlocked") + " " + 
                          unlockedDate.formatted(date: .abbreviated, time: .omitted))
                     .font(DesignTokens.Typography.label)
                     .foregroundColor(DesignTokens.Colors.iconGreen)
@@ -214,7 +215,7 @@ struct AchievementCard: View {
 struct ExpandedAchievementCard: View {
     let achievement: Achievement
     @Binding var isPresented: Bool
-    @ObservedObject private var localizationManager = LocalizationManager.shared
+    @Environment(\.localizationProvider) private var localizationProvider
     
     var body: some View {
         VStack(spacing: DesignTokens.Spacing.xxl) {
@@ -236,13 +237,13 @@ struct ExpandedAchievementCard: View {
                         .foregroundColor(DesignTokens.Colors.textPrimary)
                         .multilineTextAlignment(.center)
                     
-                    Text(achievement.displayDescription)
+                    Text(achievement.displayDescription(using: localizationProvider))
                         .font(DesignTokens.Typography.secondaryRegular)
                         .foregroundColor(DesignTokens.Colors.textSecondary)
                         .multilineTextAlignment(.center)
                     
                     if let unlockedDate = achievement.unlockedDate {
-                        Text(LocalizationManager.shared.localizedString(for: "achievements.unlocked") + " " + 
+                        Text(localizationProvider.localizedString(for: "achievements.unlocked") + " " + 
                              unlockedDate.formatted(date: .abbreviated, time: .omitted))
                         .font(DesignTokens.Typography.label)
                         .foregroundColor(DesignTokens.Colors.iconGreen)
@@ -288,7 +289,7 @@ struct ExpandedAchievementCard: View {
                         isPresented = false
                     }
                 }) {
-                    Text(LocalizationManager.shared.localizedString(for: "settings.done"))
+                    Text(localizationProvider.localizedString(for: "settings.done"))
                         .font(DesignTokens.Typography.secondaryRegular)
                         .foregroundColor(DesignTokens.Colors.textSecondary)
                         .frame(maxWidth: .infinity)
@@ -351,15 +352,15 @@ struct ExpandedAchievementCard: View {
     }
     
     private func generateShareText() -> String {
-        let appName = LocalizationManager.shared.localizedString(for: "app.name")
+        let appName = localizationProvider.localizedString(for: "app.name")
         let unlockedDate = achievement.unlockedDate?.formatted(date: .abbreviated, time: .omitted) ?? ""
         
         return """
         🏆 \(achievement.title)
         
-        \(achievement.displayDescription)
+        \(achievement.displayDescription(using: localizationProvider))
         
-        \(LocalizationManager.shared.localizedString(for: "achievements.share.text")) \(unlockedDate)
+        \(localizationProvider.localizedString(for: "achievements.share.text")) \(unlockedDate)
         
         \(appName)
         """
@@ -387,7 +388,7 @@ struct ExpandedAchievementCard: View {
 
 struct ShareableAchievementCardView: View {
     let achievement: Achievement
-    @ObservedObject private var localizationManager = LocalizationManager.shared
+    @Environment(\.localizationProvider) private var localizationProvider
     
     var body: some View {
         VStack(spacing: 40) {
@@ -410,14 +411,14 @@ struct ShareableAchievementCardView: View {
                     .foregroundColor(Color.black)
                     .multilineTextAlignment(.center)
                 
-                Text(achievement.displayDescription)
+                Text(achievement.displayDescription(using: localizationProvider))
                     .font(.system(size: 32))
                     .foregroundColor(Color.gray)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 60)
                 
                 if let unlockedDate = achievement.unlockedDate {
-                    Text(LocalizationManager.shared.localizedString(for: "achievements.unlocked") + " " + 
+                    Text(localizationProvider.localizedString(for: "achievements.unlocked") + " " + 
                          unlockedDate.formatted(date: .abbreviated, time: .omitted))
                     .font(.system(size: 22))
                     .foregroundColor(Color(red: 0.0, green: 0.7, blue: 0.0))
@@ -435,7 +436,7 @@ struct ShareableAchievementCardView: View {
                     .aspectRatio(contentMode: .fit)
                     .frame(width: 180, height: 180)
                 
-                Text(LocalizationManager.shared.localizedString(for: "app.name"))
+                Text(localizationProvider.localizedString(for: "app.name"))
                     .font(.system(size: 36, weight: .semibold))
                     .foregroundColor(achievement.color)
             }
@@ -461,8 +462,9 @@ struct ShareableAchievementCardView: View {
 #Preview {
     NavigationStack {
         AchievementsView()
-            .environmentObject(AchievementManager.shared)
+            .environmentObject(AchievementManager(notificationManager: NotificationManager()))
             .environment(\.settingsManager, SettingsManager())
+            .environment(\.localizationProvider, LocalizationManager())
     }
 }
 

@@ -16,51 +16,56 @@ protocol QuizUseCaseProtocol {
 
 class QuizUseCase: QuizUseCaseProtocol {
     private let questionsRepository: QuestionsRepositoryProtocol
-    private let adaptiveEngine: AdaptiveLearningEngine
-    private let profileManager: ProfileManager
+    private let profileProgressProvider: ProfileProgressProviding
+    private let questionSelectionStrategy: QuestionSelectionStrategy
+    private let fallbackStrategy: QuestionSelectionStrategy
+    private let questionPoolProgressManager: QuestionPoolProgressManaging
     private let questionPoolVersion = 1
     
     init(
         questionsRepository: QuestionsRepositoryProtocol,
-        adaptiveEngine: AdaptiveLearningEngine,
-        profileManager: ProfileManager
+        profileProgressProvider: ProfileProgressProviding,
+        questionSelectionStrategy: QuestionSelectionStrategy,
+        fallbackStrategy: QuestionSelectionStrategy? = nil,
+        questionPoolProgressManager: QuestionPoolProgressManaging
     ) {
         self.questionsRepository = questionsRepository
-        self.adaptiveEngine = adaptiveEngine
-        self.profileManager = profileManager
+        self.profileProgressProvider = profileProgressProvider
+        self.questionSelectionStrategy = questionSelectionStrategy
+        self.fallbackStrategy = fallbackStrategy ?? FallbackQuestionSelectionStrategy()
+        self.questionPoolProgressManager = questionPoolProgressManager
     }
     
     func startQuiz(language: String) async throws -> [Question] {
         let allQuestions = try await questionsRepository.loadQuestions(language: language)
-        let progress = QuestionPoolProgress(version: questionPoolVersion)
-        let used = progress.usedIds
+        let used = questionPoolProgressManager.getUsedIds(version: questionPoolVersion)
         let sessionCount = min(20, allQuestions.count) // Адаптивный размер сессии
-        var selected = adaptiveEngine.selectQuestions(
+        
+        // Use primary strategy
+        var selected = questionSelectionStrategy.selectQuestions(
             from: allQuestions,
-            progress: profileManager.progress,
+            progress: profileProgressProvider.progress,
             usedQuestionIds: used,
             sessionCount: sessionCount
         )
         
+        // If not enough questions, use fallback strategy
         if selected.count < sessionCount {
-            let remainingNewQuestions = allQuestions.filter { question in
-                !used.contains(question.id) && !selected.contains(where: { $0.id == question.id })
-            }
-            if !remainingNewQuestions.isEmpty {
-                let remainingNeeded = sessionCount - selected.count
-                selected.append(contentsOf: Array(remainingNewQuestions.shuffled().prefix(remainingNeeded)))
-            }
-        }
-        
-        if selected.count < sessionCount {
-            let fallback = allQuestions.filter { question in
-                !selected.contains(where: { $0.id == question.id })
-            }
+            let alreadySelectedIds = Set(selected.map { $0.id })
+            let remainingQuestions = allQuestions.filter { !alreadySelectedIds.contains($0.id) }
             let remainingNeeded = sessionCount - selected.count
-            selected.append(contentsOf: Array(fallback.shuffled().prefix(remainingNeeded)))
+            
+            let fallbackSelected = fallbackStrategy.selectQuestions(
+                from: remainingQuestions,
+                progress: profileProgressProvider.progress,
+                usedQuestionIds: used.union(alreadySelectedIds),
+                sessionCount: remainingNeeded
+            )
+            
+            selected.append(contentsOf: fallbackSelected)
         }
         
-        progress.markUsed(selected.map { $0.id })
+        questionPoolProgressManager.markUsed(selected.map { $0.id }, version: questionPoolVersion)
         return selected
     }
     
@@ -99,14 +104,15 @@ class QuizUseCase: QuizUseCaseProtocol {
     
     func getProgressStats(language: String) async throws -> (total: Int, used: Int, remaining: Int) {
         let allQuestions = try await questionsRepository.loadQuestions(language: language)
-        let progress = QuestionPoolProgress(version: questionPoolVersion)
-        let usedCount = progress.usedIds.count
-        let remainingCount = allQuestions.count - usedCount
+        let stats = questionPoolProgressManager.getProgressStats(
+            total: allQuestions.count,
+            version: questionPoolVersion
+        )
         
         return (
             total: allQuestions.count,
-            used: usedCount,
-            remaining: remainingCount
+            used: stats.used,
+            remaining: stats.remaining
         )
     }
 }

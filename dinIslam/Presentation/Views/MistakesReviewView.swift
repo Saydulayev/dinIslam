@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct MistakesReviewView: View {
+    @Environment(\.localizationProvider) private var localizationProvider
     @Bindable var viewModel: QuizViewModel
     @State private var showingStopConfirm: Bool = false
     
@@ -117,7 +118,7 @@ struct MistakesReviewView: View {
                                 HStack {
                                     Image(systemName: "exclamationmark.triangle.fill")
                                         .foregroundColor(DesignTokens.Colors.iconRed)
-                                    Text(LocalizationManager.shared.localizedString(for: "mistakes.wrongAnswer"))
+                                    Text(localizationProvider.localizedString(for: "mistakes.wrongAnswer"))
                                         .font(DesignTokens.Typography.label)
                                         .foregroundColor(DesignTokens.Colors.iconRed)
                                         .fontWeight(.semibold)
@@ -167,7 +168,7 @@ struct MistakesReviewView: View {
                         HStack(spacing: DesignTokens.Spacing.md) {
                             Image(systemName: "stop.fill")
                                 .font(.system(size: DesignTokens.Sizes.iconMedium))
-                            Text(LocalizationManager.shared.localizedString(for: "mistakes.stop"))
+                            Text(localizationProvider.localizedString(for: "mistakes.stop"))
                                 .font(DesignTokens.Typography.secondarySemibold)
                         }
                         .foregroundColor(DesignTokens.Colors.textPrimary)
@@ -220,15 +221,20 @@ struct MistakesReviewView: View {
         statsManager: statsManager,
         examStatisticsManager: examStatsManager
     )
+    let adaptiveStrategy = AdaptiveQuestionSelectionStrategy(adaptiveEngine: adaptiveEngine)
+    let fallbackStrategy = FallbackQuestionSelectionStrategy()
+    let questionPoolProgressManager = DefaultQuestionPoolProgressManager()
     let quizUseCase = QuizUseCase(
         questionsRepository: QuestionsRepository(),
-        adaptiveEngine: adaptiveEngine,
-        profileManager: profileManager
+        profileProgressProvider: profileManager, // ProfileManager implements ProfileProgressProviding
+        questionSelectionStrategy: adaptiveStrategy,
+        fallbackStrategy: fallbackStrategy,
+        questionPoolProgressManager: questionPoolProgressManager
     )
     let viewModel = QuizViewModel(
         quizUseCase: quizUseCase,
         statsManager: statsManager,
         settingsManager: SettingsManager()
     )
-    return MistakesReviewView(viewModel: viewModel)
+    MistakesReviewView(viewModel: viewModel)
 }

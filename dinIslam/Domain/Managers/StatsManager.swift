@@ -11,18 +11,27 @@ import Observation
 @MainActor
 @Observable
 class StatsManager {
-    weak var profileSyncDelegate: ProfileProgressSyncDelegate?
+    private var profileProgressSyncer: ProfileProgressSyncing?
     var stats: UserStats
     
-    private let userDefaults = UserDefaults.standard
+    private let userDefaults: UserDefaults
     private let statsKey = "UserStats"
     
-    init() {
-        self.stats = Self.loadStats()
+    init(
+        userDefaults: UserDefaults = .standard,
+        profileProgressSyncer: ProfileProgressSyncing? = nil
+    ) {
+        self.userDefaults = userDefaults
+        self.profileProgressSyncer = profileProgressSyncer
+        self.stats = Self.loadStats(from: userDefaults, key: statsKey)
     }
     
-    private static func loadStats() -> UserStats {
-        guard let data = UserDefaults.standard.data(forKey: "UserStats"),
+    func setProfileProgressSyncer(_ syncer: ProfileProgressSyncing?) {
+        self.profileProgressSyncer = syncer
+    }
+    
+    private static func loadStats(from userDefaults: UserDefaults, key: String) -> UserStats {
+        guard let data = userDefaults.data(forKey: key),
               let stats = try? JSONDecoder().decode(UserStats.self, from: data) else {
             return UserStats()
         }
@@ -32,7 +41,7 @@ class StatsManager {
     func recordQuizSession(_ summary: QuizSessionSummary) {
         stats.recordQuizSession(summary)
         saveStats()
-        profileSyncDelegate?.statsManager(self, didRecord: summary)
+        profileProgressSyncer?.syncStatsUpdate(summary)
     }
     
     func clearWrongQuestions() {
@@ -43,8 +52,8 @@ class StatsManager {
     func removeWrongQuestion(_ questionId: String) {
         stats.removeWrongQuestion(questionId)
         saveStats()
-        // Уведомляем делегата об обновлении статистики для синхронизации с ProfileManager
-        profileSyncDelegate?.statsManagerDidUpdate(self)
+        // Уведомляем syncer об обновлении статистики для синхронизации с ProfileManager
+        profileProgressSyncer?.syncStatsDidUpdate()
     }
     
     func getWrongQuestions(from allQuestions: [Question]) -> [Question] {
@@ -60,13 +69,13 @@ class StatsManager {
     func resetStats() {
         stats = UserStats()
         saveStats()
-        profileSyncDelegate?.statsManagerDidReset(self)
+        profileProgressSyncer?.syncStatsReset()
     }
     
     func resetStatsExceptTotalQuestions() {
         stats = UserStats()
         saveStats()
-        profileSyncDelegate?.statsManagerDidReset(self)
+        profileProgressSyncer?.syncStatsReset()
     }
     
     func getCorrectedMistakesCount() -> Int {
@@ -96,7 +105,7 @@ class StatsManager {
         stats.perfectScores = 0
         stats.longestStreak = 0
         saveStats()
-        profileSyncDelegate?.statsManagerDidReset(self)
+        profileProgressSyncer?.syncStatsReset()
     }
     
     // MARK: - Profile Progress Sync
@@ -154,10 +163,4 @@ class StatsManager {
         
         saveStats()
     }
-}
-
-protocol ProfileProgressSyncDelegate: AnyObject {
-    func statsManager(_ manager: StatsManager, didRecord summary: QuizSessionSummary)
-    func statsManagerDidReset(_ manager: StatsManager)
-    func statsManagerDidUpdate(_ manager: StatsManager)
 }

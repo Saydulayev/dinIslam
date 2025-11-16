@@ -9,24 +9,43 @@ import Foundation
 import Combine
 import SwiftUI
 
-class AchievementManager: ObservableObject {
-    static let shared = AchievementManager()
+class AchievementManager: ObservableObject, AchievementManaging {
+    // MARK: - Backward Compatibility (Deprecated)
+    @available(*, deprecated, message: "Use dependency injection instead")
+    static let shared: AchievementManager = {
+        let notificationManager = NotificationManager()
+        let manager = AchievementManager(
+            notificationManager: notificationManager,
+            localizationProvider: LocalizationManager()
+        )
+        return manager
+    }()
     
     @Published var achievements: [Achievement] = []
     @Published var newAchievements: [Achievement] = []
     
-    private let userDefaults = UserDefaults.standard
+    private let userDefaults: UserDefaults
     private let achievementsKey = "UserAchievements"
-    private var notificationManager: NotificationManager
+    private let notificationManager: NotificationManager
+    private let localizationProvider: LocalizationProviding
     
-    private init(notificationManager: NotificationManager = NotificationManager()) {
+    init(
+        userDefaults: UserDefaults = .standard,
+        notificationManager: NotificationManager,
+        localizationProvider: LocalizationProviding? = nil
+    ) {
+        self.userDefaults = userDefaults
         self.notificationManager = notificationManager
+        // Use provided localization provider or create default for backward compatibility
+        self.localizationProvider = localizationProvider ?? LocalizationManager()
         loadAchievements()
         initializeDefaultAchievements()
     }
     
+    @available(*, deprecated, message: "Pass notificationManager in init instead")
     func configureDependencies(notificationManager: NotificationManager) {
-        self.notificationManager = notificationManager
+        // This method is deprecated - notificationManager should be passed in init
+        // Keeping for backward compatibility but it won't work with the new structure
     }
     
     func refreshLocalization() {
@@ -34,8 +53,8 @@ class AchievementManager: ObservableObject {
         for i in 0..<achievements.count {
             achievements[i] = Achievement(
                 id: achievements[i].id,
-                title: achievements[i].type.localizedTitle,
-                description: achievements[i].type.localizedDescription,
+                title: achievements[i].type.title(using: localizationProvider),
+                description: achievements[i].type.description(using: localizationProvider),
                 icon: achievements[i].icon,
                 color: achievements[i].color,
                 type: achievements[i].type,
@@ -140,8 +159,8 @@ class AchievementManager: ObservableObject {
         return [
             Achievement(
                 id: "first_quiz",
-                title: AchievementType.firstQuiz.localizedTitle,
-                description: AchievementType.firstQuiz.localizedDescription,
+                title: AchievementType.firstQuiz.title(using: localizationProvider),
+                description: AchievementType.firstQuiz.description(using: localizationProvider),
                 icon: "play.circle.fill",
                 color: .blue,
                 type: .firstQuiz,
@@ -149,8 +168,8 @@ class AchievementManager: ObservableObject {
             ),
             Achievement(
                 id: "perfect_score",
-                title: AchievementType.perfectScore.localizedTitle,
-                description: AchievementType.perfectScore.localizedDescription,
+                title: AchievementType.perfectScore.title(using: localizationProvider),
+                description: AchievementType.perfectScore.description(using: localizationProvider),
                 icon: "star.fill",
                 color: .yellow,
                 type: .perfectScore,
@@ -158,8 +177,8 @@ class AchievementManager: ObservableObject {
             ),
             Achievement(
                 id: "speed_runner",
-                title: AchievementType.speedRunner.localizedTitle,
-                description: AchievementType.speedRunner.localizedDescription,
+                title: AchievementType.speedRunner.title(using: localizationProvider),
+                description: AchievementType.speedRunner.description(using: localizationProvider),
                 icon: "timer",
                 color: .orange,
                 type: .speedRunner,
@@ -167,8 +186,8 @@ class AchievementManager: ObservableObject {
             ),
             Achievement(
                 id: "scholar",
-                title: AchievementType.scholar.localizedTitle,
-                description: AchievementType.scholar.localizedDescription,
+                title: AchievementType.scholar.title(using: localizationProvider),
+                description: AchievementType.scholar.description(using: localizationProvider),
                 icon: "book.fill",
                 color: .purple,
                 type: .scholar,
@@ -176,8 +195,8 @@ class AchievementManager: ObservableObject {
             ),
             Achievement(
                 id: "dedicated",
-                title: AchievementType.dedicated.localizedTitle,
-                description: AchievementType.dedicated.localizedDescription,
+                title: AchievementType.dedicated.title(using: localizationProvider),
+                description: AchievementType.dedicated.description(using: localizationProvider),
                 icon: "flame.fill",
                 color: .red,
                 type: .dedicated,
@@ -185,8 +204,8 @@ class AchievementManager: ObservableObject {
             ),
             Achievement(
                 id: "master",
-                title: AchievementType.master.localizedTitle,
-                description: AchievementType.master.localizedDescription,
+                title: AchievementType.master.title(using: localizationProvider),
+                description: AchievementType.master.description(using: localizationProvider),
                 icon: "crown.fill",
                 color: .yellow,
                 type: .master,
@@ -194,8 +213,8 @@ class AchievementManager: ObservableObject {
             ),
             Achievement(
                 id: "streak",
-                title: AchievementType.streak.localizedTitle,
-                description: AchievementType.streak.localizedDescription,
+                title: AchievementType.streak.title(using: localizationProvider),
+                description: AchievementType.streak.description(using: localizationProvider),
                 icon: "bolt.fill",
                 color: .cyan,
                 type: .streak,
@@ -203,8 +222,8 @@ class AchievementManager: ObservableObject {
             ),
             Achievement(
                 id: "explorer",
-                title: AchievementType.explorer.localizedTitle,
-                description: AchievementType.explorer.localizedDescription,
+                title: AchievementType.explorer.title(using: localizationProvider),
+                description: AchievementType.explorer.description(using: localizationProvider),
                 icon: "globe",
                 color: .green,
                 type: .explorer,
@@ -212,8 +231,8 @@ class AchievementManager: ObservableObject {
             ),
             Achievement(
                 id: "perfectionist",
-                title: AchievementType.perfectionist.localizedTitle,
-                description: AchievementType.perfectionist.localizedDescription,
+                title: AchievementType.perfectionist.title(using: localizationProvider),
+                description: AchievementType.perfectionist.description(using: localizationProvider),
                 icon: "diamond.fill",
                 color: .pink,
                 type: .perfectionist,
@@ -221,8 +240,8 @@ class AchievementManager: ObservableObject {
             ),
             Achievement(
                 id: "legend",
-                title: AchievementType.legend.localizedTitle,
-                description: AchievementType.legend.localizedDescription,
+                title: AchievementType.legend.title(using: localizationProvider),
+                description: AchievementType.legend.description(using: localizationProvider),
                 icon: "trophy.fill",
                 color: .indigo,
                 type: .legend,

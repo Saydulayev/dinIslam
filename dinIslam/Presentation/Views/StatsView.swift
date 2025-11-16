@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct StatsView: View {
+    @Environment(\.localizationProvider) private var localizationProvider
     @Bindable var statsManager: StatsManager
     @Environment(\.settingsManager) private var settingsManager
     @EnvironmentObject private var remoteService: RemoteQuestionsService
@@ -114,11 +115,11 @@ struct StatsView: View {
                 .padding(.bottom, DesignTokens.Spacing.xxxl)
             }
         }
-        .navigationTitle(LocalizationManager.shared.localizedString(for: "stats.title"))
+        .navigationTitle(localizationProvider.localizedString(for: "stats.title"))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
-                Button(LocalizationManager.shared.localizedString(for: "stats.reset")) {
+                Button(localizationProvider.localizedString(for: "stats.reset")) {
                     showingResetAlert = true
                 }
                 .font(DesignTokens.Typography.secondarySemibold)
@@ -328,9 +329,9 @@ struct StatsView: View {
         mistakesTask?.cancel()
         
         // Используем существующие экземпляры из DI контейнера
-        let container = DIContainer.shared
+        let dependencies = DIContainer.createDependencies()
         let viewModel = QuizViewModel(
-            quizUseCase: container.quizUseCase, 
+            quizUseCase: dependencies.quizUseCase, 
             statsManager: statsManager, 
             settingsManager: settingsManager
         )

@@ -368,9 +368,9 @@ struct EnhancedStatsView: View {
         mistakesTask?.cancel()
         
         // Используем существующие экземпляры из DI контейнера
-        let container = DIContainer.shared
+        let dependencies = DIContainer.createDependencies()
         let viewModel = QuizViewModel(
-            quizUseCase: container.quizUseCase, 
+            quizUseCase: dependencies.quizUseCase, 
             statsManager: statsManager, 
             settingsManager: settingsManager
         )

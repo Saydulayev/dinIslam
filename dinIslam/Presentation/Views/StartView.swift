@@ -57,12 +57,15 @@ struct StartView: View {
         profileManager: ProfileManager,
         examUseCase: ExamUseCaseProtocol,
         examStatisticsManager: ExamStatisticsManager,
-        enhancedContainer: EnhancedDIContainer
+        enhancedQuizUseCase: EnhancedQuizUseCaseProtocol
     ) {
         let quizViewModel = QuizViewModel(
             quizUseCase: quizUseCase,
             statsManager: statsManager,
             settingsManager: settingsManager
+        )
+        let questionsPreloading = DefaultQuestionsPreloadingService(
+            enhancedQuizUseCase: enhancedQuizUseCase
         )
         _model = State(
             initialValue: StartViewModel(
@@ -72,7 +75,7 @@ struct StartView: View {
                 profileManager: profileManager,
                 examUseCase: examUseCase,
                 examStatisticsManager: examStatisticsManager,
-                enhancedContainer: enhancedContainer
+                questionsPreloading: questionsPreloading
             )
         )
     }
@@ -83,12 +86,16 @@ struct StartView: View {
         settingsManager: SettingsManager,
         profileManager: ProfileManager,
         examUseCase: ExamUseCaseProtocol,
-        examStatisticsManager: ExamStatisticsManager
+        examStatisticsManager: ExamStatisticsManager,
+        enhancedContainer: EnhancedDIContainer
     ) {
         let quizViewModel = QuizViewModel(
             quizUseCase: quizUseCase,
             statsManager: statsManager,
             settingsManager: settingsManager
+        )
+        let questionsPreloading = DefaultQuestionsPreloadingService(
+            enhancedQuizUseCase: enhancedContainer.enhancedQuizUseCase
         )
         _model = State(
             initialValue: StartViewModel(
@@ -98,7 +105,7 @@ struct StartView: View {
                 profileManager: profileManager,
                 examUseCase: examUseCase,
                 examStatisticsManager: examStatisticsManager,
-                enhancedContainer: EnhancedDIContainer.shared
+                questionsPreloading: questionsPreloading
             )
         )
     }
@@ -160,7 +167,7 @@ struct StartView: View {
                 case .achievements:
                     AchievementsView()
                 case .settings:
-                    SettingsView(viewModel: SettingsViewModel(settingsManager: model.settingsManager))
+                    SettingsViewWithDependencies(settingsManager: model.settingsManager)
                 case .profile:
                     UnifiedProfileView(statsManager: model.statsManager)
                 case .exam:
@@ -446,23 +453,33 @@ private struct ParticleFieldView: View {
         statsManager: statsManager,
         examStatisticsManager: examStatsManager
     )
+    let adaptiveStrategy = AdaptiveQuestionSelectionStrategy(adaptiveEngine: adaptiveEngine)
+    let fallbackStrategy = FallbackQuestionSelectionStrategy()
+    let questionPoolProgressManager = DefaultQuestionPoolProgressManager()
     let quizUseCase = QuizUseCase(
         questionsRepository: QuestionsRepository(),
-        adaptiveEngine: adaptiveEngine,
-        profileManager: profileManager
+        profileProgressProvider: profileManager, // ProfileManager implements ProfileProgressProviding
+        questionSelectionStrategy: adaptiveStrategy,
+        fallbackStrategy: fallbackStrategy,
+        questionPoolProgressManager: questionPoolProgressManager
     )
     let examUseCase = ExamUseCase(
         questionsRepository: QuestionsRepository(),
         examStatisticsManager: examStatsManager
     )
+    
+    // Create enhanced dependencies for Preview
+    let baseDependencies = AppDependencies()
+    let enhancedDependencies = EnhancedDIContainer.createEnhancedDependencies(baseDependencies: baseDependencies)
 
-    return StartView(
+    StartView(
         quizUseCase: quizUseCase,
         statsManager: statsManager,
         settingsManager: settingsManager,
         profileManager: profileManager,
         examUseCase: examUseCase,
-        examStatisticsManager: examStatsManager
+        examStatisticsManager: examStatsManager,
+        enhancedQuizUseCase: enhancedDependencies.enhancedQuizUseCase
     )
     .environment(\.settingsManager, settingsManager)
     .environment(\.statsManager, statsManager)

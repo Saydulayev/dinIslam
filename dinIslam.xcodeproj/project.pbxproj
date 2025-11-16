@@ -9,6 +9,7 @@
 /* Begin PBXFileReference section */
 		C20EB7D12EC89DC700C1BC2F /* dinIslam.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = dinIslam.xcodeproj; sourceTree = "<group>"; };
 		C22747742EA631EA00F2199B /* dinIslam.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = dinIslam.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C235C3732ECA4D51006A6CF3 /* dinIslam.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = dinIslam.xcodeproj; sourceTree = "<group>"; };
 		C23E762F2EC932A3006206DC /* dinIslam.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = dinIslam.xcodeproj; sourceTree = "<group>"; };
 		C24927CF2EBFD9FD009A4CC4 /* dinIslam.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = dinIslam.xcodeproj; sourceTree = "<group>"; };
 		C275F25A2EBFD775002BEE44 /* dinIslam.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = dinIslam.xcodeproj; sourceTree = "<group>"; };
@@ -67,6 +68,11 @@
 			children = (
 				C22747742EA631EA00F2199B /* dinIslam.app */,
 			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		C235C3762ECA4D51006A6CF3 /* Products */ = {
+			isa = PBXGroup;
 			name = Products;
 			sourceTree = "<group>";
 		};
@@ -169,6 +175,10 @@
 				{
 					ProductGroup = C275F25B2EBFD775002BEE44 /* Products */;
 					ProjectRef = C275F25A2EBFD775002BEE44 /* dinIslam.xcodeproj */;
+				},
+				{
+					ProductGroup = C235C3762ECA4D51006A6CF3 /* Products */;
+					ProjectRef = C235C3732ECA4D51006A6CF3 /* dinIslam.xcodeproj */;
 				},
 				{
 					ProductGroup = C24927D12EBFD9FD009A4CC4 /* Products */;

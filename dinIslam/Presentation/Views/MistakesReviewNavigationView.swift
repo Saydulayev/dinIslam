@@ -10,6 +10,7 @@ import SwiftUI
 struct MistakesReviewNavigationView: View {
     @Bindable var viewModel: QuizViewModel
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.localizationProvider) private var localizationProvider
     
     init(viewModel: QuizViewModel) {
         _viewModel = Bindable(viewModel)
@@ -76,7 +77,7 @@ struct MistakesReviewNavigationView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
             }
-            .navigationTitle(LocalizationManager.shared.localizedString(for: "mistakes.reviewTitle"))
+            .navigationTitle(localizationProvider.localizedString(for: "mistakes.reviewTitle"))
             .navigationBarTitleDisplayMode(.inline)
             .navigationBarBackButtonHidden(true)
             .onChange(of: viewModel.state) { _, newState in
@@ -110,15 +111,20 @@ struct MistakesReviewNavigationView: View {
         statsManager: statsManager,
         examStatisticsManager: examStatsManager
     )
+    let adaptiveStrategy = AdaptiveQuestionSelectionStrategy(adaptiveEngine: adaptiveEngine)
+    let fallbackStrategy = FallbackQuestionSelectionStrategy()
+    let questionPoolProgressManager = DefaultQuestionPoolProgressManager()
     let quizUseCase = QuizUseCase(
         questionsRepository: QuestionsRepository(),
-        adaptiveEngine: adaptiveEngine,
-        profileManager: profileManager
+        profileProgressProvider: profileManager, // ProfileManager implements ProfileProgressProviding
+        questionSelectionStrategy: adaptiveStrategy,
+        fallbackStrategy: fallbackStrategy,
+        questionPoolProgressManager: questionPoolProgressManager
     )
     let viewModel = QuizViewModel(
         quizUseCase: quizUseCase,
         statsManager: statsManager,
         settingsManager: SettingsManager()
     )
-    return MistakesReviewNavigationView(viewModel: viewModel)
+    MistakesReviewNavigationView(viewModel: viewModel)
 }

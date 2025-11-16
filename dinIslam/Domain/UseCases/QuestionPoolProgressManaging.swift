@@ -1,0 +1,16 @@
+//
+//  QuestionPoolProgressManaging.swift
+//  dinIslam
+//
+//  Created by Assistant on 13.11.25.
+//
+
+import Foundation
+
+protocol QuestionPoolProgressManaging {
+    func getUsedIds(version: Int) -> Set<String>
+    func markUsed(_ questionIds: [String], version: Int)
+    func reset(version: Int)
+    func getProgressStats(total: Int, version: Int) -> (used: Int, remaining: Int)
+}
+

@@ -72,19 +72,23 @@ final class ProfileManager {
     @ObservationIgnored private let statsManager: StatsManager
     @ObservationIgnored private let examStatisticsManager: ExamStatisticsManager
     
-    // Services
-    @ObservationIgnored private let authService: ProfileAuthService
-    @ObservationIgnored private let syncService: ProfileSyncService
+    // Services via protocols
+    @ObservationIgnored private let authService: ProfileAuthHandling
+    @ObservationIgnored private let syncService: ProfileSyncing
     @ObservationIgnored private let mergeService: ProfileMergeService
-    @ObservationIgnored private let avatarManager: ProfileAvatarManager
-    @ObservationIgnored private let progressBuilder: ProfileProgressBuilder
+    @ObservationIgnored private let avatarService: ProfileAvatarHandling
+    @ObservationIgnored private let progressService: ProfileProgressManaging
 
     init(
         localStore localStoreOverride: ProfileLocalStore? = nil,
         cloudService cloudServiceOverride: CloudKitProfileService? = nil,
         adaptiveEngine adaptiveEngineOverride: AdaptiveLearningEngine? = nil,
         statsManager: StatsManager,
-        examStatisticsManager: ExamStatisticsManager
+        examStatisticsManager: ExamStatisticsManager,
+        authService: ProfileAuthHandling? = nil,
+        syncService: ProfileSyncing? = nil,
+        avatarService: ProfileAvatarHandling? = nil,
+        progressService: ProfileProgressManaging? = nil
     ) {
         let resolvedLocalStore: ProfileLocalStore
         if let override = localStoreOverride {
@@ -113,21 +117,34 @@ final class ProfileManager {
         self.statsManager = statsManager
         self.examStatisticsManager = examStatisticsManager
 
-        // Initialize services
+        // Initialize services with default implementations if not provided
         self.mergeService = ProfileMergeService(adaptiveEngine: resolvedAdaptiveEngine)
-        self.avatarManager = ProfileAvatarManager(localStore: resolvedLocalStore)
-        self.progressBuilder = ProfileProgressBuilder(
+        
+        let resolvedAvatarManager = ProfileAvatarManager(localStore: resolvedLocalStore)
+        let resolvedAvatarService = avatarService ?? DefaultProfileAvatarService(avatarManager: resolvedAvatarManager)
+        
+        let resolvedProgressBuilder = ProfileProgressBuilder(
             adaptiveEngine: resolvedAdaptiveEngine,
             statsManager: statsManager,
             examStatisticsManager: examStatisticsManager
         )
-        self.syncService = ProfileSyncService(
+        let resolvedProgressService = progressService ?? DefaultProfileProgressService(progressBuilder: resolvedProgressBuilder)
+        
+        let resolvedSyncService = ProfileSyncService(
             cloudService: resolvedCloudService,
             localStore: resolvedLocalStore,
             mergeService: mergeService,
-            avatarManager: avatarManager
+            avatarManager: resolvedAvatarManager
         )
-        self.authService = ProfileAuthService()
+        let resolvedSyncServiceWrapper = syncService ?? DefaultProfileSyncService(syncService: resolvedSyncService)
+        
+        let resolvedAuthService = authService ?? DefaultProfileAuthService(authService: ProfileAuthService())
+        
+        // Assign services to properties
+        self.avatarService = resolvedAvatarService
+        self.progressService = resolvedProgressService
+        self.syncService = resolvedSyncServiceWrapper
+        self.authService = resolvedAuthService
 
         if let storedProfile = resolvedLocalStore.loadCurrentProfile() {
             profile = storedProfile
@@ -136,13 +153,10 @@ final class ProfileManager {
         }
 
         // Валидация аватара при загрузке профиля
-        avatarManager.validateAvatar(profile: &profile)
+        self.avatarService.validateAvatar(profile: &profile)
         localStore.saveProfile(profile)
 
-        self.statsManager.profileSyncDelegate = self
-        self.examStatisticsManager.profileSyncDelegate = self
-
-        progressBuilder.rebuildProgressFromLocalStats(profile: &profile)
+        self.progressService.rebuildProgressFromLocalStats(profile: &profile)
         localStore.saveProfile(profile)
 
         if profile.authMethod != .anonymous {
@@ -175,13 +189,13 @@ final class ProfileManager {
         let signedInProfileId = profile.id
         
         // Сохраняем данные из ProfileProgress в локальные StatsManager перед выходом
-        progressBuilder.syncProgressToLocalStats(profile: profile)
+        progressService.syncProgressToLocalStats(profile: profile)
         
         // Переключаемся на анонимный профиль
         profile = localStore.loadOrCreateAnonymousProfile()
         
         // Восстанавливаем локальные данные в новый анонимный профиль
-        progressBuilder.rebuildProgressFromLocalStats(profile: &profile)
+        progressService.rebuildProgressFromLocalStats(profile: &profile)
         
         localStore.saveProfile(profile)
         syncState = .idle
@@ -203,7 +217,7 @@ final class ProfileManager {
         profile.metadata.updatedAt = Date()
         profile.metadata.lastSyncedAt = nil
         localStore.deleteAvatar(for: profileId)
-        progressBuilder.rebuildProgressFromLocalStats(profile: &profile)
+        progressService.rebuildProgressFromLocalStats(profile: &profile)
         localStore.saveProfile(profile)
 
         if isSignedIn {
@@ -223,7 +237,7 @@ final class ProfileManager {
     }
 
     func updateAvatar(with data: Data, fileExtension: String = "dat") async {
-        guard avatarManager.updateAvatar(profile: &profile, data: data, fileExtension: fileExtension) else {
+        guard avatarService.updateAvatar(profile: &profile, data: data, fileExtension: fileExtension) else {
             return
         }
         localStore.saveProfile(profile)
@@ -233,7 +247,7 @@ final class ProfileManager {
     }
 
     func deleteAvatar() async {
-        avatarManager.deleteAvatar(profile: &profile)
+        avatarService.deleteAvatar(profile: &profile)
         localStore.saveProfile(profile)
         if isSignedIn {
             await performSync()
@@ -251,7 +265,7 @@ final class ProfileManager {
     }
 
     func validateAvatar() {
-        avatarManager.validateAvatar(profile: &profile)
+        avatarService.validateAvatar(profile: &profile)
         localStore.saveProfile(profile)
     }
 
@@ -329,7 +343,7 @@ final class ProfileManager {
         // Временно устанавливаем signedInProfile как текущий профиль для rebuildProgressFromLocalStats
         let originalProfile = profile
         profile = signedInProfile
-        progressBuilder.rebuildProgressFromLocalStats(profile: &profile)
+        progressService.rebuildProgressFromLocalStats(profile: &profile)
         signedInProfile = profile
         profile = originalProfile
 
@@ -345,12 +359,12 @@ final class ProfileManager {
             
             // Если есть удаленный профиль, обновляем локальные данные из объединенного профиля
             if hasRemoteProfile {
-                progressBuilder.syncProgressToLocalStats(profile: profile)
+                progressService.syncProgressToLocalStats(profile: profile)
             }
             // Если нет удаленного профиля, локальные данные уже перенесены в ProfileProgress выше
             
             // Валидация аватара после входа
-            avatarManager.validateAvatar(profile: &profile)
+            avatarService.validateAvatar(profile: &profile)
             localStore.saveProfile(profile)
             await performSync()
             errorMessage = nil
@@ -367,43 +381,46 @@ final class ProfileManager {
         return formatter.string(from: components)
     }
     
-    deinit {
+    nonisolated deinit {
         syncService.cancelSync()
     }
 }
 
-// MARK: - Delegates
-extension ProfileManager: ProfileProgressSyncDelegate {
-    func statsManager(_ manager: StatsManager, didRecord summary: QuizSessionSummary) {
+// MARK: - ProfileProgressSyncing Implementation
+extension ProfileManager: ProfileProgressSyncing {
+    func syncStatsUpdate(_ summary: QuizSessionSummary) {
         lastRecommendations = adaptiveEngine.applyQuizSummary(summary, to: &profile)
         localStore.saveProfile(profile)
         scheduleSync()
     }
 
-    func statsManagerDidReset(_ manager: StatsManager) {
-        progressBuilder.rebuildProgressFromLocalStats(profile: &profile)
+    func syncStatsReset() {
+        progressService.rebuildProgressFromLocalStats(profile: &profile)
         localStore.saveProfile(profile)
         scheduleSync()
     }
     
-    func statsManagerDidUpdate(_ manager: StatsManager) {
+    func syncStatsDidUpdate() {
         // Обновляем progress из локальных данных при изменении статистики (например, при исправлении ошибок)
-        progressBuilder.rebuildProgressFromLocalStats(profile: &profile)
+        progressService.rebuildProgressFromLocalStats(profile: &profile)
         localStore.saveProfile(profile)
         scheduleSync()
     }
-}
-
-extension ProfileManager: ProfileExamSyncDelegate {
-    func examStatisticsManager(_ manager: ExamStatisticsManager, didRecord summary: ExamSessionSummary) {
+    
+    func syncExamUpdate(_ summary: ExamSessionSummary) {
         adaptiveEngine.applyExamSummary(summary, to: &profile)
         localStore.saveProfile(profile)
         scheduleSync()
     }
 
-    func examStatisticsManagerDidReset(_ manager: ExamStatisticsManager) {
-        progressBuilder.rebuildProgressFromLocalStats(profile: &profile)
+    func syncExamReset() {
+        progressService.rebuildProgressFromLocalStats(profile: &profile)
         localStore.saveProfile(profile)
         scheduleSync()
     }
+}
+
+// MARK: - ProfileProgressProviding Implementation
+extension ProfileManager: ProfileProgressProviding {
+    // Уже реализовано через var progress: ProfileProgress { profile.progress }
 }

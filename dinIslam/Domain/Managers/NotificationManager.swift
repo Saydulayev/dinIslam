@@ -17,8 +17,10 @@ class NotificationManager: ObservableObject {
     @Published var hasPermission = false
     
     private let center = UNUserNotificationCenter.current()
+    private let localizationProvider: LocalizationProviding
     
-    init() {
+    init(localizationProvider: LocalizationProviding? = nil) {
+        self.localizationProvider = localizationProvider ?? LocalizationManager()
         checkNotificationPermission()
         loadSettings()
     }
@@ -64,8 +66,8 @@ class NotificationManager: ObservableObject {
         center.removePendingNotificationRequests(withIdentifiers: ["daily_reminder"])
         
         let content = UNMutableNotificationContent()
-        content.title = LocalizationManager.shared.localizedString(for: "notification.title")
-        content.body = LocalizationManager.shared.localizedString(for: "notification.body")
+        content.title = localizationProvider.localizedString(for: "notification.title")
+        content.body = localizationProvider.localizedString(for: "notification.body")
         content.sound = .default
         content.badge = 1
         
@@ -155,8 +157,8 @@ class NotificationManager: ObservableObject {
         guard hasPermission else { return }
         
         let content = UNMutableNotificationContent()
-        content.title = LocalizationManager.shared.localizedString(for: "achievement.notification.title")
-        content.body = "\(LocalizationManager.shared.localizedString(for: "achievement.notification.body")) \(achievement.title)"
+        content.title = localizationProvider.localizedString(for: "achievement.notification.title")
+        content.body = "\(localizationProvider.localizedString(for: "achievement.notification.body")) \(achievement.title)"
         content.sound = .default
         content.badge = 1
         
@@ -182,8 +184,8 @@ class NotificationManager: ObservableObject {
         
         // Schedule a reminder for the next day if user hasn't studied today
         let content = UNMutableNotificationContent()
-        content.title = LocalizationManager.shared.localizedString(for: "streak.notification.title")
-        content.body = LocalizationManager.shared.localizedString(for: "streak.notification.body")
+        content.title = localizationProvider.localizedString(for: "streak.notification.title")
+        content.body = localizationProvider.localizedString(for: "streak.notification.body")
         content.sound = .default
         content.badge = 1
         
