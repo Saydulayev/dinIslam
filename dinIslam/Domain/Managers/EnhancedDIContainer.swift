@@ -213,7 +213,8 @@ struct EnhancedDependencies {
             questionsRepository: enhancedQuestionsRepository,
             networkManager: networkManager,
             adaptiveEngine: baseDependencies.adaptiveLearningEngine,
-            profileManager: baseDependencies.profileManager
+            profileManager: baseDependencies.profileManager,
+            questionPoolProgressManager: baseDependencies.questionPoolProgressManager
         )
     }
     
@@ -251,7 +252,8 @@ struct EnhancedDependencies {
             questionsRepository: updated.enhancedQuestionsRepository,
             networkManager: updated.networkManager,
             adaptiveEngine: baseDependencies.adaptiveLearningEngine,
-            profileManager: baseDependencies.profileManager
+            profileManager: baseDependencies.profileManager,
+            questionPoolProgressManager: baseDependencies.questionPoolProgressManager
         )
         
         return updated
@@ -289,7 +291,8 @@ struct EnhancedDependencies {
             questionsRepository: updated.enhancedQuestionsRepository,
             networkManager: updated.networkManager,
             adaptiveEngine: baseDependencies.adaptiveLearningEngine,
-            profileManager: baseDependencies.profileManager
+            profileManager: baseDependencies.profileManager,
+            questionPoolProgressManager: baseDependencies.questionPoolProgressManager
         )
         
         return updated
@@ -313,24 +316,26 @@ class EnhancedQuizUseCase: EnhancedQuizUseCaseProtocol {
     private let networkManager: NetworkManager
     private let adaptiveEngine: AdaptiveLearningEngine
     private let profileManager: ProfileManager
+    private let questionPoolProgressManager: QuestionPoolProgressManaging
     private let questionPoolVersion = 1
     
     init(
         questionsRepository: EnhancedQuestionsRepositoryProtocol,
         networkManager: NetworkManager,
         adaptiveEngine: AdaptiveLearningEngine,
-        profileManager: ProfileManager
+        profileManager: ProfileManager,
+        questionPoolProgressManager: QuestionPoolProgressManaging? = nil
     ) {
         self.questionsRepository = questionsRepository
         self.networkManager = networkManager
         self.adaptiveEngine = adaptiveEngine
         self.profileManager = profileManager
+        self.questionPoolProgressManager = questionPoolProgressManager ?? DefaultQuestionPoolProgressManager()
     }
     
     func startQuiz(language: String) async throws -> [Question] {
         let allQuestions = try await questionsRepository.loadQuestions(language: language)
-        let progress = QuestionPoolProgress(version: questionPoolVersion)
-        let used = progress.usedIds
+        let used = questionPoolProgressManager.getUsedIds(version: questionPoolVersion)
         
         let sessionCount = min(20, allQuestions.count)
         var selected = adaptiveEngine.selectQuestions(
@@ -358,7 +363,7 @@ class EnhancedQuizUseCase: EnhancedQuizUseCaseProtocol {
             selected.append(contentsOf: Array(fallback.shuffled().prefix(remainingNeeded)))
         }
         
-        progress.markUsed(selected.map { $0.id })
+        questionPoolProgressManager.markUsed(selected.map { $0.id }, version: questionPoolVersion)
         return selected
     }
     

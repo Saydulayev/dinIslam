@@ -55,8 +55,7 @@ dinIslam/
 │   ├── Models/               # Модели данных
 │   │   ├── Question.swift    # Модель вопросов
 │   │   ├── AppSettings.swift # Модель настроек
-│   │   ├── UserStats.swift   # Модель статистики пользователя
-│   │   └── QuestionPoolProgress.swift # Модель прогресса пула вопросов
+│   │   └── UserStats.swift   # Модель статистики пользователя
 │   ├── Repositories/         # Протоколы репозиториев
 │   │   └── QuestionsRepository.swift
 │   ├── UseCases/             # Бизнес-сценарии
