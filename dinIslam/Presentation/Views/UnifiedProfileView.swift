@@ -591,7 +591,7 @@ struct UnifiedProfileView: View {
             
             VStack(spacing: DesignTokens.Spacing.md) {
                 HStack {
-                    Text("stats.sync.status".localized)
+                    Text("stats.sync.questions.status".localized)
                         .font(DesignTokens.Typography.secondaryRegular)
                         .foregroundColor(DesignTokens.Colors.textSecondary)
                     Spacer()
@@ -625,9 +625,22 @@ struct UnifiedProfileView: View {
                     }
                 }
                 
-                VStack(spacing: DesignTokens.Spacing.sm) {
+                if remoteService.hasUpdates {
                     MinimalButton(
-                        icon: "arrow.clockwise",
+                        icon: "arrow.down.circle",
+                        title: "stats.sync.sync".localized,
+                        foregroundColor: DesignTokens.Colors.iconGreen
+                    ) {
+                        syncTask?.cancel()
+                        syncTask = Task { @MainActor in
+                            await syncQuestions()
+                        }
+                    }
+                    .disabled(remoteService.isLoading)
+                    .opacity(remoteService.isLoading ? 0.6 : 1.0)
+                } else {
+                    MinimalButton(
+                        icon: "tray.and.arrow.down.fill",
                         title: "stats.sync.check".localized,
                         foregroundColor: DesignTokens.Colors.iconBlue
                     ) {
@@ -638,21 +651,6 @@ struct UnifiedProfileView: View {
                     }
                     .disabled(remoteService.isLoading)
                     .opacity(remoteService.isLoading ? 0.6 : 1.0)
-                    
-                    if remoteService.hasUpdates {
-                        MinimalButton(
-                            icon: "arrow.down.circle",
-                            title: "stats.sync.sync".localized,
-                            foregroundColor: DesignTokens.Colors.iconGreen
-                        ) {
-                            syncTask?.cancel()
-                            syncTask = Task { @MainActor in
-                                await syncQuestions()
-                            }
-                        }
-                        .disabled(remoteService.isLoading)
-                        .opacity(remoteService.isLoading ? 0.6 : 1.0)
-                    }
                 }
             }
         }
