@@ -84,6 +84,13 @@
 "result.totalQuestions" = "Total Questions:";
 "result.timeSpent" = "Time:";
 "result.newRecord" = "New Record!";
+"result.feedback.excellent" = "Excellent!";
+"result.feedback.great" = "Great!";
+"result.feedback.good" = "Good!";
+"result.feedback.notBad" = "Not Bad!";
+"result.feedback.average" = "Average Result";
+"result.feedback.needImprovement" = "Need More Practice";
+"result.feedback.keepPracticing" = "Keep Practicing";
 "result.playAgain" = "Continue Learning";
 "result.backToStart" = "Back to Start";
 

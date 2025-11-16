@@ -85,6 +85,13 @@
 "result.totalQuestions" = "Всего вопросов:";
 "result.timeSpent" = "Время:";
 "result.newRecord" = "Новый рекорд!";
+"result.feedback.excellent" = "Превосходно!";
+"result.feedback.great" = "Отлично!";
+"result.feedback.good" = "Хорошо!";
+"result.feedback.notBad" = "Неплохо!";
+"result.feedback.average" = "Средний результат";
+"result.feedback.needImprovement" = "Нужно больше практики";
+"result.feedback.keepPracticing" = "Продолжайте практиковаться";
 "result.playAgain" = "Продолжить изучение";
 "result.backToStart" = "В главное меню";
 

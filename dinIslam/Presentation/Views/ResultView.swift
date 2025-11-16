@@ -86,32 +86,30 @@ struct ResultView: View {
                     .cardStyle(cornerRadius: DesignTokens.CornerRadius.xlarge)
                     .padding(.horizontal, DesignTokens.Spacing.xxl)
                     
-                    // New record badge
-                    if result.isNewRecord {
-                        HStack(spacing: DesignTokens.Spacing.md) {
-                            Image(systemName: "star.fill")
-                                .font(.system(size: DesignTokens.Sizes.iconMedium))
-                                .foregroundColor(DesignTokens.Colors.iconOrange)
-                            LocalizedText("result.newRecord")
-                                .font(DesignTokens.Typography.secondarySemibold)
-                                .foregroundColor(DesignTokens.Colors.iconOrange)
-                        }
-                        .padding(DesignTokens.Spacing.lg)
-                        .frame(maxWidth: .infinity)
-                        .cardStyle(
-                            cornerRadius: DesignTokens.CornerRadius.medium,
-                            fillColor: DesignTokens.Colors.iconOrange.opacity(0.15),
-                            borderColor: DesignTokens.Colors.iconOrange.opacity(0.45),
-                            shadowColor: Color.black.opacity(0.24),
-                            shadowRadius: 6,
-                            shadowYOffset: 3
-                        )
-                        .overlay(
-                            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
-                                .stroke(DesignTokens.Colors.iconOrange, lineWidth: 1)
-                        )
-                        .padding(.horizontal, DesignTokens.Spacing.xxl)
+                    // Result feedback badge
+                    HStack(spacing: DesignTokens.Spacing.md) {
+                        Image(systemName: feedbackIcon)
+                            .font(.system(size: DesignTokens.Sizes.iconMedium))
+                            .foregroundColor(feedbackColor)
+                        LocalizedText(resultFeedbackMessage)
+                            .font(DesignTokens.Typography.secondarySemibold)
+                            .foregroundColor(feedbackColor)
                     }
+                    .padding(DesignTokens.Spacing.lg)
+                    .frame(maxWidth: .infinity)
+                    .cardStyle(
+                        cornerRadius: DesignTokens.CornerRadius.medium,
+                        fillColor: feedbackColor.opacity(0.15),
+                        borderColor: feedbackColor.opacity(0.45),
+                        shadowColor: Color.black.opacity(0.24),
+                        shadowRadius: 6,
+                        shadowYOffset: 3
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
+                            .stroke(feedbackColor, lineWidth: 1)
+                    )
+                    .padding(.horizontal, DesignTokens.Spacing.xxl)
                     
                     Spacer()
                         .frame(height: DesignTokens.Spacing.xxl)
@@ -223,6 +221,63 @@ struct ResultView: View {
         case 60..<80:
             return DesignTokens.Colors.statusGreen
         case 40..<60:
+            return DesignTokens.Colors.iconOrange
+        default:
+            return DesignTokens.Colors.iconRed
+        }
+    }
+    
+    private var resultFeedbackMessage: String {
+        switch result.percentage {
+        case 90...:
+            return "result.feedback.excellent"
+        case 80..<90:
+            return "result.feedback.great"
+        case 70..<80:
+            return "result.feedback.good"
+        case 60..<70:
+            return "result.feedback.notBad"
+        case 50..<60:
+            return "result.feedback.average"
+        case 40..<50:
+            return "result.feedback.needImprovement"
+        default:
+            return "result.feedback.keepPracticing"
+        }
+    }
+    
+    private var feedbackIcon: String {
+        switch result.percentage {
+        case 90...:
+            return "star.fill"
+        case 80..<90:
+            return "star.fill"
+        case 70..<80:
+            return "checkmark.circle.fill"
+        case 60..<70:
+            return "checkmark.circle.fill"
+        case 50..<60:
+            return "exclamationmark.circle.fill"
+        case 40..<50:
+            return "exclamationmark.triangle.fill"
+        default:
+            return "arrow.clockwise.circle.fill"
+        }
+    }
+    
+    private var feedbackColor: Color {
+        switch result.percentage {
+        case 90...:
+            return DesignTokens.Colors.iconOrange
+        case 80..<90:
+            return DesignTokens.Colors.iconOrange
+        case 70..<80:
+            return DesignTokens.Colors.statusGreen
+        case 60..<70:
+            return DesignTokens.Colors.statusGreen
+        case 50..<60:
+            return DesignTokens.Colors.iconOrange
+        case 40..<50:
             return DesignTokens.Colors.iconOrange
         default:
             return DesignTokens.Colors.iconRed
