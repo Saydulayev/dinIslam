@@ -123,16 +123,20 @@ struct ResultView: View {
                                 LocalizedText("result.playAgain")
                                     .font(DesignTokens.Typography.secondarySemibold)
                             }
-                            .foregroundColor(DesignTokens.Colors.textPrimary)
+                            .foregroundColor(DesignTokens.Colors.iconBlue)
                             .frame(maxWidth: .infinity)
                             .frame(height: 56)
                             .cardStyle(
                                 cornerRadius: DesignTokens.CornerRadius.medium,
-                                fillColor: DesignTokens.Colors.iconBlue,
-                                borderColor: DesignTokens.Colors.iconBlue.opacity(0.45),
+                                fillColor: DesignTokens.Colors.progressCard,
+                                borderColor: DesignTokens.Colors.borderDefault,
                                 shadowColor: Color.black.opacity(0.24),
                                 shadowRadius: 8,
                                 shadowYOffset: 4
+                            )
+                            .overlay(
+                                RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
+                                    .stroke(DesignTokens.Colors.borderSubtle, lineWidth: 1)
                             )
                         }
                         
@@ -261,7 +265,7 @@ struct ResultView: View {
         case 40..<50:
             return "exclamationmark.triangle.fill"
         default:
-            return "arrow.clockwise.circle.fill"
+            return "book.fill"
         }
     }
     

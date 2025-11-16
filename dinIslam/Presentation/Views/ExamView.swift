@@ -94,19 +94,23 @@ struct ExamView: View {
                             Text("exam.finish".localized)
                                 .font(DesignTokens.Typography.secondarySemibold)
                         }
-                        .foregroundColor(DesignTokens.Colors.textPrimary)
+                        .foregroundColor(DesignTokens.Colors.statusGreen)
                         .frame(maxWidth: .infinity)
-                        .frame(height: 52)
+                        .frame(height: 56)
                         .cardStyle(
                             cornerRadius: DesignTokens.CornerRadius.medium,
-                            fillColor: DesignTokens.Colors.statusGreen,
-                            borderColor: DesignTokens.Colors.statusGreen.opacity(0.4),
+                            fillColor: DesignTokens.Colors.progressCard,
+                            borderColor: DesignTokens.Colors.borderDefault,
                             shadowColor: Color.black.opacity(0.24),
                             shadowRadius: 8,
                             shadowYOffset: 4
                         )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
+                                .stroke(DesignTokens.Colors.borderSubtle, lineWidth: 1)
+                        )
                         .padding(.horizontal, DesignTokens.Spacing.xxl)
-                        .padding(.vertical, DesignTokens.Spacing.md)
+                        .padding(.vertical, DesignTokens.Spacing.lg)
                     }
                     .accessibilityLabel("Finish exam")
                     .accessibilityHint("Double tap to finish the current exam")
