@@ -171,19 +171,23 @@ struct MistakesReviewView: View {
                             Text(localizationProvider.localizedString(for: "mistakes.stop"))
                                 .font(DesignTokens.Typography.secondarySemibold)
                         }
-                        .foregroundColor(DesignTokens.Colors.textPrimary)
+                        .foregroundColor(DesignTokens.Colors.iconRed)
                         .frame(maxWidth: .infinity)
-                        .frame(height: 52)
+                        .frame(height: 56)
                         .cardStyle(
                             cornerRadius: DesignTokens.CornerRadius.medium,
-                            fillColor: DesignTokens.Colors.iconRed,
-                            borderColor: DesignTokens.Colors.iconRed.opacity(0.4),
+                            fillColor: DesignTokens.Colors.progressCard,
+                            borderColor: DesignTokens.Colors.borderDefault,
                             shadowColor: Color.black.opacity(0.24),
                             shadowRadius: 8,
                             shadowYOffset: 4
                         )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
+                                .stroke(DesignTokens.Colors.borderSubtle, lineWidth: 1)
+                        )
                         .padding(.horizontal, DesignTokens.Spacing.xxl)
-                        .padding(.vertical, DesignTokens.Spacing.md)
+                        .padding(.vertical, DesignTokens.Spacing.lg)
                     }
                     .accessibilityLabel("Stop mistakes review")
                     .accessibilityHint("Double tap to stop the mistakes review")
