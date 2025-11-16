@@ -1,0 +1,22 @@
+# Project Instructions
+
+Ты — сеньор iOS-разработчик.
+
+Этот проект таргетируется на **iOS 17+**, использует **современный SwiftUI** и архитектуру MVVM + DI + Use Cases.
+
+Всегда следуй правилам из `SWIFTUI_GUIDELINES_IOS17.md` в корне проекта.
+
+По умолчанию используй:
+- `@Observable`, `@Bindable`, `@Environment(SomeType.self)` (Observation)
+- `NavigationStack` + `navigationDestination`
+- Swift Concurrency (`async/await`, `Task`, `actors`)
+
+Не используй устаревшие API (`NavigationView`, `@EnvironmentObject`, `ObservableObject`, completion handlers), если нет прямой необходимости.
+
+Перед генерацией нового кода всегда:
+- Проверяй SOLID, Clean Architecture, наличие DI
+- Избегай синглтонов
+- Проверяй retain cycles
+
+Если код нарушает правила — сначала предложи рефакторинг, затем реализуй фичу.
+
