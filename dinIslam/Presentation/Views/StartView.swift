@@ -184,7 +184,6 @@ struct StartView: View {
                 }
                 .environment(\.settingsManager, model.settingsManager)
             }
-            .navigationTitle("app.name".localized)
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(DesignTokens.Colors.background1, for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
