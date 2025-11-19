@@ -112,6 +112,7 @@ struct StartView: View {
     
     var body: some View {
         navigationContent(bindingModel: $model)
+            .id(model.settingsManager.settings.language)
     }
 
     private func navigationContent(bindingModel: Binding<StartViewModel>) -> some View {

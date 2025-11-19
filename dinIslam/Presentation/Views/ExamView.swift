@@ -45,21 +45,32 @@ struct ExamView: View {
                         
                         // Answer options
                         ExamAnswersView(viewModel: viewModel)
-                        
-                        // Skip button (if available)
+                    }
+                    .padding(.horizontal, DesignTokens.Spacing.xxl)
+                    .padding(.top, DesignTokens.Spacing.lg)
+                    .padding(.bottom, DesignTokens.Spacing.xl)
+                }
+                
+                // Fixed action buttons at the bottom
+                VStack(spacing: 0) {
+                    Divider()
+                        .background(DesignTokens.Colors.borderSubtle)
+                    
+                    HStack(spacing: DesignTokens.Spacing.md) {
+                        // Skip button
                         if viewModel.canSkipQuestion {
                             Button(action: {
                                 viewModel.skipQuestion()
                             }) {
-                                HStack(spacing: DesignTokens.Spacing.md) {
+                                VStack(spacing: DesignTokens.Spacing.xs) {
                                     Image(systemName: "forward.fill")
                                         .font(.system(size: DesignTokens.Sizes.iconMedium))
                                     Text("exam.skip".localized)
-                                        .font(DesignTokens.Typography.secondarySemibold)
+                                        .font(DesignTokens.Typography.label)
                                 }
                                 .foregroundColor(DesignTokens.Colors.iconOrange)
                                 .frame(maxWidth: .infinity)
-                                .frame(height: 50)
+                                .frame(height: 56)
                                 .cardStyle(
                                     cornerRadius: DesignTokens.CornerRadius.medium,
                                     fillColor: DesignTokens.Colors.iconOrange.opacity(0.15),
@@ -68,52 +79,65 @@ struct ExamView: View {
                                     shadowRadius: 8,
                                     shadowYOffset: 4
                                 )
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
-                                        .stroke(DesignTokens.Colors.iconOrange, lineWidth: 1)
-                                )
                             }
+                            .accessibilityLabel("Skip question")
                         }
+                        
+                        // Pause/Resume button
+                        Button(action: {
+                            if viewModel.state == .active(.paused) {
+                                viewModel.resumeExam()
+                            } else {
+                                showingPauseAlert = true
+                            }
+                        }) {
+                            VStack(spacing: DesignTokens.Spacing.xs) {
+                                Image(systemName: viewModel.state == .active(.paused) ? "play.fill" : "pause.fill")
+                                    .font(.system(size: DesignTokens.Sizes.iconMedium))
+                                Text(viewModel.state == .active(.paused) ? "exam.resume".localized : "exam.pause".localized)
+                                    .font(DesignTokens.Typography.label)
+                            }
+                            .foregroundColor(DesignTokens.Colors.iconBlue)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 56)
+                            .cardStyle(
+                                cornerRadius: DesignTokens.CornerRadius.medium,
+                                fillColor: DesignTokens.Colors.iconBlue.opacity(0.15),
+                                borderColor: DesignTokens.Colors.iconBlue.opacity(0.35),
+                                shadowColor: Color.black.opacity(0.2),
+                                shadowRadius: 8,
+                                shadowYOffset: 4
+                            )
+                        }
+                        .accessibilityLabel(viewModel.state == .active(.paused) ? "Resume exam" : "Pause exam")
+                        
+                        // Finish button
+                        Button(action: {
+                            showingStopAlert = true
+                        }) {
+                            VStack(spacing: DesignTokens.Spacing.xs) {
+                                Image(systemName: "checkmark.circle.fill")
+                                    .font(.system(size: DesignTokens.Sizes.iconMedium))
+                                Text("quiz.finish".localized)
+                                    .font(DesignTokens.Typography.label)
+                            }
+                            .foregroundColor(DesignTokens.Colors.statusGreen)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 56)
+                            .cardStyle(
+                                cornerRadius: DesignTokens.CornerRadius.medium,
+                                fillColor: DesignTokens.Colors.statusGreen.opacity(0.15),
+                                borderColor: DesignTokens.Colors.statusGreen.opacity(0.35),
+                                shadowColor: Color.black.opacity(0.2),
+                                shadowRadius: 8,
+                                shadowYOffset: 4
+                            )
+                        }
+                        .accessibilityLabel("Finish exam")
+                        .accessibilityHint("Double tap to finish the current exam")
                     }
                     .padding(.horizontal, DesignTokens.Spacing.xxl)
-                    .padding(.top, DesignTokens.Spacing.lg)
-                    .padding(.bottom, DesignTokens.Spacing.xl)
-                }
-                
-                // Fixed finish button at the bottom
-                VStack(spacing: 0) {
-                    Divider()
-                        .background(DesignTokens.Colors.borderSubtle)
-                    
-                    Button(action: {
-                        showingStopAlert = true
-                    }) {
-                        HStack(spacing: DesignTokens.Spacing.md) {
-                            Image(systemName: "checkmark.circle.fill")
-                                .font(.system(size: DesignTokens.Sizes.iconMedium))
-                            Text("exam.finish".localized)
-                                .font(DesignTokens.Typography.secondarySemibold)
-                        }
-                        .foregroundColor(DesignTokens.Colors.statusGreen)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 56)
-                        .cardStyle(
-                            cornerRadius: DesignTokens.CornerRadius.medium,
-                            fillColor: DesignTokens.Colors.statusGreen.opacity(0.15),
-                            borderColor: DesignTokens.Colors.statusGreen.opacity(0.35),
-                            shadowColor: Color.black.opacity(0.2),
-                            shadowRadius: 8,
-                            shadowYOffset: 4
-                        )
-                        .overlay(
-                            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
-                                .stroke(DesignTokens.Colors.borderSubtle, lineWidth: 1)
-                        )
-                        .padding(.horizontal, DesignTokens.Spacing.xxl)
-                        .padding(.vertical, DesignTokens.Spacing.lg)
-                    }
-                    .accessibilityLabel("Finish exam")
-                    .accessibilityHint("Double tap to finish the current exam")
+                    .padding(.vertical, DesignTokens.Spacing.lg)
                     .background(DesignTokens.Colors.cardBackground)
                 }
             }
@@ -124,18 +148,6 @@ struct ExamView: View {
         .toolbarBackground(DesignTokens.Colors.background1, for: .navigationBar)
         .toolbarBackground(.visible, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button(viewModel.state == .active(.paused) ? "exam.resume".localized : "exam.pause".localized) {
-                    if viewModel.state == .active(.paused) {
-                        viewModel.resumeExam()
-                    } else {
-                        showingPauseAlert = true
-                    }
-                }
-                .foregroundColor(DesignTokens.Colors.iconBlue)
-            }
-        }
         .navigationDestination(isPresented: $showingResult) {
             if let result = viewModel.examResult {
                 ExamResultView(
@@ -200,24 +212,22 @@ struct ExamHeaderView: View {
                 Spacer()
                 
                 // Timer
-                if viewModel.configuration.showTimer {
-                    HStack(spacing: DesignTokens.Spacing.sm) {
-                        Image(systemName: "timer")
-                            .font(.system(size: DesignTokens.Sizes.iconSmall))
-                            .foregroundColor(timerColor)
-                        
-                        Text(viewModel.timeRemainingFormatted)
-                            .font(DesignTokens.Typography.secondarySemibold)
-                            .foregroundColor(timerColor)
-                            .monospacedDigit()
-                    }
-                    .padding(.horizontal, DesignTokens.Spacing.md)
-                    .padding(.vertical, DesignTokens.Spacing.sm)
-                    .background(
-                        RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.small)
-                            .fill(timerBackgroundColor)
-                    )
+                HStack(spacing: DesignTokens.Spacing.sm) {
+                    Image(systemName: "timer")
+                        .font(.system(size: DesignTokens.Sizes.iconSmall))
+                        .foregroundColor(timerColor)
+                    
+                    Text(viewModel.timeRemainingFormatted)
+                        .font(DesignTokens.Typography.secondarySemibold)
+                        .foregroundColor(timerColor)
+                        .monospacedDigit()
                 }
+                .padding(.horizontal, DesignTokens.Spacing.md)
+                .padding(.vertical, DesignTokens.Spacing.sm)
+                .background(
+                    RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.small)
+                        .fill(timerBackgroundColor)
+                )
             }
         }
         .padding(.horizontal, DesignTokens.Spacing.xxl)
@@ -258,7 +268,7 @@ struct ExamQuestionView: View {
                     .foregroundColor(DesignTokens.Colors.textPrimary)
                     .multilineTextAlignment(.leading)
                 
-                // Category and difficulty
+                // Category
                 HStack(spacing: DesignTokens.Spacing.md) {
                     Label(question.category, systemImage: "folder")
                         .font(DesignTokens.Typography.label)
@@ -269,22 +279,19 @@ struct ExamQuestionView: View {
                             RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.small)
                                 .fill(DesignTokens.Colors.iconBlue.opacity(0.15))
                         )
-                    
-                    Label(question.difficulty.localizedName, systemImage: "star")
-                        .font(DesignTokens.Typography.label)
-                        .foregroundColor(DesignTokens.Colors.textSecondary)
-                        .padding(.horizontal, DesignTokens.Spacing.sm)
-                        .padding(.vertical, DesignTokens.Spacing.xs)
-                        .background(
-                            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.small)
-                                .fill(DesignTokens.Colors.iconOrange.opacity(0.15))
-                        )
                 }
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(DesignTokens.Spacing.xxl)
-        .cardStyle(cornerRadius: DesignTokens.CornerRadius.large)
+        .cardStyle(
+            cornerRadius: DesignTokens.CornerRadius.large,
+            fillColor: DesignTokens.Colors.iconPurple.opacity(0.15),
+            borderColor: DesignTokens.Colors.iconPurple.opacity(0.35),
+            shadowColor: Color.black.opacity(0.2),
+            shadowRadius: 8,
+            shadowYOffset: 4
+        )
     }
 }
 

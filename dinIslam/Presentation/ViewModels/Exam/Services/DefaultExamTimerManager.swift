@@ -22,7 +22,13 @@ final class DefaultExamTimerManager: ExamTimerManaging {
     ) {
         stopTimer()
         
-        timeRemaining = timeLimit
+        // Если время уже установлено и меньше лимита, продолжаем с него (возобновление после паузы)
+        // Иначе начинаем с полного лимита
+        if timeRemaining <= 0 || timeRemaining >= timeLimit {
+            timeRemaining = timeLimit
+        }
+        // Иначе оставляем текущее timeRemaining (возобновление после паузы)
+        
         isTimerActive = true
         questionStartTime = Date()
         onTimeUpCallback = onTimeUp

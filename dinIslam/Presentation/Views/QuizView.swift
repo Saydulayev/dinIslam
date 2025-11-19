@@ -93,8 +93,8 @@ struct QuizView: View {
                                     .frame(maxWidth: .infinity)
                                     .cardStyle(
                                         cornerRadius: DesignTokens.CornerRadius.medium,
-                                        fillColor: DesignTokens.Colors.iconBlue.opacity(0.15),
-                                        borderColor: DesignTokens.Colors.iconBlue.opacity(0.35),
+                                        fillColor: DesignTokens.Colors.iconPurple.opacity(0.15),
+                                        borderColor: DesignTokens.Colors.iconPurple.opacity(0.35),
                                         shadowColor: Color.black.opacity(0.2),
                                         shadowRadius: 8,
                                         shadowYOffset: 4
@@ -103,17 +103,13 @@ struct QuizView: View {
                                     .accessibilityAddTraits(.isHeader)
                                     .dynamicTypeSize(.large)
                                 
-                                // Category and difficulty
+                                // Category
                                 HStack {
                                     Label(question.category, systemImage: "tag")
                                         .font(DesignTokens.Typography.label)
                                         .foregroundStyle(DesignTokens.Colors.textSecondary)
                                     
                                     Spacer()
-                                    
-                                    Label(question.difficulty.localizedName, systemImage: "star.fill")
-                                        .font(DesignTokens.Typography.label)
-                                        .foregroundStyle(DesignTokens.Colors.textSecondary)
                                 }
                                 .padding(.horizontal, DesignTokens.Spacing.sm)
                             }

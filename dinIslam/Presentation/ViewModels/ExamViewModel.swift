@@ -32,8 +32,11 @@ class ExamViewModel {
     
     // Timer properties (delegated to timerManager)
     var timeRemaining: TimeInterval {
-        get { timerManager.timeRemaining }
-        set { timerManager.timeRemaining = newValue }
+        get { displayedTimeRemaining }
+        set { 
+            timerManager.timeRemaining = newValue
+            displayedTimeRemaining = newValue
+        }
     }
     var isTimerActive: Bool {
         get { timerManager.isTimerActive }
@@ -44,6 +47,10 @@ class ExamViewModel {
     private var examStartTime: Date?
     private var totalTimeSpent: TimeInterval = 0
     private var nextQuestionTask: Task<Void, Never>?
+    
+    // Timer update tracking for SwiftUI
+    private var displayedTimeRemaining: TimeInterval = 0
+    private var timerUpdateTask: Task<Void, Never>?
     
     // MARK: - Computed Properties
     var currentQuestion: Question? {
@@ -157,6 +164,10 @@ class ExamViewModel {
             examStartTime = Date()
             totalTimeSpent = 0
             
+            // Сбрасываем время для первого вопроса
+            timerManager.timeRemaining = 0
+            displayedTimeRemaining = 0
+            
             // Start first question timer
             startQuestionTimer()
             
@@ -235,6 +246,9 @@ class ExamViewModel {
             finishExam()
         } else {
             currentQuestionIndex += 1
+            // Сбрасываем время для нового вопроса
+            timerManager.timeRemaining = 0
+            displayedTimeRemaining = 0
             startQuestionTimer()
         }
     }
@@ -335,16 +349,37 @@ class ExamViewModel {
     private func startQuestionTimer() {
         guard currentQuestion != nil else { return }
         
+        // startTimer() автоматически использует текущее timeRemaining если оно > 0 (возобновление после паузы)
+        // или устанавливает полное время если timeRemaining <= 0 (новый вопрос)
         timerManager.startTimer(
             timeLimit: configuration.timePerQuestion,
             onTimeUp: { [weak self] in
                 self?.handleTimeUp()
             }
         )
+        
+        // Sync displayed time
+        displayedTimeRemaining = timerManager.timeRemaining
+        
+        // Start update task to refresh view every second
+        timerUpdateTask?.cancel()
+        timerUpdateTask = Task { [weak self] in
+            guard let self else { return }
+            while !Task.isCancelled && self.timerManager.isTimerActive {
+                try? await Task.sleep(nanoseconds: 1_000_000_000) // 1 second
+                guard !Task.isCancelled else { break }
+                await MainActor.run {
+                    self.displayedTimeRemaining = self.timerManager.timeRemaining
+                }
+            }
+        }
     }
     
     private func stopQuestionTimer() {
         timerManager.stopTimer()
+        timerUpdateTask?.cancel()
+        timerUpdateTask = nil
+        displayedTimeRemaining = timerManager.timeRemaining
     }
     
     private func handleTimeUp() {
@@ -395,5 +430,6 @@ class ExamViewModel {
     deinit {
         timerManager.stopTimer()
         nextQuestionTask?.cancel()
+        timerUpdateTask?.cancel()
     }
 }
