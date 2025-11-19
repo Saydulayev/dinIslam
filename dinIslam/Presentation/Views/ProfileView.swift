@@ -203,7 +203,14 @@ struct ProfileView: View {
             }
         }
         .padding(DesignTokens.Spacing.xxxl)
-        .cardStyle(cornerRadius: DesignTokens.CornerRadius.xlarge)
+        .cardStyle(
+            cornerRadius: DesignTokens.CornerRadius.xlarge,
+            fillColor: DesignTokens.Colors.cardBackground,
+            borderColor: DesignTokens.Colors.iconPurple.opacity(0.3),
+            shadowColor: Color.black.opacity(0.2),
+            shadowRadius: 8,
+            shadowYOffset: 4
+        )
     }
     
     // MARK: - Progress Section
@@ -270,7 +277,14 @@ struct ProfileView: View {
             }
         }
         .padding(DesignTokens.Spacing.xxl)
-        .cardStyle(cornerRadius: DesignTokens.CornerRadius.xlarge)
+        .cardStyle(
+            cornerRadius: DesignTokens.CornerRadius.xlarge,
+            fillColor: DesignTokens.Colors.cardBackground,
+            borderColor: DesignTokens.Colors.iconGreen.opacity(0.3),
+            shadowColor: Color.black.opacity(0.2),
+            shadowRadius: 8,
+            shadowYOffset: 4
+        )
     }
     
     // MARK: - Sync Section
@@ -331,7 +345,14 @@ struct ProfileView: View {
             }
         }
         .padding(DesignTokens.Spacing.xxl)
-        .cardStyle(cornerRadius: DesignTokens.CornerRadius.xlarge)
+        .cardStyle(
+            cornerRadius: DesignTokens.CornerRadius.xlarge,
+            fillColor: DesignTokens.Colors.cardBackground,
+            borderColor: DesignTokens.Colors.iconBlue.opacity(0.3),
+            shadowColor: Color.black.opacity(0.2),
+            shadowRadius: 8,
+            shadowYOffset: 4
+        )
     }
     
     // MARK: - Helpers

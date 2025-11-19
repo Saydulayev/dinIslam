@@ -83,7 +83,14 @@ struct ResultView: View {
                         }
                     }
                     .padding(DesignTokens.Spacing.xxl)
-                    .cardStyle(cornerRadius: DesignTokens.CornerRadius.xlarge)
+                    .cardStyle(
+                        cornerRadius: DesignTokens.CornerRadius.xlarge,
+                        fillColor: DesignTokens.Colors.cardBackground,
+                        borderColor: DesignTokens.Colors.iconBlue.opacity(0.3),
+                        shadowColor: Color.black.opacity(0.2),
+                        shadowRadius: 8,
+                        shadowYOffset: 4
+                    )
                     .padding(.horizontal, DesignTokens.Spacing.xxl)
                     
                     // Result feedback badge
@@ -100,10 +107,10 @@ struct ResultView: View {
                     .cardStyle(
                         cornerRadius: DesignTokens.CornerRadius.medium,
                         fillColor: feedbackColor.opacity(0.15),
-                        borderColor: feedbackColor.opacity(0.45),
-                        shadowColor: Color.black.opacity(0.24),
-                        shadowRadius: 6,
-                        shadowYOffset: 3
+                        borderColor: feedbackColor.opacity(0.35),
+                        shadowColor: Color.black.opacity(0.2),
+                        shadowRadius: 8,
+                        shadowYOffset: 4
                     )
                     .overlay(
                         RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
@@ -128,9 +135,9 @@ struct ResultView: View {
                             .frame(height: 56)
                             .cardStyle(
                                 cornerRadius: DesignTokens.CornerRadius.medium,
-                                fillColor: DesignTokens.Colors.progressCard,
-                                borderColor: DesignTokens.Colors.borderDefault,
-                                shadowColor: Color.black.opacity(0.24),
+                                fillColor: DesignTokens.Colors.iconBlue.opacity(0.15),
+                                borderColor: DesignTokens.Colors.iconBlue.opacity(0.35),
+                                shadowColor: Color.black.opacity(0.2),
                                 shadowRadius: 8,
                                 shadowYOffset: 4
                             )
@@ -152,9 +159,9 @@ struct ResultView: View {
                             .frame(height: 56)
                             .cardStyle(
                                 cornerRadius: DesignTokens.CornerRadius.medium,
-                                fillColor: DesignTokens.Colors.progressCard,
-                                borderColor: DesignTokens.Colors.borderDefault,
-                                shadowColor: Color.black.opacity(0.24),
+                                fillColor: DesignTokens.Colors.iconBlue.opacity(0.15),
+                                borderColor: DesignTokens.Colors.iconBlue.opacity(0.35),
+                                shadowColor: Color.black.opacity(0.2),
                                 shadowRadius: 8,
                                 shadowYOffset: 4
                             )

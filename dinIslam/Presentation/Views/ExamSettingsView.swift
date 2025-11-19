@@ -73,7 +73,14 @@ struct ExamSettingsView: View {
                                     )
                                 }
                                 .padding(DesignTokens.Spacing.xxl)
-                                .cardStyle(cornerRadius: DesignTokens.CornerRadius.xlarge)
+                                .cardStyle(
+                                    cornerRadius: DesignTokens.CornerRadius.xlarge,
+                                    fillColor: DesignTokens.Colors.cardBackground,
+                                    borderColor: DesignTokens.Colors.iconOrange.opacity(0.3),
+                                    shadowColor: Color.black.opacity(0.2),
+                                    shadowRadius: 8,
+                                    shadowYOffset: 4
+                                )
                                 .padding(.horizontal, DesignTokens.Spacing.xxl)
                                 
                                 Text("exam.settings.presets.footer".localized)
@@ -184,7 +191,14 @@ struct ExamSettingsView: View {
                                         }
                                     }
                                     .padding(DesignTokens.Spacing.xxl)
-                                    .cardStyle(cornerRadius: DesignTokens.CornerRadius.xlarge)
+                                    .cardStyle(
+                                    cornerRadius: DesignTokens.CornerRadius.xlarge,
+                                    fillColor: DesignTokens.Colors.cardBackground,
+                                    borderColor: DesignTokens.Colors.iconOrange.opacity(0.3),
+                                    shadowColor: Color.black.opacity(0.2),
+                                    shadowRadius: 8,
+                                    shadowYOffset: 4
+                                )
                                     .padding(.horizontal, DesignTokens.Spacing.xxl)
                                     
                                     Text("exam.settings.custom.footer".localized)
@@ -226,9 +240,9 @@ struct ExamSettingsView: View {
                             .frame(height: 56)
                             .cardStyle(
                                 cornerRadius: DesignTokens.CornerRadius.medium,
-                                fillColor: DesignTokens.Colors.progressCard,
-                                borderColor: DesignTokens.Colors.borderDefault,
-                                shadowColor: Color.black.opacity(0.24),
+                                fillColor: DesignTokens.Colors.iconBlue.opacity(0.15),
+                                borderColor: DesignTokens.Colors.iconBlue.opacity(0.35),
+                                shadowColor: Color.black.opacity(0.2),
                                 shadowRadius: 8,
                                 shadowYOffset: 4
                             )
@@ -459,7 +473,14 @@ struct ExamPreviewCard: View {
             }
         }
         .padding(DesignTokens.Spacing.xxl)
-        .cardStyle(cornerRadius: DesignTokens.CornerRadius.large)
+        .cardStyle(
+            cornerRadius: DesignTokens.CornerRadius.large,
+            fillColor: DesignTokens.Colors.cardBackground,
+            borderColor: DesignTokens.Colors.iconOrange.opacity(0.3),
+            shadowColor: Color.black.opacity(0.2),
+            shadowRadius: 8,
+            shadowYOffset: 4
+        )
     }
     
     private func formatTotalTime() -> String {

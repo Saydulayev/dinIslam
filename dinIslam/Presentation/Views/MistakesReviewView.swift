@@ -91,8 +91,9 @@ struct MistakesReviewView: View {
                                     .frame(maxWidth: .infinity)
                                     .cardStyle(
                                         cornerRadius: DesignTokens.CornerRadius.medium,
-                                        borderColor: DesignTokens.Colors.borderDefault,
-                                        shadowColor: Color.black.opacity(0.24),
+                                        fillColor: DesignTokens.Colors.iconRed.opacity(0.15),
+                                        borderColor: DesignTokens.Colors.iconRed.opacity(0.35),
+                                        shadowColor: Color.black.opacity(0.2),
                                         shadowRadius: 8,
                                         shadowYOffset: 4
                                     )
@@ -176,9 +177,9 @@ struct MistakesReviewView: View {
                         .frame(height: 56)
                         .cardStyle(
                             cornerRadius: DesignTokens.CornerRadius.medium,
-                            fillColor: DesignTokens.Colors.progressCard,
-                            borderColor: DesignTokens.Colors.borderDefault,
-                            shadowColor: Color.black.opacity(0.24),
+                            fillColor: DesignTokens.Colors.iconRed.opacity(0.15),
+                            borderColor: DesignTokens.Colors.iconRed.opacity(0.35),
+                            shadowColor: Color.black.opacity(0.2),
                             shadowRadius: 8,
                             shadowYOffset: 4
                         )

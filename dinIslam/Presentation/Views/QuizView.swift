@@ -92,8 +92,9 @@ struct QuizView: View {
                                     .frame(maxWidth: .infinity)
                                     .cardStyle(
                                         cornerRadius: DesignTokens.CornerRadius.medium,
-                                        borderColor: DesignTokens.Colors.borderDefault,
-                                        shadowColor: Color.black.opacity(0.24),
+                                        fillColor: DesignTokens.Colors.iconBlue.opacity(0.15),
+                                        borderColor: DesignTokens.Colors.iconBlue.opacity(0.35),
+                                        shadowColor: Color.black.opacity(0.2),
                                         shadowRadius: 8,
                                         shadowYOffset: 4
                                     )
@@ -159,9 +160,9 @@ struct QuizView: View {
                         .frame(height: 56)
                         .cardStyle(
                             cornerRadius: DesignTokens.CornerRadius.medium,
-                            fillColor: DesignTokens.Colors.progressCard,
-                            borderColor: DesignTokens.Colors.borderDefault,
-                            shadowColor: Color.black.opacity(0.24),
+                            fillColor: DesignTokens.Colors.statusGreen.opacity(0.15),
+                            borderColor: DesignTokens.Colors.statusGreen.opacity(0.35),
+                            shadowColor: Color.black.opacity(0.2),
                             shadowRadius: 8,
                             shadowYOffset: 4
                         )
@@ -242,13 +243,13 @@ struct AnswerButton: View {
     
     private var backgroundColor: Color {
         if !isAnswerSelected {
-            return DesignTokens.Colors.progressCard
+            return DesignTokens.Colors.iconBlue.opacity(0.15)
         } else if isSelected {
-            return isCorrect ? DesignTokens.Colors.statusGreen.opacity(0.15) : DesignTokens.Colors.iconRed.opacity(0.15)
+            return isCorrect ? DesignTokens.Colors.statusGreen.opacity(0.2) : DesignTokens.Colors.iconRed.opacity(0.2)
         } else if isCorrect {
-            return DesignTokens.Colors.statusGreen.opacity(0.15)
+            return DesignTokens.Colors.statusGreen.opacity(0.2)
         } else {
-            return DesignTokens.Colors.progressCard
+            return DesignTokens.Colors.cardBackground
         }
     }
     

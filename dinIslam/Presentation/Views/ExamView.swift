@@ -62,9 +62,9 @@ struct ExamView: View {
                                 .frame(height: 50)
                                 .cardStyle(
                                     cornerRadius: DesignTokens.CornerRadius.medium,
-                                    fillColor: DesignTokens.Colors.progressCard,
+                                    fillColor: DesignTokens.Colors.iconOrange.opacity(0.15),
                                     borderColor: DesignTokens.Colors.iconOrange.opacity(0.35),
-                                    shadowColor: Color.black.opacity(0.24),
+                                    shadowColor: Color.black.opacity(0.2),
                                     shadowRadius: 8,
                                     shadowYOffset: 4
                                 )
@@ -99,9 +99,9 @@ struct ExamView: View {
                         .frame(height: 56)
                         .cardStyle(
                             cornerRadius: DesignTokens.CornerRadius.medium,
-                            fillColor: DesignTokens.Colors.progressCard,
-                            borderColor: DesignTokens.Colors.borderDefault,
-                            shadowColor: Color.black.opacity(0.24),
+                            fillColor: DesignTokens.Colors.statusGreen.opacity(0.15),
+                            borderColor: DesignTokens.Colors.statusGreen.opacity(0.35),
+                            shadowColor: Color.black.opacity(0.2),
                             shadowRadius: 8,
                             shadowYOffset: 4
                         )

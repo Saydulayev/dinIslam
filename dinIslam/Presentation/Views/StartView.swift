@@ -308,7 +308,14 @@ struct StartView: View {
             actionsSection(model: model)
         }
         .padding(DesignTokens.Spacing.xxl)
-        .cardStyle(cornerRadius: DesignTokens.CornerRadius.xlarge)
+        .cardStyle(
+            cornerRadius: DesignTokens.CornerRadius.xlarge,
+            fillColor: DesignTokens.Colors.cardBackground,
+            borderColor: DesignTokens.Colors.iconBlue.opacity(0.3),
+            shadowColor: Color.black.opacity(0.2),
+            shadowRadius: 8,
+            shadowYOffset: 4
+        )
     }
     
     private func statsCard(model: StartViewModel) -> some View {
@@ -381,9 +388,9 @@ struct StartView: View {
             .frame(maxWidth: .infinity)
             .cardStyle(
                 cornerRadius: DesignTokens.CornerRadius.medium,
-                fillColor: DesignTokens.Colors.progressCard,
-                borderColor: DesignTokens.Colors.borderDefault,
-                shadowColor: Color.black.opacity(0.24),
+                fillColor: DesignTokens.Colors.iconBlue.opacity(0.15),
+                borderColor: DesignTokens.Colors.iconBlue.opacity(0.35),
+                shadowColor: Color.black.opacity(0.2),
                 shadowRadius: 8,
                 shadowYOffset: 4
             )
@@ -415,9 +422,9 @@ struct StartView: View {
             .frame(maxWidth: .infinity)
             .cardStyle(
                 cornerRadius: DesignTokens.CornerRadius.medium,
-                fillColor: DesignTokens.Colors.progressCard,
+                fillColor: DesignTokens.Colors.iconOrange.opacity(0.15),
                 borderColor: DesignTokens.Colors.iconOrange.opacity(0.35),
-                shadowColor: Color.black.opacity(0.24),
+                shadowColor: Color.black.opacity(0.2),
                 shadowRadius: 8,
                 shadowYOffset: 4
             )
