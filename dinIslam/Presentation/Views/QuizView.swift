@@ -45,37 +45,38 @@ struct QuizView: View {
             
             VStack(spacing: 0) {
                 // Header with progress and score
-                VStack(spacing: DesignTokens.Spacing.lg) {
+                VStack(spacing: DesignTokens.Spacing.sm) {
                     HStack {
                         LocalizedText("quiz.question")
-                            .font(DesignTokens.Typography.secondaryRegular)
+                            .font(DesignTokens.Typography.label)
                             .foregroundStyle(DesignTokens.Colors.textSecondary)
                         
                         Spacer()
                         
                         LocalizedText("quiz.score")
-                            .font(DesignTokens.Typography.secondaryRegular)
+                            .font(DesignTokens.Typography.label)
                             .foregroundStyle(DesignTokens.Colors.textSecondary)
                     }
                     
                     HStack {
                         Text(progressText)
-                            .font(DesignTokens.Typography.h1)
+                            .font(DesignTokens.Typography.secondarySemibold)
                             .foregroundStyle(DesignTokens.Colors.textPrimary)
                         
                         Spacer()
                         
                         Text("\(viewModel.correctAnswers)")
-                            .font(DesignTokens.Typography.h1)
+                            .font(DesignTokens.Typography.secondarySemibold)
                             .foregroundStyle(DesignTokens.Colors.statusGreen)
                     }
                     
                     // Progress bar
                     ProgressView(value: viewModel.progress)
                         .progressViewStyle(LinearProgressViewStyle(tint: DesignTokens.Colors.iconBlue))
-                        .scaleEffect(x: 1, y: 2, anchor: .center)
+                        .scaleEffect(x: 1, y: 1.5, anchor: .center)
                 }
-                .padding(DesignTokens.Spacing.xxl)
+                .padding(.horizontal, DesignTokens.Spacing.xxl)
+                .padding(.vertical, DesignTokens.Spacing.md)
                 .background(DesignTokens.Colors.cardBackground)
             
                 // Question content
