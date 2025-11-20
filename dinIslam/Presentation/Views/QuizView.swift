@@ -43,6 +43,30 @@ struct QuizView: View {
             )
             .ignoresSafeArea()
             
+            // Loading overlay
+            if viewModel.isLoading {
+                VStack(spacing: DesignTokens.Spacing.lg) {
+                    ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle(tint: DesignTokens.Colors.iconBlue))
+                        .scaleEffect(1.5)
+                    
+                    Text("quiz.loading".localized)
+                        .font(DesignTokens.Typography.bodyRegular)
+                        .foregroundStyle(DesignTokens.Colors.textSecondary)
+                }
+                .padding(DesignTokens.Spacing.xxl)
+                .cardStyle(
+                    cornerRadius: DesignTokens.CornerRadius.medium,
+                    fillColor: DesignTokens.Colors.cardBackground,
+                    borderColor: DesignTokens.Colors.iconBlue.opacity(0.3),
+                    shadowColor: Color.black.opacity(0.2),
+                    shadowRadius: 8,
+                    shadowYOffset: 4
+                )
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(Color.black.opacity(0.3))
+            }
+            
             VStack(spacing: 0) {
                 // Header with progress and score
                 VStack(spacing: DesignTokens.Spacing.sm) {

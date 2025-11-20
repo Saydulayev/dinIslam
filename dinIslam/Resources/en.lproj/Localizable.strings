@@ -159,6 +159,9 @@
 "quiz.finish.confirm.ok" = "Finish";
 "quiz.finish.confirm.cancel" = "Cancel";
 
+// Quiz Loading
+"quiz.loading" = "Loading...";
+
 // Stats View - Pluralization Support
 "stats.title" = "Statistics";
 "stats.done" = "Done";
@@ -486,3 +489,8 @@
 "exam.grade.good" = "Good";
 "exam.grade.satisfactory" = "Satisfactory";
 "exam.grade.unsatisfactory" = "Unsatisfactory";
+
+// Start View
+"start.loading" = "Loading...";
+"start.begin" = "Start Quiz";
+"start.examMode" = "Exam Mode";

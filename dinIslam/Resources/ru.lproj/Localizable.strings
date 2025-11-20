@@ -160,6 +160,9 @@
 "quiz.finish.confirm.ok" = "Завершить";
 "quiz.finish.confirm.cancel" = "Отмена";
 
+// Quiz Loading
+"quiz.loading" = "Загрузка...";
+
 // Stats View - Pluralization Support
 "stats.title" = "Статистика";
 "stats.done" = "Готово";
@@ -502,3 +505,8 @@
 "exam.grade.good" = "Хорошо";
 "exam.grade.satisfactory" = "Удовлетворительно";
 "exam.grade.unsatisfactory" = "Неудовлетворительно";
+
+// Start View
+"start.loading" = "Загрузка...";
+"start.begin" = "Начать викторину";
+"start.examMode" = "Режим экзамена";
