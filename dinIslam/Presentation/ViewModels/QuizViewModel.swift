@@ -15,10 +15,10 @@ import OSLog
 class QuizViewModel {
     // MARK: - Properties
     private let quizUseCase: QuizUseCaseProtocol
-    private let hapticManager: HapticManager
-    private let soundManager: SoundManager
-    private let statsManager: StatsManager
-    private let achievementManager: AchievementManager
+    private let feedbackProvider: QuizFeedbackProviding
+    private let statisticsRecorder: QuizStatisticsRecording
+    private let achievementChecker: QuizAchievementChecking
+    private let localizationProvider: LocalizationProviding
     
     var state: QuizState = .idle
     var questions: [Question] = []
@@ -33,7 +33,7 @@ class QuizViewModel {
     
     // MARK: - Achievement Properties
     var newAchievements: [Achievement] {
-        achievementManager.newAchievements
+        achievementChecker.newAchievements
     }
     
     private var startTime: Date?
@@ -77,12 +77,80 @@ class QuizViewModel {
     }
     
     // MARK: - Initialization
-    init(quizUseCase: QuizUseCaseProtocol, statsManager: StatsManager, settingsManager: SettingsManager) {
+    init(
+        quizUseCase: QuizUseCaseProtocol,
+        feedbackProvider: QuizFeedbackProviding? = nil,
+        statisticsRecorder: QuizStatisticsRecording? = nil,
+        achievementChecker: QuizAchievementChecking? = nil,
+        statsManager: StatsManager? = nil,
+        settingsManager: SettingsManager? = nil,
+        localizationProvider: LocalizationProviding? = nil
+    ) {
         self.quizUseCase = quizUseCase
-        self.statsManager = statsManager
-        self.hapticManager = HapticManager(settingsManager: settingsManager)
-        self.soundManager = SoundManager(settingsManager: settingsManager)
-        self.achievementManager = AchievementManager.shared
+        
+        // Initialize localization provider
+        self.localizationProvider = localizationProvider ?? LocalizationManager()
+        
+        // Initialize statistics recorder - must have either statisticsRecorder or statsManager
+        if let statisticsRecorder = statisticsRecorder {
+            self.statisticsRecorder = statisticsRecorder
+        } else if let statsManager = statsManager {
+            self.statisticsRecorder = DefaultQuizStatisticsRecorder(statsManager: statsManager)
+        } else {
+            // Fallback: create a default StatsManager if nothing provided
+            // This should not happen in production, but provides backward compatibility
+            let defaultStatsManager = StatsManager()
+            self.statisticsRecorder = DefaultQuizStatisticsRecorder(statsManager: defaultStatsManager)
+        }
+        
+        // Initialize feedback provider
+        if let feedbackProvider = feedbackProvider {
+            self.feedbackProvider = feedbackProvider
+        } else if let settingsManager = settingsManager {
+            let hapticManager = HapticManager(settingsManager: settingsManager)
+            let soundManager = SoundManager(settingsManager: settingsManager)
+            self.feedbackProvider = DefaultQuizFeedbackProvider(
+                hapticManager: hapticManager,
+                soundManager: soundManager
+            )
+        } else {
+            // Fallback: create defaults without settings manager
+            self.feedbackProvider = DefaultQuizFeedbackProvider(
+                hapticManager: HapticManager(),
+                soundManager: SoundManager()
+            )
+        }
+        
+        // Achievement checker requires AchievementManager
+        if let achievementChecker = achievementChecker {
+            self.achievementChecker = achievementChecker
+        } else {
+            // Fallback: create default achievement manager for backward compatibility
+            self.achievementChecker = DefaultQuizAchievementChecker(
+                achievementManager: AchievementManager(notificationManager: NotificationManager())
+            )
+        }
+    }
+    
+    convenience init(quizUseCase: QuizUseCaseProtocol, statsManager: StatsManager, settingsManager: SettingsManager) {
+        // Create default services
+        let hapticManager = HapticManager(settingsManager: settingsManager)
+        let soundManager = SoundManager(settingsManager: settingsManager)
+        let feedbackProvider = DefaultQuizFeedbackProvider(
+            hapticManager: hapticManager,
+            soundManager: soundManager
+        )
+        let statisticsRecorder = DefaultQuizStatisticsRecorder(statsManager: statsManager)
+        let achievementChecker = DefaultQuizAchievementChecker(
+            achievementManager: AchievementManager(notificationManager: NotificationManager())
+        )
+        
+        self.init(
+            quizUseCase: quizUseCase,
+            feedbackProvider: feedbackProvider,
+            statisticsRecorder: statisticsRecorder,
+            achievementChecker: achievementChecker
+        )
     }
     
     // MARK: - Public Methods
@@ -123,8 +191,7 @@ class QuizViewModel {
         isAnswerSelected = true
         
         // Provide haptic and sound feedback
-        hapticManager.selectionChanged()
-        soundManager.playSelectionSound()
+        feedbackProvider.selectionChanged()
         
         // Check if answer is correct
         if let currentQuestion = currentQuestion {
@@ -133,12 +200,9 @@ class QuizViewModel {
             
             if isCorrect {
                 correctAnswers += 1
-                hapticManager.success()
-                soundManager.playSuccessSound()
-            } else {
-                hapticManager.error()
-                soundManager.playErrorSound()
             }
+            
+            feedbackProvider.answerSelected(isCorrect: isCorrect)
         }
         
         // Show result briefly before moving to next question
@@ -202,17 +266,16 @@ class QuizViewModel {
                 outcomes: outcomes
             )
             
-            statsManager.recordQuizSession(summary)
+            statisticsRecorder.recordQuizSession(summary)
             
             // Check for new achievements
-            achievementManager.checkAchievements(for: statsManager.stats, quizResult: quizResult)
+            achievementChecker.checkAchievements(for: statisticsRecorder.stats, quizResult: quizResult)
         }
         
         state = .completed(.finished)
         
         // Provide completion feedback - same as in exam mode
-        hapticManager.success()
-        soundManager.playSuccessSound()
+        feedbackProvider.quizCompleted(success: (quizResult?.percentage ?? 0) > 0)
     }
     
     @MainActor
@@ -243,21 +306,20 @@ class QuizViewModel {
     
     // MARK: - Mistakes Review Methods
     @MainActor
-    func startMistakesReview() async {
+    func startMistakesReview(language: String) async {
         state = .active(.loading)
         isLoading = true
         errorMessage = nil
         
         do {
             // Get all questions to find the wrong ones
-            let languageCode = LocalizationManager.shared.currentLanguage
-            let allQuestions = try await quizUseCase.loadAllQuestions(language: languageCode)
+            let allQuestions = try await quizUseCase.loadAllQuestions(language: language)
             
             // Filter only wrong questions
-            let wrongQuestions = statsManager.getWrongQuestions(from: allQuestions)
+            let wrongQuestions = statisticsRecorder.getWrongQuestions(from: allQuestions)
             
             guard !wrongQuestions.isEmpty else {
-                errorMessage = LocalizationManager.shared.localizedString(for: "mistakes.noWrongQuestions")
+                errorMessage = localizationProvider.localizedString(for: "mistakes.noWrongQuestions")
                 state = .idle
                 isLoading = false
                 return
@@ -297,19 +359,18 @@ class QuizViewModel {
         
         // Remove correctly answered questions from wrong questions list
         for questionId in correctlyAnsweredIds {
-            statsManager.removeWrongQuestion(questionId)
+            statisticsRecorder.removeWrongQuestion(questionId)
         }
         
         state = .completed(.mistakesFinished)
         
         // Provide completion feedback - same as in exam mode
-        hapticManager.success()
-        soundManager.playSuccessSound()
+        feedbackProvider.quizCompleted(success: true)
     }
     
     // MARK: - Achievement Methods
     func clearNewAchievements() {
-        achievementManager.clearNewAchievements()
+        achievementChecker.clearNewAchievements()
     }
 
     deinit {

@@ -16,6 +16,8 @@ class SettingsViewModel {
     private let settingsManager: SettingsManager
     private let hapticManager: HapticManager
     private let soundManager: SoundManager
+    private let localizationProvider: LocalizationProviding
+    private let achievementManager: AchievementManaging
     
     // Убираем дублирование - используем только settingsManager.settings
     var settings: AppSettings {
@@ -27,10 +29,17 @@ class SettingsViewModel {
     var showingTermsOfService = false
     var refreshTrigger = UUID()
     
-    init(settingsManager: SettingsManager) {
+    init(
+        settingsManager: SettingsManager,
+        localizationProvider: LocalizationProviding? = nil,
+        achievementManager: AchievementManaging? = nil
+    ) {
         self.settingsManager = settingsManager
         self.hapticManager = HapticManager(settingsManager: settingsManager)
         self.soundManager = SoundManager(settingsManager: settingsManager)
+        // Use provided dependencies or create defaults for backward compatibility
+        self.localizationProvider = localizationProvider ?? LocalizationManager()
+        self.achievementManager = achievementManager ?? AchievementManager(notificationManager: NotificationManager())
     }
     
     // MARK: - Language Settings
@@ -51,10 +60,10 @@ class SettingsViewModel {
             languageCode = "en"
         }
         
-        LocalizationManager.shared.setLanguage(languageCode)
+        localizationProvider.setLanguage(languageCode)
         refreshTrigger = UUID()
         hapticManager.selectionChanged()
-        AchievementManager.shared.refreshLocalization()
+        achievementManager.refreshLocalization()
     }
     
     // MARK: - Sound Settings
@@ -133,6 +142,6 @@ class SettingsViewModel {
         settingsManager.updateSoundEnabled(defaultSettings.soundEnabled)
         settingsManager.updateHapticEnabled(defaultSettings.hapticEnabled)
         settingsManager.updateNotificationsEnabled(defaultSettings.notificationsEnabled)
-        AchievementManager.shared.refreshLocalization()
+        achievementManager.refreshLocalization()
     }
 }

@@ -101,10 +101,21 @@ class RemoteQuestionsService: ObservableObject {
         
         let remoteQuestions = try JSONDecoder().decode([RemoteQuestion].self, from: data)
         print("✅ RemoteQuestionsService: Successfully loaded \(remoteQuestions.count) questions from \(fileName)")
-        print("📋 Remote question IDs: \(remoteQuestions.map { $0.id }.joined(separator: ", "))")
+        
+        // Преобразуем ID в строки для логирования
+        let questionIds = remoteQuestions.map { question -> String in
+            switch question.id {
+            case .string(let str):
+                return str
+            case .int(let num):
+                return String(num)
+            }
+        }
+        print("📋 Remote question IDs: \(questionIds.joined(separator: ", "))")
         
         // Проверяем, есть ли q31
-        if remoteQuestions.contains(where: { $0.id == "q31" }) {
+        let hasQ31 = questionIds.contains("q31")
+        if hasQ31 {
             print("🎯 Found q31 in remote questions!")
         } else {
             print("❌ q31 NOT found in remote questions")
@@ -221,32 +232,166 @@ class RemoteQuestionsService: ObservableObject {
 
 // MARK: - Remote Question Models
 
+// Поддержка обоих форматов: старый (id/text/answers с id) и новый (id/question/answers как массив строк)
 struct RemoteQuestion: Codable {
-    let id: String
-    let text: String
-    let answers: [RemoteAnswer]
+    // ID может быть строкой или числом
+    let id: RemoteQuestionID
+    let text: String?
+    let question: String?  // Новый формат использует "question" вместо "text"
+    let answers: RemoteAnswers
     let correctIndex: Int
-    let category: String
-    let difficulty: String
+    let category: String?
+    let difficulty: String?
+    
+    // Определяем текст вопроса из любого формата
+    var questionText: String {
+        return text ?? question ?? ""
+    }
+    
+    // Определяем категорию с дефолтным значением
+    var questionCategory: String {
+        return category ?? "Общее"
+    }
     
     func toQuestion() -> Question {
+        // Преобразуем ID в строку
+        let questionId: String
+        switch id {
+        case .string(let str):
+            questionId = str
+        case .int(let num):
+            questionId = String(num)
+        }
+        
+        // Преобразуем answers в нужный формат
+        let questionAnswers: [Answer]
+        switch answers {
+        case .objects(let answerObjects):
+            questionAnswers = answerObjects.map { $0.toAnswer() }
+        case .strings(let answerStrings):
+            // Генерируем ID для строковых ответов
+            questionAnswers = answerStrings.enumerated().map { index, text in
+                Answer(id: "a\(index + 1)", text: text)
+            }
+        }
+        
+        // Определяем difficulty
+        let questionDifficulty: Difficulty
+        if let difficultyStr = difficulty,
+           let parsedDifficulty = Difficulty(rawValue: difficultyStr.lowercased()) {
+            questionDifficulty = parsedDifficulty
+        } else {
+            questionDifficulty = .medium
+        }
+        
         return Question(
-            id: id,
-            text: text,
-            answers: answers.map { $0.toAnswer() },
+            id: questionId,
+            text: questionText,
+            answers: questionAnswers,
             correctIndex: correctIndex,
-            category: category,
-            difficulty: .medium // Default difficulty since we're simplifying
+            category: questionCategory,
+            difficulty: questionDifficulty
         )
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case id, text, question, answers, correctIndex, category, difficulty
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        
+        // Обрабатываем ID (может быть строкой или числом)
+        if let stringId = try? container.decode(String.self, forKey: .id) {
+            id = .string(stringId)
+        } else if let intId = try? container.decode(Int.self, forKey: .id) {
+            id = .int(intId)
+        } else {
+            throw DecodingError.typeMismatch(
+                RemoteQuestionID.self,
+                DecodingError.Context(
+                    codingPath: decoder.codingPath + [CodingKeys.id],
+                    debugDescription: "ID must be either String or Int"
+                )
+            )
+        }
+        
+        // Обрабатываем текст вопроса (может быть "text" или "question")
+        text = try? container.decode(String.self, forKey: .text)
+        question = try? container.decode(String.self, forKey: .question)
+        
+        // Обрабатываем answers (может быть массив объектов или массив строк)
+        if let answerObjects = try? container.decode([RemoteAnswer].self, forKey: .answers) {
+            answers = .objects(answerObjects)
+        } else if let answerStrings = try? container.decode([String].self, forKey: .answers) {
+            answers = .strings(answerStrings)
+        } else {
+            throw DecodingError.typeMismatch(
+                RemoteAnswers.self,
+                DecodingError.Context(
+                    codingPath: decoder.codingPath + [CodingKeys.answers],
+                    debugDescription: "Answers must be either array of objects or array of strings"
+                )
+            )
+        }
+        
+        correctIndex = try container.decode(Int.self, forKey: .correctIndex)
+        category = try? container.decode(String.self, forKey: .category)
+        difficulty = try? container.decode(String.self, forKey: .difficulty)
+    }
+    
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        
+        // Кодируем ID
+        switch id {
+        case .string(let str):
+            try container.encode(str, forKey: .id)
+        case .int(let num):
+            try container.encode(num, forKey: .id)
+        }
+        
+        // Кодируем текст (приоритет text над question для обратной совместимости)
+        if let text = text {
+            try container.encode(text, forKey: .text)
+        } else if let question = question {
+            try container.encode(question, forKey: .question)
+        }
+        
+        // Кодируем answers
+        switch answers {
+        case .objects(let answerObjects):
+            try container.encode(answerObjects, forKey: .answers)
+        case .strings(let answerStrings):
+            try container.encode(answerStrings, forKey: .answers)
+        }
+        
+        try container.encode(correctIndex, forKey: .correctIndex)
+        if let category = category {
+            try container.encode(category, forKey: .category)
+        }
+        if let difficulty = difficulty {
+            try container.encode(difficulty, forKey: .difficulty)
+        }
     }
 }
 
+enum RemoteQuestionID: Codable {
+    case string(String)
+    case int(Int)
+}
+
+enum RemoteAnswers: Codable {
+    case objects([RemoteAnswer])
+    case strings([String])
+}
+
 struct RemoteAnswer: Codable {
-    let id: String
+    let id: String?
     let text: String
     
     func toAnswer() -> Answer {
-        return Answer(id: id, text: text)
+        return Answer(id: id ?? UUID().uuidString, text: text)
     }
 }
 

@@ -7,120 +7,115 @@
 
 import Foundation
 
-// MARK: - Enhanced Dependency Injection Container
+// MARK: - Enhanced Dependency Injection Container (Factory)
 class EnhancedDIContainer {
-    static let shared = EnhancedDIContainer()
+    // MARK: - Factory Methods
+    static func createEnhancedDependencies(baseDependencies: AppDependenciesProtocol? = nil) -> EnhancedDependencies {
+        let base = baseDependencies ?? AppDependencies()
+        return EnhancedDependencies(baseDependencies: base)
+    }
     
-    // MARK: - Network Layer
-    lazy var networkManager: NetworkManager = {
-        NetworkManager()
-    }()
-    
-    lazy var networkConfiguration: NetworkConfiguration = {
-        NetworkConfiguration.default
-    }()
-    
-    // MARK: - Cache Layer
-    lazy var cacheManager: CacheManager = {
-        CacheManager()
-    }()
-    
-    lazy var cacheConfiguration: CacheConfiguration = {
-        CacheConfiguration.default
+    // MARK: - Backward Compatibility (Deprecated)
+    @available(*, deprecated, message: "Use EnhancedDIContainer.createEnhancedDependencies() instead")
+    static let shared: EnhancedDIContainer = {
+        let container = EnhancedDIContainer()
+        let baseDeps = AppDependencies()
+        container._dependencies = EnhancedDependencies(baseDependencies: baseDeps)
+        return container
     }()
     
-    // MARK: - Core Services
-    lazy var settingsManager: SettingsManager = {
-        SettingsManager()
-    }()
-    
-    lazy var statsManager: StatsManager = {
-        DIContainer.shared.statsManager
-    }()
-    
-    lazy var examStatisticsManager: ExamStatisticsManager = {
-        DIContainer.shared.examStatisticsManager
-    }()
-
-    lazy var adaptiveLearningEngine: AdaptiveLearningEngine = {
-        DIContainer.shared.adaptiveLearningEngine
-    }()
-
-    lazy var profileManager: ProfileManager = {
-        DIContainer.shared.profileManager
-    }()
-    
-    lazy var achievementManager: AchievementManager = {
-        let manager = AchievementManager.shared
-        manager.configureDependencies(notificationManager: notificationManager)
-        return manager
-    }()
-    
-    lazy var localizationManager: LocalizationManager = {
-        LocalizationManager.shared
-    }()
-    
-    // MARK: - Enhanced Services
-    lazy var enhancedRemoteQuestionsService: EnhancedRemoteQuestionsService = {
-        EnhancedRemoteQuestionsService(
-            networkManager: networkManager,
-            cacheManager: cacheManager,
-            configuration: cacheConfiguration
-        )
-    }()
-    
-    // MARK: - Use Cases
-    lazy var quizUseCase: QuizUseCaseProtocol = {
-        QuizUseCase(
-            questionsRepository: questionsRepository,
-            adaptiveEngine: adaptiveLearningEngine,
-            profileManager: profileManager
-        )
-    }()
-    
-    lazy var enhancedQuizUseCase: EnhancedQuizUseCaseProtocol = {
-        EnhancedQuizUseCase(
-            questionsRepository: enhancedQuestionsRepository,
-            networkManager: networkManager,
-            adaptiveEngine: adaptiveLearningEngine,
-            profileManager: profileManager
-        )
-    }()
-    
-    lazy var examUseCase: ExamUseCaseProtocol = {
-        ExamUseCase(questionsRepository: questionsRepository, examStatisticsManager: examStatisticsManager)
-    }()
-    
-    // MARK: - Repositories
-    lazy var questionsRepository: QuestionsRepositoryProtocol = {
-        QuestionsRepository(
-            remoteService: RemoteQuestionsService(),
-            useRemoteQuestions: true
-        )
-    }()
-    
-    lazy var enhancedQuestionsRepository: EnhancedQuestionsRepositoryProtocol = {
-        EnhancedQuestionsRepository(
-            remoteService: enhancedRemoteQuestionsService,
-            useRemoteQuestions: true,
-            networkManager: networkManager
-        )
-    }()
-    
-    // MARK: - Managers
-    lazy var hapticManager: HapticManager = {
-        HapticManager(settingsManager: settingsManager)
-    }()
-    
-    lazy var soundManager: SoundManager = {
-        SoundManager(settingsManager: settingsManager)
-    }()
-    
-    lazy var notificationManager: NotificationManager = {
-        NotificationManager()
-    }()
+    private var _dependencies: EnhancedDependencies?
     
     private init() {}
+    
+    // MARK: - Lazy Properties for Backward Compatibility
+    var networkManager: NetworkManager {
+        _dependencies?.networkManager ?? EnhancedDependencies(baseDependencies: AppDependencies()).networkManager
+    }
+    
+    var networkConfiguration: NetworkConfiguration {
+        _dependencies?.networkConfiguration ?? EnhancedDependencies(baseDependencies: AppDependencies()).networkConfiguration
+    }
+    
+    var cacheManager: CacheManager {
+        _dependencies?.cacheManager ?? EnhancedDependencies(baseDependencies: AppDependencies()).cacheManager
+    }
+    
+    var cacheConfiguration: CacheConfiguration {
+        _dependencies?.cacheConfiguration ?? EnhancedDependencies(baseDependencies: AppDependencies()).cacheConfiguration
+    }
+    
+    var settingsManager: SettingsManager {
+        _dependencies?.baseDependencies.settingsManager ?? AppDependencies().settingsManager
+    }
+    
+    var statsManager: StatsManager {
+        _dependencies?.baseDependencies.statsManager ?? AppDependencies().statsManager
+    }
+    
+    var examStatisticsManager: ExamStatisticsManager {
+        _dependencies?.baseDependencies.examStatisticsManager ?? AppDependencies().examStatisticsManager
+    }
+
+    var adaptiveLearningEngine: AdaptiveLearningEngine {
+        _dependencies?.baseDependencies.adaptiveLearningEngine ?? AppDependencies().adaptiveLearningEngine
+    }
+
+    var profileManager: ProfileManager {
+        _dependencies?.baseDependencies.profileManager ?? AppDependencies().profileManager
+    }
+    
+    var achievementManager: AchievementManager {
+        // Cast to AchievementManager for backward compatibility
+        if let manager = _dependencies?.baseDependencies.achievementManager as? AchievementManager {
+            return manager
+        }
+        return AppDependencies().achievementManager as? AchievementManager ?? AchievementManager(notificationManager: NotificationManager())
+    }
+    
+    var localizationManager: LocalizationManager {
+        // Cast to LocalizationManager for backward compatibility
+        if let manager = _dependencies?.baseDependencies.localizationProvider as? LocalizationManager {
+            return manager
+        }
+        return AppDependencies().localizationProvider as? LocalizationManager ?? LocalizationManager()
+    }
+    
+    var enhancedRemoteQuestionsService: EnhancedRemoteQuestionsService {
+        _dependencies?.enhancedRemoteQuestionsService ?? EnhancedDependencies(baseDependencies: AppDependencies()).enhancedRemoteQuestionsService
+    }
+    
+    var quizUseCase: QuizUseCaseProtocol {
+        _dependencies?.baseDependencies.quizUseCase ?? AppDependencies().quizUseCase
+    }
+    
+    var enhancedQuizUseCase: EnhancedQuizUseCaseProtocol {
+        _dependencies?.enhancedQuizUseCase ?? EnhancedDependencies(baseDependencies: AppDependencies()).enhancedQuizUseCase
+    }
+    
+    var examUseCase: ExamUseCaseProtocol {
+        _dependencies?.baseDependencies.examUseCase ?? AppDependencies().examUseCase
+    }
+    
+    var questionsRepository: QuestionsRepositoryProtocol {
+        _dependencies?.baseDependencies.questionsRepository ?? AppDependencies().questionsRepository
+    }
+    
+    var enhancedQuestionsRepository: EnhancedQuestionsRepositoryProtocol {
+        _dependencies?.enhancedQuestionsRepository ?? EnhancedDependencies(baseDependencies: AppDependencies()).enhancedQuestionsRepository
+    }
+    
+    var hapticManager: HapticManager {
+        _dependencies?.baseDependencies.hapticManager ?? AppDependencies().hapticManager
+    }
+    
+    var soundManager: SoundManager {
+        _dependencies?.baseDependencies.soundManager ?? AppDependencies().soundManager
+    }
+    
+    var notificationManager: NotificationManager {
+        _dependencies?.baseDependencies.notificationManager ?? AppDependencies().notificationManager
+    }
     
     // MARK: - Configuration Methods
     func configureNetwork(
@@ -128,16 +123,24 @@ class EnhancedDIContainer {
         maxRetries: Int? = nil,
         retryDelay: TimeInterval? = nil
     ) {
+        guard var deps = _dependencies else {
+            // Create new dependencies if not set
+            let baseDeps = AppDependencies()
+            _dependencies = EnhancedDependencies(baseDependencies: baseDeps)
+            configureNetwork(timeout: timeout, maxRetries: maxRetries, retryDelay: retryDelay)
+            return
+        }
+        
         let config = NetworkConfiguration(
-            timeout: timeout ?? networkConfiguration.timeout,
-            maxRetries: maxRetries ?? networkConfiguration.maxRetries,
-            retryDelay: retryDelay ?? networkConfiguration.retryDelay,
-            maxRetryDelay: networkConfiguration.maxRetryDelay
+            timeout: timeout ?? deps.networkConfiguration.timeout,
+            maxRetries: maxRetries ?? deps.networkConfiguration.maxRetries,
+            retryDelay: retryDelay ?? deps.networkConfiguration.retryDelay,
+            maxRetryDelay: deps.networkConfiguration.maxRetryDelay
         )
         
-        networkConfiguration = config
-        // Recreate network manager with new configuration
-        networkManager = NetworkManager(configuration: config)
+        deps.networkConfiguration = config
+        deps.networkManager = NetworkManager(configuration: config)
+        _dependencies = deps
     }
     
     func configureCache(
@@ -145,45 +148,154 @@ class EnhancedDIContainer {
         maxCacheSize: Int? = nil,
         compressionEnabled: Bool? = nil
     ) {
+        guard var deps = _dependencies else {
+            // Create new dependencies if not set
+            let baseDeps = AppDependencies()
+            _dependencies = EnhancedDependencies(baseDependencies: baseDeps)
+            configureCache(ttl: ttl, maxCacheSize: maxCacheSize, compressionEnabled: compressionEnabled)
+            return
+        }
+        
+        let config = CacheConfiguration(
+            ttl: ttl ?? deps.cacheConfiguration.ttl,
+            maxCacheSize: maxCacheSize ?? deps.cacheConfiguration.maxCacheSize,
+            compressionEnabled: compressionEnabled ?? deps.cacheConfiguration.compressionEnabled
+        )
+        
+        deps.cacheConfiguration = config
+        deps.cacheManager = CacheManager(configuration: config)
+        _dependencies = deps
+    }
+    
+    // MARK: - Reset (Deprecated)
+    @available(*, deprecated, message: "Create new EnhancedDependencies instead")
+    func reset() {
+        let baseDeps = AppDependencies()
+        _dependencies = EnhancedDependencies(baseDependencies: baseDeps)
+    }
+}
+
+// MARK: - Enhanced Dependencies
+struct EnhancedDependencies {
+    let baseDependencies: AppDependenciesProtocol
+    
+    var networkManager: NetworkManager
+    var networkConfiguration: NetworkConfiguration
+    var cacheManager: CacheManager
+    var cacheConfiguration: CacheConfiguration
+    var enhancedRemoteQuestionsService: EnhancedRemoteQuestionsService
+    var enhancedQuestionsRepository: EnhancedQuestionsRepositoryProtocol
+    var enhancedQuizUseCase: EnhancedQuizUseCaseProtocol
+    
+    init(baseDependencies: AppDependenciesProtocol) {
+        self.baseDependencies = baseDependencies
+        
+        // Initialize enhanced services
+        self.networkConfiguration = NetworkConfiguration.default
+        self.networkManager = NetworkManager(configuration: networkConfiguration)
+        
+        self.cacheConfiguration = CacheConfiguration.default
+        self.cacheManager = CacheManager(configuration: cacheConfiguration)
+        
+        self.enhancedRemoteQuestionsService = EnhancedRemoteQuestionsService(
+            networkManager: networkManager,
+            cacheManager: cacheManager,
+            configuration: cacheConfiguration
+        )
+        
+        self.enhancedQuestionsRepository = EnhancedQuestionsRepository(
+            remoteService: enhancedRemoteQuestionsService,
+            useRemoteQuestions: true,
+            networkManager: networkManager
+        )
+        
+        self.enhancedQuizUseCase = EnhancedQuizUseCase(
+            questionsRepository: enhancedQuestionsRepository,
+            networkManager: networkManager,
+            adaptiveEngine: baseDependencies.adaptiveLearningEngine,
+            profileManager: baseDependencies.profileManager,
+            questionPoolProgressManager: baseDependencies.questionPoolProgressManager
+        )
+    }
+    
+    // MARK: - Configuration Methods
+    func withNetworkConfiguration(
+        timeout: TimeInterval? = nil,
+        maxRetries: Int? = nil,
+        retryDelay: TimeInterval? = nil
+    ) -> EnhancedDependencies {
+        let config = NetworkConfiguration(
+            timeout: timeout ?? networkConfiguration.timeout,
+            maxRetries: maxRetries ?? networkConfiguration.maxRetries,
+            retryDelay: retryDelay ?? networkConfiguration.retryDelay,
+            maxRetryDelay: networkConfiguration.maxRetryDelay
+        )
+        
+        var updated = self
+        updated.networkConfiguration = config
+        updated.networkManager = NetworkManager(configuration: config)
+        
+        // Recreate dependent services with new network manager
+        updated.enhancedRemoteQuestionsService = EnhancedRemoteQuestionsService(
+            networkManager: updated.networkManager,
+            cacheManager: updated.cacheManager,
+            configuration: updated.cacheConfiguration
+        )
+        
+        updated.enhancedQuestionsRepository = EnhancedQuestionsRepository(
+            remoteService: updated.enhancedRemoteQuestionsService,
+            useRemoteQuestions: true,
+            networkManager: updated.networkManager
+        )
+        
+        updated.enhancedQuizUseCase = EnhancedQuizUseCase(
+            questionsRepository: updated.enhancedQuestionsRepository,
+            networkManager: updated.networkManager,
+            adaptiveEngine: baseDependencies.adaptiveLearningEngine,
+            profileManager: baseDependencies.profileManager,
+            questionPoolProgressManager: baseDependencies.questionPoolProgressManager
+        )
+        
+        return updated
+    }
+    
+    func withCacheConfiguration(
+        ttl: TimeInterval? = nil,
+        maxCacheSize: Int? = nil,
+        compressionEnabled: Bool? = nil
+    ) -> EnhancedDependencies {
         let config = CacheConfiguration(
             ttl: ttl ?? cacheConfiguration.ttl,
             maxCacheSize: maxCacheSize ?? cacheConfiguration.maxCacheSize,
             compressionEnabled: compressionEnabled ?? cacheConfiguration.compressionEnabled
         )
         
-        cacheConfiguration = config
-        // Recreate cache manager with new configuration
-        cacheManager = CacheManager(configuration: config)
-    }
-    
-    // MARK: - Reset
-    func reset() {
-        settingsManager = SettingsManager()
-        statsManager = DIContainer.shared.statsManager
-        examStatisticsManager = DIContainer.shared.examStatisticsManager
-        achievementManager = AchievementManager.shared
-        networkManager = NetworkManager()
-        cacheManager = CacheManager()
-        enhancedRemoteQuestionsService = EnhancedRemoteQuestionsService()
-        // Fix: pass QuestionsRepositoryProtocol to QuizUseCase
-        questionsRepository = QuestionsRepository()
-        adaptiveLearningEngine = DIContainer.shared.adaptiveLearningEngine
-        profileManager = DIContainer.shared.profileManager
-        quizUseCase = QuizUseCase(
-            questionsRepository: questionsRepository,
-            adaptiveEngine: adaptiveLearningEngine,
-            profileManager: profileManager
+        var updated = self
+        updated.cacheConfiguration = config
+        updated.cacheManager = CacheManager(configuration: config)
+        
+        // Recreate dependent services with new cache manager
+        updated.enhancedRemoteQuestionsService = EnhancedRemoteQuestionsService(
+            networkManager: updated.networkManager,
+            cacheManager: updated.cacheManager,
+            configuration: updated.cacheConfiguration
         )
-        enhancedQuizUseCase = EnhancedQuizUseCase(
-            questionsRepository: EnhancedQuestionsRepository(),
-            networkManager: networkManager,
-            adaptiveEngine: adaptiveLearningEngine,
-            profileManager: profileManager
+        
+        updated.enhancedQuestionsRepository = EnhancedQuestionsRepository(
+            remoteService: updated.enhancedRemoteQuestionsService,
+            useRemoteQuestions: true,
+            networkManager: updated.networkManager
         )
-        enhancedQuestionsRepository = EnhancedQuestionsRepository()
-        hapticManager = HapticManager(settingsManager: settingsManager)
-        soundManager = SoundManager(settingsManager: settingsManager)
-        notificationManager = NotificationManager()
+        
+        updated.enhancedQuizUseCase = EnhancedQuizUseCase(
+            questionsRepository: updated.enhancedQuestionsRepository,
+            networkManager: updated.networkManager,
+            adaptiveEngine: baseDependencies.adaptiveLearningEngine,
+            profileManager: baseDependencies.profileManager,
+            questionPoolProgressManager: baseDependencies.questionPoolProgressManager
+        )
+        
+        return updated
     }
 }
 
@@ -204,24 +316,26 @@ class EnhancedQuizUseCase: EnhancedQuizUseCaseProtocol {
     private let networkManager: NetworkManager
     private let adaptiveEngine: AdaptiveLearningEngine
     private let profileManager: ProfileManager
+    private let questionPoolProgressManager: QuestionPoolProgressManaging
     private let questionPoolVersion = 1
     
     init(
         questionsRepository: EnhancedQuestionsRepositoryProtocol,
         networkManager: NetworkManager,
         adaptiveEngine: AdaptiveLearningEngine,
-        profileManager: ProfileManager
+        profileManager: ProfileManager,
+        questionPoolProgressManager: QuestionPoolProgressManaging? = nil
     ) {
         self.questionsRepository = questionsRepository
         self.networkManager = networkManager
         self.adaptiveEngine = adaptiveEngine
         self.profileManager = profileManager
+        self.questionPoolProgressManager = questionPoolProgressManager ?? DefaultQuestionPoolProgressManager()
     }
     
     func startQuiz(language: String) async throws -> [Question] {
         let allQuestions = try await questionsRepository.loadQuestions(language: language)
-        let progress = QuestionPoolProgress(version: questionPoolVersion)
-        let used = progress.usedIds
+        let used = questionPoolProgressManager.getUsedIds(version: questionPoolVersion)
         
         let sessionCount = min(20, allQuestions.count)
         var selected = adaptiveEngine.selectQuestions(
@@ -249,7 +363,7 @@ class EnhancedQuizUseCase: EnhancedQuizUseCaseProtocol {
             selected.append(contentsOf: Array(fallback.shuffled().prefix(remainingNeeded)))
         }
         
-        progress.markUsed(selected.map { $0.id })
+        questionPoolProgressManager.markUsed(selected.map { $0.id }, version: questionPoolVersion)
         return selected
     }
     

@@ -14,7 +14,6 @@ import UIKit
 enum StartRoute: Hashable {
     case quiz
     case result(ResultSnapshot)
-    case stats
     case achievements
     case settings
     case profile
@@ -58,12 +57,15 @@ struct StartView: View {
         profileManager: ProfileManager,
         examUseCase: ExamUseCaseProtocol,
         examStatisticsManager: ExamStatisticsManager,
-        enhancedContainer: EnhancedDIContainer
+        enhancedQuizUseCase: EnhancedQuizUseCaseProtocol
     ) {
         let quizViewModel = QuizViewModel(
             quizUseCase: quizUseCase,
             statsManager: statsManager,
             settingsManager: settingsManager
+        )
+        let questionsPreloading = DefaultQuestionsPreloadingService(
+            enhancedQuizUseCase: enhancedQuizUseCase
         )
         _model = State(
             initialValue: StartViewModel(
@@ -73,7 +75,7 @@ struct StartView: View {
                 profileManager: profileManager,
                 examUseCase: examUseCase,
                 examStatisticsManager: examStatisticsManager,
-                enhancedContainer: enhancedContainer
+                questionsPreloading: questionsPreloading
             )
         )
     }
@@ -84,12 +86,16 @@ struct StartView: View {
         settingsManager: SettingsManager,
         profileManager: ProfileManager,
         examUseCase: ExamUseCaseProtocol,
-        examStatisticsManager: ExamStatisticsManager
+        examStatisticsManager: ExamStatisticsManager,
+        enhancedContainer: EnhancedDIContainer
     ) {
         let quizViewModel = QuizViewModel(
             quizUseCase: quizUseCase,
             statsManager: statsManager,
             settingsManager: settingsManager
+        )
+        let questionsPreloading = DefaultQuestionsPreloadingService(
+            enhancedQuizUseCase: enhancedContainer.enhancedQuizUseCase
         )
         _model = State(
             initialValue: StartViewModel(
@@ -99,13 +105,14 @@ struct StartView: View {
                 profileManager: profileManager,
                 examUseCase: examUseCase,
                 examStatisticsManager: examStatisticsManager,
-                enhancedContainer: EnhancedDIContainer.shared
+                questionsPreloading: questionsPreloading
             )
         )
     }
     
     var body: some View {
         navigationContent(bindingModel: $model)
+            .id(model.settingsManager.settings.language)
     }
 
     private func navigationContent(bindingModel: Binding<StartViewModel>) -> some View {
@@ -158,14 +165,12 @@ struct StartView: View {
                             model.clearNewAchievements()
                         }
                     )
-                case .stats:
-                    StatsView(statsManager: model.statsManager)
                 case .achievements:
                     AchievementsView()
                 case .settings:
-                    SettingsView(viewModel: SettingsViewModel(settingsManager: model.settingsManager))
+                    SettingsViewWithDependencies(settingsManager: model.settingsManager)
                 case .profile:
-                    ProfileView()
+                    UnifiedProfileView(statsManager: model.statsManager)
                 case .exam:
                     if let examViewModel = model.examViewModel {
                         ExamView(viewModel: examViewModel) {
@@ -180,7 +185,6 @@ struct StartView: View {
                 }
                 .environment(\.settingsManager, model.settingsManager)
             }
-            .navigationTitle("app.name".localized)
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(DesignTokens.Colors.background1, for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
@@ -189,9 +193,9 @@ struct StartView: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
                         Button(action: {
-                            model.showStats()
+                            model.showProfile()
                         }) {
-                            Label("start.menu.stats".localized, systemImage: "chart.bar.fill")
+                            Label("start.menu.profile".localized, systemImage: "person.crop.circle")
                         }
                         
                         Divider()
@@ -200,14 +204,6 @@ struct StartView: View {
                             model.showAchievements()
                         }) {
                             Label("start.menu.achievements".localized, systemImage: "trophy.fill")
-                        }
-                        
-                        Divider()
-                        
-                        Button(action: {
-                            model.showProfile()
-                        }) {
-                            Label("start.menu.profile".localized, systemImage: "person.crop.circle")
                         }
                         
                         Divider()
@@ -312,7 +308,14 @@ struct StartView: View {
             actionsSection(model: model)
         }
         .padding(DesignTokens.Spacing.xxl)
-        .cardStyle(cornerRadius: DesignTokens.CornerRadius.xlarge)
+        .cardStyle(
+            cornerRadius: DesignTokens.CornerRadius.xlarge,
+            fillColor: DesignTokens.Colors.cardBackground,
+            borderColor: DesignTokens.Colors.iconBlue.opacity(0.3),
+            shadowColor: Color.black.opacity(0.2),
+            shadowRadius: 8,
+            shadowYOffset: 4
+        )
     }
     
     private func statsCard(model: StartViewModel) -> some View {
@@ -385,9 +388,9 @@ struct StartView: View {
             .frame(maxWidth: .infinity)
             .cardStyle(
                 cornerRadius: DesignTokens.CornerRadius.medium,
-                fillColor: DesignTokens.Colors.progressCard,
-                borderColor: DesignTokens.Colors.borderDefault,
-                shadowColor: Color.black.opacity(0.24),
+                fillColor: DesignTokens.Colors.iconBlue.opacity(0.15),
+                borderColor: DesignTokens.Colors.iconBlue.opacity(0.35),
+                shadowColor: Color.black.opacity(0.2),
                 shadowRadius: 8,
                 shadowYOffset: 4
             )
@@ -419,9 +422,9 @@ struct StartView: View {
             .frame(maxWidth: .infinity)
             .cardStyle(
                 cornerRadius: DesignTokens.CornerRadius.medium,
-                fillColor: DesignTokens.Colors.progressCard,
+                fillColor: DesignTokens.Colors.iconOrange.opacity(0.15),
                 borderColor: DesignTokens.Colors.iconOrange.opacity(0.35),
-                shadowColor: Color.black.opacity(0.24),
+                shadowColor: Color.black.opacity(0.2),
                 shadowRadius: 8,
                 shadowYOffset: 4
             )
@@ -457,23 +460,33 @@ private struct ParticleFieldView: View {
         statsManager: statsManager,
         examStatisticsManager: examStatsManager
     )
+    let adaptiveStrategy = AdaptiveQuestionSelectionStrategy(adaptiveEngine: adaptiveEngine)
+    let fallbackStrategy = FallbackQuestionSelectionStrategy()
+    let questionPoolProgressManager = DefaultQuestionPoolProgressManager()
     let quizUseCase = QuizUseCase(
         questionsRepository: QuestionsRepository(),
-        adaptiveEngine: adaptiveEngine,
-        profileManager: profileManager
+        profileProgressProvider: profileManager, // ProfileManager implements ProfileProgressProviding
+        questionSelectionStrategy: adaptiveStrategy,
+        fallbackStrategy: fallbackStrategy,
+        questionPoolProgressManager: questionPoolProgressManager
     )
     let examUseCase = ExamUseCase(
         questionsRepository: QuestionsRepository(),
         examStatisticsManager: examStatsManager
     )
+    
+    // Create enhanced dependencies for Preview
+    let baseDependencies = AppDependencies()
+    let enhancedDependencies = EnhancedDIContainer.createEnhancedDependencies(baseDependencies: baseDependencies)
 
-    return StartView(
+    StartView(
         quizUseCase: quizUseCase,
         statsManager: statsManager,
         settingsManager: settingsManager,
         profileManager: profileManager,
         examUseCase: examUseCase,
-        examStatisticsManager: examStatsManager
+        examStatisticsManager: examStatsManager,
+        enhancedQuizUseCase: enhancedDependencies.enhancedQuizUseCase
     )
     .environment(\.settingsManager, settingsManager)
     .environment(\.statsManager, statsManager)

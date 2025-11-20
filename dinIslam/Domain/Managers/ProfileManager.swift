@@ -6,7 +6,6 @@
 //
 
 import AuthenticationServices
-import CryptoKit
 import Foundation
 
 @MainActor
@@ -29,7 +28,23 @@ final class ProfileManager {
     }
 
     var displayName: String {
-        profile.fullName ?? NSLocalizedString("profile.anonymous", comment: "Anonymous user placeholder")
+        // Сначала используем пользовательское имя, если оно задано
+        if let customName = profile.customDisplayName, !customName.isEmpty {
+            return customName
+        }
+        
+        // Затем пытаемся использовать fullName
+        if let fullName = profile.fullName, !fullName.isEmpty {
+            return fullName
+        }
+        
+        // Если fullName нет, используем email (если он не приватный)
+        if let email = profile.email, !isPrivateEmail(email) {
+            return email
+        }
+        
+        // В последнюю очередь показываем анонимного пользователя
+        return NSLocalizedString("profile.anonymous", comment: "Anonymous user placeholder")
     }
 
     var email: String? {
@@ -56,15 +71,24 @@ final class ProfileManager {
     @ObservationIgnored private let adaptiveEngine: AdaptiveLearningEngine
     @ObservationIgnored private let statsManager: StatsManager
     @ObservationIgnored private let examStatisticsManager: ExamStatisticsManager
-    @ObservationIgnored private var syncTask: Task<Void, Never>?
-    @ObservationIgnored private var currentNonce: String?
+    
+    // Services via protocols
+    @ObservationIgnored private let authService: ProfileAuthHandling
+    @ObservationIgnored private let syncService: ProfileSyncing
+    @ObservationIgnored private let mergeService: ProfileMergeService
+    @ObservationIgnored private let avatarService: ProfileAvatarHandling
+    @ObservationIgnored private let progressService: ProfileProgressManaging
 
     init(
         localStore localStoreOverride: ProfileLocalStore? = nil,
         cloudService cloudServiceOverride: CloudKitProfileService? = nil,
         adaptiveEngine adaptiveEngineOverride: AdaptiveLearningEngine? = nil,
         statsManager: StatsManager,
-        examStatisticsManager: ExamStatisticsManager
+        examStatisticsManager: ExamStatisticsManager,
+        authService: ProfileAuthHandling? = nil,
+        syncService: ProfileSyncing? = nil,
+        avatarService: ProfileAvatarHandling? = nil,
+        progressService: ProfileProgressManaging? = nil
     ) {
         let resolvedLocalStore: ProfileLocalStore
         if let override = localStoreOverride {
@@ -93,6 +117,35 @@ final class ProfileManager {
         self.statsManager = statsManager
         self.examStatisticsManager = examStatisticsManager
 
+        // Initialize services with default implementations if not provided
+        self.mergeService = ProfileMergeService(adaptiveEngine: resolvedAdaptiveEngine)
+        
+        let resolvedAvatarManager = ProfileAvatarManager(localStore: resolvedLocalStore)
+        let resolvedAvatarService = avatarService ?? DefaultProfileAvatarService(avatarManager: resolvedAvatarManager)
+        
+        let resolvedProgressBuilder = ProfileProgressBuilder(
+            adaptiveEngine: resolvedAdaptiveEngine,
+            statsManager: statsManager,
+            examStatisticsManager: examStatisticsManager
+        )
+        let resolvedProgressService = progressService ?? DefaultProfileProgressService(progressBuilder: resolvedProgressBuilder)
+        
+        let resolvedSyncService = ProfileSyncService(
+            cloudService: resolvedCloudService,
+            localStore: resolvedLocalStore,
+            mergeService: mergeService,
+            avatarManager: resolvedAvatarManager
+        )
+        let resolvedSyncServiceWrapper = syncService ?? DefaultProfileSyncService(syncService: resolvedSyncService)
+        
+        let resolvedAuthService = authService ?? DefaultProfileAuthService(authService: ProfileAuthService())
+        
+        // Assign services to properties
+        self.avatarService = resolvedAvatarService
+        self.progressService = resolvedProgressService
+        self.syncService = resolvedSyncServiceWrapper
+        self.authService = resolvedAuthService
+
         if let storedProfile = resolvedLocalStore.loadCurrentProfile() {
             profile = storedProfile
         } else {
@@ -100,12 +153,11 @@ final class ProfileManager {
         }
 
         // Валидация аватара при загрузке профиля
-        validateAvatar()
+        self.avatarService.validateAvatar(profile: &profile)
+        localStore.saveProfile(profile)
 
-        self.statsManager.profileSyncDelegate = self
-        self.examStatisticsManager.profileSyncDelegate = self
-
-        rebuildProgressFromLocalStats()
+        self.progressService.rebuildProgressFromLocalStats(profile: &profile)
+        localStore.saveProfile(profile)
 
         if profile.authMethod != .anonymous {
             Task {
@@ -116,35 +168,35 @@ final class ProfileManager {
 
     // MARK: - Sign In with Apple
     func prepareSignInRequest(_ request: ASAuthorizationAppleIDRequest) {
-        let nonce = randomNonceString()
-        currentNonce = nonce
-        request.requestedScopes = [.fullName, .email]
-        request.nonce = sha256(nonce)
+        authService.prepareSignInRequest(request)
     }
 
     func handleSignInResult(_ result: Result<ASAuthorization, Error>) {
-        switch result {
-        case .success(let authorization):
-            guard let credential = authorization.credential as? ASAuthorizationAppleIDCredential else {
-                errorMessage = NSLocalizedString("profile.signin.invalidCredential", comment: "Invalid credential")
-                return
+        authService.handleSignInResult(
+            result,
+            onSuccess: { [weak self] credential in
+                await self?.handleAppleCredential(credential)
+            },
+            onFailure: { [weak self] message in
+                self?.errorMessage = message
+                self?.syncState = .failed(message)
             }
-            Task {
-                await handleAppleCredential(credential)
-            }
-        case .failure(let error):
-            errorMessage = error.localizedDescription
-            syncState = .failed(error.localizedDescription)
-        }
+        )
     }
 
     func signOut() {
         guard isSignedIn else { return }
         let signedInProfileId = profile.id
+        
+        // Сохраняем данные из ProfileProgress в локальные StatsManager перед выходом
+        progressService.syncProgressToLocalStats(profile: profile)
+        
+        // Переключаемся на анонимный профиль
         profile = localStore.loadOrCreateAnonymousProfile()
-        statsManager.resetStats()
-        examStatisticsManager.resetStatistics()
-        rebuildProgressFromLocalStats()
+        
+        // Восстанавливаем локальные данные в новый анонимный профиль
+        progressService.rebuildProgressFromLocalStats(profile: &profile)
+        
         localStore.saveProfile(profile)
         syncState = .idle
         errorMessage = nil
@@ -153,7 +205,7 @@ final class ProfileManager {
 
     func resetProfileData() async {
         isLoading = true
-        syncTask?.cancel()
+        syncService.cancelSync()
         let profileId = profile.id
         errorMessage = nil
 
@@ -165,7 +217,7 @@ final class ProfileManager {
         profile.metadata.updatedAt = Date()
         profile.metadata.lastSyncedAt = nil
         localStore.deleteAvatar(for: profileId)
-        rebuildProgressFromLocalStats()
+        progressService.rebuildProgressFromLocalStats(profile: &profile)
         localStore.saveProfile(profile)
 
         if isSignedIn {
@@ -173,8 +225,9 @@ final class ProfileManager {
                 try await cloudService.deleteProfile(with: profileId)
                 await performSync()
             } catch {
-                errorMessage = error.localizedDescription
-                syncState = .failed(error.localizedDescription)
+                let friendlyMessage = ProfileErrorHandler.userFriendlyErrorMessage(from: error)
+                errorMessage = friendlyMessage
+                syncState = .failed(friendlyMessage)
             }
         } else {
             syncState = .idle
@@ -184,11 +237,9 @@ final class ProfileManager {
     }
 
     func updateAvatar(with data: Data, fileExtension: String = "dat") async {
-        guard let savedURL = localStore.saveAvatarData(data, for: profile.id, fileExtension: fileExtension) else {
+        guard avatarService.updateAvatar(profile: &profile, data: data, fileExtension: fileExtension) else {
             return
         }
-        profile.avatarURL = savedURL
-        profile.metadata.updatedAt = Date()
         localStore.saveProfile(profile)
         if isSignedIn {
             await performSync()
@@ -196,9 +247,16 @@ final class ProfileManager {
     }
 
     func deleteAvatar() async {
-        guard profile.avatarURL != nil else { return }
-        localStore.deleteAvatar(for: profile.id)
-        profile.avatarURL = nil
+        avatarService.deleteAvatar(profile: &profile)
+        localStore.saveProfile(profile)
+        if isSignedIn {
+            await performSync()
+        }
+    }
+    
+    func updateDisplayName(_ newName: String?) async {
+        let trimmedName = newName?.trimmingCharacters(in: .whitespacesAndNewlines)
+        profile.customDisplayName = trimmedName?.isEmpty == false ? trimmedName : nil
         profile.metadata.updatedAt = Date()
         localStore.saveProfile(profile)
         if isSignedIn {
@@ -207,74 +265,54 @@ final class ProfileManager {
     }
 
     func validateAvatar() {
-        // Проверяем существование файла аватара
-        if let avatarURL = profile.avatarURL {
-            let fileManager = FileManager.default
-            if !fileManager.fileExists(atPath: avatarURL.path) {
-                // Файл не существует, пытаемся найти его в локальном хранилище
-                if let existingAvatar = localStore.loadAvatar(for: profile.id) {
-                    profile.avatarURL = existingAvatar
-                    localStore.saveProfile(profile)
-                } else {
-                    // Файл не найден, очищаем avatarURL
-                    profile.avatarURL = nil
-                    localStore.saveProfile(profile)
-                }
-            }
-        } else {
-            // Если avatarURL отсутствует, но файл существует, восстанавливаем ссылку
-            if let existingAvatar = localStore.loadAvatar(for: profile.id) {
-                profile.avatarURL = existingAvatar
-                localStore.saveProfile(profile)
-            }
-        }
+        avatarService.validateAvatar(profile: &profile)
+        localStore.saveProfile(profile)
     }
 
     // MARK: - Sync Management
     func refreshFromCloud(mergeStrategy: ProfileMergeStrategy = .newest) async {
-        guard isSignedIn else { return }
-        do {
-            if let remoteProfile = try await cloudService.fetchProfile(for: profile.id) {
-                profile = mergeProfile(local: profile, remote: remoteProfile, strategy: mergeStrategy)
-                profile.metadata.lastSyncedAt = Date()
-                // Валидация аватара после синхронизации
-                validateAvatar()
-                localStore.saveProfile(profile)
+        let currentProfile = profile
+        await syncService.refreshFromCloud(
+            profile: currentProfile,
+            mergeStrategy: mergeStrategy,
+            onSuccess: { [weak self] updatedProfile in
+                self?.profile = updatedProfile
+                self?.syncState = .idle
+                self?.errorMessage = nil
+            },
+            onError: { [weak self] message in
+                self?.errorMessage = message
+                self?.syncState = .failed(message)
             }
-        } catch {
-            errorMessage = error.localizedDescription
-            syncState = .failed(error.localizedDescription)
-        }
+        )
     }
 
     private func scheduleSync() {
-        localStore.saveProfile(profile)
-        guard isSignedIn else { return }
-
-        syncTask?.cancel()
-        syncTask = Task { [weak self] in
-            try? await Task.sleep(nanoseconds: 2_000_000_000) // 2 seconds debounce
-            await self?.performSync()
+        let currentProfile = profile
+        syncService.scheduleSync(
+            profile: currentProfile,
+            isSignedIn: isSignedIn
+        ) { [weak self] updatedProfile in
+            guard let self = self, let updated = updatedProfile else { return }
+            self.profile = updated
         }
     }
 
     private func performSync() async {
-        guard isSignedIn else { return }
         syncState = .syncing
-        do {
-            var profileToSync = profile
-            profileToSync.metadata.updatedAt = Date()
-            profileToSync.metadata.lastSyncedAt = Date()
-            let savedProfile = try await cloudService.saveProfile(profileToSync)
-            profile = savedProfile
-            // Валидация аватара после синхронизации
-            validateAvatar()
-            localStore.saveProfile(profile)
-            syncState = .idle
-        } catch {
-            errorMessage = error.localizedDescription
-            syncState = .failed(error.localizedDescription)
-        }
+        let currentProfile = profile
+        await syncService.performSync(
+            profile: currentProfile,
+            onSuccess: { [weak self] updatedProfile in
+                self?.profile = updatedProfile
+                self?.syncState = .idle
+                self?.errorMessage = nil
+            },
+            onError: { [weak self] message in
+                self?.errorMessage = message
+                self?.syncState = .failed(message)
+            }
+        )
     }
 
     // MARK: - Private Helpers
@@ -283,11 +321,13 @@ final class ProfileManager {
         defer { isLoading = false }
 
         let userId = credential.user
+        
         var signedInProfile = UserProfile(
             id: userId,
             authMethod: .signInWithApple,
             fullName: formattedName(from: credential.fullName) ?? profile.fullName,
             email: credential.email ?? profile.email,
+            customDisplayName: profile.customDisplayName, // Сохраняем пользовательское имя
             localeIdentifier: Locale.current.identifier,
             avatarURL: profile.avatarURL,
             progress: ProfileProgress(),
@@ -299,246 +339,39 @@ final class ProfileManager {
                 lastDeviceIdentifier: UIDeviceIdentifierProvider.currentIdentifier()
             )
         )
+        
+        // Временно устанавливаем signedInProfile как текущий профиль для rebuildProgressFromLocalStats
+        let originalProfile = profile
+        profile = signedInProfile
+        progressService.rebuildProgressFromLocalStats(profile: &profile)
+        signedInProfile = profile
+        profile = originalProfile
 
         do {
             var hasRemoteProfile = false
             if let remoteProfile = try await cloudService.fetchProfile(for: userId) {
-                signedInProfile = mergeProfile(local: signedInProfile, remote: remoteProfile, strategy: .newest)
+                // Объединяем локальные данные (уже в signedInProfile.progress) с удаленными
+                signedInProfile = mergeService.mergeProfile(local: signedInProfile, remote: remoteProfile, strategy: .newest)
                 hasRemoteProfile = true
             }
 
             profile = signedInProfile
             
-            if !hasRemoteProfile {
-                statsManager.resetStats()
-                examStatisticsManager.resetStatistics()
+            // Если есть удаленный профиль, обновляем локальные данные из объединенного профиля
+            if hasRemoteProfile {
+                progressService.syncProgressToLocalStats(profile: profile)
             }
+            // Если нет удаленного профиля, локальные данные уже перенесены в ProfileProgress выше
             
             // Валидация аватара после входа
-            validateAvatar()
+            avatarService.validateAvatar(profile: &profile)
             localStore.saveProfile(profile)
             await performSync()
             errorMessage = nil
         } catch {
-            errorMessage = error.localizedDescription
-            syncState = .failed(error.localizedDescription)
-        }
-    }
-
-    private func rebuildProgressFromLocalStats() {
-        var progress = profile.progress
-        let stats = statsManager.stats
-        let examStats = examStatisticsManager.statistics
-
-        progress.totalQuestionsAnswered = stats.totalQuestionsStudied
-        progress.correctAnswers = stats.correctAnswers
-        progress.incorrectAnswers = stats.incorrectAnswers
-        progress.correctedMistakes = stats.correctedMistakes
-        progress.currentStreak = stats.currentStreak
-        progress.longestStreak = stats.longestStreak
-        progress.averageQuizScore = stats.averageRecentScore
-        progress.lastActivityAt = stats.lastQuizDate
-
-        progress.examsTaken = examStats.totalExamsCompleted
-        progress.examsPassed = examStats.examsPassed
-
-        progress.difficultyStats = stats.difficultyStats.compactMap { key, value in
-            guard let difficulty = Difficulty(rawValue: key) else { return nil }
-            return DifficultyPerformance(
-                difficulty: difficulty,
-                correctAnswers: value.correctAnswers,
-                totalAnswers: value.totalAnswers,
-                adaptiveScore: value.adaptiveScore,
-                masteryLevel: masteryLevel(for: value.adaptiveScore)
-            )
-        }
-
-        progress.topicProgress = stats.topicStats.map { key, value in
-            TopicProgress(
-                topicId: key,
-                displayName: key,
-                correctAnswers: value.correctAnswers,
-                totalAnswers: value.totalAnswers,
-                masteryLevel: masteryLevel(for: value.accuracy),
-                streak: value.streak,
-                recommendedDifficulty: recommendedDifficulty(for: masteryLevel(for: value.accuracy)),
-                lastActivityAt: value.lastUpdated
-            )
-        }
-
-        progress.quizHistory = stats.recentQuizResults.map { record in
-            let correctCount = Int((record.percentage / 100.0) * Double(record.questionsCount))
-            return QuizHistoryEntry(
-                date: record.date,
-                percentage: record.percentage,
-                correctAnswers: correctCount,
-                totalQuestions: record.questionsCount,
-                difficultyBreakdown: [:],
-                topicBreakdown: [:]
-            )
-        }
-
-        progress.examHistory = progress.examHistory.filter { entry in
-            examStats.lastExamDate == nil || entry.date <= (examStats.lastExamDate ?? entry.date)
-        }
-
-        progress.masteryLevel = adaptiveEngine.computeOverallMastery(
-            averageScore: progress.averageQuizScore,
-            streak: progress.currentStreak
-        )
-        progress.recommendations = adaptiveEngine.generateRecommendations(for: progress)
-
-        profile.progress = progress
-        profile.metadata.updatedAt = Date()
-    }
-
-    private func mergeProfile(local: UserProfile, remote: UserProfile, strategy: ProfileMergeStrategy) -> UserProfile {
-        var merged = remote
-
-        switch strategy {
-        case .preferLocal:
-            merged.fullName = local.fullName ?? remote.fullName
-            merged.email = local.email ?? remote.email
-            merged.preferences = mergePreferences(remote: remote.preferences, local: local.preferences, preferLocal: true)
-            merged.progress = mergeProgress(remote: remote.progress, local: local.progress, preferLocal: true)
-            merged.avatarURL = local.avatarURL ?? merged.avatarURL
-        case .preferRemote:
-            merged.preferences = mergePreferences(remote: remote.preferences, local: local.preferences, preferLocal: false)
-            merged.progress = mergeProgress(remote: remote.progress, local: local.progress, preferLocal: false)
-            merged.avatarURL = remote.avatarURL ?? local.avatarURL
-        case .newest:
-            let preferLocal = (local.metadata.updatedAt > remote.metadata.updatedAt)
-            merged.fullName = preferLocal ? (local.fullName ?? remote.fullName) : remote.fullName
-            merged.email = preferLocal ? (local.email ?? remote.email) : remote.email
-            merged.preferences = mergePreferences(remote: remote.preferences, local: local.preferences, preferLocal: preferLocal)
-            merged.progress = mergeProgress(remote: remote.progress, local: local.progress, preferLocal: preferLocal)
-            merged.avatarURL = preferLocal
-                ? (local.avatarURL ?? remote.avatarURL)
-                : (remote.avatarURL ?? local.avatarURL)
-        }
-
-        merged.metadata.updatedAt = Date()
-        merged.metadata.lastSyncedAt = Date()
-        merged.metadata.lastDeviceIdentifier = UIDeviceIdentifierProvider.currentIdentifier()
-        return merged
-    }
-
-    private func mergePreferences(remote: ProfilePreferences, local: ProfilePreferences, preferLocal: Bool) -> ProfilePreferences {
-        ProfilePreferences(
-            preferredDifficulty: preferLocal ? (local.preferredDifficulty ?? remote.preferredDifficulty) : (remote.preferredDifficulty ?? local.preferredDifficulty),
-            dailyGoal: preferLocal ? local.dailyGoal : remote.dailyGoal,
-            notificationsEnabled: preferLocal ? local.notificationsEnabled : remote.notificationsEnabled,
-            syncedSettings: preferLocal ? local.syncedSettings : remote.syncedSettings,
-            preferredStudyTopics: preferLocal ? (local.preferredStudyTopics.isEmpty ? remote.preferredStudyTopics : local.preferredStudyTopics) : (remote.preferredStudyTopics.isEmpty ? local.preferredStudyTopics : remote.preferredStudyTopics)
-        )
-    }
-
-    private func mergeProgress(remote: ProfileProgress, local: ProfileProgress, preferLocal: Bool) -> ProfileProgress {
-        var merged = remote
-
-        if preferLocal {
-            merged.totalQuestionsAnswered = max(remote.totalQuestionsAnswered, local.totalQuestionsAnswered)
-            merged.correctAnswers = max(remote.correctAnswers, local.correctAnswers)
-            merged.incorrectAnswers = max(remote.incorrectAnswers, local.incorrectAnswers)
-            merged.correctedMistakes = max(remote.correctedMistakes, local.correctedMistakes)
-            merged.examsTaken = max(remote.examsTaken, local.examsTaken)
-            merged.examsPassed = max(remote.examsPassed, local.examsPassed)
-            merged.currentStreak = max(remote.currentStreak, local.currentStreak)
-            merged.longestStreak = max(remote.longestStreak, local.longestStreak)
-            merged.averageQuizScore = max(remote.averageQuizScore, local.averageQuizScore)
-        } else {
-            merged.totalQuestionsAnswered = max(remote.totalQuestionsAnswered, local.totalQuestionsAnswered)
-            merged.correctAnswers = max(remote.correctAnswers, local.correctAnswers)
-            merged.incorrectAnswers = max(remote.incorrectAnswers, local.incorrectAnswers)
-            merged.correctedMistakes = max(remote.correctedMistakes, local.correctedMistakes)
-            merged.examsTaken = max(remote.examsTaken, local.examsTaken)
-            merged.examsPassed = max(remote.examsPassed, local.examsPassed)
-            merged.currentStreak = max(remote.currentStreak, local.currentStreak)
-            merged.longestStreak = max(remote.longestStreak, local.longestStreak)
-            merged.averageQuizScore = max(remote.averageQuizScore, local.averageQuizScore)
-        }
-
-        merged.difficultyStats = mergeDifficultyStats(remote: remote.difficultyStats, local: local.difficultyStats)
-        merged.topicProgress = mergeTopicProgress(remote: remote.topicProgress, local: local.topicProgress)
-        merged.quizHistory = mergeQuizHistory(remote: remote.quizHistory, local: local.quizHistory)
-        merged.examHistory = mergeExamHistory(remote: remote.examHistory, local: local.examHistory)
-        let latestActivity = max(remote.lastActivityAt ?? .distantPast, local.lastActivityAt ?? .distantPast)
-        merged.lastActivityAt = latestActivity == .distantPast ? nil : latestActivity
-        merged.recommendations = adaptiveEngine.generateRecommendations(for: merged)
-        merged.masteryLevel = adaptiveEngine.computeOverallMastery(
-            averageScore: merged.averageQuizScore,
-            streak: merged.currentStreak
-        )
-        return merged
-    }
-
-    private func mergeDifficultyStats(remote: [DifficultyPerformance], local: [DifficultyPerformance]) -> [DifficultyPerformance] {
-        var dictionary: [Difficulty: DifficultyPerformance] = [:]
-        for stat in remote {
-            dictionary[stat.difficulty] = stat
-        }
-        for stat in local {
-            if var existing = dictionary[stat.difficulty] {
-                existing.totalAnswers = max(existing.totalAnswers, stat.totalAnswers)
-                existing.correctAnswers = max(existing.correctAnswers, stat.correctAnswers)
-                existing.adaptiveScore = max(existing.adaptiveScore, stat.adaptiveScore)
-                existing.masteryLevel = maxMastery(existing.masteryLevel, stat.masteryLevel)
-                dictionary[stat.difficulty] = existing
-            } else {
-                dictionary[stat.difficulty] = stat
-            }
-        }
-        return Array(dictionary.values)
-    }
-
-    private func mergeTopicProgress(remote: [TopicProgress], local: [TopicProgress]) -> [TopicProgress] {
-        var dictionary: [String: TopicProgress] = [:]
-        for topic in remote {
-            dictionary[topic.topicId] = topic
-        }
-        for topic in local {
-            if var existing = dictionary[topic.topicId] {
-                existing.totalAnswers = max(existing.totalAnswers, topic.totalAnswers)
-                existing.correctAnswers = max(existing.correctAnswers, topic.correctAnswers)
-                existing.streak = max(existing.streak, topic.streak)
-                existing.masteryLevel = maxMastery(existing.masteryLevel, topic.masteryLevel)
-                existing.recommendedDifficulty = topic.recommendedDifficulty ?? existing.recommendedDifficulty
-                existing.lastActivityAt = max(existing.lastActivityAt ?? .distantPast, topic.lastActivityAt ?? .distantPast)
-                dictionary[topic.topicId] = existing
-            } else {
-                dictionary[topic.topicId] = topic
-            }
-        }
-        return Array(dictionary.values)
-    }
-
-    private func masteryLevel(for accuracy: Double) -> MasteryLevel {
-        switch accuracy {
-        case ..<50:
-            return .novice
-        case 50..<70:
-            return .learning
-        case 70..<90:
-            return .proficient
-        default:
-            return .expert
-        }
-    }
-
-    private func maxMastery(_ lhs: MasteryLevel, _ rhs: MasteryLevel) -> MasteryLevel {
-        if lhs == rhs { return lhs }
-        let order: [MasteryLevel] = [.novice, .learning, .proficient, .expert]
-        return order.firstIndex(of: lhs)! > order.firstIndex(of: rhs)! ? lhs : rhs
-    }
-
-    private func recommendedDifficulty(for mastery: MasteryLevel) -> Difficulty? {
-        switch mastery {
-        case .novice:
-            return .easy
-        case .learning:
-            return .medium
-        case .proficient, .expert:
-            return .hard
+            let friendlyMessage = ProfileErrorHandler.userFriendlyErrorMessage(from: error)
+            errorMessage = friendlyMessage
+            syncState = .failed(friendlyMessage)
         }
     }
 
@@ -547,90 +380,47 @@ final class ProfileManager {
         let formatter = PersonNameComponentsFormatter()
         return formatter.string(from: components)
     }
-
-    private func randomNonceString(length: Int = 32) -> String {
-        precondition(length > 0)
-        let charset: [Character] =
-            Array("0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._")
-        var result = ""
-        var remainingLength = length
-
-        while remainingLength > 0 {
-            let randoms = (0..<16).map { _ in UInt8.random(in: 0...255) }
-            for random in randoms {
-                if remainingLength == 0 {
-                    break
-                }
-                if random < charset.count {
-                    result.append(charset[Int(random)])
-                    remainingLength -= 1
-                }
-            }
-        }
-
-        return result
-    }
-
-    private func sha256(_ input: String) -> String {
-        let inputData = Data(input.utf8)
-        let hashed = SHA256.hash(data: inputData)
-        return hashed.compactMap { String(format: "%02x", $0) }.joined()
-    }
-
-    private func mergeQuizHistory(remote: [QuizHistoryEntry], local: [QuizHistoryEntry]) -> [QuizHistoryEntry] {
-        var dictionary: [UUID: QuizHistoryEntry] = [:]
-        for entry in remote {
-            dictionary[entry.id] = entry
-        }
-        for entry in local {
-            dictionary[entry.id] = entry
-        }
-        let merged = dictionary.values.sorted { $0.date > $1.date }
-        return Array(merged.prefix(20))
-    }
-
-    private func mergeExamHistory(remote: [ExamHistoryEntry], local: [ExamHistoryEntry]) -> [ExamHistoryEntry] {
-        var dictionary: [UUID: ExamHistoryEntry] = [:]
-        for entry in remote {
-            dictionary[entry.id] = entry
-        }
-        for entry in local {
-            dictionary[entry.id] = entry
-        }
-        let merged = dictionary.values.sorted { $0.date > $1.date }
-        return Array(merged.prefix(20))
-    }
     
-    deinit {
-        syncTask?.cancel()
+    nonisolated deinit {
+        syncService.cancelSync()
     }
 }
 
-// MARK: - Delegates
-extension ProfileManager: ProfileProgressSyncDelegate {
-    func statsManager(_ manager: StatsManager, didRecord summary: QuizSessionSummary) {
+// MARK: - ProfileProgressSyncing Implementation
+extension ProfileManager: ProfileProgressSyncing {
+    func syncStatsUpdate(_ summary: QuizSessionSummary) {
         lastRecommendations = adaptiveEngine.applyQuizSummary(summary, to: &profile)
         localStore.saveProfile(profile)
         scheduleSync()
     }
 
-    func statsManagerDidReset(_ manager: StatsManager) {
-        rebuildProgressFromLocalStats()
+    func syncStatsReset() {
+        progressService.rebuildProgressFromLocalStats(profile: &profile)
         localStore.saveProfile(profile)
         scheduleSync()
     }
-}
-
-extension ProfileManager: ProfileExamSyncDelegate {
-    func examStatisticsManager(_ manager: ExamStatisticsManager, didRecord summary: ExamSessionSummary) {
+    
+    func syncStatsDidUpdate() {
+        // Обновляем progress из локальных данных при изменении статистики (например, при исправлении ошибок)
+        progressService.rebuildProgressFromLocalStats(profile: &profile)
+        localStore.saveProfile(profile)
+        scheduleSync()
+    }
+    
+    func syncExamUpdate(_ summary: ExamSessionSummary) {
         adaptiveEngine.applyExamSummary(summary, to: &profile)
         localStore.saveProfile(profile)
         scheduleSync()
     }
 
-    func examStatisticsManagerDidReset(_ manager: ExamStatisticsManager) {
-        rebuildProgressFromLocalStats()
+    func syncExamReset() {
+        progressService.rebuildProgressFromLocalStats(profile: &profile)
         localStore.saveProfile(profile)
         scheduleSync()
     }
+}
+
+// MARK: - ProfileProgressProviding Implementation
+extension ProfileManager: ProfileProgressProviding {
+    // Уже реализовано через var progress: ProfileProgress { profile.progress }
 }

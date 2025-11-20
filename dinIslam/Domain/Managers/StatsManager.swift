@@ -11,18 +11,27 @@ import Observation
 @MainActor
 @Observable
 class StatsManager {
-    weak var profileSyncDelegate: ProfileProgressSyncDelegate?
+    private var profileProgressSyncer: ProfileProgressSyncing?
     var stats: UserStats
     
-    private let userDefaults = UserDefaults.standard
+    private let userDefaults: UserDefaults
     private let statsKey = "UserStats"
     
-    init() {
-        self.stats = Self.loadStats()
+    init(
+        userDefaults: UserDefaults = .standard,
+        profileProgressSyncer: ProfileProgressSyncing? = nil
+    ) {
+        self.userDefaults = userDefaults
+        self.profileProgressSyncer = profileProgressSyncer
+        self.stats = Self.loadStats(from: userDefaults, key: statsKey)
     }
     
-    private static func loadStats() -> UserStats {
-        guard let data = UserDefaults.standard.data(forKey: "UserStats"),
+    func setProfileProgressSyncer(_ syncer: ProfileProgressSyncing?) {
+        self.profileProgressSyncer = syncer
+    }
+    
+    private static func loadStats(from userDefaults: UserDefaults, key: String) -> UserStats {
+        guard let data = userDefaults.data(forKey: key),
               let stats = try? JSONDecoder().decode(UserStats.self, from: data) else {
             return UserStats()
         }
@@ -32,7 +41,7 @@ class StatsManager {
     func recordQuizSession(_ summary: QuizSessionSummary) {
         stats.recordQuizSession(summary)
         saveStats()
-        profileSyncDelegate?.statsManager(self, didRecord: summary)
+        profileProgressSyncer?.syncStatsUpdate(summary)
     }
     
     func clearWrongQuestions() {
@@ -43,6 +52,8 @@ class StatsManager {
     func removeWrongQuestion(_ questionId: String) {
         stats.removeWrongQuestion(questionId)
         saveStats()
+        // Уведомляем syncer об обновлении статистики для синхронизации с ProfileManager
+        profileProgressSyncer?.syncStatsDidUpdate()
     }
     
     func getWrongQuestions(from allQuestions: [Question]) -> [Question] {
@@ -58,13 +69,13 @@ class StatsManager {
     func resetStats() {
         stats = UserStats()
         saveStats()
-        profileSyncDelegate?.statsManagerDidReset(self)
+        profileProgressSyncer?.syncStatsReset()
     }
     
     func resetStatsExceptTotalQuestions() {
         stats = UserStats()
         saveStats()
-        profileSyncDelegate?.statsManagerDidReset(self)
+        profileProgressSyncer?.syncStatsReset()
     }
     
     func getCorrectedMistakesCount() -> Int {
@@ -94,11 +105,62 @@ class StatsManager {
         stats.perfectScores = 0
         stats.longestStreak = 0
         saveStats()
-        profileSyncDelegate?.statsManagerDidReset(self)
+        profileProgressSyncer?.syncStatsReset()
     }
-}
-
-protocol ProfileProgressSyncDelegate: AnyObject {
-    func statsManager(_ manager: StatsManager, didRecord summary: QuizSessionSummary)
-    func statsManagerDidReset(_ manager: StatsManager)
+    
+    // MARK: - Profile Progress Sync
+    func updateFromProfileProgress(_ progress: ProfileProgress, quizHistory: [QuizHistoryEntry]) {
+        // Сохраняем wrongQuestionIds, чтобы не потерять их при обновлении
+        let preservedWrongQuestionIds = stats.wrongQuestionIds
+        
+        // Обновляем основные метрики
+        stats.totalQuestionsStudied = progress.totalQuestionsAnswered
+        stats.correctAnswers = progress.correctAnswers
+        stats.incorrectAnswers = progress.incorrectAnswers
+        stats.correctedMistakes = progress.correctedMistakes
+        stats.currentStreak = progress.currentStreak
+        stats.longestStreak = progress.longestStreak
+        stats.lastActivityAt = progress.lastActivityAt
+        stats.lastQuizDate = progress.lastActivityAt
+        
+        // Восстанавливаем wrongQuestionIds (они не синхронизируются с CloudKit, остаются локальными)
+        stats.wrongQuestionIds = preservedWrongQuestionIds
+        
+        // Обновляем recentQuizResults из quizHistory
+        stats.recentQuizResults = quizHistory.prefix(10).map { entry in
+            QuizResultRecord(
+                percentage: entry.percentage,
+                date: entry.date,
+                questionsCount: entry.totalQuestions
+            )
+        }
+        
+        // Обновляем topicStats из topicProgress
+        stats.topicStats = Dictionary(uniqueKeysWithValues: progress.topicProgress.map { topic in
+            (topic.topicId, TopicStat(
+                correctAnswers: topic.correctAnswers,
+                totalAnswers: topic.totalAnswers,
+                streak: topic.streak,
+                longestStreak: topic.streak, // Используем текущий streak как longest, так как в TopicProgress нет longestStreak
+                lastUpdated: topic.lastActivityAt
+            ))
+        })
+        
+        // Обновляем difficultyStats из difficultyStats
+        stats.difficultyStats = Dictionary(uniqueKeysWithValues: progress.difficultyStats.map { difficulty in
+            (difficulty.difficulty.rawValue, DifficultyStat(
+                correctAnswers: difficulty.correctAnswers,
+                totalAnswers: difficulty.totalAnswers,
+                adaptiveScore: difficulty.adaptiveScore,
+                lastUpdated: nil // В DifficultyPerformance нет lastUpdated
+            ))
+        })
+        
+        // Вычисляем totalQuizzesCompleted из quizHistory
+        stats.totalQuizzesCompleted = quizHistory.count
+        
+        // averageRecentScore вычисляется автоматически через computed property в UserStats
+        
+        saveStats()
+    }
 }

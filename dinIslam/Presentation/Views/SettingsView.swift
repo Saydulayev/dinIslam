@@ -113,7 +113,14 @@ struct SettingsView: View {
                         }
                     }
                     .padding(DesignTokens.Spacing.xxl)
-                    .cardStyle(cornerRadius: DesignTokens.CornerRadius.xlarge)
+                    .cardStyle(
+                        cornerRadius: DesignTokens.CornerRadius.xlarge,
+                        fillColor: DesignTokens.Colors.cardBackground,
+                        borderColor: DesignTokens.Colors.iconBlue.opacity(0.3),
+                        shadowColor: Color.black.opacity(0.2),
+                        shadowRadius: 8,
+                        shadowYOffset: 4
+                    )
                     
                     // MARK: - Support Section
                     VStack(alignment: .leading, spacing: DesignTokens.Spacing.lg) {
@@ -165,7 +172,14 @@ struct SettingsView: View {
                         }
                     }
                     .padding(DesignTokens.Spacing.xxl)
-                    .cardStyle(cornerRadius: DesignTokens.CornerRadius.xlarge)
+                    .cardStyle(
+                        cornerRadius: DesignTokens.CornerRadius.xlarge,
+                        fillColor: DesignTokens.Colors.cardBackground,
+                        borderColor: DesignTokens.Colors.iconGreen.opacity(0.3),
+                        shadowColor: Color.black.opacity(0.2),
+                        shadowRadius: 8,
+                        shadowYOffset: 4
+                    )
                     
                     // MARK: - About Section
                     VStack(alignment: .leading, spacing: DesignTokens.Spacing.lg) {
@@ -223,7 +237,14 @@ struct SettingsView: View {
                         }
                     }
                     .padding(DesignTokens.Spacing.xxl)
-                    .cardStyle(cornerRadius: DesignTokens.CornerRadius.xlarge)
+                    .cardStyle(
+                        cornerRadius: DesignTokens.CornerRadius.xlarge,
+                        fillColor: DesignTokens.Colors.cardBackground,
+                        borderColor: DesignTokens.Colors.iconPurple.opacity(0.3),
+                        shadowColor: Color.black.opacity(0.2),
+                        shadowRadius: 8,
+                        shadowYOffset: 4
+                    )
                 }
                 .padding(.horizontal, DesignTokens.Spacing.xxl)
                 .padding(.top, DesignTokens.Spacing.lg)
@@ -360,7 +381,14 @@ struct SettingsView: View {
                         }
                     }
                     .padding(DesignTokens.Spacing.xxl)
-                    .cardStyle(cornerRadius: DesignTokens.CornerRadius.xlarge)
+                    .cardStyle(
+                        cornerRadius: DesignTokens.CornerRadius.xlarge,
+                        fillColor: DesignTokens.Colors.cardBackground,
+                        borderColor: DesignTokens.Colors.iconOrange.opacity(0.3),
+                        shadowColor: Color.black.opacity(0.2),
+                        shadowRadius: 8,
+                        shadowYOffset: 4
+                    )
                     .padding(.horizontal, DesignTokens.Spacing.xxl)
                     .padding(.top, DesignTokens.Spacing.lg)
                 }
@@ -379,6 +407,22 @@ struct SettingsView: View {
             .toolbarBackground(DesignTokens.Colors.background1, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
         }
+    }
+}
+
+struct SettingsViewWithDependencies: View {
+    @Environment(\.localizationProvider) private var localizationProvider
+    @Environment(\.achievementManager) private var achievementManager
+    let settingsManager: SettingsManager
+    
+    var body: some View {
+        SettingsView(
+            viewModel: SettingsViewModel(
+                settingsManager: settingsManager,
+                localizationProvider: localizationProvider,
+                achievementManager: achievementManager
+            )
+        )
     }
 }
 

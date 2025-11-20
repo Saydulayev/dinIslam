@@ -7,105 +7,93 @@
 
 import Foundation
 
-// MARK: - Dependency Injection Container
+// MARK: - Dependency Injection Container (Factory)
 class DIContainer {
-    static let shared = DIContainer()
+    // MARK: - Factory Methods
+    static func createDependencies() -> AppDependencies {
+        return AppDependencies()
+    }
     
-    // MARK: - Core Services
-    lazy var settingsManager: SettingsManager = {
-        SettingsManager()
-    }()
-    
-    lazy var statsManager: StatsManager = {
-        StatsManager()
-    }()
-    
-    lazy var examStatisticsManager: ExamStatisticsManager = {
-        ExamStatisticsManager()
-    }()
-
-    lazy var adaptiveLearningEngine: AdaptiveLearningEngine = {
-        AdaptiveLearningEngine()
-    }()
-
-    lazy var profileManager: ProfileManager = {
-        ProfileManager(
-            adaptiveEngine: adaptiveLearningEngine,
-            statsManager: statsManager,
-            examStatisticsManager: examStatisticsManager
-        )
+    // MARK: - Backward Compatibility (Deprecated - use createDependencies instead)
+    @available(*, deprecated, message: "Use DIContainer.createDependencies() instead")
+    static let shared: DIContainer = {
+        let container = DIContainer()
+        container._dependencies = AppDependencies()
+        return container
     }()
     
-    lazy var achievementManager: AchievementManager = {
-        let manager = AchievementManager.shared
-        manager.configureDependencies(notificationManager: notificationManager)
-        return manager
-    }()
-    
-    lazy var localizationManager: LocalizationManager = {
-        LocalizationManager.shared
-    }()
-    
-    // MARK: - Use Cases
-    lazy var quizUseCase: QuizUseCaseProtocol = {
-        QuizUseCase(
-            questionsRepository: questionsRepository,
-            adaptiveEngine: adaptiveLearningEngine,
-            profileManager: profileManager
-        )
-    }()
-    
-    lazy var examUseCase: ExamUseCaseProtocol = {
-        ExamUseCase(questionsRepository: questionsRepository, examStatisticsManager: examStatisticsManager)
-    }()
-    
-    // MARK: - Repositories
-    lazy var questionsRepository: QuestionsRepositoryProtocol = {
-        QuestionsRepository()
-    }()
-    
-    // MARK: - Managers
-    lazy var hapticManager: HapticManager = {
-        HapticManager(settingsManager: settingsManager)
-    }()
-    
-    lazy var soundManager: SoundManager = {
-        SoundManager(settingsManager: settingsManager)
-    }()
-    
-    lazy var remoteQuestionsService: RemoteQuestionsService = {
-        RemoteQuestionsService()
-    }()
-    
-    lazy var notificationManager: NotificationManager = {
-        NotificationManager()
-    }()
+    private var _dependencies: AppDependencies?
     
     private init() {}
     
-    // MARK: - Reset
+    // MARK: - Lazy Properties for Backward Compatibility
+    var settingsManager: SettingsManager {
+        _dependencies?.settingsManager ?? AppDependencies().settingsManager
+    }
+    
+    var statsManager: StatsManager {
+        _dependencies?.statsManager ?? AppDependencies().statsManager
+    }
+    
+    var examStatisticsManager: ExamStatisticsManager {
+        _dependencies?.examStatisticsManager ?? AppDependencies().examStatisticsManager
+    }
+
+    var adaptiveLearningEngine: AdaptiveLearningEngine {
+        _dependencies?.adaptiveLearningEngine ?? AppDependencies().adaptiveLearningEngine
+    }
+
+    var profileManager: ProfileManager {
+        _dependencies?.profileManager ?? AppDependencies().profileManager
+    }
+    
+    var achievementManager: AchievementManager {
+        // Cast to AchievementManager for backward compatibility
+        if let manager = _dependencies?.achievementManager as? AchievementManager {
+            return manager
+        }
+        return AppDependencies().achievementManager as? AchievementManager ?? AchievementManager(notificationManager: NotificationManager())
+    }
+    
+    var localizationManager: LocalizationManager {
+        // Cast to LocalizationManager for backward compatibility
+        if let manager = _dependencies?.localizationProvider as? LocalizationManager {
+            return manager
+        }
+        return AppDependencies().localizationProvider as? LocalizationManager ?? LocalizationManager()
+    }
+    
+    var quizUseCase: QuizUseCaseProtocol {
+        _dependencies?.quizUseCase ?? AppDependencies().quizUseCase
+    }
+    
+    var examUseCase: ExamUseCaseProtocol {
+        _dependencies?.examUseCase ?? AppDependencies().examUseCase
+    }
+    
+    var questionsRepository: QuestionsRepositoryProtocol {
+        _dependencies?.questionsRepository ?? AppDependencies().questionsRepository
+    }
+    
+    var hapticManager: HapticManager {
+        _dependencies?.hapticManager ?? AppDependencies().hapticManager
+    }
+    
+    var soundManager: SoundManager {
+        _dependencies?.soundManager ?? AppDependencies().soundManager
+    }
+    
+    var remoteQuestionsService: RemoteQuestionsService {
+        _dependencies?.remoteQuestionsService ?? AppDependencies().remoteQuestionsService
+    }
+    
+    var notificationManager: NotificationManager {
+        _dependencies?.notificationManager ?? AppDependencies().notificationManager
+    }
+    
+    // MARK: - Reset (Deprecated)
+    @available(*, deprecated, message: "Create new AppDependencies instead")
     func reset() {
-        // Reset all lazy properties by recreating the container
-        // This is a simplified approach - in production вы можете использовать
-        // более сложный DI-фреймворк
-        settingsManager = SettingsManager()
-        statsManager = StatsManager()
-        achievementManager = AchievementManager.shared
-        adaptiveLearningEngine = AdaptiveLearningEngine()
-        profileManager = ProfileManager(
-            adaptiveEngine: adaptiveLearningEngine,
-            statsManager: statsManager,
-            examStatisticsManager: examStatisticsManager
-        )
-        quizUseCase = QuizUseCase(
-            questionsRepository: questionsRepository,
-            adaptiveEngine: adaptiveLearningEngine,
-            profileManager: profileManager
-        )
-        questionsRepository = QuestionsRepository()
-        hapticManager = HapticManager(settingsManager: settingsManager)
-        soundManager = SoundManager(settingsManager: settingsManager)
-        remoteQuestionsService = RemoteQuestionsService()
-        notificationManager = NotificationManager()
+        _dependencies = AppDependencies()
     }
 }

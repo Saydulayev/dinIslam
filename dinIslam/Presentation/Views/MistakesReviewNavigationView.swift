@@ -10,20 +10,7 @@ import SwiftUI
 struct MistakesReviewNavigationView: View {
     @Bindable var viewModel: QuizViewModel
     @Environment(\.dismiss) private var dismiss
-    
-    private var mistakesResultBinding: Binding<Bool> {
-        Binding(
-            get: {
-                if case .completed(.mistakesFinished) = viewModel.state { return true }
-                return false
-            },
-            set: { newValue in
-                if !newValue {
-                    viewModel.restartQuiz()
-                }
-            }
-        )
-    }
+    @Environment(\.localizationProvider) private var localizationProvider
     
     init(viewModel: QuizViewModel) {
         _viewModel = Bindable(viewModel)
@@ -43,22 +30,9 @@ struct MistakesReviewNavigationView: View {
                     
                 case .active(.mistakesReview):
                     MistakesReviewView(viewModel: viewModel)
-                        .navigationDestination(isPresented: mistakesResultBinding) {
-                            if let result = viewModel.quizResult {
-                                MistakesResultView(
-                                    result: result,
-                                    onRepeat: {
-                                        viewModel.restartQuiz()
-                                    },
-                                    onBackToStart: {
-                                        viewModel.restartQuiz()
-                                        dismiss()
-                                    }
-                                )
-                            }
-                        }
                     
                 case .completed(.mistakesFinished):
+                    // Show result screen when mistakes review is finished
                     if let result = viewModel.quizResult {
                         MistakesResultView(
                             result: result,
@@ -70,28 +44,21 @@ struct MistakesReviewNavigationView: View {
                                 dismiss()
                             }
                         )
+                    } else {
+                        // Fallback if result is not ready yet
+                        VStack(spacing: 20) {
+                            ProgressView()
+                                .scaleEffect(1.5)
+                            Text("mistakes.loading".localized)
+                                .font(.headline)
+                        }
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                     }
                     
                 case .idle:
-                    // User stopped the mistakes review, go back
-                    VStack(spacing: 20) {
-                        Image(systemName: "checkmark.circle.fill")
-                            .font(.system(size: 60))
-                            .foregroundColor(.green)
-                        
-                        Text("mistakes.stopped".localized)
-                            .font(.headline)
-                            .foregroundColor(.primary)
-                        
-                        Button("mistakes.back".localized) {
-                            dismiss()
-                        }
-                        .padding()
-                        .background(.blue)
-                        .foregroundColor(.white)
-                        .cornerRadius(10)
-                    }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    // User stopped the mistakes review - onChange will handle dismiss
+                    // This case should rarely be visible, but kept as fallback
+                    EmptyView()
                     
                 default:
                     VStack(spacing: 20) {
@@ -110,9 +77,15 @@ struct MistakesReviewNavigationView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
             }
-            .navigationTitle(LocalizationManager.shared.localizedString(for: "mistakes.reviewTitle"))
+            .navigationTitle(localizationProvider.localizedString(for: "mistakes.reviewTitle"))
             .navigationBarTitleDisplayMode(.inline)
             .navigationBarBackButtonHidden(true)
+            .onChange(of: viewModel.state) { _, newState in
+                // Auto-dismiss when user stops the review
+                if case .idle = newState {
+                    dismiss()
+                }
+            }
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button(action: {
@@ -138,15 +111,20 @@ struct MistakesReviewNavigationView: View {
         statsManager: statsManager,
         examStatisticsManager: examStatsManager
     )
+    let adaptiveStrategy = AdaptiveQuestionSelectionStrategy(adaptiveEngine: adaptiveEngine)
+    let fallbackStrategy = FallbackQuestionSelectionStrategy()
+    let questionPoolProgressManager = DefaultQuestionPoolProgressManager()
     let quizUseCase = QuizUseCase(
         questionsRepository: QuestionsRepository(),
-        adaptiveEngine: adaptiveEngine,
-        profileManager: profileManager
+        profileProgressProvider: profileManager, // ProfileManager implements ProfileProgressProviding
+        questionSelectionStrategy: adaptiveStrategy,
+        fallbackStrategy: fallbackStrategy,
+        questionPoolProgressManager: questionPoolProgressManager
     )
     let viewModel = QuizViewModel(
         quizUseCase: quizUseCase,
         statsManager: statsManager,
         settingsManager: SettingsManager()
     )
-    return MistakesReviewNavigationView(viewModel: viewModel)
+    MistakesReviewNavigationView(viewModel: viewModel)
 }

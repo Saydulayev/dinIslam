@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct StatsView: View {
+    @Environment(\.localizationProvider) private var localizationProvider
     @Bindable var statsManager: StatsManager
     @Environment(\.settingsManager) private var settingsManager
     @EnvironmentObject private var remoteService: RemoteQuestionsService
@@ -16,11 +17,14 @@ struct StatsView: View {
     @State private var showingMistakesReview = false
     @State private var totalQuestionsCount: Int = 0
     @State private var showingResetAlert = false
+    @State private var showingMistakesError = false
+    @State private var mistakesErrorMessage: String?
     
     // Task cancellation
     @State private var updateTask: Task<Void, Never>?
     @State private var syncTask: Task<Void, Never>?
     @State private var loadQuestionsTask: Task<Void, Never>?
+    @State private var mistakesTask: Task<Void, Never>?
     
     init(statsManager: StatsManager) {
         self._statsManager = Bindable(statsManager)
@@ -111,11 +115,11 @@ struct StatsView: View {
                 .padding(.bottom, DesignTokens.Spacing.xxxl)
             }
         }
-        .navigationTitle(LocalizationManager.shared.localizedString(for: "stats.title"))
+        .navigationTitle(localizationProvider.localizedString(for: "stats.title"))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
-                Button(LocalizationManager.shared.localizedString(for: "stats.reset")) {
+                Button(localizationProvider.localizedString(for: "stats.reset")) {
                     showingResetAlert = true
                 }
                 .font(DesignTokens.Typography.secondarySemibold)
@@ -137,6 +141,7 @@ struct StatsView: View {
             updateTask?.cancel()
             syncTask?.cancel()
             loadQuestionsTask?.cancel()
+            mistakesTask?.cancel()
         }
         .alert(
             "stats.reset.confirm.title".localized,
@@ -151,6 +156,19 @@ struct StatsView: View {
             }
         } message: {
             Text("stats.reset.confirm.message".localized)
+        }
+        .alert(
+            "error.title".localized,
+            isPresented: $showingMistakesError
+        ) {
+            Button("error.ok".localized) {
+                showingMistakesError = false
+                mistakesErrorMessage = nil
+            }
+        } message: {
+            if let errorMessage = mistakesErrorMessage {
+                Text(errorMessage)
+            }
         }
     }
     
@@ -183,7 +201,14 @@ struct StatsView: View {
             }
         }
         .padding(DesignTokens.Spacing.xxl)
-        .cardStyle(cornerRadius: DesignTokens.CornerRadius.xlarge)
+        .cardStyle(
+            cornerRadius: DesignTokens.CornerRadius.xlarge,
+            fillColor: DesignTokens.Colors.cardBackground,
+            borderColor: DesignTokens.Colors.iconRed.opacity(0.3),
+            shadowColor: Color.black.opacity(0.2),
+            shadowRadius: 8,
+            shadowYOffset: 4
+        )
     }
     
     // MARK: - Sync Section
@@ -261,7 +286,14 @@ struct StatsView: View {
             }
         }
         .padding(DesignTokens.Spacing.xxl)
-        .cardStyle(cornerRadius: DesignTokens.CornerRadius.xlarge)
+        .cardStyle(
+            cornerRadius: DesignTokens.CornerRadius.xlarge,
+            fillColor: DesignTokens.Colors.cardBackground,
+            borderColor: DesignTokens.Colors.iconBlue.opacity(0.3),
+            shadowColor: Color.black.opacity(0.2),
+            shadowRadius: 8,
+            shadowYOffset: 4
+        )
     }
     
     // MARK: - Helper Methods
@@ -307,10 +339,13 @@ struct StatsView: View {
     }
     
     private func startMistakesReview() {
+        // Cancel any existing mistakes review task
+        mistakesTask?.cancel()
+        
         // Используем существующие экземпляры из DI контейнера
-        let container = DIContainer.shared
+        let dependencies = DIContainer.createDependencies()
         let viewModel = QuizViewModel(
-            quizUseCase: container.quizUseCase, 
+            quizUseCase: dependencies.quizUseCase, 
             statsManager: statsManager, 
             settingsManager: settingsManager
         )
@@ -318,12 +353,22 @@ struct StatsView: View {
         mistakesViewModel = viewModel
         showingMistakesReview = true
         
-        let mistakesTask = Task {
-            await viewModel.startMistakesReview()
+        // Start mistakes review task
+        mistakesTask = Task { @MainActor [viewModel, settingsManager] in
+            // Get current language from settings
+            let currentLanguage: AppLanguage = settingsManager.settings.language == .system ? 
+                (Locale.current.language.languageCode?.identifier == "en" ? .english : .russian) :
+                settingsManager.settings.language
+            
+            await viewModel.startMistakesReview(language: currentLanguage.rawValue)
+            
+            // Check for errors after completion
+            if let errorMessage = viewModel.errorMessage {
+                showingMistakesReview = false
+                mistakesErrorMessage = errorMessage
+                showingMistakesError = true
+            }
         }
-        
-        // Store task for potential cancellation
-        updateTask = mistakesTask
     }
 }
 

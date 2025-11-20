@@ -16,8 +16,10 @@ class ExamViewModel {
     // MARK: - Properties
     private let examUseCase: ExamUseCaseProtocol
     private let examStatisticsManager: ExamStatisticsManager
-    private let hapticManager: HapticManager
-    private let soundManager: SoundManager
+    private let feedbackProvider: QuizFeedbackProviding
+    private var timerManager: ExamTimerManaging
+    private let navigationCoordinator: ExamNavigationCoordinating
+    private let statisticsCalculator: ExamStatisticsCalculating
     
     var state: ExamState = .idle
     var configuration: ExamConfiguration = .default
@@ -28,16 +30,27 @@ class ExamViewModel {
     var errorMessage: String?
     var isLoading: Bool = false
     
-    // Timer properties
-    var timeRemaining: TimeInterval = 0
-    var isTimerActive: Bool = false
-    private var timerTask: Task<Void, Never>?
-    private var questionStartTime: Date?
+    // Timer properties (delegated to timerManager)
+    var timeRemaining: TimeInterval {
+        get { displayedTimeRemaining }
+        set { 
+            timerManager.timeRemaining = newValue
+            displayedTimeRemaining = newValue
+        }
+    }
+    var isTimerActive: Bool {
+        get { timerManager.isTimerActive }
+        set { timerManager.isTimerActive = newValue }
+    }
     
     // Progress tracking
     private var examStartTime: Date?
     private var totalTimeSpent: TimeInterval = 0
     private var nextQuestionTask: Task<Void, Never>?
+    
+    // Timer update tracking for SwiftUI
+    private var displayedTimeRemaining: TimeInterval = 0
+    private var timerUpdateTask: Task<Void, Never>?
     
     // MARK: - Computed Properties
     var currentQuestion: Question? {
@@ -55,22 +68,18 @@ class ExamViewModel {
     }
     
     var answeredQuestionsCount: Int {
-        return answers.values.filter { !$0.isSkipped && !$0.isTimeExpired }.count
+        statisticsCalculator.calculateAnsweredCount(answers: answers)
     }
     
     var skippedQuestionsCount: Int {
-        return answers.values.filter { $0.isSkipped || $0.isTimeExpired }.count
+        statisticsCalculator.calculateSkippedAnswers(answers: answers)
     }
     
     var correctAnswersCount: Int {
-        return answers.values.filter { answer in
-            guard let question = questions.first(where: { $0.id == answer.questionId }),
-                  let selectedIndex = answer.selectedAnswerIndex,
-                  !answer.isSkipped && !answer.isTimeExpired else {
-                return false
-            }
-            return selectedIndex == question.correctIndex
-        }.count
+        statisticsCalculator.calculateCorrectAnswers(
+            answers: answers,
+            questions: questions
+        )
     }
     
     var timeRemainingFormatted: String {
@@ -88,11 +97,55 @@ class ExamViewModel {
     }
     
     // MARK: - Initialization
-    init(examUseCase: ExamUseCaseProtocol, examStatisticsManager: ExamStatisticsManager, settingsManager: SettingsManager) {
+    init(
+        examUseCase: ExamUseCaseProtocol,
+        examStatisticsManager: ExamStatisticsManager,
+        feedbackProvider: QuizFeedbackProviding? = nil,
+        timerManager: ExamTimerManaging? = nil,
+        navigationCoordinator: ExamNavigationCoordinating? = nil,
+        statisticsCalculator: ExamStatisticsCalculating? = nil,
+        settingsManager: SettingsManager? = nil
+    ) {
         self.examUseCase = examUseCase
         self.examStatisticsManager = examStatisticsManager
-        self.hapticManager = HapticManager(settingsManager: settingsManager)
-        self.soundManager = SoundManager(settingsManager: settingsManager)
+        self.timerManager = timerManager ?? DefaultExamTimerManager()
+        self.navigationCoordinator = navigationCoordinator ?? DefaultExamNavigationCoordinator()
+        self.statisticsCalculator = statisticsCalculator ?? DefaultExamStatisticsCalculator()
+        
+        // Initialize feedback provider
+        if let feedbackProvider = feedbackProvider {
+            self.feedbackProvider = feedbackProvider
+        } else if let settingsManager = settingsManager {
+            let hapticManager = HapticManager(settingsManager: settingsManager)
+            let soundManager = SoundManager(settingsManager: settingsManager)
+            self.feedbackProvider = DefaultQuizFeedbackProvider(
+                hapticManager: hapticManager,
+                soundManager: soundManager
+            )
+        } else {
+            // Fallback: create defaults without settings manager
+            self.feedbackProvider = DefaultQuizFeedbackProvider(
+                hapticManager: HapticManager(),
+                soundManager: SoundManager()
+            )
+        }
+    }
+    
+    convenience init(examUseCase: ExamUseCaseProtocol, examStatisticsManager: ExamStatisticsManager, settingsManager: SettingsManager) {
+        let hapticManager = HapticManager(settingsManager: settingsManager)
+        let soundManager = SoundManager(settingsManager: settingsManager)
+        let feedbackProvider = DefaultQuizFeedbackProvider(
+            hapticManager: hapticManager,
+            soundManager: soundManager
+        )
+        let statisticsCalculator = DefaultExamStatisticsCalculator()
+        self.init(
+            examUseCase: examUseCase,
+            examStatisticsManager: examStatisticsManager,
+            feedbackProvider: feedbackProvider,
+            statisticsCalculator: statisticsCalculator,
+            settingsManager: settingsManager
+        )
     }
     
     // MARK: - Public Methods
@@ -110,6 +163,10 @@ class ExamViewModel {
             answers.removeAll()
             examStartTime = Date()
             totalTimeSpent = 0
+            
+            // Сбрасываем время для первого вопроса
+            timerManager.timeRemaining = 0
+            displayedTimeRemaining = 0
             
             // Start first question timer
             startQuestionTimer()
@@ -131,7 +188,7 @@ class ExamViewModel {
         stopQuestionTimer()
         
         // Calculate time spent on this question
-        let timeSpent = questionStartTime?.timeIntervalSinceNow.magnitude ?? 0
+        let timeSpent = timerManager.questionStartTime?.timeIntervalSinceNow.magnitude ?? 0
         
         // Create answer
         let answer = ExamAnswer(
@@ -145,13 +202,7 @@ class ExamViewModel {
         
         // Provide feedback
         let isCorrect = index == currentQuestion.correctIndex
-        if isCorrect {
-            hapticManager.success()
-            soundManager.playSuccessSound()
-        } else {
-            hapticManager.error()
-            soundManager.playErrorSound()
-        }
+        feedbackProvider.answerSelected(isCorrect: isCorrect)
         
         // Move to next question after brief delay
         nextQuestionTask?.cancel()
@@ -170,7 +221,7 @@ class ExamViewModel {
         stopQuestionTimer()
         
         // Calculate time spent
-        let timeSpent = questionStartTime?.timeIntervalSinceNow.magnitude ?? 0
+        let timeSpent = timerManager.questionStartTime?.timeIntervalSinceNow.magnitude ?? 0
         
         // Create skipped answer
         let answer = ExamAnswer(
@@ -183,8 +234,7 @@ class ExamViewModel {
         answers[currentQuestion.id] = answer
         
         // Provide feedback
-        hapticManager.selectionChanged()
-        soundManager.playSelectionSound()
+        feedbackProvider.questionSkipped()
         
         // Move to next question
         nextQuestionTask?.cancel()
@@ -196,6 +246,9 @@ class ExamViewModel {
             finishExam()
         } else {
             currentQuestionIndex += 1
+            // Сбрасываем время для нового вопроса
+            timerManager.timeRemaining = 0
+            displayedTimeRemaining = 0
             startQuestionTimer()
         }
     }
@@ -205,7 +258,7 @@ class ExamViewModel {
         
         stopQuestionTimer()
         state = .active(.paused)
-        hapticManager.selectionChanged()
+        feedbackProvider.questionPaused()
     }
     
     func resumeExam() {
@@ -213,7 +266,7 @@ class ExamViewModel {
         
         startQuestionTimer()
         state = .active(.playing)
-        hapticManager.selectionChanged()
+        feedbackProvider.questionResumed()
     }
     
     func finishExam() {
@@ -240,8 +293,10 @@ class ExamViewModel {
         state = .completed(.finished)
         
         // Provide completion feedback
-        hapticManager.success()
-        soundManager.playSuccessSound()
+        feedbackProvider.quizCompleted(success: true)
+        
+        // Navigate to results
+        navigationCoordinator.showResults()
     }
     
     func stopExam() {
@@ -267,7 +322,10 @@ class ExamViewModel {
         }
         
         state = .completed(.manuallyStopped)
-        hapticManager.selectionChanged()
+        feedbackProvider.quizCompleted(success: false)
+        
+        // Navigate to exit
+        navigationCoordinator.exitExam()
     }
     
     func restartExam() {
@@ -282,47 +340,46 @@ class ExamViewModel {
         stopQuestionTimer()
         nextQuestionTask?.cancel()
         nextQuestionTask = nil
+        
+        // Navigate to restart
+        navigationCoordinator.restartExam()
     }
     
     // MARK: - Timer Methods
     private func startQuestionTimer() {
         guard currentQuestion != nil else { return }
         
-        stopQuestionTimer()
+        // startTimer() автоматически использует текущее timeRemaining если оно > 0 (возобновление после паузы)
+        // или устанавливает полное время если timeRemaining <= 0 (новый вопрос)
+        timerManager.startTimer(
+            timeLimit: configuration.timePerQuestion,
+            onTimeUp: { [weak self] in
+                self?.handleTimeUp()
+            }
+        )
         
-        timeRemaining = configuration.timePerQuestion
-        isTimerActive = true
-        questionStartTime = Date()
+        // Sync displayed time
+        displayedTimeRemaining = timerManager.timeRemaining
         
-        timerTask = Task { [weak self] in
+        // Start update task to refresh view every second
+        timerUpdateTask?.cancel()
+        timerUpdateTask = Task { [weak self] in
             guard let self else { return }
-            await self.runTimerLoop()
+            while !Task.isCancelled && self.timerManager.isTimerActive {
+                try? await Task.sleep(nanoseconds: 1_000_000_000) // 1 second
+                guard !Task.isCancelled else { break }
+                await MainActor.run {
+                    self.displayedTimeRemaining = self.timerManager.timeRemaining
+                }
+            }
         }
     }
     
     private func stopQuestionTimer() {
-        isTimerActive = false
-        timerTask?.cancel()
-        timerTask = nil
-    }
-    
-    @MainActor
-    private func runTimerLoop() async {
-        let interval: UInt64 = 100_000_000 // 0.1 секунды
-        while isTimerActive && !Task.isCancelled {
-            do {
-                try await Task.sleep(nanoseconds: interval)
-            } catch {
-                break
-            }
-            guard isTimerActive else { break }
-            timeRemaining = max(0, timeRemaining - 0.1)
-            if timeRemaining <= 0 {
-                timeRemaining = 0
-                handleTimeUp()
-                break
-            }
-        }
+        timerManager.stopTimer()
+        timerUpdateTask?.cancel()
+        timerUpdateTask = nil
+        displayedTimeRemaining = timerManager.timeRemaining
     }
     
     private func handleTimeUp() {
@@ -331,7 +388,7 @@ class ExamViewModel {
         stopQuestionTimer()
         
         // Calculate time spent
-        let timeSpent = questionStartTime?.timeIntervalSinceNow.magnitude ?? 0
+        let timeSpent = timerManager.questionStartTime?.timeIntervalSinceNow.magnitude ?? 0
         
         // Create time expired answer
         let answer = ExamAnswer(
@@ -344,8 +401,7 @@ class ExamViewModel {
         answers[currentQuestion.id] = answer
         
         // Provide feedback
-        hapticManager.error()
-        soundManager.playErrorSound()
+        feedbackProvider.answerSelected(isCorrect: false)
         
         // Show time up state briefly
         state = .active(.timeUp)
@@ -372,7 +428,8 @@ class ExamViewModel {
     
     @MainActor
     deinit {
-        stopQuestionTimer()
+        timerManager.stopTimer()
         nextQuestionTask?.cancel()
+        timerUpdateTask?.cancel()
     }
 }

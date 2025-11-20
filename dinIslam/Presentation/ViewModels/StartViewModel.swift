@@ -33,26 +33,39 @@ final class StartViewModel {
 
     private let examUseCase: ExamUseCaseProtocol
     private let examStatisticsManager: ExamStatisticsManager
-    private let enhancedContainer: EnhancedDIContainer
-
-    // MARK: - Configuration
-    private let particleVelocityRange: ClosedRange<Double> = -0.35...0.35
-    private let particleSpeedMultiplier: Double = 0.65
+    
+    // Services via protocols
+    @ObservationIgnored private let navigationCoordinator: StartNavigationCoordinating
+    @ObservationIgnored private let visualEffectsManager: StartVisualEffectsManaging
+    @ObservationIgnored private let lifecycleManager: StartLifecycleManaging
+    @ObservationIgnored private let examViewModelFactory: ExamViewModelCreating
 
     // MARK: - UI State
-    var navigationPath = NavigationPath()
+    var navigationPath = NavigationPath() {
+        didSet {
+            navigationCoordinator.navigationPath = navigationPath
+        }
+    }
     var showingExamSettings = false
 
     var examViewModel: ExamViewModel?
 
-    var logoGlowIntensity: Double = 0.5
-    var particles: [Particle] = []
-    var isGlowAnimationStarted = false
+    var logoGlowIntensity: Double {
+        get { visualEffectsManager.logoGlowIntensity }
+        set { visualEffectsManager.logoGlowIntensity = newValue }
+    }
+    var particles: [Particle] {
+        get { visualEffectsManager.particles }
+        set { visualEffectsManager.particles = newValue }
+    }
+    var isGlowAnimationStarted: Bool {
+        get { visualEffectsManager.isGlowAnimationStarted }
+        set { visualEffectsManager.isGlowAnimationStarted = newValue }
+    }
     var cachedLanguageCode: String
 
     // MARK: - Tasks
     private var startQuizTask: Task<Void, Never>?
-    private var lastParticleUpdate: Date?
 
     // MARK: - Init
     init(
@@ -62,7 +75,11 @@ final class StartViewModel {
         profileManager: ProfileManager,
         examUseCase: ExamUseCaseProtocol,
         examStatisticsManager: ExamStatisticsManager,
-        enhancedContainer: EnhancedDIContainer
+        questionsPreloading: QuestionsPreloading,
+        navigationCoordinator: StartNavigationCoordinating? = nil,
+        visualEffectsManager: StartVisualEffectsManaging? = nil,
+        lifecycleManager: StartLifecycleManaging? = nil,
+        examViewModelFactory: ExamViewModelCreating? = nil
     ) {
         self.quizViewModel = quizViewModel
         self.statsManager = statsManager
@@ -70,7 +87,23 @@ final class StartViewModel {
         self.profileManager = profileManager
         self.examUseCase = examUseCase
         self.examStatisticsManager = examStatisticsManager
-        self.enhancedContainer = enhancedContainer
+        
+        // Initialize services with default implementations if not provided
+        let resolvedNavigationCoordinator = navigationCoordinator ?? DefaultStartNavigationCoordinator()
+        self.navigationCoordinator = resolvedNavigationCoordinator
+        // Sync initial navigation path
+        self.navigationPath = resolvedNavigationCoordinator.navigationPath
+        
+        self.visualEffectsManager = visualEffectsManager ?? DefaultStartVisualEffectsManager()
+        
+        self.lifecycleManager = lifecycleManager ?? DefaultStartLifecycleManager(
+            settingsManager: settingsManager,
+            profileManager: profileManager,
+            questionsPreloading: questionsPreloading
+        )
+        
+        self.examViewModelFactory = examViewModelFactory ?? DefaultExamViewModelFactory()
+        
         self.cachedLanguageCode = StartViewModel.languageCode(from: settingsManager)
     }
 
@@ -80,8 +113,12 @@ final class StartViewModel {
         settingsManager: SettingsManager,
         profileManager: ProfileManager,
         examUseCase: ExamUseCaseProtocol,
-        examStatisticsManager: ExamStatisticsManager
+        examStatisticsManager: ExamStatisticsManager,
+        enhancedContainer: EnhancedDIContainer
     ) {
+        let questionsPreloading = DefaultQuestionsPreloadingService(
+            enhancedQuizUseCase: enhancedContainer.enhancedQuizUseCase
+        )
         self.init(
             quizViewModel: quizViewModel,
             statsManager: statsManager,
@@ -89,32 +126,37 @@ final class StartViewModel {
             profileManager: profileManager,
             examUseCase: examUseCase,
             examStatisticsManager: examStatisticsManager,
-            enhancedContainer: EnhancedDIContainer.shared
+            questionsPreloading: questionsPreloading
         )
     }
+    
 
     // MARK: - Lifecycle
     func onAppear() {
-        clearBadge()
-        cachedLanguageCode = Self.languageCode(from: settingsManager)
-        preloadQuestions()
-        startGlowAnimationIfNeeded()
-        createParticlesIfNeeded()
-        if profileManager.isSignedIn {
-            Task { [weak self] in
-                guard let self = self else { return }
-                await self.profileManager.refreshFromCloud(mergeStrategy: .newest)
+        lifecycleManager.onAppear(
+            onLanguageCodeUpdate: { [weak self] newCode in
+                self?.cachedLanguageCode = newCode
+            },
+            onProfileSync: { [weak self] in
+                await self?.profileManager.refreshFromCloud(mergeStrategy: .newest)
             }
-        }
+        )
+        visualEffectsManager.startGlowAnimationIfNeeded()
+        visualEffectsManager.createParticlesIfNeeded()
     }
 
     func onDisappear() {
-        startQuizTask?.cancel()
-        lastParticleUpdate = nil
+        lifecycleManager.onDisappear { [weak self] in
+            self?.startQuizTask?.cancel()
+        }
     }
 
     func onLanguageChange() {
-        cachedLanguageCode = Self.languageCode(from: settingsManager)
+        lifecycleManager.onLanguageChange(
+            onLanguageCodeUpdate: { [weak self] newCode in
+                self?.cachedLanguageCode = newCode
+            }
+        )
     }
 
     func onQuizStateChange(_ newState: QuizState) {
@@ -122,7 +164,8 @@ final class StartViewModel {
         case .completed(.finished), .completed(.mistakesFinished):
             guard let quizResult = quizViewModel.quizResult else { return }
             let snapshot = StartRoute.ResultSnapshot(from: quizResult)
-            navigationPath.append(StartRoute.result(snapshot))
+            navigationCoordinator.showResult(snapshot)
+            navigationPath = navigationCoordinator.navigationPath
         default:
             break
         }
@@ -130,9 +173,11 @@ final class StartViewModel {
 
     // MARK: - Actions
     func startQuiz() {
-        navigationPath = NavigationPath()
+        navigationCoordinator.resetNavigation()
+        navigationPath = navigationCoordinator.navigationPath
         startQuizTask?.cancel()
-        navigationPath.append(StartRoute.quiz)
+        navigationCoordinator.showQuiz()
+        navigationPath = navigationCoordinator.navigationPath
         startQuizTask = Task { [weak self, cachedLanguageCode] in
             guard let self = self else { return }
             await self.quizViewModel.startQuiz(language: cachedLanguageCode)
@@ -140,19 +185,30 @@ final class StartViewModel {
     }
 
     func resetQuiz() {
-        navigationPath = NavigationPath()
+        navigationCoordinator.resetNavigation()
+        navigationPath = navigationCoordinator.navigationPath
         quizViewModel.restartQuiz()
     }
 
     func startExam(with configuration: ExamConfiguration) {
-        let viewModel = ExamViewModel(
+        // Create feedback provider for exam
+        let hapticManager = HapticManager(settingsManager: settingsManager)
+        let soundManager = SoundManager(settingsManager: settingsManager)
+        let feedbackProvider = DefaultQuizFeedbackProvider(
+            hapticManager: hapticManager,
+            soundManager: soundManager
+        )
+        
+        let viewModel = examViewModelFactory.createExamViewModel(
             examUseCase: examUseCase,
             examStatisticsManager: examStatisticsManager,
+            feedbackProvider: feedbackProvider,
             settingsManager: settingsManager
         )
 
         examViewModel = viewModel
-        navigationPath.append(StartRoute.exam)
+        navigationCoordinator.showExam()
+        navigationPath = navigationCoordinator.navigationPath
 
         Task { [cachedLanguageCode] in
             await viewModel.startExam(configuration: configuration, language: cachedLanguageCode)
@@ -160,9 +216,8 @@ final class StartViewModel {
     }
 
     func finishExamSession() {
-        if !navigationPath.isEmpty {
-            navigationPath.removeLast()
-        }
+        navigationCoordinator.finishExamSession()
+        navigationPath = navigationCoordinator.navigationPath
         examViewModel?.restartExam()
         examViewModel = nil
     }
@@ -171,106 +226,31 @@ final class StartViewModel {
         quizViewModel.clearNewAchievements()
     }
 
-    func showStats() {
-        navigationPath.append(StartRoute.stats)
-    }
-
     func showAchievements() {
-        navigationPath.append(StartRoute.achievements)
+        navigationCoordinator.showAchievements()
+        navigationPath = navigationCoordinator.navigationPath
     }
     
     func showSettings() {
-        navigationPath.append(StartRoute.settings)
+        navigationCoordinator.showSettings()
+        navigationPath = navigationCoordinator.navigationPath
     }
 
     func showProfile() {
-        navigationPath.append(StartRoute.profile)
+        navigationCoordinator.showProfile()
+        navigationPath = navigationCoordinator.navigationPath
     }
 
     // MARK: - Particles & Animations
-    private func startGlowAnimationIfNeeded() {
-        guard !isGlowAnimationStarted else { return }
-        withAnimation(.easeInOut(duration: 2.0).repeatForever(autoreverses: true)) {
-            logoGlowIntensity = 1.0
-        }
-        isGlowAnimationStarted = true
-    }
-
-    private func createParticlesIfNeeded() {
-        guard particles.isEmpty else { return }
-        particles = (0..<12).map { _ in
-            Particle(
-                x: Double.random(in: -80...80),
-                y: Double.random(in: -80...80),
-                opacity: Double.random(in: 0.3...0.8),
-                size: Double.random(in: 2...6),
-                velocityX: Double.random(in: particleVelocityRange),
-                velocityY: Double.random(in: particleVelocityRange),
-                life: Double.random(in: 0.5...1.0)
-            )
-        }
-        lastParticleUpdate = nil
-    }
-
     func updateParticles(at date: Date) {
-        guard !particles.isEmpty else {
-            lastParticleUpdate = date
-            return
-        }
-
-        let delta: Double
-        if let lastParticleUpdate {
-            delta = date.timeIntervalSince(lastParticleUpdate)
-        } else {
-            delta = 0
-        }
-        lastParticleUpdate = date
-
-        guard delta > 0 else { return }
-
-        let frameFactor = min(delta * 60.0, 1.0)
-
-        for index in particles.indices {
-            particles[index].x += particles[index].velocityX * frameFactor * particleSpeedMultiplier
-            particles[index].y += particles[index].velocityY * frameFactor * particleSpeedMultiplier
-            particles[index].life -= 0.01 * frameFactor
-            particles[index].opacity = max(0, particles[index].life * 0.8)
-
-            if particles[index].life <= 0 {
-                particles[index] = Particle(
-                    x: Double.random(in: -80...80),
-                    y: Double.random(in: -80...80),
-                    opacity: Double.random(in: 0.3...0.8),
-                    size: Double.random(in: 2...6),
-                    velocityX: Double.random(in: particleVelocityRange),
-                    velocityY: Double.random(in: particleVelocityRange),
-                    life: Double.random(in: 0.5...1.0)
-                )
-            }
-        }
+        visualEffectsManager.updateParticles(at: date)
     }
 
     func particlesSnapshot(for date: Date) -> [Particle] {
-        updateParticles(at: date)
-        return particles
+        return visualEffectsManager.particlesSnapshot(for: date)
     }
 
     // MARK: - Helpers
-    private func preloadQuestions() {
-        Task { [weak self] in
-            guard let self = self else { return }
-            await self.enhancedContainer.enhancedQuizUseCase.preloadQuestions(for: ["ru", "en"])
-        }
-    }
-
-    private func clearBadge() {
-        if #available(iOS 17.0, *) {
-            UNUserNotificationCenter.current().setBadgeCount(0, withCompletionHandler: { _ in })
-        } else {
-            UIApplication.shared.applicationIconBadgeNumber = 0
-        }
-    }
-
     private static func languageCode(from settingsManager: SettingsManager) -> String {
         settingsManager.settings.language.locale?.language.languageCode?.identifier ?? "ru"
     }

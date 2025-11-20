@@ -28,14 +28,18 @@ enum AppLanguage: String, CaseIterable, Codable {
     case russian = "ru"
     case english = "en"
     
+    // NOTE: Using GlobalLocalizationProvider here for backward compatibility in enum computed properties
+    // Enum properties cannot accept dependencies, so we use a global instance
+    // In production code, prefer passing LocalizationProviding as a parameter
     var displayName: String {
+        let localizationProvider = GlobalLocalizationProvider.instance
         switch self {
         case .system:
-            return LocalizationManager.shared.localizedString(for: "settings.language.system")
+            return localizationProvider.localizedString(for: "settings.language.system")
         case .russian:
-            return LocalizationManager.shared.localizedString(for: "settings.language.russian")
+            return localizationProvider.localizedString(for: "settings.language.russian")
         case .english:
-            return LocalizationManager.shared.localizedString(for: "settings.language.english")
+            return localizationProvider.localizedString(for: "settings.language.english")
         }
     }
     
@@ -59,9 +63,15 @@ final class SettingsManager {
     
     @ObservationIgnored private let userDefaults: UserDefaults
     @ObservationIgnored private let settingsKey = "AppSettings"
+    @ObservationIgnored private let localizationProvider: LocalizationProviding
     
-    init(userDefaults: UserDefaults = .standard) {
+    init(
+        userDefaults: UserDefaults = .standard,
+        localizationProvider: LocalizationProviding? = nil
+    ) {
         self.userDefaults = userDefaults
+        // Use provided localization provider or create default for backward compatibility
+        self.localizationProvider = localizationProvider ?? LocalizationManager()
         self.settings = Self.loadSettings(from: userDefaults, key: settingsKey)
         applyLanguageSettings()
     }
@@ -114,7 +124,7 @@ final class SettingsManager {
             languageCode = "en"
         }
         
-        // Update localization manager
-        LocalizationManager.shared.setLanguage(languageCode)
+        // Update localization provider
+        localizationProvider.setLanguage(languageCode)
     }
 }

@@ -295,16 +295,20 @@ struct ExamResultActionsView: View {
                     Text("exam.result.retake".localized)
                         .font(DesignTokens.Typography.secondarySemibold)
                 }
-                .foregroundColor(DesignTokens.Colors.textPrimary)
+                .foregroundColor(DesignTokens.Colors.iconBlue)
                 .frame(maxWidth: .infinity)
                 .frame(height: 56)
                 .cardStyle(
                     cornerRadius: DesignTokens.CornerRadius.medium,
-                    fillColor: DesignTokens.Colors.iconBlue,
-                    borderColor: DesignTokens.Colors.iconBlue.opacity(0.45),
+                    fillColor: DesignTokens.Colors.progressCard,
+                    borderColor: DesignTokens.Colors.borderDefault,
                     shadowColor: Color.black.opacity(0.24),
                     shadowRadius: 8,
                     shadowYOffset: 4
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
+                        .stroke(DesignTokens.Colors.borderSubtle, lineWidth: 1)
                 )
             }
             

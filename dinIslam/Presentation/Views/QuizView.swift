@@ -43,39 +43,64 @@ struct QuizView: View {
             )
             .ignoresSafeArea()
             
+            // Loading overlay
+            if viewModel.isLoading {
+                VStack(spacing: DesignTokens.Spacing.lg) {
+                    ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle(tint: DesignTokens.Colors.iconBlue))
+                        .scaleEffect(1.5)
+                    
+                    Text("quiz.loading".localized)
+                        .font(DesignTokens.Typography.bodyRegular)
+                        .foregroundStyle(DesignTokens.Colors.textSecondary)
+                }
+                .padding(DesignTokens.Spacing.xxl)
+                .cardStyle(
+                    cornerRadius: DesignTokens.CornerRadius.medium,
+                    fillColor: DesignTokens.Colors.cardBackground,
+                    borderColor: DesignTokens.Colors.iconBlue.opacity(0.3),
+                    shadowColor: Color.black.opacity(0.2),
+                    shadowRadius: 8,
+                    shadowYOffset: 4
+                )
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(Color.black.opacity(0.3))
+            }
+            
             VStack(spacing: 0) {
                 // Header with progress and score
-                VStack(spacing: DesignTokens.Spacing.lg) {
+                VStack(spacing: DesignTokens.Spacing.sm) {
                     HStack {
                         LocalizedText("quiz.question")
-                            .font(DesignTokens.Typography.secondaryRegular)
+                            .font(DesignTokens.Typography.label)
                             .foregroundStyle(DesignTokens.Colors.textSecondary)
                         
                         Spacer()
                         
                         LocalizedText("quiz.score")
-                            .font(DesignTokens.Typography.secondaryRegular)
+                            .font(DesignTokens.Typography.label)
                             .foregroundStyle(DesignTokens.Colors.textSecondary)
                     }
                     
                     HStack {
                         Text(progressText)
-                            .font(DesignTokens.Typography.h1)
+                            .font(DesignTokens.Typography.secondarySemibold)
                             .foregroundStyle(DesignTokens.Colors.textPrimary)
                         
                         Spacer()
                         
                         Text("\(viewModel.correctAnswers)")
-                            .font(DesignTokens.Typography.h1)
+                            .font(DesignTokens.Typography.secondarySemibold)
                             .foregroundStyle(DesignTokens.Colors.statusGreen)
                     }
                     
                     // Progress bar
                     ProgressView(value: viewModel.progress)
                         .progressViewStyle(LinearProgressViewStyle(tint: DesignTokens.Colors.iconBlue))
-                        .scaleEffect(x: 1, y: 2, anchor: .center)
+                        .scaleEffect(x: 1, y: 1.5, anchor: .center)
                 }
-                .padding(DesignTokens.Spacing.xxl)
+                .padding(.horizontal, DesignTokens.Spacing.xxl)
+                .padding(.vertical, DesignTokens.Spacing.md)
                 .background(DesignTokens.Colors.cardBackground)
             
                 // Question content
@@ -92,8 +117,9 @@ struct QuizView: View {
                                     .frame(maxWidth: .infinity)
                                     .cardStyle(
                                         cornerRadius: DesignTokens.CornerRadius.medium,
-                                        borderColor: DesignTokens.Colors.borderDefault,
-                                        shadowColor: Color.black.opacity(0.24),
+                                        fillColor: DesignTokens.Colors.iconPurple.opacity(0.15),
+                                        borderColor: DesignTokens.Colors.iconPurple.opacity(0.35),
+                                        shadowColor: Color.black.opacity(0.2),
                                         shadowRadius: 8,
                                         shadowYOffset: 4
                                     )
@@ -101,17 +127,13 @@ struct QuizView: View {
                                     .accessibilityAddTraits(.isHeader)
                                     .dynamicTypeSize(.large)
                                 
-                                // Category and difficulty
+                                // Category
                                 HStack {
                                     Label(question.category, systemImage: "tag")
                                         .font(DesignTokens.Typography.label)
                                         .foregroundStyle(DesignTokens.Colors.textSecondary)
                                     
                                     Spacer()
-                                    
-                                    Label(question.difficulty.localizedName, systemImage: "star.fill")
-                                        .font(DesignTokens.Typography.label)
-                                        .foregroundStyle(DesignTokens.Colors.textSecondary)
                                 }
                                 .padding(.horizontal, DesignTokens.Spacing.sm)
                             }
@@ -154,19 +176,23 @@ struct QuizView: View {
                             Text("quiz.finish".localized)
                                 .font(DesignTokens.Typography.secondarySemibold)
                         }
-                        .foregroundColor(DesignTokens.Colors.textPrimary)
+                        .foregroundColor(DesignTokens.Colors.statusGreen)
                         .frame(maxWidth: .infinity)
-                        .frame(height: 52)
+                        .frame(height: 56)
                         .cardStyle(
                             cornerRadius: DesignTokens.CornerRadius.medium,
-                            fillColor: DesignTokens.Colors.statusGreen,
-                            borderColor: DesignTokens.Colors.statusGreen.opacity(0.4),
-                            shadowColor: Color.black.opacity(0.24),
+                            fillColor: DesignTokens.Colors.statusGreen.opacity(0.15),
+                            borderColor: DesignTokens.Colors.statusGreen.opacity(0.35),
+                            shadowColor: Color.black.opacity(0.2),
                             shadowRadius: 8,
                             shadowYOffset: 4
                         )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
+                                .stroke(DesignTokens.Colors.borderSubtle, lineWidth: 1)
+                        )
                         .padding(.horizontal, DesignTokens.Spacing.xxl)
-                        .padding(.vertical, DesignTokens.Spacing.md)
+                        .padding(.vertical, DesignTokens.Spacing.lg)
                     }
                     .accessibilityLabel("Finish quiz")
                     .accessibilityHint("Double tap to finish the current quiz")
@@ -238,13 +264,13 @@ struct AnswerButton: View {
     
     private var backgroundColor: Color {
         if !isAnswerSelected {
-            return DesignTokens.Colors.progressCard
+            return DesignTokens.Colors.iconBlue.opacity(0.15)
         } else if isSelected {
-            return isCorrect ? DesignTokens.Colors.statusGreen.opacity(0.15) : DesignTokens.Colors.iconRed.opacity(0.15)
+            return isCorrect ? DesignTokens.Colors.statusGreen.opacity(0.2) : DesignTokens.Colors.iconRed.opacity(0.2)
         } else if isCorrect {
-            return DesignTokens.Colors.statusGreen.opacity(0.15)
+            return DesignTokens.Colors.statusGreen.opacity(0.2)
         } else {
-            return DesignTokens.Colors.progressCard
+            return DesignTokens.Colors.cardBackground
         }
     }
     
@@ -319,15 +345,20 @@ struct AnswerButtonStyle: ButtonStyle {
         statsManager: statsManager,
         examStatisticsManager: examStatsManager
     )
+    let adaptiveStrategy = AdaptiveQuestionSelectionStrategy(adaptiveEngine: adaptiveEngine)
+    let fallbackStrategy = FallbackQuestionSelectionStrategy()
+    let questionPoolProgressManager = DefaultQuestionPoolProgressManager()
     let quizUseCase = QuizUseCase(
         questionsRepository: QuestionsRepository(),
-        adaptiveEngine: adaptiveEngine,
-        profileManager: profileManager
+        profileProgressProvider: profileManager, // ProfileManager implements ProfileProgressProviding
+        questionSelectionStrategy: adaptiveStrategy,
+        fallbackStrategy: fallbackStrategy,
+        questionPoolProgressManager: questionPoolProgressManager
     )
     let viewModel = QuizViewModel(
         quizUseCase: quizUseCase,
         statsManager: statsManager,
         settingsManager: SettingsManager()
     )
-    return QuizView(viewModel: viewModel)
+    QuizView(viewModel: viewModel)
 }

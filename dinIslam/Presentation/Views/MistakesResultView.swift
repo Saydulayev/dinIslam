@@ -11,7 +11,7 @@ struct MistakesResultView: View {
     let result: QuizResult
     let onRepeat: () -> Void
     let onBackToStart: () -> Void
-    @ObservedObject private var localizationManager = LocalizationManager.shared
+    @Environment(\.localizationProvider) private var localizationProvider
     
     var body: some View {
         VStack(spacing: 32) {
@@ -45,17 +45,17 @@ struct MistakesResultView: View {
                 // Detailed stats
                 VStack(spacing: 12) {
                     StatRow(
-                        title: localizationManager.localizedString(for: "mistakes.result.totalQuestions"),
+                        title: localizationProvider.localizedString(for: "mistakes.result.totalQuestions"),
                         value: "\(result.totalQuestions)"
                     )
                     
                     StatRow(
-                        title: localizationManager.localizedString(for: "mistakes.result.correctAnswers"),
+                        title: localizationProvider.localizedString(for: "mistakes.result.correctAnswers"),
                         value: "\(result.correctAnswers)"
                     )
                     
                     StatRow(
-                        title: localizationManager.localizedString(for: "mistakes.result.timeSpent"),
+                        title: localizationProvider.localizedString(for: "mistakes.result.timeSpent"),
                         value: formatTime(result.timeSpent)
                     )
                 }

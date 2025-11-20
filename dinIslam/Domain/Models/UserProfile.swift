@@ -28,6 +28,7 @@ struct UserProfile: Codable, Identifiable, Equatable {
     var authMethod: AuthMethod
     var fullName: String?
     var email: String?
+    var customDisplayName: String?  // Пользовательское отображаемое имя
     var localeIdentifier: String
     var avatarURL: URL?
     var progress: ProfileProgress
@@ -39,6 +40,7 @@ struct UserProfile: Codable, Identifiable, Equatable {
         authMethod: AuthMethod,
         fullName: String? = nil,
         email: String? = nil,
+        customDisplayName: String? = nil,
         localeIdentifier: String = Locale.current.identifier,
         avatarURL: URL? = nil,
         progress: ProfileProgress = ProfileProgress(),
@@ -54,6 +56,7 @@ struct UserProfile: Codable, Identifiable, Equatable {
         self.authMethod = authMethod
         self.fullName = fullName
         self.email = email
+        self.customDisplayName = customDisplayName
         self.localeIdentifier = localeIdentifier
         self.avatarURL = avatarURL
         self.progress = progress

@@ -2,6 +2,7 @@
 "profile.done" = "Готово";
 "profile.anonymous" = "Гость";
 "profile.signout" = "Выйти";
+"profile.displayName.placeholder" = "Введите имя";
 "profile.mastery.novice" = "Ученик";
 "profile.mastery.learning" = "В процессе";
 "profile.mastery.proficient" = "Уверенный";
@@ -33,13 +34,20 @@
 "profile.sync.reset.cancel" = "Отмена";
 "profile.sync.reset.inProgress" = "Сбрасываем данные…";
 "profile.sync.title" = "Синхронизация";
-"profile.sync.refresh" = "Синхронизировать";
+"profile.sync.statistics" = "Синхронизация статистики";
+"profile.sync.refresh" = "Синхронизировать статистику";
 "profile.sync.ready" = "Синхронизировано";
 "profile.sync.guest" = "Гостевой режим";
 "profile.sync.lastSync" = "Последняя синхронизация: %@";
 "profile.sync.never" = "Пока не синхронизировалось с iCloud";
 "profile.sync.inProgress" = "Синхронизация...";
 "profile.sync.failed" = "Ошибка синхронизации: %@";
+"profile.sync.error.conflict" = "Конфликт данных. Попробуйте синхронизировать снова";
+"profile.sync.error.network" = "Проблема с сетью. Проверьте подключение к интернету";
+"profile.sync.error.quota" = "Превышен лимит хранилища iCloud";
+"profile.sync.error.permission" = "Нет доступа к iCloud. Проверьте настройки";
+"profile.sync.error.auth" = "Ошибка авторизации. Войдите снова";
+"profile.sync.error.generic" = "Не удалось синхронизировать. Попробуйте позже";
 "profile.sync.signin.required" = "Войдите в аккаунт для синхронизации прогресса на всех устройствах";
 "profile.signin.prompt.title" = "Синхронизация прогресса";
 "profile.signin.prompt.message" = "Войдите в аккаунт, чтобы сохранять прогресс на всех ваших устройствах и не потерять данные";
@@ -77,6 +85,13 @@
 "result.totalQuestions" = "Всего вопросов:";
 "result.timeSpent" = "Время:";
 "result.newRecord" = "Новый рекорд!";
+"result.feedback.excellent" = "Превосходно!";
+"result.feedback.great" = "Отлично!";
+"result.feedback.good" = "Хорошо!";
+"result.feedback.notBad" = "Неплохо!";
+"result.feedback.average" = "Средний результат";
+"result.feedback.needImprovement" = "Нужно больше практики";
+"result.feedback.keepPracticing" = "Продолжайте практиковаться";
 "result.playAgain" = "Продолжить изучение";
 "result.backToStart" = "В главное меню";
 
@@ -145,6 +160,9 @@
 "quiz.finish.confirm.ok" = "Завершить";
 "quiz.finish.confirm.cancel" = "Отмена";
 
+// Quiz Loading
+"quiz.loading" = "Загрузка...";
+
 // Stats View - Pluralization Support
 "stats.title" = "Статистика";
 "stats.done" = "Готово";
@@ -197,15 +215,17 @@
 
 // Sync Section
 "stats.sync.title" = "Синхронизация";
+"stats.sync.questions" = "Синхронизация вопросов";
 "stats.sync.status" = "Статус";
+"stats.sync.questions.status" = "Обновления вопросов";
 "stats.sync.available" = "Доступны обновления";
 "stats.sync.upToDate" = "Актуально";
 "stats.sync.newQuestions.title" = "Новых вопросов";
 "stats.sync.newQuestions" = "%d новый вопрос";
 "stats.sync.newQuestions_2" = "%d новых вопроса";
 "stats.sync.newQuestions_5" = "%d новых вопросов";
-"stats.sync.check" = "Проверить";
-"stats.sync.sync" = "Синхронизировать";
+"stats.sync.check" = "Проверить обновления";
+"stats.sync.sync" = "Загрузить вопросы";
 "stats.progress" = "Прогресс";
 
 // Mistakes Review
@@ -485,3 +505,8 @@
 "exam.grade.good" = "Хорошо";
 "exam.grade.satisfactory" = "Удовлетворительно";
 "exam.grade.unsatisfactory" = "Неудовлетворительно";
+
+// Start View
+"start.loading" = "Загрузка...";
+"start.begin" = "Начать викторину";
+"start.examMode" = "Режим экзамена";

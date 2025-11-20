@@ -304,6 +304,7 @@ class EnhancedRemoteQuestionsService: ObservableObject {
         
         print("🔄 EnhancedRemoteQuestionsService: Attempting to fetch from \(urlString)")
         
+        // Используем RemoteQuestion из RemoteQuestionsService, который поддерживает оба формата
         let remoteQuestions = try await networkManager.request(
             url: urlString,
             responseType: [RemoteQuestion].self

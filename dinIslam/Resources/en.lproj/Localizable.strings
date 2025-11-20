@@ -2,6 +2,7 @@
 "profile.done" = "Done";
 "profile.anonymous" = "Guest";
 "profile.signout" = "Sign Out";
+"profile.displayName.placeholder" = "Enter name";
 "profile.mastery.novice" = "Novice";
 "profile.mastery.learning" = "Learning";
 "profile.mastery.proficient" = "Proficient";
@@ -33,13 +34,20 @@
 "profile.sync.reset.cancel" = "Cancel";
 "profile.sync.reset.inProgress" = "Resetting data…";
 "profile.sync.title" = "Cloud Sync";
-"profile.sync.refresh" = "Sync Now";
+"profile.sync.statistics" = "Statistics Sync";
+"profile.sync.refresh" = "Sync Statistics";
 "profile.sync.ready" = "Synced";
 "profile.sync.guest" = "Guest Mode";
 "profile.sync.lastSync" = "Last sync: %@";
 "profile.sync.never" = "Not synced with iCloud yet";
 "profile.sync.inProgress" = "Syncing...";
 "profile.sync.failed" = "Sync failed: %@";
+"profile.sync.error.conflict" = "Data conflict. Try syncing again";
+"profile.sync.error.network" = "Network issue. Check your internet connection";
+"profile.sync.error.quota" = "iCloud storage quota exceeded";
+"profile.sync.error.permission" = "No iCloud access. Check your settings";
+"profile.sync.error.auth" = "Authentication error. Please sign in again";
+"profile.sync.error.generic" = "Failed to sync. Please try again later";
 "profile.sync.signin.required" = "Sign in to sync your progress across all devices";
 "profile.signin.prompt.title" = "Sync Your Progress";
 "profile.signin.prompt.message" = "Sign in to save your progress across all your devices and never lose your data";
@@ -76,6 +84,13 @@
 "result.totalQuestions" = "Total Questions:";
 "result.timeSpent" = "Time:";
 "result.newRecord" = "New Record!";
+"result.feedback.excellent" = "Excellent!";
+"result.feedback.great" = "Great!";
+"result.feedback.good" = "Good!";
+"result.feedback.notBad" = "Not Bad!";
+"result.feedback.average" = "Average Result";
+"result.feedback.needImprovement" = "Need More Practice";
+"result.feedback.keepPracticing" = "Keep Practicing";
 "result.playAgain" = "Continue Learning";
 "result.backToStart" = "Back to Start";
 
@@ -144,6 +159,9 @@
 "quiz.finish.confirm.ok" = "Finish";
 "quiz.finish.confirm.cancel" = "Cancel";
 
+// Quiz Loading
+"quiz.loading" = "Loading...";
+
 // Stats View - Pluralization Support
 "stats.title" = "Statistics";
 "stats.done" = "Done";
@@ -189,14 +207,16 @@
 
 // Sync Section
 "stats.sync.title" = "Sync";
+"stats.sync.questions" = "Questions Sync";
 "stats.sync.status" = "Status";
+"stats.sync.questions.status" = "Question Updates";
 "stats.sync.available" = "Updates Available";
 "stats.sync.upToDate" = "Up to Date";
 "stats.sync.newQuestions.title" = "New Questions";
 "stats.sync.newQuestions" = "%d new question";
 "stats.sync.newQuestions_other" = "%d new questions";
-"stats.sync.check" = "Check";
-"stats.sync.sync" = "Sync";
+"stats.sync.check" = "Check Updates";
+"stats.sync.sync" = "Download Questions";
 "stats.progress" = "Progress";
 
 // Mistakes Review
@@ -469,3 +489,8 @@
 "exam.grade.good" = "Good";
 "exam.grade.satisfactory" = "Satisfactory";
 "exam.grade.unsatisfactory" = "Unsatisfactory";
+
+// Start View
+"start.loading" = "Loading...";
+"start.begin" = "Start Quiz";
+"start.examMode" = "Exam Mode";

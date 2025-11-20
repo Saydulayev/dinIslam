@@ -10,7 +10,7 @@ import SwiftUI
 struct AchievementNotificationView: View {
     let achievement: Achievement
     @Binding var isPresented: Bool
-    @ObservedObject private var localizationManager = LocalizationManager.shared
+    @Environment(\.localizationProvider) private var localizationProvider
     
     var body: some View {
         VStack(spacing: 16) {
@@ -27,7 +27,7 @@ struct AchievementNotificationView: View {
                 }
                 
                 VStack(spacing: 4) {
-                    Text(LocalizationManager.shared.localizedString(for: "achievements.congratulations"))
+                    Text(localizationProvider.localizedString(for: "achievements.congratulations"))
                         .font(.headline)
                         .foregroundColor(.secondary)
                     
@@ -40,7 +40,7 @@ struct AchievementNotificationView: View {
             }
             
             // Description
-            Text(achievement.type.localizedNotification)
+            Text(achievement.type.notification(using: localizationProvider))
                 .font(.subheadline)
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
@@ -52,7 +52,7 @@ struct AchievementNotificationView: View {
                     isPresented = false
                 }
             }) {
-                Text(LocalizationManager.shared.localizedString(for: "settings.done"))
+                Text(localizationProvider.localizedString(for: "settings.done"))
                     .font(.headline)
                     .fontWeight(.semibold)
                     .foregroundColor(.white)
@@ -86,8 +86,8 @@ struct AchievementNotificationView: View {
         AchievementNotificationView(
             achievement: Achievement(
                 id: "test",
-                title: LocalizationManager.shared.localizedString(for: "achievements.firstQuiz.title"),
-                description: LocalizationManager.shared.localizedString(for: "achievements.firstQuiz.description"),
+                title: LocalizationManager().localizedString(for: "achievements.firstQuiz.title"),
+                description: LocalizationManager().localizedString(for: "achievements.firstQuiz.description"),
                 icon: "play.circle.fill",
                 color: .blue,
                 type: .firstQuiz,
