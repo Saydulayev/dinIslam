@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import OSLog
 
 final class ProfileLocalStore {
     private enum Constants {
@@ -56,7 +57,7 @@ final class ProfileLocalStore {
             let data = try Data(contentsOf: fileURL)
             return try decoder.decode(UserProfile.self, from: data)
         } catch {
-            print("❌ Failed to load profile \(id): \(error)")
+            AppLogger.error("Failed to load profile \(id)", error: error, category: AppLogger.data)
             return nil
         }
     }
@@ -71,7 +72,7 @@ final class ProfileLocalStore {
                 userDefaults.set(profile.id, forKey: Constants.anonymousProfileKey)
             }
         } catch {
-            print("❌ Failed to save profile \(profile.id): \(error)")
+            AppLogger.error("Failed to save profile \(profile.id)", error: error, category: AppLogger.data)
         }
     }
 
@@ -107,7 +108,7 @@ final class ProfileLocalStore {
             do {
                 try fileManager.createDirectory(at: directoryURL, withIntermediateDirectories: true)
             } catch {
-                print("❌ Failed to create profiles directory: \(error)")
+                AppLogger.error("Failed to create profiles directory", error: error, category: AppLogger.data)
             }
         }
 
@@ -115,7 +116,7 @@ final class ProfileLocalStore {
             do {
                 try fileManager.createDirectory(at: avatarsDirectoryURL, withIntermediateDirectories: true)
             } catch {
-                print("❌ Failed to create avatars directory: \(error)")
+                AppLogger.error("Failed to create avatars directory", error: error, category: AppLogger.data)
             }
         }
     }
@@ -135,7 +136,7 @@ final class ProfileLocalStore {
             try data.write(to: url, options: .atomic)
             return url
         } catch {
-            print("❌ Failed to save avatar for \(profileId): \(error)")
+            AppLogger.error("Failed to save avatar for \(profileId)", error: error, category: AppLogger.data)
             return nil
         }
     }

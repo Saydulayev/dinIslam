@@ -28,6 +28,14 @@ private struct AchievementManagerKey: EnvironmentKey {
     static let defaultValue: AchievementManaging? = nil
 }
 
+private struct RemoteQuestionsServiceKey: EnvironmentKey {
+    static let defaultValue: RemoteQuestionsService? = nil
+}
+
+private struct NotificationManagerKey: EnvironmentKey {
+    static let defaultValue: NotificationManager? = nil
+}
+
 extension EnvironmentValues {
     var localizationProvider: LocalizationProviding {
         get { 
@@ -80,6 +88,24 @@ extension EnvironmentValues {
             self[ProfileManagerKey.self] = newValue 
         }
     }
+    
+    var remoteQuestionsService: RemoteQuestionsService {
+        get {
+            self[RemoteQuestionsServiceKey.self] ?? RemoteQuestionsService()
+        }
+        set {
+            self[RemoteQuestionsServiceKey.self] = newValue
+        }
+    }
+    
+    var notificationManager: NotificationManager {
+        get {
+            self[NotificationManagerKey.self] ?? NotificationManager()
+        }
+        set {
+            self[NotificationManagerKey.self] = newValue
+        }
+    }
 }
 
 @main
@@ -127,9 +153,8 @@ struct dinIslamApp: App {
             .environment(\.settingsManager, dependencies.settingsManager)
             .environment(\.localizationProvider, dependencies.localizationProvider)
             .environment(\.achievementManager, dependencies.achievementManager)
-            .environmentObject(dependencies.achievementManager as? AchievementManager ?? AchievementManager(notificationManager: dependencies.notificationManager))
-            .environmentObject(dependencies.remoteQuestionsService)
-            .environmentObject(dependencies.notificationManager)
+            .environment(\.remoteQuestionsService, dependencies.remoteQuestionsService)
+            .environment(\.notificationManager, dependencies.notificationManager)
             .environment(\.statsManager, dependencies.statsManager)
             .environment(\.profileManager, dependencies.profileManager)
             .preferredColorScheme(.dark)

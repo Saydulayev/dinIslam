@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct AchievementsView: View {
-    @EnvironmentObject private var achievementManager: AchievementManager
+    @Environment(\.achievementManager) private var achievementManager: AchievementManaging
     @Environment(\.dismiss) private var dismiss
     @Environment(\.settingsManager) private var settingsManager
     @Environment(\.statsManager) private var statsManager: StatsManager
@@ -16,32 +16,63 @@ struct AchievementsView: View {
     @State private var showingResetAlert = false
     @State private var selectedAchievement: Achievement?
     
+    private var backgroundGradient: some View {
+        LinearGradient(
+            colors: [
+                DesignTokens.Colors.background1,
+                DesignTokens.Colors.background2
+            ],
+            startPoint: .top,
+            endPoint: .bottom
+        )
+    }
+    
+    private var achievementsList: some View {
+        ScrollView {
+            LazyVStack(spacing: DesignTokens.Spacing.lg) {
+                ForEach(achievementManager.achievements) { achievement in
+                    AchievementCard(
+                        achievement: achievement,
+                        onTap: { selectedAchievement = achievement }
+                    )
+                }
+            }
+            .padding(.horizontal, DesignTokens.Spacing.xxl)
+            .padding(.top, DesignTokens.Spacing.lg)
+            .padding(.bottom, DesignTokens.Spacing.xxxl)
+        }
+    }
+    
+    private var expandedCardOverlay: some View {
+        Group {
+            if let achievement = selectedAchievement, achievement.isUnlocked {
+                ZStack {
+                    Color.black.opacity(0.7)
+                        .ignoresSafeArea()
+                        .onTapGesture {
+                            withAnimation {
+                                selectedAchievement = nil
+                            }
+                        }
+                    
+                    ExpandedAchievementCard(
+                        achievement: achievement,
+                        isPresented: Binding(
+                            get: { selectedAchievement != nil },
+                            set: { if !$0 { selectedAchievement = nil } }
+                        )
+                    )
+                }
+            }
+        }
+    }
+    
     var body: some View {
         ZStack {
-            // Gradient background
-            LinearGradient(
-                colors: [
-                    DesignTokens.Colors.background1,
-                    DesignTokens.Colors.background2
-                ],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea()
+            backgroundGradient
+                .ignoresSafeArea()
             
-            ScrollView {
-                LazyVStack(spacing: DesignTokens.Spacing.lg) {
-                    ForEach(achievementManager.achievements) { achievement in
-                        AchievementCard(
-                            achievement: achievement,
-                            onTap: { selectedAchievement = achievement }
-                        )
-                    }
-                }
-                .padding(.horizontal, DesignTokens.Spacing.xxl)
-                .padding(.top, DesignTokens.Spacing.lg)
-                .padding(.bottom, DesignTokens.Spacing.xxxl)
-            }
+            achievementsList
         }
         .navigationTitle("achievements.title".localized)
         .navigationBarTitleDisplayMode(.inline)
@@ -70,30 +101,7 @@ struct AchievementsView: View {
         } message: {
             Text("achievements.reset.confirm.message".localized)
         }
-        .overlay(
-            // Expanded Achievement Card Overlay
-            Group {
-                if let achievement = selectedAchievement, achievement.isUnlocked {
-                    ZStack {
-                        Color.black.opacity(0.7)
-                            .ignoresSafeArea()
-                            .onTapGesture {
-                                withAnimation {
-                                    selectedAchievement = nil
-                                }
-                            }
-                        
-                        ExpandedAchievementCard(
-                            achievement: achievement,
-                            isPresented: Binding(
-                                get: { selectedAchievement != nil },
-                                set: { if !$0 { selectedAchievement = nil } }
-                            )
-                        )
-                    }
-                }
-            }
-        )
+        .overlay(expandedCardOverlay)
     }
 }
 
@@ -102,7 +110,7 @@ struct AchievementCard: View {
     let onTap: () -> Void
     @Environment(\.localizationProvider) private var localizationProvider
     @Environment(\.settingsManager) private var settingsManager
-    @EnvironmentObject private var achievementManager: AchievementManager
+    @Environment(\.achievementManager) private var achievementManager: AchievementManaging
     @Environment(\.statsManager) private var statsManager: StatsManager
     
     private var isUnlocked: Bool {
@@ -462,7 +470,7 @@ struct ShareableAchievementCardView: View {
 #Preview {
     NavigationStack {
         AchievementsView()
-            .environmentObject(AchievementManager(notificationManager: NotificationManager()))
+            .environment(\.achievementManager, AchievementManager(notificationManager: NotificationManager()))
             .environment(\.settingsManager, SettingsManager())
             .environment(\.localizationProvider, LocalizationManager())
     }

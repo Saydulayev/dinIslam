@@ -11,7 +11,7 @@ import MessageUI
 struct SettingsView: View {
     @Bindable var viewModel: SettingsViewModel
     @Environment(\.dismiss) private var dismiss
-    @EnvironmentObject private var notificationManager: NotificationManager
+    @Environment(\.notificationManager) private var notificationManager: NotificationManager
     @State private var showingNotificationSettings = false
     
     init(viewModel: SettingsViewModel) {
@@ -274,7 +274,7 @@ struct SettingsView: View {
         .sheet(isPresented: $showingNotificationSettings) {
             NavigationStack {
                 NotificationSettingsView()
-                    .environmentObject(notificationManager)
+                    .environment(\.notificationManager, notificationManager)
             }
         }
         .sheet(isPresented: $viewModel.showingPrivacyPolicy) {

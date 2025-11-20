@@ -7,6 +7,7 @@
 
 import Foundation
 import Combine
+import OSLog
 
 // MARK: - Enhanced Questions Repository Protocol
 protocol EnhancedQuestionsRepositoryProtocol {
@@ -48,7 +49,7 @@ class EnhancedQuestionsRepository: EnhancedQuestionsRepositoryProtocol {
         
         // Check network connectivity
         guard networkManager.isConnected || !useRemoteQuestions else {
-            print("📱 No internet connection, falling back to local questions")
+            AppLogger.info("No internet connection, falling back to local questions", category: AppLogger.network)
             return try loadLocalQuestions(language: language)
         }
         
@@ -70,18 +71,18 @@ class EnhancedQuestionsRepository: EnhancedQuestionsRepositoryProtocol {
             return
         }
         
-        print("🚀 Preloading questions for languages: \(uniqueLanguages)")
+        AppLogger.info("Preloading questions for languages: \(uniqueLanguages)", category: AppLogger.data)
         
         for language in uniqueLanguages {
             let appLanguage: AppLanguage = language == "en" ? .english : .russian
             _ = await remoteService.fetchQuestions(for: appLanguage, manageLoadingState: false)
-            print("✅ Preloaded questions for \(language)")
+            AppLogger.info("Preloaded questions for \(language)", category: AppLogger.data)
         }
     }
     
     func clearCache() async {
         remoteService.clearCache()
-        print("🗑️ Questions cache cleared")
+        AppLogger.info("Questions cache cleared", category: AppLogger.data)
     }
     
     func getCacheStatus() -> CacheStatus {

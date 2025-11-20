@@ -7,6 +7,7 @@
 
 import Foundation
 import Combine
+import OSLog
 
 // MARK: - Cache Configuration
 struct CacheConfiguration {
@@ -51,9 +52,9 @@ class CacheManager {
             let cacheEncoded = try JSONEncoder().encode(cacheData)
             try cacheEncoded.write(to: cacheFilePath)
             
-            print("💾 Cached data for key: \(key)")
+            AppLogger.info("Cached data for key: \(key)", category: AppLogger.data)
         } catch {
-            print("❌ Failed to cache data for key: \(key): \(error)")
+            AppLogger.error("Failed to cache data for key: \(key)", error: error, category: AppLogger.data)
         }
     }
     
@@ -74,9 +75,9 @@ class CacheManager {
         let now = Date()
         if now.timeIntervalSince(cacheData.timestamp) > cacheData.ttl {
             if allowExpired {
-                print("⚠️ Using expired cache as backup for key: \(key)")
+                AppLogger.warning("Using expired cache as backup for key: \(key)", category: AppLogger.data)
             } else {
-                print("⚠️ Cache expired for key: \(key), but keeping as backup")
+                AppLogger.warning("Cache expired for key: \(key), but keeping as backup", category: AppLogger.data)
                 return nil
             }
         }
@@ -85,7 +86,7 @@ class CacheManager {
             let decodedData = try JSONDecoder().decode(type, from: cacheData.data)
             return decodedData
         } catch {
-            print("❌ Failed to decode cached data for key: \(key): \(error)")
+            AppLogger.error("Failed to decode cached data for key: \(key)", error: error, category: AppLogger.data)
             return nil
         }
     }
@@ -179,7 +180,7 @@ class EnhancedRemoteQuestionsService: ObservableObject {
         
         // Try to get from cache first
         if let cachedQuestions = cacheManager.getCachedData([Question].self, for: cacheKey) {
-            print("📱 Using cached questions for \(language.rawValue)")
+            AppLogger.info("Using cached questions for \(language.rawValue)", category: AppLogger.data)
             await MainActor.run {
                 cachedQuestionsCount = cachedQuestions.count
             }
@@ -203,12 +204,12 @@ class EnhancedRemoteQuestionsService: ObservableObject {
             return remoteQuestions
             
         } catch {
-            print("❌ Failed to fetch remote questions: \(error)")
+            AppLogger.error("Failed to fetch remote questions", error: error, category: AppLogger.network)
             
             // Try to use expired cache as backup
             let cacheKey = "questions_\(language.rawValue)"
             if let expiredCacheQuestions = cacheManager.getCachedData([Question].self, for: cacheKey, allowExpired: true) {
-                print("🔄 Using expired cache as backup for \(language.rawValue)")
+                AppLogger.info("Using expired cache as backup for \(language.rawValue)", category: AppLogger.data)
                 return expiredCacheQuestions
             }
             
@@ -238,10 +239,10 @@ class EnhancedRemoteQuestionsService: ObservableObject {
                 cachedQuestionsCount = cachedQuestions.count
                 hasUpdates = remoteQuestions.count > cachedQuestions.count
                 
-                print("🔄 Update check: Remote=\(remoteQuestions.count), Cached=\(cachedQuestions.count), HasUpdates=\(hasUpdates)")
+                AppLogger.info("Update check: Remote=\(remoteQuestions.count), Cached=\(cachedQuestions.count), HasUpdates=\(hasUpdates)", category: AppLogger.network)
             }
         } catch {
-            print("❌ Failed to check for updates: \(error)")
+            AppLogger.error("Failed to check for updates", error: error, category: AppLogger.network)
             await MainActor.run {
                 hasUpdates = false
             }
@@ -249,7 +250,7 @@ class EnhancedRemoteQuestionsService: ObservableObject {
     }
     
     func forceSync(for language: AppLanguage) async -> [Question] {
-        print("🔄 Force sync started for \(language.rawValue)")
+        AppLogger.info("Force sync started for \(language.rawValue)", category: AppLogger.network)
         
         await MainActor.run {
             isLoading = true
@@ -276,18 +277,18 @@ class EnhancedRemoteQuestionsService: ObservableObject {
                 remoteQuestionsCount = remoteQuestions.count
             }
             
-            print("✅ Force sync completed: \(remoteQuestions.count) questions")
+            AppLogger.info("Force sync completed: \(remoteQuestions.count) questions", category: AppLogger.network)
             return remoteQuestions
             
         } catch {
-            print("❌ Force sync failed: \(error)")
+            AppLogger.error("Force sync failed", error: error, category: AppLogger.network)
             return cacheManager.getCachedData([Question].self, for: "questions_\(language.rawValue)") ?? []
         }
     }
     
     func clearCache() {
         cacheManager.clearAllCache()
-        print("🗑️ Cache cleared")
+        AppLogger.info("Cache cleared", category: AppLogger.data)
     }
     
     func getCacheInfo() -> (size: Int64, entries: Int) {
@@ -302,7 +303,7 @@ class EnhancedRemoteQuestionsService: ObservableObject {
         let fileName = language == .russian ? "questions.json" : "questions_en.json"
         let urlString = "\(baseURL)/\(fileName)"
         
-        print("🔄 EnhancedRemoteQuestionsService: Attempting to fetch from \(urlString)")
+        AppLogger.info("EnhancedRemoteQuestionsService: Attempting to fetch from \(urlString)", category: AppLogger.network)
         
         // Используем RemoteQuestion из RemoteQuestionsService, который поддерживает оба формата
         let remoteQuestions = try await networkManager.request(
@@ -310,7 +311,7 @@ class EnhancedRemoteQuestionsService: ObservableObject {
             responseType: [RemoteQuestion].self
         )
         
-        print("✅ EnhancedRemoteQuestionsService: Successfully loaded \(remoteQuestions.count) questions from \(fileName)")
+        AppLogger.info("EnhancedRemoteQuestionsService: Successfully loaded \(remoteQuestions.count) questions from \(fileName)", category: AppLogger.network)
         return remoteQuestions.map { $0.toQuestion() }
     }
     
@@ -320,11 +321,11 @@ class EnhancedRemoteQuestionsService: ObservableObject {
         guard let url = Bundle.main.url(forResource: fileName, withExtension: "json"),
               let data = try? Data(contentsOf: url),
               let questions = try? JSONDecoder().decode([Question].self, from: data) else {
-            print("❌ Failed to load local questions for \(language.rawValue)")
+            AppLogger.error("Failed to load local questions for \(language.rawValue)", category: AppLogger.data)
             return []
         }
         
-        print("📱 Loaded \(questions.count) local questions for \(language.rawValue)")
+        AppLogger.info("Loaded \(questions.count) local questions for \(language.rawValue)", category: AppLogger.data)
         return questions
     }
 }

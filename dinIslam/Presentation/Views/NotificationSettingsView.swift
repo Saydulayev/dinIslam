@@ -9,9 +9,11 @@ import SwiftUI
 import UserNotifications
 
 struct NotificationSettingsView: View {
-    @EnvironmentObject private var notificationManager: NotificationManager
+    @Environment(\.notificationManager) private var notificationManager: NotificationManager
     @Environment(\.dismiss) private var dismiss
     @State private var showingPermissionAlert = false
+    @State private var isNotificationEnabled: Bool = false
+    @State private var reminderTime: Date = Date()
     
     var body: some View {
         List {
@@ -71,7 +73,7 @@ struct NotificationSettingsView: View {
                                 .font(.body)
                                 .foregroundColor(.primary)
                             
-                            Text(notificationManager.isNotificationEnabled ?
+                            Text(isNotificationEnabled ?
                                  "settings.on".localized :
                                  "settings.off".localized)
                                 .font(.caption)
@@ -80,15 +82,15 @@ struct NotificationSettingsView: View {
                         
                         Spacer()
                         
-                        Toggle("", isOn: $notificationManager.isNotificationEnabled)
-                            .onChange(of: notificationManager.isNotificationEnabled) { _, newValue in
+                        Toggle("", isOn: $isNotificationEnabled)
+                            .onChange(of: isNotificationEnabled) { _, newValue in
                                 notificationManager.toggleNotifications(newValue)
                             }
                     }
                     .padding(.vertical, 4)
                     
                     // Reminder Time
-                    if notificationManager.isNotificationEnabled {
+                    if isNotificationEnabled {
                         HStack {
                             Image(systemName: "clock")
                                 .foregroundColor(.blue)
@@ -99,16 +101,16 @@ struct NotificationSettingsView: View {
                                     .font(.body)
                                     .foregroundColor(.primary)
                                 
-                                Text(notificationManager.reminderTime.formatted(date: .omitted, time: .shortened))
+                                Text(reminderTime.formatted(date: .omitted, time: .shortened))
                                     .font(.caption)
                                     .foregroundColor(.secondary)
                             }
                             
                             Spacer()
                             
-                            DatePicker("", selection: $notificationManager.reminderTime, displayedComponents: .hourAndMinute)
+                            DatePicker("", selection: $reminderTime, displayedComponents: .hourAndMinute)
                                 .labelsHidden()
-                                .onChange(of: notificationManager.reminderTime) { _, newValue in
+                                .onChange(of: reminderTime) { _, newValue in
                                     notificationManager.updateReminderTime(newValue)
                                 }
                         }
@@ -117,13 +119,23 @@ struct NotificationSettingsView: View {
                 } header: {
                     Text("notification.settings.title".localized)
                 } footer: {
-                    if notificationManager.isNotificationEnabled {
+                    if isNotificationEnabled {
                         Text("notification.settings.footer".localized)
                             .font(.caption)
                             .foregroundColor(.secondary)
                     }
                 }
             }
+        }
+        .onAppear {
+            isNotificationEnabled = notificationManager.isNotificationEnabled
+            reminderTime = notificationManager.reminderTime
+        }
+        .onChange(of: notificationManager.isNotificationEnabled) { _, newValue in
+            isNotificationEnabled = newValue
+        }
+        .onChange(of: notificationManager.reminderTime) { _, newValue in
+            reminderTime = newValue
         }
         .navigationTitle("notification.settings.title".localized)
         .navigationBarTitleDisplayMode(.large)
@@ -147,5 +159,5 @@ struct NotificationSettingsView: View {
 
 #Preview {
     NotificationSettingsView()
-        .environmentObject(NotificationManager())
+        .environment(\.notificationManager, NotificationManager())
 }
