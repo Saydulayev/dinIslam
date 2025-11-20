@@ -61,7 +61,7 @@ struct ProfileStatsSectionView: View {
                     backgroundColor: DesignTokens.Colors.iconOrange.opacity(0.2)
                 )
                 
-                // Total Questions (only for non-signed in users, or show accuracy for signed in)
+                // Accuracy or Quizzes Completed (для обоих показываем одинаково)
                 if manager.isSignedIn {
                     ProgressCardView(
                         icon: "chart.bar",
@@ -71,10 +71,13 @@ struct ProfileStatsSectionView: View {
                         backgroundColor: DesignTokens.Colors.iconPurple.opacity(0.2)
                     )
                 } else {
+                    // Для неавторизованных показываем точность из statsManager
+                    let accuracy = statsManager.stats.totalQuestionsStudied > 0 ?
+                        Int((Double(statsManager.stats.correctAnswers) / Double(statsManager.stats.totalQuestionsStudied)) * 100) : 0
                     ProgressCardView(
-                        icon: "book.closed",
-                        value: "\(totalQuestionsCount)",
-                        label: "stats.totalQuestions.title".localized,
+                        icon: "chart.bar",
+                        value: "\(accuracy)%",
+                        label: "profile.progress.accuracy".localized,
                         iconColor: DesignTokens.Colors.iconPurple,
                         backgroundColor: DesignTokens.Colors.iconPurple.opacity(0.2)
                     )
@@ -91,11 +94,11 @@ struct ProfileStatsSectionView: View {
                     )
                 } else {
                     ProgressCardView(
-                        icon: "checkmark.circle",
-                        value: "\(statsManager.stats.totalQuizzesCompleted)",
-                        label: "stats.quizzesCompleted.title".localized,
-                        iconColor: DesignTokens.Colors.iconBlue,
-                        backgroundColor: DesignTokens.Colors.iconBlue.opacity(0.2)
+                        icon: "flame",
+                        value: "\(statsManager.stats.currentStreak)",
+                        label: "profile.progress.streak".localized,
+                        iconColor: DesignTokens.Colors.iconOrange,
+                        backgroundColor: DesignTokens.Colors.iconOrange.opacity(0.2)
                     )
                 }
             }
