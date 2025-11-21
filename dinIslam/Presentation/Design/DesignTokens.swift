@@ -61,9 +61,12 @@ struct DesignTokens {
         static let iconPurple = Color(hex: "#8b5cf6") // purple-500
         static let iconPurpleLight = Color(hex: "#a78bfa") // purple-400
         
-        // Yellow colors (для лампочки)
+        // Yellow colors (для лампочки и исправленных ошибок)
         static let iconYellow = Color(hex: "#fbbf24") // amber-500
         static let iconYellowLight = Color(hex: "#fde68a") // amber-200
+        
+        // Flame/Fire color (для streak)
+        static let iconFlame = Color(hex: "#ef4444") // red-500 с оранжевым оттенком
         
         // Status colors
         static let statusGreen = Color(hex: "#10B981")
@@ -78,6 +81,31 @@ struct DesignTokens {
         static let quizButtonGradientEnd = Color(hex: "#1e40af") // blue-800
         static let examButtonGradientStart = Color(hex: "#431407") // orange-950
         static let examButtonGradientEnd = Color(hex: "#7c2d12") // orange-900
+        
+        // Card gradients - тематические градиенты для карточек прогресса
+        // Синий океанский (Questions Studied)
+        static let blueGradientStart = Color(hex: "#1e3a8a") // blue-900
+        static let blueGradientEnd = Color(hex: "#1e40af") // blue-800
+        
+        // Зеленый успешный (Correct Answers)
+        static let greenGradientStart = Color(hex: "#14532d") // green-950
+        static let greenGradientEnd = Color(hex: "#166534") // green-900
+        
+        // Красный предупреждение (Incorrect Answers)
+        static let redGradientStart = Color(hex: "#7f1d1d") // red-900
+        static let redGradientEnd = Color(hex: "#991b1b") // red-800
+        
+        // Янтарный исправление (Corrected Mistakes)
+        static let amberGradientStart = Color(hex: "#78350f") // amber-950
+        static let amberGradientEnd = Color(hex: "#92400e") // amber-900
+        
+        // Фиолетовый статистика (Accuracy)
+        static let purpleGradientStart = Color(hex: "#581c87") // purple-900
+        static let purpleGradientEnd = Color(hex: "#6b21a8") // purple-800
+        
+        // Огненный streak (Current Streak)
+        static let flameGradientStart = Color(hex: "#7c2d12") // orange-900
+        static let flameGradientEnd = Color(hex: "#dc2626") // red-600
     }
     
     // MARK: - Spacing

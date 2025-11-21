@@ -57,8 +57,8 @@ struct ProfileStatsSectionView: View {
                     icon: "exclamationmark.circle",
                     value: "\(manager.isSignedIn ? manager.progress.correctedMistakes : statsManager.stats.correctedMistakes)",
                     label: manager.isSignedIn ? "profile.progress.corrected".localized : "stats.correctedMistakes.title".localized,
-                    iconColor: DesignTokens.Colors.iconOrange,
-                    backgroundColor: DesignTokens.Colors.iconOrange.opacity(0.2)
+                    iconColor: DesignTokens.Colors.iconYellow,
+                    backgroundColor: DesignTokens.Colors.iconYellow.opacity(0.2)
                 )
                 
                 // Accuracy or Quizzes Completed (для обоих показываем одинаково)
@@ -89,16 +89,16 @@ struct ProfileStatsSectionView: View {
                         icon: "flame",
                         value: "\(manager.progress.currentStreak)",
                         label: "profile.progress.streak".localized,
-                        iconColor: DesignTokens.Colors.iconOrange,
-                        backgroundColor: DesignTokens.Colors.iconOrange.opacity(0.2)
+                        iconColor: DesignTokens.Colors.iconFlame,
+                        backgroundColor: DesignTokens.Colors.iconFlame.opacity(0.2)
                     )
                 } else {
                     ProgressCardView(
                         icon: "flame",
                         value: "\(statsManager.stats.currentStreak)",
                         label: "profile.progress.streak".localized,
-                        iconColor: DesignTokens.Colors.iconOrange,
-                        backgroundColor: DesignTokens.Colors.iconOrange.opacity(0.2)
+                        iconColor: DesignTokens.Colors.iconFlame,
+                        backgroundColor: DesignTokens.Colors.iconFlame.opacity(0.2)
                     )
                 }
             }
@@ -107,42 +107,60 @@ struct ProfileStatsSectionView: View {
             HStack(spacing: DesignTokens.Spacing.lg) {
                 Image(systemName: "book.closed")
                     .font(.system(size: DesignTokens.Sizes.iconMedium))
-                    .foregroundColor(DesignTokens.Colors.iconPurple)
+                    .foregroundColor(.white) // Белая иконка для лучшей видимости на градиенте
                     .frame(width: 40, height: 40)
                 
                 VStack(alignment: .leading, spacing: DesignTokens.Spacing.xs) {
                     Text("stats.totalQuestions.title".localized)
                         .font(DesignTokens.Typography.label)
-                        .foregroundColor(DesignTokens.Colors.textPrimary)
+                        .foregroundColor(.white.opacity(0.9)) // Белый текст с небольшой прозрачностью
                     
                     Text("\(totalQuestionsCount)")
                         .font(DesignTokens.Typography.statsValue)
-                        .foregroundColor(DesignTokens.Colors.textPrimary)
+                        .foregroundColor(.white) // Белый текст для лучшей читаемости
                 }
                 
                 Spacer()
             }
             .padding(DesignTokens.Spacing.lg)
             .background(
-                // Прозрачная рамка с фиолетовым свечением (как на главном экране)
-                RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
-                    .stroke(
-                        LinearGradient(
-                            gradient: Gradient(colors: [
-                                DesignTokens.Colors.iconPurpleLight.opacity(0.5),
-                                DesignTokens.Colors.iconPurpleLight.opacity(0.2)
-                            ]),
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        ),
-                        lineWidth: 1.5
+                ZStack {
+                    // Градиентный фон (как у карточек)
+                    LinearGradient(
+                        gradient: Gradient(colors: [
+                            DesignTokens.Colors.purpleGradientStart,
+                            DesignTokens.Colors.purpleGradientEnd
+                        ]),
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
                     )
-                    .shadow(
-                        color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
-                        radius: 12,
-                        x: 0,
-                        y: 0
-                    )
+                    
+                    // Рамка с градиентом и свечением
+                    RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
+                        .stroke(
+                            LinearGradient(
+                                gradient: Gradient(colors: [
+                                    DesignTokens.Colors.iconPurpleLight.opacity(0.5),
+                                    DesignTokens.Colors.iconPurpleLight.opacity(0.2)
+                                ]),
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            lineWidth: 1.5
+                        )
+                        .shadow(
+                            color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
+                            radius: 12,
+                            x: 0,
+                            y: 0
+                        )
+                }
+            )
+            .clipShape(RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium))
+            .shadow(
+                color: DesignTokens.Colors.purpleGradientStart.opacity(0.5),
+                radius: 12,
+                y: 6
             )
         }
         .padding(DesignTokens.Spacing.xxl)

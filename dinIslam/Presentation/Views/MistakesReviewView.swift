@@ -74,8 +74,9 @@ struct MistakesReviewView: View {
                         .progressViewStyle(LinearProgressViewStyle(tint: DesignTokens.Colors.iconRed))
                         .scaleEffect(x: 1, y: 2, anchor: .center)
                 }
-                .padding(DesignTokens.Spacing.xxl)
-                .background(DesignTokens.Colors.cardBackground)
+                .padding(.horizontal, DesignTokens.Spacing.xxl)
+                .padding(.vertical, DesignTokens.Spacing.md)
+                // Убираем фон, чтобы был виден градиент как на главном экране
             
                 // Question content
                 ScrollView {
@@ -172,33 +173,60 @@ struct MistakesReviewView: View {
                             Text(localizationProvider.localizedString(for: "mistakes.stop"))
                                 .font(DesignTokens.Typography.secondarySemibold)
                         }
-                        .foregroundColor(DesignTokens.Colors.iconRed)
+                        .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
                         .frame(height: 56)
-                        .cardStyle(
-                            cornerRadius: DesignTokens.CornerRadius.medium,
-                            fillColor: DesignTokens.Colors.iconRed.opacity(0.15),
-                            borderColor: DesignTokens.Colors.iconRed.opacity(0.35),
-                            shadowColor: Color.black.opacity(0.2),
-                            shadowRadius: 8,
-                            shadowYOffset: 4
+                        .background(
+                            ZStack {
+                                // Градиентный фон кнопки (красный для остановки)
+                                LinearGradient(
+                                    gradient: Gradient(colors: [
+                                        DesignTokens.Colors.redGradientStart,
+                                        DesignTokens.Colors.redGradientEnd
+                                    ]),
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                                
+                                // Рамка с градиентом и свечением
+                                RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
+                                    .stroke(
+                                        LinearGradient(
+                                            gradient: Gradient(colors: [
+                                                DesignTokens.Colors.iconPurpleLight.opacity(0.5),
+                                                DesignTokens.Colors.iconPurpleLight.opacity(0.2)
+                                            ]),
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        ),
+                                        lineWidth: 1.5
+                                    )
+                                    .shadow(
+                                        color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
+                                        radius: 12,
+                                        x: 0,
+                                        y: 0
+                                    )
+                            }
                         )
-                        .overlay(
-                            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
-                                .stroke(DesignTokens.Colors.borderSubtle, lineWidth: 1)
+                        .clipShape(RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium))
+                        .shadow(
+                            color: DesignTokens.Colors.redGradientStart.opacity(0.5),
+                            radius: 12,
+                            y: 6
                         )
                         .padding(.horizontal, DesignTokens.Spacing.xxl)
                         .padding(.vertical, DesignTokens.Spacing.lg)
                     }
                     .accessibilityLabel("Stop mistakes review")
                     .accessibilityHint("Double tap to stop the mistakes review")
-                    .background(DesignTokens.Colors.cardBackground)
+                    // Убираем фон, чтобы был виден градиент как на главном экране
                 }
             }
         }
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
-        .toolbarBackground(DesignTokens.Colors.background1, for: .navigationBar)
+        .toolbarBackground(.clear, for: .navigationBar) // прозрачный toolbar для градиента
         .toolbarBackground(.visible, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
         .alert(

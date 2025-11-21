@@ -81,8 +81,8 @@ struct StatsView: View {
                             icon: "exclamationmark.circle",
                             value: "\(statsManager.stats.correctedMistakes)",
                             label: "stats.correctedMistakes.title".localized,
-                            iconColor: DesignTokens.Colors.iconOrange,
-                            backgroundColor: DesignTokens.Colors.iconOrange.opacity(0.2)
+                            iconColor: DesignTokens.Colors.iconYellow,
+                            backgroundColor: DesignTokens.Colors.iconYellow.opacity(0.2)
                         )
                         
                         ProgressCardView(
@@ -126,7 +126,8 @@ struct StatsView: View {
                 .foregroundColor(DesignTokens.Colors.iconRed)
             }
         }
-        .toolbarBackground(DesignTokens.Colors.background1, for: .navigationBar)
+        .toolbarBackground(.clear, for: .navigationBar) // прозрачный toolbar для градиента
+        .toolbarBackground(.visible, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
         .navigationDestination(isPresented: $showingMistakesReview) {
             if let viewModel = mistakesViewModel {

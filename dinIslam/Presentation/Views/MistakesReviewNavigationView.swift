@@ -17,14 +17,28 @@ struct MistakesReviewNavigationView: View {
     }
     
     var body: some View {
-        Group {
+        ZStack {
+            // Background - очень темный градиент с оттенками индиго/фиолетового (как на главном экране)
+            LinearGradient(
+                gradient: Gradient(colors: [
+                    Color(hex: "#0a0a1a"), // темно-индиго сверху
+                    Color(hex: "#000000") // черный снизу
+                ]),
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .ignoresSafeArea()
+            
+            Group {
                 switch viewModel.state {
                 case .active(.loading):
-                    VStack(spacing: 20) {
+                    VStack(spacing: DesignTokens.Spacing.lg) {
                         ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: DesignTokens.Colors.iconBlue))
                             .scaleEffect(1.5)
                         Text("mistakes.loading".localized)
-                            .font(.headline)
+                            .font(DesignTokens.Typography.bodyRegular)
+                            .foregroundStyle(DesignTokens.Colors.textSecondary)
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     
@@ -46,11 +60,13 @@ struct MistakesReviewNavigationView: View {
                         )
                     } else {
                         // Fallback if result is not ready yet
-                        VStack(spacing: 20) {
+                        VStack(spacing: DesignTokens.Spacing.lg) {
                             ProgressView()
+                                .progressViewStyle(CircularProgressViewStyle(tint: DesignTokens.Colors.iconBlue))
                                 .scaleEffect(1.5)
                             Text("mistakes.loading".localized)
-                                .font(.headline)
+                                .font(DesignTokens.Typography.bodyRegular)
+                                .foregroundStyle(DesignTokens.Colors.textSecondary)
                         }
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                     }
@@ -61,44 +77,83 @@ struct MistakesReviewNavigationView: View {
                     EmptyView()
                     
                 default:
-                    VStack(spacing: 20) {
+                    VStack(spacing: DesignTokens.Spacing.lg) {
                         Text("mistakes.error".localized)
-                            .font(.headline)
-                            .foregroundColor(.red)
+                            .font(DesignTokens.Typography.h2)
+                            .foregroundColor(DesignTokens.Colors.iconRed)
                         
                         Button("mistakes.back".localized) {
                             dismiss()
                         }
-                        .padding()
-                        .background(.blue)
+                        .font(DesignTokens.Typography.secondarySemibold)
                         .foregroundColor(.white)
-                        .cornerRadius(10)
+                        .padding(.horizontal, DesignTokens.Spacing.xxl)
+                        .padding(.vertical, DesignTokens.Spacing.lg)
+                        .background(
+                            ZStack {
+                                // Градиентный фон кнопки
+                                LinearGradient(
+                                    gradient: Gradient(colors: [
+                                        DesignTokens.Colors.blueGradientStart,
+                                        DesignTokens.Colors.blueGradientEnd
+                                    ]),
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                                
+                                // Рамка с градиентом и свечением
+                                RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
+                                    .stroke(
+                                        LinearGradient(
+                                            gradient: Gradient(colors: [
+                                                DesignTokens.Colors.iconPurpleLight.opacity(0.5),
+                                                DesignTokens.Colors.iconPurpleLight.opacity(0.2)
+                                            ]),
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        ),
+                                        lineWidth: 1.5
+                                    )
+                                    .shadow(
+                                        color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
+                                        radius: 12,
+                                        x: 0,
+                                        y: 0
+                                    )
+                            }
+                        )
+                        .clipShape(RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium))
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
             }
-            .navigationTitle(localizationProvider.localizedString(for: "mistakes.reviewTitle"))
-            .navigationBarTitleDisplayMode(.inline)
-            .navigationBarBackButtonHidden(true)
-            .onChange(of: viewModel.state) { _, newState in
-                // Auto-dismiss when user stops the review
-                if case .idle = newState {
-                    dismiss()
-                }
+        }
+        .navigationTitle(localizationProvider.localizedString(for: "mistakes.reviewTitle"))
+        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(true)
+        .toolbarBackground(.clear, for: .navigationBar) // прозрачный toolbar для градиента
+        .toolbarBackground(.visible, for: .navigationBar)
+        .toolbarColorScheme(.dark, for: .navigationBar)
+        .onChange(of: viewModel.state) { _, newState in
+            // Auto-dismiss when user stops the review
+            if case .idle = newState {
+                dismiss()
             }
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button(action: {
-                        dismiss()
-                    }) {
-                        HStack(spacing: 2) {
-                            Image(systemName: "chevron.left")
-                                .font(.system(size: 17, weight: .medium))
-                        }
+        }
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button(action: {
+                    dismiss()
+                }) {
+                    HStack(spacing: 2) {
+                        Image(systemName: "chevron.left")
+                            .font(.system(size: 17, weight: .medium))
+                            .foregroundColor(DesignTokens.Colors.textPrimary)
                     }
                 }
             }
         }
+    }
     }
 
 

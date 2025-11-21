@@ -105,40 +105,52 @@ struct ProgressCardView: View {
     private func gradientColors(for color: Color) -> [Color] {
         // Определяем градиент на основе цвета иконки
         if color == DesignTokens.Colors.iconBlue {
-            // Синий градиент (как у кнопки Quiz)
+            // Синий океанский градиент (Questions Studied)
             return [
-                DesignTokens.Colors.quizButtonGradientStart,
-                DesignTokens.Colors.quizButtonGradientEnd
+                DesignTokens.Colors.blueGradientStart,
+                DesignTokens.Colors.blueGradientEnd
+            ]
+        } else if color == DesignTokens.Colors.iconGreen {
+            // Зеленый успешный градиент (Correct Answers)
+            return [
+                DesignTokens.Colors.greenGradientStart,
+                DesignTokens.Colors.greenGradientEnd
+            ]
+        } else if color == DesignTokens.Colors.iconRed {
+            // Красный предупреждение (Incorrect Answers)
+            return [
+                DesignTokens.Colors.redGradientStart,
+                DesignTokens.Colors.redGradientEnd
+            ]
+        } else if color == DesignTokens.Colors.iconYellow {
+            // Янтарный исправление (Corrected Mistakes)
+            return [
+                DesignTokens.Colors.amberGradientStart,
+                DesignTokens.Colors.amberGradientEnd
+            ]
+        } else if color == DesignTokens.Colors.iconPurple {
+            // Фиолетовый статистика (Accuracy)
+            return [
+                DesignTokens.Colors.purpleGradientStart,
+                DesignTokens.Colors.purpleGradientEnd
+            ]
+        } else if color == DesignTokens.Colors.iconFlame {
+            // Огненный градиент (Streak)
+            return [
+                DesignTokens.Colors.flameGradientStart,
+                DesignTokens.Colors.flameGradientEnd
             ]
         } else if color == DesignTokens.Colors.iconOrange {
-            // Оранжевый градиент (как у кнопки Exam)
+            // Оранжевый градиент (для других случаев)
             return [
                 DesignTokens.Colors.examButtonGradientStart,
                 DesignTokens.Colors.examButtonGradientEnd
             ]
-        } else if color == DesignTokens.Colors.iconGreen {
-            // Зеленый градиент
-            return [
-                Color(hex: "#14532d"), // dark green
-                Color(hex: "#166534")  // green-800
-            ]
-        } else if color == DesignTokens.Colors.iconRed {
-            // Красный градиент
-            return [
-                Color(hex: "#7f1d1d"), // dark red
-                Color(hex: "#991b1b")  // red-800
-            ]
-        } else if color == DesignTokens.Colors.iconPurple {
-            // Фиолетовый градиент
-            return [
-                Color(hex: "#581c87"), // purple-900
-                Color(hex: "#6b21a8")  // purple-800
-            ]
         } else {
             // По умолчанию синий градиент
             return [
-                DesignTokens.Colors.quizButtonGradientStart,
-                DesignTokens.Colors.quizButtonGradientEnd
+                DesignTokens.Colors.blueGradientStart,
+                DesignTokens.Colors.blueGradientEnd
             ]
         }
     }
