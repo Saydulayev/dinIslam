@@ -246,30 +246,30 @@ struct ExpandedAchievementCard: View {
             VStack(spacing: DesignTokens.Spacing.lg) {
                 ZStack {
                     Circle()
-                        .fill(Color.white.opacity(0.2))
+                        .fill(achievement.color.opacity(0.2))
                         .frame(width: 100, height: 100)
                     
                     Image(systemName: achievement.icon)
                         .font(.system(size: 50, weight: .semibold))
-                        .foregroundColor(.white)
+                        .foregroundColor(achievement.color)
                 }
                 
                 VStack(spacing: DesignTokens.Spacing.sm) {
                     Text(achievement.title)
                         .font(.system(size: 24, weight: .bold))
-                        .foregroundColor(.white)
+                        .foregroundColor(DesignTokens.Colors.textPrimary)
                         .multilineTextAlignment(.center)
                     
                     Text(achievement.displayDescription(using: localizationProvider))
                         .font(DesignTokens.Typography.secondaryRegular)
-                        .foregroundColor(.white.opacity(0.9))
+                        .foregroundColor(DesignTokens.Colors.textSecondary)
                         .multilineTextAlignment(.center)
                     
                     if let unlockedDate = achievement.unlockedDate {
                         Text(localizationProvider.localizedString(for: "achievements.unlocked") + " " + 
                              unlockedDate.formatted(date: .abbreviated, time: .omitted))
                         .font(DesignTokens.Typography.label)
-                        .foregroundColor(.white.opacity(0.8))
+                        .foregroundColor(DesignTokens.Colors.iconGreen)
                         .fontWeight(.medium)
                         .padding(.top, DesignTokens.Spacing.xs)
                     }
@@ -302,12 +302,14 @@ struct ExpandedAchievementCard: View {
         .padding(DesignTokens.Spacing.xxl)
         .background(
             ZStack {
-                // Градиентный фон (адаптируем под цвет достижения)
-                LinearGradient(
-                    gradient: Gradient(colors: achievementGradientColors(for: achievement.color)),
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
+                // Прозрачный темный фон
+                RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xlarge)
+                    .fill(Color.black.opacity(0.4))
+                    .background(
+                        // Блюр эффект для глубины
+                        RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xlarge)
+                            .fill(.ultraThinMaterial)
+                    )
                 
                 // Рамка с фиолетовым свечением
                 RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xlarge)
@@ -332,7 +334,7 @@ struct ExpandedAchievementCard: View {
         )
         .clipShape(RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xlarge))
         .shadow(
-            color: achievementGradientColors(for: achievement.color).first?.opacity(0.5) ?? Color.black.opacity(0.3),
+            color: achievement.color.opacity(0.3),
             radius: 20,
             y: 12
         )
@@ -343,42 +345,6 @@ struct ExpandedAchievementCard: View {
     }
     
     // MARK: - Helper
-    private func achievementGradientColors(for color: Color) -> [Color] {
-        // Определяем градиент на основе цвета достижения
-        if color == DesignTokens.Colors.iconBlue {
-            return [
-                DesignTokens.Colors.quizButtonGradientStart,
-                DesignTokens.Colors.quizButtonGradientEnd
-            ]
-        } else if color == DesignTokens.Colors.iconOrange {
-            return [
-                DesignTokens.Colors.examButtonGradientStart,
-                DesignTokens.Colors.examButtonGradientEnd
-            ]
-        } else if color == DesignTokens.Colors.iconGreen {
-            return [
-                Color(hex: "#14532d"), // dark green
-                Color(hex: "#166534")  // green-800
-            ]
-        } else if color == DesignTokens.Colors.iconRed {
-            return [
-                Color(hex: "#7f1d1d"), // dark red
-                Color(hex: "#991b1b")  // red-800
-            ]
-        } else if color == DesignTokens.Colors.iconPurple {
-            return [
-                Color(hex: "#581c87"), // purple-900
-                Color(hex: "#6b21a8")  // purple-800
-            ]
-        } else {
-            // По умолчанию синий градиент
-            return [
-                DesignTokens.Colors.quizButtonGradientStart,
-                DesignTokens.Colors.quizButtonGradientEnd
-            ]
-        }
-    }
-    
     private func shareAchievement() {
         guard let shareImage = generateShareImage() else {
             // Fallback to text if image generation fails
