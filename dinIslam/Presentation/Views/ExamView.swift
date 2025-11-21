@@ -22,11 +22,11 @@ struct ExamView: View {
     
     var body: some View {
         ZStack {
-            // Gradient Background
+            // Background - очень темный градиент с оттенками индиго/фиолетового (как на главном экране)
             LinearGradient(
                 gradient: Gradient(colors: [
-                    DesignTokens.Colors.background1,
-                    DesignTokens.Colors.background2
+                    Color(hex: "#0a0a1a"), // темно-индиго сверху
+                    Color(hex: "#000000") // черный снизу
                 ]),
                 startPoint: .top,
                 endPoint: .bottom
@@ -40,15 +40,75 @@ struct ExamView: View {
                 // Main content
                 ScrollView {
                     VStack(spacing: DesignTokens.Spacing.xxl) {
-                        // Question content
-                        ExamQuestionView(viewModel: viewModel)
-                        
-                        // Answer options
-                        ExamAnswersView(viewModel: viewModel)
+                        // Question text
+                        if let question = viewModel.currentQuestion {
+                            VStack(spacing: DesignTokens.Spacing.lg) {
+                                Text(question.text)
+                                    .font(DesignTokens.Typography.h2)
+                                    .foregroundStyle(DesignTokens.Colors.textPrimary)
+                                    .multilineTextAlignment(.center)
+                                    .padding(DesignTokens.Spacing.xxl)
+                                    .frame(maxWidth: .infinity)
+                                    .background(
+                                        // Прозрачная рамка с фиолетовым свечением (как на главном экране)
+                                        RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
+                                            .stroke(
+                                                LinearGradient(
+                                                    gradient: Gradient(colors: [
+                                                        DesignTokens.Colors.iconPurpleLight.opacity(0.5),
+                                                        DesignTokens.Colors.iconPurpleLight.opacity(0.2)
+                                                    ]),
+                                                    startPoint: .topLeading,
+                                                    endPoint: .bottomTrailing
+                                                ),
+                                                lineWidth: 1.5
+                                            )
+                                            .shadow(
+                                                color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
+                                                radius: 12,
+                                                x: 0,
+                                                y: 0
+                                            )
+                                    )
+                                    .accessibilityLabel("Question: \(question.text)")
+                                    .accessibilityAddTraits(.isHeader)
+                                    .dynamicTypeSize(.large)
+                                
+                                // Category
+                                HStack {
+                                    Label(question.category, systemImage: "tag")
+                                        .font(DesignTokens.Typography.label)
+                                        .foregroundStyle(DesignTokens.Colors.textSecondary)
+                                    
+                                    Spacer()
+                                }
+                                .padding(.horizontal, DesignTokens.Spacing.sm)
+                            }
+                            
+                            // Answer options
+                            VStack(spacing: DesignTokens.Spacing.md) {
+                                ForEach(Array(question.answers.enumerated()), id: \.element.id) { index, answer in
+                                    let isAnswered = viewModel.answers[question.id] != nil
+                                    let isSelected = viewModel.answers[question.id]?.selectedAnswerIndex == index
+                                    
+                                    AnswerButton(
+                                        answer: answer,
+                                        index: index,
+                                        isSelected: isSelected,
+                                        isCorrect: index == question.correctIndex,
+                                        isAnswerSelected: isAnswered,
+                                        action: {
+                                            viewModel.selectAnswer(at: index)
+                                        }
+                                    )
+                                    .accessibilityLabel("Answer option \(index + 1)")
+                                    .accessibilityHint("Double tap to select this answer")
+                                    .accessibilityAddTraits(isSelected ? .isSelected : [])
+                                }
+                            }
+                        }
                     }
-                    .padding(.horizontal, DesignTokens.Spacing.xxl)
-                    .padding(.top, DesignTokens.Spacing.lg)
-                    .padding(.bottom, DesignTokens.Spacing.xl)
+                    .padding(DesignTokens.Spacing.xxl)
                 }
                 
                 // Fixed action buttons at the bottom
@@ -71,13 +131,26 @@ struct ExamView: View {
                                 .foregroundColor(DesignTokens.Colors.iconOrange)
                                 .frame(maxWidth: .infinity)
                                 .frame(height: 56)
-                                .cardStyle(
-                                    cornerRadius: DesignTokens.CornerRadius.medium,
-                                    fillColor: DesignTokens.Colors.iconOrange.opacity(0.15),
-                                    borderColor: DesignTokens.Colors.iconOrange.opacity(0.35),
-                                    shadowColor: Color.black.opacity(0.2),
-                                    shadowRadius: 8,
-                                    shadowYOffset: 4
+                                .background(
+                                    // Прозрачная рамка с фиолетовым свечением (как на главном экране)
+                                    RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
+                                        .stroke(
+                                            LinearGradient(
+                                                gradient: Gradient(colors: [
+                                                    DesignTokens.Colors.iconPurpleLight.opacity(0.5),
+                                                    DesignTokens.Colors.iconPurpleLight.opacity(0.2)
+                                                ]),
+                                                startPoint: .topLeading,
+                                                endPoint: .bottomTrailing
+                                            ),
+                                            lineWidth: 1.5
+                                        )
+                                        .shadow(
+                                            color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
+                                            radius: 12,
+                                            x: 0,
+                                            y: 0
+                                        )
                                 )
                             }
                             .accessibilityLabel("Skip question")
@@ -100,13 +173,26 @@ struct ExamView: View {
                             .foregroundColor(DesignTokens.Colors.iconBlue)
                             .frame(maxWidth: .infinity)
                             .frame(height: 56)
-                            .cardStyle(
-                                cornerRadius: DesignTokens.CornerRadius.medium,
-                                fillColor: DesignTokens.Colors.iconBlue.opacity(0.15),
-                                borderColor: DesignTokens.Colors.iconBlue.opacity(0.35),
-                                shadowColor: Color.black.opacity(0.2),
-                                shadowRadius: 8,
-                                shadowYOffset: 4
+                            .background(
+                                // Прозрачная рамка с фиолетовым свечением (как на главном экране)
+                                RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
+                                    .stroke(
+                                        LinearGradient(
+                                            gradient: Gradient(colors: [
+                                                DesignTokens.Colors.iconPurpleLight.opacity(0.5),
+                                                DesignTokens.Colors.iconPurpleLight.opacity(0.2)
+                                            ]),
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        ),
+                                        lineWidth: 1.5
+                                    )
+                                    .shadow(
+                                        color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
+                                        radius: 12,
+                                        x: 0,
+                                        y: 0
+                                    )
                             )
                         }
                         .accessibilityLabel(viewModel.state == .active(.paused) ? "Resume exam" : "Pause exam")
@@ -124,13 +210,26 @@ struct ExamView: View {
                             .foregroundColor(DesignTokens.Colors.statusGreen)
                             .frame(maxWidth: .infinity)
                             .frame(height: 56)
-                            .cardStyle(
-                                cornerRadius: DesignTokens.CornerRadius.medium,
-                                fillColor: DesignTokens.Colors.statusGreen.opacity(0.15),
-                                borderColor: DesignTokens.Colors.statusGreen.opacity(0.35),
-                                shadowColor: Color.black.opacity(0.2),
-                                shadowRadius: 8,
-                                shadowYOffset: 4
+                            .background(
+                                // Прозрачная рамка с фиолетовым свечением (как на главном экране)
+                                RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
+                                    .stroke(
+                                        LinearGradient(
+                                            gradient: Gradient(colors: [
+                                                DesignTokens.Colors.iconPurpleLight.opacity(0.5),
+                                                DesignTokens.Colors.iconPurpleLight.opacity(0.2)
+                                            ]),
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        ),
+                                        lineWidth: 1.5
+                                    )
+                                    .shadow(
+                                        color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
+                                        radius: 12,
+                                        x: 0,
+                                        y: 0
+                                    )
                             )
                         }
                         .accessibilityLabel("Finish exam")
@@ -138,14 +237,14 @@ struct ExamView: View {
                     }
                     .padding(.horizontal, DesignTokens.Spacing.xxl)
                     .padding(.vertical, DesignTokens.Spacing.lg)
-                    .background(DesignTokens.Colors.cardBackground)
+                    // Убираем фон, чтобы был виден градиент как на главном экране
                 }
             }
         }
         .navigationTitle("exam.title".localized)
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
-        .toolbarBackground(DesignTokens.Colors.background1, for: .navigationBar)
+        .toolbarBackground(.clear, for: .navigationBar) // прозрачный toolbar для градиента
         .toolbarBackground(.visible, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
         .navigationDestination(isPresented: $showingResult) {
@@ -232,7 +331,7 @@ struct ExamHeaderView: View {
         }
         .padding(.horizontal, DesignTokens.Spacing.xxl)
         .padding(.vertical, DesignTokens.Spacing.lg)
-        .background(DesignTokens.Colors.cardBackground)
+        // Убираем фон, чтобы был виден градиент как на главном экране
     }
     
     private var timerColor: Color {
@@ -256,153 +355,6 @@ struct ExamHeaderView: View {
     }
 }
 
-// MARK: - Exam Question View
-struct ExamQuestionView: View {
-    let viewModel: ExamViewModel
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: DesignTokens.Spacing.lg) {
-            if let question = viewModel.currentQuestion {
-                Text(question.text)
-                    .font(DesignTokens.Typography.h2)
-                    .foregroundColor(DesignTokens.Colors.textPrimary)
-                    .multilineTextAlignment(.leading)
-                
-                // Category
-                HStack(spacing: DesignTokens.Spacing.md) {
-                    Label(question.category, systemImage: "folder")
-                        .font(DesignTokens.Typography.label)
-                        .foregroundColor(DesignTokens.Colors.textSecondary)
-                        .padding(.horizontal, DesignTokens.Spacing.sm)
-                        .padding(.vertical, DesignTokens.Spacing.xs)
-                        .background(
-                            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.small)
-                                .fill(DesignTokens.Colors.iconBlue.opacity(0.15))
-                        )
-                }
-            }
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(DesignTokens.Spacing.xxl)
-        .cardStyle(
-            cornerRadius: DesignTokens.CornerRadius.large,
-            fillColor: DesignTokens.Colors.iconPurple.opacity(0.15),
-            borderColor: DesignTokens.Colors.iconPurple.opacity(0.35),
-            shadowColor: Color.black.opacity(0.2),
-            shadowRadius: 8,
-            shadowYOffset: 4
-        )
-    }
-}
-
-// MARK: - Exam Answers View
-struct ExamAnswersView: View {
-    let viewModel: ExamViewModel
-    
-    var body: some View {
-        VStack(spacing: DesignTokens.Spacing.md) {
-            if let question = viewModel.currentQuestion {
-                ForEach(Array(question.answers.enumerated()), id: \.element.id) { index, answer in
-                    ExamAnswerButton(
-                        answer: answer,
-                        index: index,
-                        isSelected: viewModel.answers[question.id]?.selectedAnswerIndex == index,
-                        isCorrect: index == question.correctIndex,
-                        isAnswered: viewModel.answers[question.id] != nil,
-                        onTap: {
-                            viewModel.selectAnswer(at: index)
-                        }
-                    )
-                }
-            }
-        }
-    }
-}
-
-// MARK: - Exam Answer Button
-struct ExamAnswerButton: View {
-    let answer: Answer
-    let index: Int
-    let isSelected: Bool
-    let isCorrect: Bool
-    let isAnswered: Bool
-    let onTap: () -> Void
-    
-    private var buttonColor: Color {
-        if isAnswered {
-            // Показываем цвет только для выбранного ответа
-            if isSelected {
-                return isCorrect ? DesignTokens.Colors.statusGreen : DesignTokens.Colors.iconRed
-            } else {
-                // Остальные ответы остаются серыми
-                return DesignTokens.Colors.textTertiary
-            }
-        } else {
-            return isSelected ? DesignTokens.Colors.iconBlue : DesignTokens.Colors.textTertiary
-        }
-    }
-    
-    private var buttonBackground: Color {
-        if isAnswered {
-            // Показываем фон только для выбранного ответа
-            if isSelected {
-                return isCorrect ? DesignTokens.Colors.statusGreen.opacity(0.15) : DesignTokens.Colors.iconRed.opacity(0.15)
-            } else {
-                // Остальные ответы остаются с обычным фоном
-                return DesignTokens.Colors.progressCard
-            }
-        } else {
-            return isSelected ? DesignTokens.Colors.iconBlue.opacity(0.15) : DesignTokens.Colors.progressCard
-        }
-    }
-    
-    var body: some View {
-        Button(action: onTap) {
-            HStack(spacing: DesignTokens.Spacing.lg) {
-                // Answer letter
-                Text(String(Character(UnicodeScalar(65 + index)!)))
-                    .font(DesignTokens.Typography.secondarySemibold)
-                    .foregroundColor(buttonColor)
-                    .frame(width: 32, height: 32)
-                    .background(
-                        Circle()
-                            .fill(buttonColor.opacity(0.2))
-                    )
-                
-                // Answer text
-                Text(answer.text)
-                    .font(DesignTokens.Typography.bodyRegular)
-                    .foregroundColor(DesignTokens.Colors.textPrimary)
-                    .multilineTextAlignment(.leading)
-                
-                Spacer()
-                
-                // Status icon - показываем только для выбранного ответа
-                if isAnswered && isSelected {
-                    Image(systemName: isCorrect ? "checkmark.circle.fill" : "xmark.circle.fill")
-                        .foregroundColor(buttonColor)
-                        .font(.system(size: DesignTokens.Sizes.iconMedium))
-                }
-            }
-            .padding(DesignTokens.Spacing.lg)
-            .background(
-                RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
-                    .fill(buttonBackground)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
-                            .stroke(buttonColor, lineWidth: isSelected ? 2 : 1)
-                    )
-            )
-            .shadow(
-                color: isSelected ? buttonColor.opacity(0.3) : DesignTokens.Shadows.card,
-                radius: isSelected ? 8 : DesignTokens.Shadows.cardRadius,
-                y: DesignTokens.Shadows.cardY
-            )
-        }
-        .disabled(isAnswered)
-        .buttonStyle(PlainButtonStyle())
-    }
-}
 
 
 #Preview {

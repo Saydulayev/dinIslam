@@ -31,11 +31,11 @@ struct MistakesReviewView: View {
     
     var body: some View {
         ZStack {
-            // Gradient Background
+            // Background - очень темный градиент с оттенками индиго/фиолетового (как на главном экране)
             LinearGradient(
                 gradient: Gradient(colors: [
-                    DesignTokens.Colors.background1,
-                    DesignTokens.Colors.background2
+                    Color(hex: "#0a0a1a"), // темно-индиго сверху
+                    Color(hex: "#000000") // черный снизу
                 ]),
                 startPoint: .top,
                 endPoint: .bottom

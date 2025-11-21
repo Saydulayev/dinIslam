@@ -32,11 +32,11 @@ struct QuizView: View {
     
     var body: some View {
         ZStack {
-            // Gradient Background
+            // Background - очень темный градиент с оттенками индиго/фиолетового (как на главном экране)
             LinearGradient(
                 gradient: Gradient(colors: [
-                    DesignTokens.Colors.background1,
-                    DesignTokens.Colors.background2
+                    Color(hex: "#0a0a1a"), // темно-индиго сверху
+                    Color(hex: "#000000") // черный снизу
                 ]),
                 startPoint: .top,
                 endPoint: .bottom
@@ -55,16 +55,29 @@ struct QuizView: View {
                         .foregroundStyle(DesignTokens.Colors.textSecondary)
                 }
                 .padding(DesignTokens.Spacing.xxl)
-                .cardStyle(
-                    cornerRadius: DesignTokens.CornerRadius.medium,
-                    fillColor: DesignTokens.Colors.cardBackground,
-                    borderColor: DesignTokens.Colors.iconBlue.opacity(0.3),
-                    shadowColor: Color.black.opacity(0.2),
-                    shadowRadius: 8,
-                    shadowYOffset: 4
+                .background(
+                    // Прозрачная рамка с фиолетовым свечением (как на главном экране)
+                    RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
+                        .stroke(
+                            LinearGradient(
+                                gradient: Gradient(colors: [
+                                    DesignTokens.Colors.iconPurpleLight.opacity(0.5),
+                                    DesignTokens.Colors.iconPurpleLight.opacity(0.2)
+                                ]),
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            lineWidth: 1.5
+                        )
+                        .shadow(
+                            color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
+                            radius: 12,
+                            x: 0,
+                            y: 0
+                        )
                 )
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(Color.black.opacity(0.3))
+                // Убираем затемнение, чтобы был виден градиент как на главном экране
             }
             
             VStack(spacing: 0) {
@@ -101,7 +114,7 @@ struct QuizView: View {
                 }
                 .padding(.horizontal, DesignTokens.Spacing.xxl)
                 .padding(.vertical, DesignTokens.Spacing.md)
-                .background(DesignTokens.Colors.cardBackground)
+                // Убираем фон, чтобы был виден градиент как на главном экране
             
                 // Question content
                 ScrollView {
@@ -115,13 +128,26 @@ struct QuizView: View {
                                     .multilineTextAlignment(.center)
                                     .padding(DesignTokens.Spacing.xxl)
                                     .frame(maxWidth: .infinity)
-                                    .cardStyle(
-                                        cornerRadius: DesignTokens.CornerRadius.medium,
-                                        fillColor: DesignTokens.Colors.iconPurple.opacity(0.15),
-                                        borderColor: DesignTokens.Colors.iconPurple.opacity(0.35),
-                                        shadowColor: Color.black.opacity(0.2),
-                                        shadowRadius: 8,
-                                        shadowYOffset: 4
+                                    .background(
+                                        // Прозрачная рамка с фиолетовым свечением (как на главном экране)
+                                        RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
+                                            .stroke(
+                                                LinearGradient(
+                                                    gradient: Gradient(colors: [
+                                                        DesignTokens.Colors.iconPurpleLight.opacity(0.5),
+                                                        DesignTokens.Colors.iconPurpleLight.opacity(0.2)
+                                                    ]),
+                                                    startPoint: .topLeading,
+                                                    endPoint: .bottomTrailing
+                                                ),
+                                                lineWidth: 1.5
+                                            )
+                                            .shadow(
+                                                color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
+                                                radius: 12,
+                                                x: 0,
+                                                y: 0
+                                            )
                                     )
                                     .accessibilityLabel("Question: \(question.text)")
                                     .accessibilityAddTraits(.isHeader)
@@ -179,30 +205,39 @@ struct QuizView: View {
                         .foregroundColor(DesignTokens.Colors.statusGreen)
                         .frame(maxWidth: .infinity)
                         .frame(height: 56)
-                        .cardStyle(
-                            cornerRadius: DesignTokens.CornerRadius.medium,
-                            fillColor: DesignTokens.Colors.statusGreen.opacity(0.15),
-                            borderColor: DesignTokens.Colors.statusGreen.opacity(0.35),
-                            shadowColor: Color.black.opacity(0.2),
-                            shadowRadius: 8,
-                            shadowYOffset: 4
-                        )
-                        .overlay(
+                        .background(
+                            // Прозрачная рамка с фиолетовым свечением (как на главном экране)
                             RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
-                                .stroke(DesignTokens.Colors.borderSubtle, lineWidth: 1)
+                                .stroke(
+                                    LinearGradient(
+                                        gradient: Gradient(colors: [
+                                            DesignTokens.Colors.iconPurpleLight.opacity(0.5),
+                                            DesignTokens.Colors.iconPurpleLight.opacity(0.2)
+                                        ]),
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    ),
+                                    lineWidth: 1.5
+                                )
+                                .shadow(
+                                    color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
+                                    radius: 12,
+                                    x: 0,
+                                    y: 0
+                                )
                         )
                         .padding(.horizontal, DesignTokens.Spacing.xxl)
                         .padding(.vertical, DesignTokens.Spacing.lg)
                     }
                     .accessibilityLabel("Finish quiz")
                     .accessibilityHint("Double tap to finish the current quiz")
-                    .background(DesignTokens.Colors.cardBackground)
+                    // Убираем фон, чтобы был виден градиент как на главном экране
                 }
             }
         }
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
-        .toolbarBackground(DesignTokens.Colors.background1, for: .navigationBar)
+        .toolbarBackground(.clear, for: .navigationBar) // прозрачный toolbar для градиента
         .toolbarBackground(.visible, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
         .alert(
