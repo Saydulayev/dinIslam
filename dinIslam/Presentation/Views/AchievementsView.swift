@@ -17,11 +17,12 @@ struct AchievementsView: View {
     @State private var selectedAchievement: Achievement?
     
     private var backgroundGradient: some View {
+        // Background - очень темный градиент с оттенками индиго/фиолетового (как на главном экране)
         LinearGradient(
-            colors: [
-                DesignTokens.Colors.background1,
-                DesignTokens.Colors.background2
-            ],
+            gradient: Gradient(colors: [
+                Color(hex: "#0a0a1a"), // темно-индиго сверху
+                Color(hex: "#000000") // черный снизу
+            ]),
             startPoint: .top,
             endPoint: .bottom
         )
@@ -85,7 +86,7 @@ struct AchievementsView: View {
                 .foregroundColor(DesignTokens.Colors.iconRed)
             }
         }
-        .toolbarBackground(DesignTokens.Colors.background1, for: .navigationBar)
+        .toolbarBackground(.clear, for: .navigationBar) // прозрачный toolbar для градиента
         .toolbarColorScheme(.dark, for: .navigationBar)
         .alert(
             "achievements.reset.confirm.title".localized,
@@ -201,14 +202,28 @@ struct AchievementCard: View {
             }
         }
         .padding(DesignTokens.Spacing.xl)
-        .cardStyle(
-            cornerRadius: DesignTokens.CornerRadius.medium,
-            borderColor: isUnlocked ? achievement.color.opacity(0.45) : DesignTokens.Colors.borderDefault,
-            shadowColor: Color.black.opacity(0.24),
-            shadowRadius: 8,
-            shadowYOffset: 4
+        .background(
+            // Прозрачная рамка с фиолетовым свечением (как на главном экране)
+            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
+                .stroke(
+                    LinearGradient(
+                        gradient: Gradient(colors: [
+                            DesignTokens.Colors.iconPurpleLight.opacity(isUnlocked ? 0.5 : 0.3),
+                            DesignTokens.Colors.iconPurpleLight.opacity(isUnlocked ? 0.2 : 0.1)
+                        ]),
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 1.5
+                )
+                .shadow(
+                    color: DesignTokens.Colors.iconPurpleLight.opacity(isUnlocked ? 0.3 : 0.15),
+                    radius: 12,
+                    x: 0,
+                    y: 0
+                )
         )
-        .opacity(isUnlocked ? 1.0 : 0.7)
+        .opacity(isUnlocked ? 1.0 : 0.6)
         .animation(.easeInOut(duration: 0.3), value: isUnlocked)
         .onTapGesture {
             if isUnlocked {
@@ -231,30 +246,30 @@ struct ExpandedAchievementCard: View {
             VStack(spacing: DesignTokens.Spacing.lg) {
                 ZStack {
                     Circle()
-                        .fill(achievement.color.opacity(0.2))
+                        .fill(Color.white.opacity(0.2))
                         .frame(width: 100, height: 100)
                     
                     Image(systemName: achievement.icon)
                         .font(.system(size: 50, weight: .semibold))
-                        .foregroundColor(achievement.color)
+                        .foregroundColor(.white)
                 }
                 
                 VStack(spacing: DesignTokens.Spacing.sm) {
                     Text(achievement.title)
                         .font(.system(size: 24, weight: .bold))
-                        .foregroundColor(DesignTokens.Colors.textPrimary)
+                        .foregroundColor(.white)
                         .multilineTextAlignment(.center)
                     
                     Text(achievement.displayDescription(using: localizationProvider))
                         .font(DesignTokens.Typography.secondaryRegular)
-                        .foregroundColor(DesignTokens.Colors.textSecondary)
+                        .foregroundColor(.white.opacity(0.9))
                         .multilineTextAlignment(.center)
                     
                     if let unlockedDate = achievement.unlockedDate {
                         Text(localizationProvider.localizedString(for: "achievements.unlocked") + " " + 
                              unlockedDate.formatted(date: .abbreviated, time: .omitted))
                         .font(DesignTokens.Typography.label)
-                        .foregroundColor(DesignTokens.Colors.iconGreen)
+                        .foregroundColor(.white.opacity(0.8))
                         .fontWeight(.medium)
                         .padding(.top, DesignTokens.Spacing.xs)
                     }
@@ -263,73 +278,105 @@ struct ExpandedAchievementCard: View {
             
             // Buttons
             VStack(spacing: DesignTokens.Spacing.sm) {
-                // Share Button - стилизованная
-                Button(action: {
+                // Share Button - в стиле MinimalButton
+                MinimalButton(
+                    icon: "square.and.arrow.up",
+                    title: "achievements.share".localized,
+                    foregroundColor: achievement.color
+                ) {
                     shareAchievement()
-                }) {
-                    HStack(spacing: DesignTokens.Spacing.sm) {
-                        Image(systemName: "square.and.arrow.up")
-                            .font(.system(size: DesignTokens.Sizes.iconSmall))
-                        Text("achievements.share".localized)
-                            .font(DesignTokens.Typography.secondaryRegular)
-                    }
-                    .foregroundColor(achievement.color)
-                    .frame(maxWidth: .infinity)
-                    .padding(.horizontal, DesignTokens.Spacing.xl)
-                    .padding(.vertical, DesignTokens.Spacing.md)
-                    .cardStyle(
-                        cornerRadius: DesignTokens.CornerRadius.medium,
-                        borderColor: .clear,
-                        borderWidth: 0,
-                        shadowColor: Color.black.opacity(0.22),
-                        shadowRadius: 6,
-                        shadowYOffset: 3
-                    )
-                    .overlay(
-                        RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
-                            .stroke(achievement.color.opacity(0.5), lineWidth: 1)
-                    )
                 }
                 
-                // Close Button
-                Button(action: {
+                // Close Button - в стиле MinimalButton
+                MinimalButton(
+                    icon: "xmark",
+                    title: localizationProvider.localizedString(for: "settings.done"),
+                    foregroundColor: DesignTokens.Colors.textSecondary
+                ) {
                     withAnimation(.easeInOut(duration: 0.3)) {
                         isPresented = false
                     }
-                }) {
-                    Text(localizationProvider.localizedString(for: "settings.done"))
-                        .font(DesignTokens.Typography.secondaryRegular)
-                        .foregroundColor(DesignTokens.Colors.textSecondary)
-                        .frame(maxWidth: .infinity)
-                        .padding(.horizontal, DesignTokens.Spacing.xl)
-                        .padding(.vertical, DesignTokens.Spacing.md)
-                        .cardStyle(
-                            cornerRadius: DesignTokens.CornerRadius.medium,
-                            borderColor: DesignTokens.Colors.borderDefault,
-                            shadowColor: Color.black.opacity(0.18),
-                            shadowRadius: 4,
-                            shadowYOffset: 2
-                        )
                 }
             }
         }
         .padding(DesignTokens.Spacing.xxl)
-        .cardStyle(
-            cornerRadius: DesignTokens.CornerRadius.xlarge,
-            borderColor: .clear,
-            borderWidth: 0,
-            shadowColor: Color.black.opacity(0.35),
-            shadowRadius: 20,
-            shadowYOffset: 12
+        .background(
+            ZStack {
+                // Градиентный фон (адаптируем под цвет достижения)
+                LinearGradient(
+                    gradient: Gradient(colors: achievementGradientColors(for: achievement.color)),
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+                
+                // Рамка с фиолетовым свечением
+                RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xlarge)
+                    .stroke(
+                        LinearGradient(
+                            gradient: Gradient(colors: [
+                                DesignTokens.Colors.iconPurpleLight.opacity(0.5),
+                                DesignTokens.Colors.iconPurpleLight.opacity(0.2)
+                            ]),
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 1.5
+                    )
+                    .shadow(
+                        color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
+                        radius: 12,
+                        x: 0,
+                        y: 0
+                    )
+            }
         )
-        .overlay(
-            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xlarge)
-                .stroke(achievement.color.opacity(0.5), lineWidth: 2)
+        .clipShape(RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xlarge))
+        .shadow(
+            color: achievementGradientColors(for: achievement.color).first?.opacity(0.5) ?? Color.black.opacity(0.3),
+            radius: 20,
+            y: 12
         )
         .padding(.horizontal, DesignTokens.Spacing.xxxl)
         .scaleEffect(isPresented ? 1.0 : 0.8)
         .opacity(isPresented ? 1.0 : 0.0)
         .animation(.spring(response: 0.6, dampingFraction: 0.8), value: isPresented)
+    }
+    
+    // MARK: - Helper
+    private func achievementGradientColors(for color: Color) -> [Color] {
+        // Определяем градиент на основе цвета достижения
+        if color == DesignTokens.Colors.iconBlue {
+            return [
+                DesignTokens.Colors.quizButtonGradientStart,
+                DesignTokens.Colors.quizButtonGradientEnd
+            ]
+        } else if color == DesignTokens.Colors.iconOrange {
+            return [
+                DesignTokens.Colors.examButtonGradientStart,
+                DesignTokens.Colors.examButtonGradientEnd
+            ]
+        } else if color == DesignTokens.Colors.iconGreen {
+            return [
+                Color(hex: "#14532d"), // dark green
+                Color(hex: "#166534")  // green-800
+            ]
+        } else if color == DesignTokens.Colors.iconRed {
+            return [
+                Color(hex: "#7f1d1d"), // dark red
+                Color(hex: "#991b1b")  // red-800
+            ]
+        } else if color == DesignTokens.Colors.iconPurple {
+            return [
+                Color(hex: "#581c87"), // purple-900
+                Color(hex: "#6b21a8")  // purple-800
+            ]
+        } else {
+            // По умолчанию синий градиент
+            return [
+                DesignTokens.Colors.quizButtonGradientStart,
+                DesignTokens.Colors.quizButtonGradientEnd
+            ]
+        }
     }
     
     private func shareAchievement() {

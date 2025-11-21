@@ -144,19 +144,59 @@ struct ProfileCardView: View {
                         manager.signOut()
                     }
                 } else {
-                    // Sign in with Apple button
+                    // Sign in with Apple button в стиле главного экрана
                     SignInWithAppleButton(.signIn) { request in
                         manager.prepareSignInRequest(request)
                     } onCompletion: { result in
                         manager.handleSignInResult(result)
                     }
                     .frame(height: 50)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
+                            .stroke(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [
+                                        DesignTokens.Colors.iconPurpleLight.opacity(0.5),
+                                        DesignTokens.Colors.iconPurpleLight.opacity(0.2)
+                                    ]),
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                ),
+                                lineWidth: 1.5
+                            )
+                            .shadow(
+                                color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
+                                radius: 12,
+                                x: 0,
+                                y: 0
+                            )
+                    )
                     .clipShape(RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium))
                 }
             }
         }
         .padding(DesignTokens.Spacing.xxxl)
-        .cardStyle(cornerRadius: DesignTokens.CornerRadius.xlarge)
+        .background(
+            // Прозрачная рамка с фиолетовым свечением (как на главном экране)
+            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xlarge)
+                .stroke(
+                    LinearGradient(
+                        gradient: Gradient(colors: [
+                            DesignTokens.Colors.iconPurpleLight.opacity(0.5),
+                            DesignTokens.Colors.iconPurpleLight.opacity(0.2)
+                        ]),
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 1.5
+                )
+                .shadow(
+                    color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
+                    radius: 12,
+                    x: 0,
+                    y: 0
+                )
+        )
     }
     
     private func saveDisplayName() {

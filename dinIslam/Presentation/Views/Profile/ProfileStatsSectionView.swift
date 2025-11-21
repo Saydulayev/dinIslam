@@ -123,15 +123,50 @@ struct ProfileStatsSectionView: View {
                 Spacer()
             }
             .padding(DesignTokens.Spacing.lg)
-            .cardStyle(
-                cornerRadius: DesignTokens.CornerRadius.medium,
-                fillColor: DesignTokens.Colors.iconPurple.opacity(0.2),
-                borderColor: DesignTokens.Colors.iconPurple.opacity(0.55),
-                shadowColor: Color.black.opacity(0.22)
+            .background(
+                // Прозрачная рамка с фиолетовым свечением (как на главном экране)
+                RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
+                    .stroke(
+                        LinearGradient(
+                            gradient: Gradient(colors: [
+                                DesignTokens.Colors.iconPurpleLight.opacity(0.5),
+                                DesignTokens.Colors.iconPurpleLight.opacity(0.2)
+                            ]),
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 1.5
+                    )
+                    .shadow(
+                        color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
+                        radius: 12,
+                        x: 0,
+                        y: 0
+                    )
             )
         }
         .padding(DesignTokens.Spacing.xxl)
-        .cardStyle(cornerRadius: DesignTokens.CornerRadius.xlarge)
+        .background(
+            // Прозрачная рамка с фиолетовым свечением (как на главном экране)
+            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xlarge)
+                .stroke(
+                    LinearGradient(
+                        gradient: Gradient(colors: [
+                            DesignTokens.Colors.iconPurpleLight.opacity(0.5),
+                            DesignTokens.Colors.iconPurpleLight.opacity(0.2)
+                        ]),
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 1.5
+                )
+                .shadow(
+                    color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
+                    radius: 12,
+                    x: 0,
+                    y: 0
+                )
+        )
     }
 }
 

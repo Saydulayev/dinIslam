@@ -40,12 +40,12 @@ struct UnifiedProfileView: View {
         @Bindable var manager = profileManager
         
         ZStack {
-            // Gradient background
+            // Background - очень темный градиент с оттенками индиго/фиолетового (как на главном экране)
             LinearGradient(
-                colors: [
-                    DesignTokens.Colors.background1,
-                    DesignTokens.Colors.background2
-                ],
+                gradient: Gradient(colors: [
+                    Color(hex: "#0a0a1a"), // темно-индиго сверху
+                    Color(hex: "#000000") // черный снизу
+                ]),
                 startPoint: .top,
                 endPoint: .bottom
             )
@@ -110,7 +110,7 @@ struct UnifiedProfileView: View {
                 }
             }
         }
-        .toolbarBackground(DesignTokens.Colors.background1, for: .navigationBar)
+        .toolbarBackground(.clear, for: .navigationBar) // прозрачный toolbar для градиента
         .toolbarColorScheme(.dark, for: .navigationBar)
         .onAppear {
             manager.validateAvatar()

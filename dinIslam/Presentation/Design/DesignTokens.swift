@@ -40,32 +40,44 @@ struct DesignTokens {
     
     // MARK: - Colors
     struct Colors {
-        // Background colors - более светлые тона, как в прогресс-карточках
-        static let background1 = Color(hex: "#0F0F0F")
-        static let background2 = Color(hex: "#141414")
-        static let cardBackground = Color(hex: "#1A1A1A")
-        static let progressCard = Color(hex: "#1A1A1A")
-        static let hoverBackground = Color(hex: "#252525")
+        // Background colors - точные цвета из дизайна
+        static let background1 = Color(hex: "#000000") // черный фон
+        static let background2 = Color(hex: "#000000") // черный для градиента
+        static let cardBackground = Color(hex: "#262626") // neutral-800 - карточка
+        static let progressCard = Color(hex: "#262626") // neutral-800
+        static let hoverBackground = Color(hex: "#171717") // neutral-900 - hover
         
-        // Text colors
-        static let textPrimary = Color.white
-        static let textSecondary = Color(hex: "#9CA3AF")
-        static let textTertiary = Color(hex: "#6B7280")
+        // Text colors - из дизайна
+        static let textPrimary = Color.white // основной текст
+        static let textSecondary = Color(hex: "#9ca3af") // gray-400 - вторичный текст
+        static let textTertiary = Color(hex: "#9ca3af") // gray-400 - третичный текст
         
-        // Icon colors
-        static let iconBlue = Color(hex: "#60A5FA")
+        // Icon colors - точные цвета из дизайна
+        static let iconBlue = Color(hex: "#3b82f6") // blue-500
+        static let iconBlueLight = Color(hex: "#60a5fa") // blue-400
         static let iconGreen = Color(hex: "#34D399")
         static let iconRed = Color(hex: "#F87171")
-        static let iconOrange = Color(hex: "#FB923C")
-        static let iconPurple = Color(hex: "#A78BFA")
+        static let iconOrange = Color(hex: "#fb923c") // orange-400
+        static let iconPurple = Color(hex: "#8b5cf6") // purple-500
+        static let iconPurpleLight = Color(hex: "#a78bfa") // purple-400
+        
+        // Yellow colors (для лампочки)
+        static let iconYellow = Color(hex: "#fbbf24") // amber-500
+        static let iconYellowLight = Color(hex: "#fde68a") // amber-200
         
         // Status colors
         static let statusGreen = Color(hex: "#10B981")
         
-        // Borders
-        static let borderSubtle = Color.white.opacity(0.05)
-        static let borderLight = Color.white.opacity(0.10)
-        static let borderDefault = Color(hex: "#2B2B2B")
+        // Borders - нейтральные цвета
+        static let borderSubtle = Color(hex: "#171717").opacity(0.3) // neutral-900 с прозрачностью
+        static let borderLight = Color(hex: "#171717").opacity(0.5) // neutral-900 с прозрачностью
+        static let borderDefault = Color(hex: "#171717") // neutral-900
+        
+        // Button gradients - градиенты для кнопок
+        static let quizButtonGradientStart = Color(hex: "#1e3a8a") // blue-900
+        static let quizButtonGradientEnd = Color(hex: "#1e40af") // blue-800
+        static let examButtonGradientStart = Color(hex: "#431407") // orange-950
+        static let examButtonGradientEnd = Color(hex: "#7c2d12") // orange-900
     }
     
     // MARK: - Spacing

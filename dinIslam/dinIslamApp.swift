@@ -48,8 +48,19 @@ extension EnvironmentValues {
     
     var achievementManager: AchievementManaging {
         get { 
-            self[AchievementManagerKey.self] ?? AchievementManager(
-                notificationManager: NotificationManager()
+            if let manager = self[AchievementManagerKey.self] {
+                return manager
+            }
+            
+            // Fallback for previews/tests - use notificationManager from environment if available
+            // to maintain single source of truth for NotificationManager
+            let notificationManager = self[NotificationManagerKey.self] ?? NotificationManager()
+            let localizationProvider = self[LocalizationProviderKey.self] ?? LocalizationManager()
+            
+            // Create fallback instance (only used in previews/tests or if not set in environment)
+            return AchievementManager(
+                notificationManager: notificationManager,
+                localizationProvider: localizationProvider
             )
         }
         set { 
@@ -150,13 +161,14 @@ struct dinIslamApp: App {
                 examStatisticsManager: dependencies.examStatisticsManager,
                 enhancedQuizUseCase: enhancedDependencies.enhancedQuizUseCase
             )
-            .environment(\.settingsManager, dependencies.settingsManager)
-            .environment(\.localizationProvider, dependencies.localizationProvider)
+            // Set achievementManager first to ensure it's available before any views access it
             .environment(\.achievementManager, dependencies.achievementManager)
-            .environment(\.remoteQuestionsService, dependencies.remoteQuestionsService)
             .environment(\.notificationManager, dependencies.notificationManager)
+            .environment(\.localizationProvider, dependencies.localizationProvider)
+            .environment(\.settingsManager, dependencies.settingsManager)
             .environment(\.statsManager, dependencies.statsManager)
             .environment(\.profileManager, dependencies.profileManager)
+            .environment(\.remoteQuestionsService, dependencies.remoteQuestionsService)
             .preferredColorScheme(.dark)
         }
     }
