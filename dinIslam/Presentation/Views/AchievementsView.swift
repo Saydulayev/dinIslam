@@ -289,7 +289,7 @@ struct ExpandedAchievementCard: View {
                 
                 // Close Button - в стиле MinimalButton
                 MinimalButton(
-                    icon: "xmark",
+                    icon: "checkmark.circle",
                     title: localizationProvider.localizedString(for: "settings.done"),
                     foregroundColor: DesignTokens.Colors.textSecondary
                 ) {
