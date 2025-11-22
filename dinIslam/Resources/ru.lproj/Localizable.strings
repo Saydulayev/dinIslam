@@ -116,7 +116,7 @@
 "settings.theme.light" = "Светлая";
 "settings.theme.dark" = "Темная";
 "settings.sound.title" = "Звук";
-"settings.haptic.title" = "Тактильная обратная связь";
+"settings.haptic.title" = "Тактильность";
 "settings.notifications.title" = "Уведомления";
 
 // Support

@@ -147,7 +147,7 @@ struct StartView: View {
                         .padding(.bottom, DesignTokens.Spacing.xxxl)
                         .frame(minHeight: proxy.size.height, alignment: .bottom)
                     }
-                    .scrollDisabled(false)
+                    .scrollDisabled(true)
                 }
             }
             .navigationDestination(for: StartRoute.self) { route in

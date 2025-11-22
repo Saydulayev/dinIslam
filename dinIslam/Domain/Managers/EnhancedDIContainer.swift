@@ -66,11 +66,7 @@ class EnhancedDIContainer {
     }
     
     var achievementManager: AchievementManager {
-        // Cast to AchievementManager for backward compatibility
-        if let manager = _dependencies?.baseDependencies.achievementManager as? AchievementManager {
-            return manager
-        }
-        return AppDependencies().achievementManager as? AchievementManager ?? AchievementManager(notificationManager: NotificationManager())
+        _dependencies?.baseDependencies.achievementManager ?? AppDependencies().achievementManager
     }
     
     var localizationManager: LocalizationManager {

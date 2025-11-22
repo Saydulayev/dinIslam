@@ -86,6 +86,8 @@ struct SettingsView: View {
                                 Text("settings.haptic.title".localized)
                                     .font(DesignTokens.Typography.bodyRegular)
                                     .foregroundColor(DesignTokens.Colors.textPrimary)
+                                    .lineLimit(2)
+                                    .minimumScaleFactor(0.85)
                                 
                                 Spacer()
                                 

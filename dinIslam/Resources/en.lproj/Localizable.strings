@@ -115,7 +115,7 @@
 "settings.theme.light" = "Light";
 "settings.theme.dark" = "Dark";
 "settings.sound.title" = "Sound";
-"settings.haptic.title" = "Haptic Feedback";
+"settings.haptic.title" = "Haptic";
 "settings.notifications.title" = "Notifications";
 
 // Support
