@@ -297,7 +297,7 @@ struct ExpandedAchievementCard: View {
                 
                 // Close Button - в стиле MinimalButton
                 MinimalButton(
-                    icon: "checkmark.square ",
+                    icon: "checkmark.square",
                     title: localizationProvider.localizedString(for: "settings.done"),
                     foregroundColor: DesignTokens.Colors.textSecondary
                 ) {
@@ -371,9 +371,8 @@ struct ExpandedAchievementCard: View {
         let renderer = ImageRenderer(content: shareableCard)
         renderer.scale = UIScreen.main.scale
         
-        // Устанавливаем размер изображения
-        // Размер карточки 1000x1200 + padding 60 с каждой стороны = 1120x1320
-        let targetSize = CGSize(width: 1120, height: 1320)
+        // Устанавливаем размер изображения (Instagram story size: 1080x1920)
+        let targetSize = CGSize(width: 1080, height: 1920)
         renderer.proposedSize = .init(width: targetSize.width, height: targetSize.height)
         
         // Даем время на рендеринг
@@ -420,71 +419,122 @@ struct ShareableAchievementCardView: View {
     @Environment(\.localizationProvider) private var localizationProvider
     
     var body: some View {
-        VStack(spacing: 40) {
-            // Icon
-            ZStack {
-                Circle()
-                    .fill(achievement.color.opacity(0.2))
-                    .frame(width: 200, height: 200)
-                
-                Image(systemName: achievement.icon)
-                    .font(.system(size: 100, weight: .semibold))
-                    .foregroundColor(achievement.color)
-            }
-            .padding(.top, 60)
+        ZStack {
+            // Background - темный градиент как на главном экране
+            LinearGradient(
+                gradient: Gradient(colors: [
+                    Color(hex: "#0a0a1a"), // темно-индиго сверху
+                    Color(hex: "#000000") // черный снизу
+                ]),
+                startPoint: .top,
+                endPoint: .bottom
+            )
             
-            // Title and Description
-            VStack(spacing: 20) {
-                Text(achievement.title)
-                    .font(.system(size: 64, weight: .bold))
-                    .foregroundColor(Color.black)
-                    .multilineTextAlignment(.center)
-                
-                Text(achievement.displayDescription(using: localizationProvider))
-                    .font(.system(size: 32))
-                    .foregroundColor(Color.gray)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 60)
-                
-                if let unlockedDate = achievement.unlockedDate {
-                    Text(localizationProvider.localizedString(for: "achievements.unlocked") + " " + 
-                         unlockedDate.formatted(date: .abbreviated, time: .omitted))
-                    .font(.system(size: 22))
-                    .foregroundColor(Color(red: 0.0, green: 0.7, blue: 0.0))
-                    .fontWeight(.medium)
-                    .padding(.top, 16)
+            VStack(spacing: 60) {
+                // App Logo at top
+                VStack(spacing: 20) {
+                    Image("image")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 180, height: 180)
+                    
+                    Text(localizationProvider.localizedString(for: "app.name"))
+                        .font(.system(size: 48, weight: .bold))
+                        .foregroundColor(.white)
                 }
-            }
-            
-            Spacer()
-            
-            // App Logo and Name at bottom
-            VStack(spacing: 20) {
-                Image("image")
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: 180, height: 180)
+                .padding(.top, 80)
                 
-                Text(localizationProvider.localizedString(for: "app.name"))
-                    .font(.system(size: 36, weight: .semibold))
-                    .foregroundColor(achievement.color)
+                Spacer()
+                
+                // Achievement Card - УВЕЛИЧЕНА
+                VStack(spacing: 50) {
+                    // Icon - УВЕЛИЧЕН
+                    ZStack {
+                        Circle()
+                            .fill(achievement.color.opacity(0.2))
+                            .frame(width: 280, height: 280)
+                        
+                        Image(systemName: achievement.icon)
+                            .font(.system(size: 140, weight: .semibold))
+                            .foregroundColor(achievement.color)
+                    }
+                    
+                    // Title and Description - УВЕЛИЧЕНЫ ШРИФТЫ
+                    VStack(spacing: 24) {
+                        Text(achievement.title)
+                            .font(.system(size: 60, weight: .bold))
+                            .foregroundColor(.white)
+                            .multilineTextAlignment(.center)
+                            .lineLimit(3)
+                        
+                        Text(achievement.displayDescription(using: localizationProvider))
+                            .font(.system(size: 36))
+                            .foregroundColor(Color.white.opacity(0.75))
+                            .multilineTextAlignment(.center)
+                            .lineLimit(4)
+                            .padding(.horizontal, 40)
+                        
+                        if let unlockedDate = achievement.unlockedDate {
+                            HStack(spacing: 12) {
+                                Image(systemName: "checkmark.circle.fill")
+                                    .font(.system(size: 32))
+                                    .foregroundColor(DesignTokens.Colors.iconGreen)
+                                
+                                Text(localizationProvider.localizedString(for: "achievements.unlocked") + " " + 
+                                     unlockedDate.formatted(date: .abbreviated, time: .omitted))
+                                .font(.system(size: 32, weight: .medium))
+                                .foregroundColor(DesignTokens.Colors.iconGreen)
+                            }
+                            .padding(.top, 16)
+                        }
+                    }
+                }
+                .padding(60)
+                .background(
+                    ZStack {
+                        // Прозрачная рамка с фиолетовым свечением (как на главном экране)
+                        RoundedRectangle(cornerRadius: 32)
+                            .fill(Color.white.opacity(0.05))
+                        
+                        RoundedRectangle(cornerRadius: 32)
+                            .stroke(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [
+                                        DesignTokens.Colors.iconPurpleLight.opacity(0.6),
+                                        DesignTokens.Colors.iconPurpleLight.opacity(0.3)
+                                    ]),
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                ),
+                                lineWidth: 3
+                            )
+                    }
+                )
+                .shadow(
+                    color: DesignTokens.Colors.iconPurpleLight.opacity(0.5),
+                    radius: 30,
+                    x: 0,
+                    y: 0
+                )
+                .padding(.horizontal, 80)
+                
+                Spacer()
+                
+                // Trophy icon at bottom - УВЕЛИЧЕН
+                HStack(spacing: 16) {
+                    Image(systemName: "trophy.fill")
+                        .font(.system(size: 40))
+                        .foregroundColor(achievement.color)
+                    
+                    Text("achievements.singular".localized)
+                        .font(.system(size: 40, weight: .semibold))
+                        .foregroundColor(.white.opacity(0.8))
+                }
+                .padding(.bottom, 80)
             }
-            .padding(.bottom, 60)
         }
-        .frame(width: 1000, height: 1200)
-        .background(
-            ZStack {
-                // Фон (белый)
-                RoundedRectangle(cornerRadius: 24)
-                    .fill(Color.white)
-                
-                // Обводка
-                RoundedRectangle(cornerRadius: 24)
-                    .stroke(achievement.color.opacity(0.3), lineWidth: 3)
-            }
-            .shadow(color: Color.black.opacity(0.1), radius: 20, x: 0, y: 10)
-        )
-        .padding(60)
+        .frame(width: 1080, height: 1920) // Instagram story size
+        .clipShape(RoundedRectangle(cornerRadius: 0))
     }
 }
 

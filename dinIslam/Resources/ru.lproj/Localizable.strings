@@ -255,6 +255,7 @@
 
 // Achievements
 "achievements.title" = "Достижения";
+"achievements.singular" = "Достижение";
 "achievements.unlocked" = "Разблокировано";
 "achievements.locked" = "Заблокировано";
 "achievements.progress" = "Прогресс";
