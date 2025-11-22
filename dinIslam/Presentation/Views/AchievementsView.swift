@@ -8,13 +8,21 @@
 import SwiftUI
 
 struct AchievementsView: View {
-    @Environment(\.achievementManager) private var achievementManager: AchievementManaging
+    @ObservedObject var achievementManager: AchievementManager
     @Environment(\.dismiss) private var dismiss
     @Environment(\.settingsManager) private var settingsManager
     @Environment(\.statsManager) private var statsManager: StatsManager
     @Environment(\.localizationProvider) private var localizationProvider
     @State private var showingResetAlert = false
     @State private var selectedAchievement: Achievement?
+    
+    init(achievementManager: AchievementManager? = nil) {
+        // Use the provided manager, or create a fallback (for previews)
+        _achievementManager = ObservedObject(wrappedValue: achievementManager ?? AchievementManager(
+            notificationManager: NotificationManager(),
+            localizationProvider: LocalizationManager()
+        ))
+    }
     
     private var backgroundGradient: some View {
         // Background - очень темный градиент с оттенками индиго/фиолетового (как на главном экране)
@@ -111,7 +119,7 @@ struct AchievementCard: View {
     let onTap: () -> Void
     @Environment(\.localizationProvider) private var localizationProvider
     @Environment(\.settingsManager) private var settingsManager
-    @Environment(\.achievementManager) private var achievementManager: AchievementManaging
+    @Environment(\.achievementManager) private var achievementManager: AchievementManager
     @Environment(\.statsManager) private var statsManager: StatsManager
     
     private var isUnlocked: Bool {
@@ -289,7 +297,7 @@ struct ExpandedAchievementCard: View {
                 
                 // Close Button - в стиле MinimalButton
                 MinimalButton(
-                    icon: "checkmark.circle",
+                    icon: "checkmark.square ",
                     title: localizationProvider.localizedString(for: "settings.done"),
                     foregroundColor: DesignTokens.Colors.textSecondary
                 ) {

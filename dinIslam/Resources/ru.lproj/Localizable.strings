@@ -283,7 +283,7 @@
 // Achievement Descriptions (Locked)
 "achievements.firstQuiz.description" = "Пройдите первую викторину";
 "achievements.perfectScore.description" = "Получите 100% в любой викторине";
-"achievements.speedRunner.description" = "Пройдите викторину менее чем за 2 минуты";
+"achievements.speedRunner.description" = "Пройдите викторину менее чем за 2 минуты с результатом 80%+";
 "achievements.scholar.description" = "Изучите 100 вопросов";
 "achievements.dedicated.description" = "Пройдите 10 викторин";
 "achievements.master.description" = "Пройдите 50 викторин";
@@ -295,7 +295,7 @@
 // Achievement Descriptions (Unlocked)
 "achievements.firstQuiz.description.unlocked" = "Вы прошли первую викторину";
 "achievements.perfectScore.description.unlocked" = "Вы получили 100% в викторине";
-"achievements.speedRunner.description.unlocked" = "Вы прошли викторину менее чем за 2 минуты";
+"achievements.speedRunner.description.unlocked" = "Вы прошли викторину менее чем за 2 минуты с результатом 80%+";
 "achievements.scholar.description.unlocked" = "Вы изучили 100 вопросов";
 "achievements.dedicated.description.unlocked" = "Вы прошли 10 викторин";
 "achievements.master.description.unlocked" = "Вы прошли 50 викторин";

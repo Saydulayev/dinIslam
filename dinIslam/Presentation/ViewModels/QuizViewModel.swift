@@ -132,7 +132,12 @@ class QuizViewModel {
         }
     }
     
-    convenience init(quizUseCase: QuizUseCaseProtocol, statsManager: StatsManager, settingsManager: SettingsManager) {
+    convenience init(
+        quizUseCase: QuizUseCaseProtocol,
+        statsManager: StatsManager,
+        settingsManager: SettingsManager,
+        achievementManager: AchievementManager
+    ) {
         // Create default services
         let hapticManager = HapticManager(settingsManager: settingsManager)
         let soundManager = SoundManager(settingsManager: settingsManager)
@@ -142,7 +147,7 @@ class QuizViewModel {
         )
         let statisticsRecorder = DefaultQuizStatisticsRecorder(statsManager: statsManager)
         let achievementChecker = DefaultQuizAchievementChecker(
-            achievementManager: AchievementManager(notificationManager: NotificationManager())
+            achievementManager: achievementManager
         )
         
         self.init(

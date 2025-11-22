@@ -45,6 +45,7 @@ enum StartRoute: Hashable {
 
 struct StartView: View {
     @State private var model: StartViewModel
+    @Environment(\.achievementManager) private var achievementManager
     
     init(model: StartViewModel) {
         _model = State(initialValue: model)
@@ -57,12 +58,14 @@ struct StartView: View {
         profileManager: ProfileManager,
         examUseCase: ExamUseCaseProtocol,
         examStatisticsManager: ExamStatisticsManager,
-        enhancedQuizUseCase: EnhancedQuizUseCaseProtocol
+        enhancedQuizUseCase: EnhancedQuizUseCaseProtocol,
+        achievementManager: AchievementManager
     ) {
         let quizViewModel = QuizViewModel(
             quizUseCase: quizUseCase,
             statsManager: statsManager,
-            settingsManager: settingsManager
+            settingsManager: settingsManager,
+            achievementManager: achievementManager
         )
         let questionsPreloading = DefaultQuestionsPreloadingService(
             enhancedQuizUseCase: enhancedQuizUseCase
@@ -87,12 +90,14 @@ struct StartView: View {
         profileManager: ProfileManager,
         examUseCase: ExamUseCaseProtocol,
         examStatisticsManager: ExamStatisticsManager,
-        enhancedContainer: EnhancedDIContainer
+        enhancedContainer: EnhancedDIContainer,
+        achievementManager: AchievementManager
     ) {
         let quizViewModel = QuizViewModel(
             quizUseCase: quizUseCase,
             statsManager: statsManager,
-            settingsManager: settingsManager
+            settingsManager: settingsManager,
+            achievementManager: achievementManager
         )
         let questionsPreloading = DefaultQuestionsPreloadingService(
             enhancedQuizUseCase: enhancedContainer.enhancedQuizUseCase
@@ -166,7 +171,7 @@ struct StartView: View {
                         }
                     )
                 case .achievements:
-                    AchievementsView()
+                    AchievementsView(achievementManager: achievementManager)
                 case .settings:
                     SettingsViewWithDependencies(settingsManager: model.settingsManager)
                 case .profile:
@@ -492,6 +497,11 @@ struct StartView: View {
         statsManager: statsManager,
         examStatisticsManager: examStatsManager
     )
+    let notificationManager = NotificationManager()
+    let achievementManager = AchievementManager(
+        notificationManager: notificationManager,
+        localizationProvider: LocalizationManager()
+    )
     let adaptiveStrategy = AdaptiveQuestionSelectionStrategy(adaptiveEngine: adaptiveEngine)
     let fallbackStrategy = FallbackQuestionSelectionStrategy()
     let questionPoolProgressManager = DefaultQuestionPoolProgressManager()
@@ -518,10 +528,12 @@ struct StartView: View {
         profileManager: profileManager,
         examUseCase: examUseCase,
         examStatisticsManager: examStatsManager,
-        enhancedQuizUseCase: enhancedDependencies.enhancedQuizUseCase
+        enhancedQuizUseCase: enhancedDependencies.enhancedQuizUseCase,
+        achievementManager: achievementManager
     )
     .environment(\.settingsManager, settingsManager)
     .environment(\.statsManager, statsManager)
     .environment(\.profileManager, profileManager)
+    .environment(\.achievementManager, achievementManager)
 }
 

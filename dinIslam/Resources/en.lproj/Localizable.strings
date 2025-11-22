@@ -274,7 +274,7 @@
 // Achievement Descriptions (Locked)
 "achievements.firstQuiz.description" = "Complete your first quiz";
 "achievements.perfectScore.description" = "Get 100% in any quiz";
-"achievements.speedRunner.description" = "Complete a quiz in under 2 minutes";
+"achievements.speedRunner.description" = "Complete a quiz in under 2 minutes with 80%+ score";
 "achievements.scholar.description" = "Study 100 questions";
 "achievements.dedicated.description" = "Complete 10 quizzes";
 "achievements.master.description" = "Complete 50 quizzes";
@@ -286,7 +286,7 @@
 // Achievement Descriptions (Unlocked)
 "achievements.firstQuiz.description.unlocked" = "You completed your first quiz";
 "achievements.perfectScore.description.unlocked" = "You got 100% in a quiz";
-"achievements.speedRunner.description.unlocked" = "You completed a quiz in under 2 minutes";
+"achievements.speedRunner.description.unlocked" = "You completed a quiz in under 2 minutes with 80%+ score";
 "achievements.scholar.description.unlocked" = "You studied 100 questions";
 "achievements.dedicated.description.unlocked" = "You completed 10 quizzes";
 "achievements.master.description.unlocked" = "You completed 50 quizzes";

@@ -25,7 +25,7 @@ private struct LocalizationProviderKey: EnvironmentKey {
 }
 
 private struct AchievementManagerKey: EnvironmentKey {
-    static let defaultValue: AchievementManaging? = nil
+    static let defaultValue: AchievementManager? = nil
 }
 
 private struct RemoteQuestionsServiceKey: EnvironmentKey {
@@ -46,7 +46,7 @@ extension EnvironmentValues {
         }
     }
     
-    var achievementManager: AchievementManaging {
+    var achievementManager: AchievementManager {
         get { 
             if let manager = self[AchievementManagerKey.self] {
                 return manager
@@ -159,7 +159,8 @@ struct dinIslamApp: App {
                 profileManager: dependencies.profileManager,
                 examUseCase: dependencies.examUseCase,
                 examStatisticsManager: dependencies.examStatisticsManager,
-                enhancedQuizUseCase: enhancedDependencies.enhancedQuizUseCase
+                enhancedQuizUseCase: enhancedDependencies.enhancedQuizUseCase,
+                achievementManager: dependencies.achievementManager
             )
             // Set achievementManager first to ensure it's available before any views access it
             .environment(\.achievementManager, dependencies.achievementManager)
