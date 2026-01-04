@@ -48,6 +48,7 @@
 "profile.sync.error.permission" = "Нет доступа к iCloud. Проверьте настройки";
 "profile.sync.error.auth" = "Ошибка авторизации. Войдите снова";
 "profile.sync.error.generic" = "Не удалось синхронизировать. Попробуйте позже";
+"profile.sync.retry" = "Повторить синхронизацию";
 "profile.sync.signin.required" = "Войдите в аккаунт для синхронизации прогресса на всех устройствах";
 "profile.signin.prompt.title" = "Синхронизация прогресса";
 "profile.signin.prompt.message" = "Войдите в аккаунт, чтобы сохранять прогресс на всех ваших устройствах и не потерять данные";

@@ -48,6 +48,7 @@
 "profile.sync.error.permission" = "No iCloud access. Check your settings";
 "profile.sync.error.auth" = "Authentication error. Please sign in again";
 "profile.sync.error.generic" = "Failed to sync. Please try again later";
+"profile.sync.retry" = "Retry Sync";
 "profile.sync.signin.required" = "Sign in to sync your progress across all devices";
 "profile.signin.prompt.title" = "Sync Your Progress";
 "profile.signin.prompt.message" = "Sign in to save your progress across all your devices and never lose your data";

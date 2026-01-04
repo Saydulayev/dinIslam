@@ -248,6 +248,10 @@ final class ProfileManager {
         localStore.saveProfile(profile)
         if isSignedIn {
             await performSync()
+            // Проверяем статус синхронизации после завершения
+            if case .failed(let message) = syncState {
+                AppLogger.warning("Failed to sync avatar update to CloudKit: \(message)", category: AppLogger.data)
+            }
         }
     }
 
@@ -256,6 +260,10 @@ final class ProfileManager {
         localStore.saveProfile(profile)
         if isSignedIn {
             await performSync()
+            // Проверяем статус синхронизации после завершения
+            if case .failed(let message) = syncState {
+                AppLogger.warning("Failed to sync avatar deletion to CloudKit: \(message)", category: AppLogger.data)
+            }
         }
     }
     
@@ -266,6 +274,10 @@ final class ProfileManager {
         localStore.saveProfile(profile)
         if isSignedIn {
             await performSync()
+            // Проверяем статус синхронизации после завершения
+            if case .failed(let message) = syncState {
+                AppLogger.warning("Failed to sync display name update to CloudKit: \(message)", category: AppLogger.data)
+            }
         }
     }
 
