@@ -162,6 +162,7 @@
 
 // Quiz Loading
 "quiz.loading" = "Загрузка...";
+"quiz.bankCompleted" = "Все вопросы уже изучены. Перейдите в режим повторения.";
 
 // Stats View - Pluralization Support
 "stats.title" = "Статистика";
@@ -511,3 +512,11 @@
 "start.loading" = "Загрузка...";
 "start.begin" = "Начать викторину";
 "start.examMode" = "Режим экзамена";
+
+// Bank Completion
+"bank.completion.title" = "Все вопросы изучены!";
+"bank.completion.subtitle" = "Поздравляем! Вы прошли весь банк вопросов.";
+"bank.completion.questionsCompleted" = "Вопросов изучено";
+"bank.completion.startOver" = "Начать заново";
+"bank.completion.review" = "Повторение";
+"bank.completion.bankCompleted" = "Банк завершён";

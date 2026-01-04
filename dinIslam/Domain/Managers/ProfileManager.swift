@@ -219,6 +219,11 @@ final class ProfileManager {
         localStore.deleteAvatar(for: profileId)
         progressService.rebuildProgressFromLocalStats(profile: &profile)
         localStore.saveProfile(profile)
+        
+        // Очищаем прогресс изучения вопросов (usedIds)
+        let questionPoolProgressManager = DefaultQuestionPoolProgressManager()
+        questionPoolProgressManager.reset(version: 1)
+        questionPoolProgressManager.setReviewMode(false, version: 1)
 
         if isSignedIn {
             do {

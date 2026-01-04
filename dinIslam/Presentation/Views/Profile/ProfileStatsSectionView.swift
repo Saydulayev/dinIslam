@@ -11,6 +11,9 @@ struct ProfileStatsSectionView: View {
     @Bindable var manager: ProfileManager
     @Bindable var statsManager: StatsManager
     let totalQuestionsCount: Int
+    let isResettingProfile: Bool
+    let statsRefreshTrigger: Int
+    @State private var studiedCount: Int = 0
     
     var body: some View {
         VStack(alignment: .leading, spacing: DesignTokens.Spacing.xxl) {
@@ -28,7 +31,7 @@ struct ProfileStatsSectionView: View {
                 // Questions Studied
                 ProgressCardView(
                     icon: "questionmark.circle",
-                    value: "\(manager.isSignedIn ? manager.progress.totalQuestionsAnswered : statsManager.stats.totalQuestionsStudied)",
+                    value: "\(studiedCount) / \(totalQuestionsCount)",
                     label: manager.isSignedIn ? "profile.progress.questions".localized : "stats.questionsStudied.title".localized,
                     iconColor: DesignTokens.Colors.iconBlue,
                     backgroundColor: DesignTokens.Colors.iconBlue.opacity(0.2)
@@ -185,6 +188,28 @@ struct ProfileStatsSectionView: View {
                     y: 0
                 )
         )
+        .onAppear {
+            loadProgressStats()
+        }
+        .onChange(of: totalQuestionsCount) { _, _ in
+            loadProgressStats()
+        }
+        .onChange(of: isResettingProfile) { _, newValue in
+            // Когда сброс завершён (isResettingProfile становится false), обновляем статистику
+            if !newValue {
+                loadProgressStats()
+            }
+        }
+        .onChange(of: statsRefreshTrigger) { _, _ in
+            // Обновляем статистику при изменении триггера (например, после сброса для неавторизованных)
+            loadProgressStats()
+        }
+    }
+    
+    private func loadProgressStats() {
+        let manager = DefaultQuestionPoolProgressManager()
+        let stats = manager.getProgressStats(total: totalQuestionsCount, version: 1)
+        studiedCount = stats.used
     }
 }
 

@@ -12,5 +12,10 @@ protocol QuestionPoolProgressManaging {
     func markUsed(_ questionIds: [String], version: Int)
     func reset(version: Int)
     func getProgressStats(total: Int, version: Int) -> (used: Int, remaining: Int)
+    
+    // Режимы изучения
+    func isReviewMode(version: Int) -> Bool
+    func setReviewMode(_ enabled: Bool, version: Int)
+    func isBankCompleted(total: Int, version: Int) -> Bool
 }
 

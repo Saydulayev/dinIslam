@@ -11,6 +11,7 @@ struct DefaultQuestionPoolProgressManager: QuestionPoolProgressManaging {
     private let userDefaults: UserDefaults
     private let versionKey = "QuestionPool.version"
     private let usedIdsKey = "QuestionPool.usedIds"
+    private let reviewModeKey = "QuestionPool.reviewMode"
     
     init(userDefaults: UserDefaults = .standard) {
         self.userDefaults = userDefaults
@@ -34,6 +35,7 @@ struct DefaultQuestionPoolProgressManager: QuestionPoolProgressManaging {
     func reset(version: Int) {
         userDefaults.set(version, forKey: versionKey)
         userDefaults.set([], forKey: usedIdsKey)
+        userDefaults.set(false, forKey: reviewModeKey)
     }
     
     func getProgressStats(total: Int, version: Int) -> (used: Int, remaining: Int) {
@@ -41,6 +43,21 @@ struct DefaultQuestionPoolProgressManager: QuestionPoolProgressManaging {
         let usedCount = usedIds.count
         let remainingCount = max(0, total - usedCount)
         return (used: usedCount, remaining: remainingCount)
+    }
+    
+    func isReviewMode(version: Int) -> Bool {
+        ensureVersion(version)
+        return userDefaults.bool(forKey: reviewModeKey)
+    }
+    
+    func setReviewMode(_ enabled: Bool, version: Int) {
+        ensureVersion(version)
+        userDefaults.set(enabled, forKey: reviewModeKey)
+    }
+    
+    func isBankCompleted(total: Int, version: Int) -> Bool {
+        let usedIds = getUsedIds(version: version)
+        return usedIds.count >= total
     }
     
     private func ensureVersion(_ currentVersion: Int) {

@@ -33,6 +33,7 @@ final class StartViewModel {
 
     private let examUseCase: ExamUseCaseProtocol
     private let examStatisticsManager: ExamStatisticsManager
+    @ObservationIgnored private let enhancedQuizUseCase: (any EnhancedQuizUseCaseProtocol)?
     
     // Services via protocols
     @ObservationIgnored private let navigationCoordinator: StartNavigationCoordinating
@@ -76,6 +77,7 @@ final class StartViewModel {
         examUseCase: ExamUseCaseProtocol,
         examStatisticsManager: ExamStatisticsManager,
         questionsPreloading: QuestionsPreloading,
+        enhancedQuizUseCase: (any EnhancedQuizUseCaseProtocol)? = nil,
         navigationCoordinator: StartNavigationCoordinating? = nil,
         visualEffectsManager: StartVisualEffectsManaging? = nil,
         lifecycleManager: StartLifecycleManaging? = nil,
@@ -87,6 +89,7 @@ final class StartViewModel {
         self.profileManager = profileManager
         self.examUseCase = examUseCase
         self.examStatisticsManager = examStatisticsManager
+        self.enhancedQuizUseCase = enhancedQuizUseCase
         
         // Initialize services with default implementations if not provided
         let resolvedNavigationCoordinator = navigationCoordinator ?? DefaultStartNavigationCoordinator()
@@ -126,7 +129,8 @@ final class StartViewModel {
             profileManager: profileManager,
             examUseCase: examUseCase,
             examStatisticsManager: examStatisticsManager,
-            questionsPreloading: questionsPreloading
+            questionsPreloading: questionsPreloading,
+            enhancedQuizUseCase: enhancedContainer.enhancedQuizUseCase
         )
     }
     
@@ -176,12 +180,41 @@ final class StartViewModel {
         navigationCoordinator.resetNavigation()
         navigationPath = navigationCoordinator.navigationPath
         startQuizTask?.cancel()
-        navigationCoordinator.showQuiz()
-        navigationPath = navigationCoordinator.navigationPath
         startQuizTask = Task { [weak self, cachedLanguageCode] in
             guard let self = self else { return }
+            
+            // Проверяем завершение банка через enhancedQuizUseCase или quizUseCase
+            if let enhancedUseCase = self.enhancedQuizUseCase {
+                do {
+                    let completionInfo = try await enhancedUseCase.isBankCompleted(language: cachedLanguageCode)
+                    let isReviewMode = await self.isReviewMode()
+                    
+                    if completionInfo.isCompleted && !isReviewMode {
+                        // Показываем экран завершения
+                        await MainActor.run {
+                            self.navigationCoordinator.showBankCompletion(totalQuestions: completionInfo.totalQuestions)
+                            self.navigationPath = self.navigationCoordinator.navigationPath
+                        }
+                        return
+                    }
+                } catch {
+                    // В случае ошибки продолжаем с обычной логикой
+                }
+            }
+            
+            // Обычный запуск викторины
+            await MainActor.run {
+                self.navigationCoordinator.showQuiz()
+                self.navigationPath = self.navigationCoordinator.navigationPath
+            }
             await self.quizViewModel.startQuiz(language: cachedLanguageCode)
         }
+    }
+    
+    private func isReviewMode() async -> Bool {
+        // Получаем доступ к questionPoolProgressManager через DefaultQuestionPoolProgressManager
+        let manager = DefaultQuestionPoolProgressManager()
+        return manager.isReviewMode(version: 1)
     }
 
     func resetQuiz() {
@@ -239,6 +272,18 @@ final class StartViewModel {
     func showProfile() {
         navigationCoordinator.showProfile()
         navigationPath = navigationCoordinator.navigationPath
+    }
+    
+    // MARK: - Bank Completion Actions
+    func resetQuestionPool() {
+        let manager = DefaultQuestionPoolProgressManager()
+        manager.reset(version: 1)
+        manager.setReviewMode(false, version: 1)
+    }
+    
+    func enableReviewMode() {
+        let manager = DefaultQuestionPoolProgressManager()
+        manager.setReviewMode(true, version: 1)
     }
 
     // MARK: - Particles & Animations

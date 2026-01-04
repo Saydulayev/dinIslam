@@ -18,6 +18,7 @@ enum StartRoute: Hashable {
     case settings
     case profile
     case exam
+    case bankCompletion(totalQuestions: Int)
     
     struct ResultSnapshot: Hashable {
         let totalQuestions: Int
@@ -78,7 +79,8 @@ struct StartView: View {
                 profileManager: profileManager,
                 examUseCase: examUseCase,
                 examStatisticsManager: examStatisticsManager,
-                questionsPreloading: questionsPreloading
+                questionsPreloading: questionsPreloading,
+                enhancedQuizUseCase: enhancedQuizUseCase
             )
         )
     }
@@ -110,7 +112,8 @@ struct StartView: View {
                 profileManager: profileManager,
                 examUseCase: examUseCase,
                 examStatisticsManager: examStatisticsManager,
-                questionsPreloading: questionsPreloading
+                questionsPreloading: questionsPreloading,
+                enhancedQuizUseCase: enhancedContainer.enhancedQuizUseCase
             )
         )
     }
@@ -182,6 +185,19 @@ struct StartView: View {
                             model.finishExamSession()
                         }
                     }
+                case .bankCompletion(let totalQuestions):
+                    BankCompletionView(
+                        totalQuestions: totalQuestions,
+                        onStartOver: {
+                            model.resetQuestionPool()
+                            model.resetQuiz()
+                        },
+                        onStartReview: {
+                            model.enableReviewMode()
+                            model.resetQuiz()
+                            model.startQuiz()
+                        }
+                    )
                 }
             }
             .sheet(isPresented: bindingModel.showingExamSettings) {

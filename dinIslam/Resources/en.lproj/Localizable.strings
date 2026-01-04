@@ -161,6 +161,7 @@
 
 // Quiz Loading
 "quiz.loading" = "Loading...";
+"quiz.bankCompleted" = "All questions have been studied. Switch to review mode.";
 
 // Stats View - Pluralization Support
 "stats.title" = "Statistics";
@@ -495,3 +496,11 @@
 "start.loading" = "Loading...";
 "start.begin" = "Start Quiz";
 "start.examMode" = "Exam Mode";
+
+// Bank Completion
+"bank.completion.title" = "All Questions Studied!";
+"bank.completion.subtitle" = "Congratulations! You've completed the entire question bank.";
+"bank.completion.questionsCompleted" = "Questions Completed";
+"bank.completion.startOver" = "Start Over";
+"bank.completion.review" = "Review";
+"bank.completion.bankCompleted" = "Bank Completed";

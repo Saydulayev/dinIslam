@@ -21,6 +21,7 @@ struct UnifiedProfileView: View {
     @State private var showingMistakesReview = false
     @State private var totalQuestionsCount: Int = 0
     @State private var showingResetAlert = false
+    @State private var statsRefreshTrigger: Int = 0
     @State private var isEditingDisplayName = false
     @State private var editingDisplayName = ""
     @State private var showingMistakesError = false
@@ -66,7 +67,9 @@ struct UnifiedProfileView: View {
                     ProfileStatsSectionView(
                         manager: manager,
                         statsManager: statsManager,
-                        totalQuestionsCount: totalQuestionsCount
+                        totalQuestionsCount: totalQuestionsCount,
+                        isResettingProfile: isResettingProfile,
+                        statsRefreshTrigger: statsRefreshTrigger
                     )
                     
                     // Wrong Questions Section
@@ -133,6 +136,8 @@ struct UnifiedProfileView: View {
                     isResettingProfile = true
                     await manager.resetProfileData()
                     isResettingProfile = false
+                    // Триггерим обновление статистики после сброса
+                    statsRefreshTrigger += 1
                 }
             }
             Button("profile.sync.reset.cancel".localized, role: .cancel) { }
@@ -148,7 +153,13 @@ struct UnifiedProfileView: View {
             }
             Button("stats.reset.confirm.ok".localized, role: .destructive) {
                 statsManager.resetStatsExceptTotalQuestions()
+                // Очищаем прогресс изучения вопросов (usedIds)
+                let questionPoolProgressManager = DefaultQuestionPoolProgressManager()
+                questionPoolProgressManager.reset(version: 1)
+                questionPoolProgressManager.setReviewMode(false, version: 1)
                 showingResetAlert = false
+                // Триггерим обновление статистики
+                statsRefreshTrigger += 1
             }
         } message: {
             Text("stats.reset.confirm.message".localized)
