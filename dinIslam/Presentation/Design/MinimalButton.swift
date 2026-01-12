@@ -2,7 +2,7 @@
 //  MinimalButton.swift
 //  dinIslam
 //
-//  Created by GPT-5 Codex on 13.11.25.
+//  Created by Saydulayev on 12.01.26.
 //
 
 import SwiftUI
