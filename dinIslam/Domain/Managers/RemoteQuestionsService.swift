@@ -123,7 +123,19 @@ class RemoteQuestionsService: ObservableObject {
         }
         #endif
         
-        return remoteQuestions.map { $0.toQuestion() }
+        let questions = remoteQuestions.map { $0.toQuestion() }
+        
+        // Validate questions before returning
+        let validator = QuestionValidator()
+        do {
+            try validator.validate(questions)
+            AppLogger.info("RemoteQuestionsService: All \(questions.count) questions validated successfully", category: AppLogger.network)
+        } catch let validationError as ValidationError {
+            AppLogger.error("RemoteQuestionsService: Validation failed", error: validationError, category: AppLogger.network)
+            throw RemoteQuestionsError.decodingError
+        }
+        
+        return questions
     }
     
     private func cacheQuestions(_ questions: [Question], for language: AppLanguage) async {
@@ -158,6 +170,17 @@ class RemoteQuestionsService: ObservableObject {
             return []
         }
         
+        // Validate local questions
+        let validator = QuestionValidator()
+        do {
+            try validator.validate(questions)
+            AppLogger.info("RemoteQuestionsService: Local questions validated successfully (\(questions.count) questions)", category: AppLogger.data)
+        } catch {
+            AppLogger.error("RemoteQuestionsService: Local questions validation failed", error: error, category: AppLogger.data)
+            // Return empty array if local questions are invalid
+            return []
+        }
+        
         return questions
     }
     // MARK: - Update Check Methods
@@ -185,7 +208,8 @@ class RemoteQuestionsService: ObservableObject {
             await MainActor.run {
                 remoteQuestionsCount = remoteCount
                 cachedQuestionsCount = cachedCount
-                hasUpdates = remoteCount > cachedCount
+                // Use != instead of > to detect both additions and content changes
+                hasUpdates = remoteCount != cachedCount
                 
                 AppLogger.info("Update check: Remote=\(remoteCount), Cached=\(cachedCount), HasUpdates=\(hasUpdates)", category: AppLogger.network)
             }

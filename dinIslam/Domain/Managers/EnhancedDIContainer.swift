@@ -306,6 +306,11 @@ protocol EnhancedQuizUseCaseProtocol {
     func clearCache() async
     func isBankCompleted(language: String) async throws -> (isCompleted: Bool, totalQuestions: Int, studiedCount: Int)
     func markQuestionsUsed(_ questionIds: [String])
+    
+    // Update checking
+    func checkForUpdates(language: String) async
+    func hasUpdates() -> Bool
+    func forceSync(language: String) async -> [Question]
 }
 
 // MARK: - Enhanced Quiz Use Case
@@ -333,9 +338,13 @@ class EnhancedQuizUseCase: EnhancedQuizUseCaseProtocol {
     
     func startQuiz(language: String) async throws -> [Question] {
         let allQuestions = try await questionsRepository.loadQuestions(language: language)
+        let currentQuestionIds = Set(allQuestions.map { $0.id })
         let used = questionPoolProgressManager.getUsedIds(version: questionPoolVersion)
         let isReviewMode = questionPoolProgressManager.isReviewMode(version: questionPoolVersion)
-        let isCompleted = questionPoolProgressManager.isBankCompleted(total: allQuestions.count, version: questionPoolVersion)
+        let isCompleted = questionPoolProgressManager.isBankCompleted(
+            currentQuestionIds: currentQuestionIds,
+            version: questionPoolVersion
+        )
         
         // Если банк завершён и не в режиме повторения, возвращаем пустой массив (показываем экран завершения)
         if isCompleted && !isReviewMode {
@@ -457,14 +466,34 @@ class EnhancedQuizUseCase: EnhancedQuizUseCaseProtocol {
     
     func isBankCompleted(language: String) async throws -> (isCompleted: Bool, totalQuestions: Int, studiedCount: Int) {
         let allQuestions = try await questionsRepository.loadQuestions(language: language)
+        let currentQuestionIds = Set(allQuestions.map { $0.id })
         let totalQuestions = allQuestions.count
-        let isCompleted = questionPoolProgressManager.isBankCompleted(total: totalQuestions, version: questionPoolVersion)
-        let stats = questionPoolProgressManager.getProgressStats(total: totalQuestions, version: questionPoolVersion)
+        let isCompleted = questionPoolProgressManager.isBankCompleted(
+            currentQuestionIds: currentQuestionIds,
+            version: questionPoolVersion
+        )
+        let stats = questionPoolProgressManager.getProgressStats(
+            total: totalQuestions,
+            currentQuestionIds: currentQuestionIds,
+            version: questionPoolVersion
+        )
         
         return (
             isCompleted: isCompleted,
             totalQuestions: totalQuestions,
             studiedCount: stats.used
         )
+    }
+    
+    func checkForUpdates(language: String) async {
+        await questionsRepository.checkForUpdates(language: language)
+    }
+    
+    func hasUpdates() -> Bool {
+        return questionsRepository.hasUpdates()
+    }
+    
+    func forceSync(language: String) async -> [Question] {
+        return await questionsRepository.forceSync(language: language)
     }
 }

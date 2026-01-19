@@ -16,6 +16,7 @@
 		C275F25A2EBFD775002BEE44 /* dinIslam.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = dinIslam.xcodeproj; sourceTree = "<group>"; };
 		C28FBDDF2EC681DE0075C1DC /* dinIslam.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = dinIslam.xcodeproj; sourceTree = "<group>"; };
 		C2B4017E2EC634070063FCCE /* dinIslam.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = dinIslam.xcodeproj; sourceTree = "<group>"; };
+		C2BAD0952F1E6FCE00DBB8A9 /* dinIslam.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = dinIslam.xcodeproj; sourceTree = "<group>"; };
 		C2D3B6042EC0B407009AA1DD /* dinIslam.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = dinIslam.xcodeproj; sourceTree = "<group>"; };
 		C2E892FA2ED0F5F7003AFF44 /* dinIslam.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = dinIslam.xcodeproj; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -108,6 +109,11 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		C2BAD0982F1E6FCE00DBB8A9 /* Products */ = {
+			isa = PBXGroup;
+			name = Products;
+			sourceTree = "<group>";
+		};
 		C2D3B6062EC0B407009AA1DD /* Products */ = {
 			isa = PBXGroup;
 			name = Products;
@@ -195,6 +201,10 @@
 				{
 					ProductGroup = C20EB7D42EC89DC700C1BC2F /* Products */;
 					ProjectRef = C20EB7D12EC89DC700C1BC2F /* dinIslam.xcodeproj */;
+				},
+				{
+					ProductGroup = C2BAD0982F1E6FCE00DBB8A9 /* Products */;
+					ProjectRef = C2BAD0952F1E6FCE00DBB8A9 /* dinIslam.xcodeproj */;
 				},
 				{
 					ProductGroup = C2E892FD2ED0F5F7003AFF44 /* Products */;

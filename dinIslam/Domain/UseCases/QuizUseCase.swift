@@ -40,9 +40,13 @@ class QuizUseCase: QuizUseCaseProtocol {
     
     func startQuiz(language: String) async throws -> [Question] {
         let allQuestions = try await questionsRepository.loadQuestions(language: language)
+        let currentQuestionIds = Set(allQuestions.map { $0.id })
         let used = questionPoolProgressManager.getUsedIds(version: questionPoolVersion)
         let isReviewMode = questionPoolProgressManager.isReviewMode(version: questionPoolVersion)
-        let isCompleted = questionPoolProgressManager.isBankCompleted(total: allQuestions.count, version: questionPoolVersion)
+        let isCompleted = questionPoolProgressManager.isBankCompleted(
+            currentQuestionIds: currentQuestionIds,
+            version: questionPoolVersion
+        )
         
         // Если банк завершён и не в режиме повторения, возвращаем пустой массив (показываем экран завершения)
         if isCompleted && !isReviewMode {
@@ -152,8 +156,10 @@ class QuizUseCase: QuizUseCaseProtocol {
     
     func getProgressStats(language: String) async throws -> (total: Int, used: Int, remaining: Int) {
         let allQuestions = try await questionsRepository.loadQuestions(language: language)
+        let currentQuestionIds = Set(allQuestions.map { $0.id })
         let stats = questionPoolProgressManager.getProgressStats(
             total: allQuestions.count,
+            currentQuestionIds: currentQuestionIds,
             version: questionPoolVersion
         )
         
@@ -166,9 +172,17 @@ class QuizUseCase: QuizUseCaseProtocol {
     
     func isBankCompleted(language: String) async throws -> (isCompleted: Bool, totalQuestions: Int, studiedCount: Int) {
         let allQuestions = try await questionsRepository.loadQuestions(language: language)
+        let currentQuestionIds = Set(allQuestions.map { $0.id })
         let totalQuestions = allQuestions.count
-        let isCompleted = questionPoolProgressManager.isBankCompleted(total: totalQuestions, version: questionPoolVersion)
-        let stats = questionPoolProgressManager.getProgressStats(total: totalQuestions, version: questionPoolVersion)
+        let isCompleted = questionPoolProgressManager.isBankCompleted(
+            currentQuestionIds: currentQuestionIds,
+            version: questionPoolVersion
+        )
+        let stats = questionPoolProgressManager.getProgressStats(
+            total: totalQuestions,
+            currentQuestionIds: currentQuestionIds,
+            version: questionPoolVersion
+        )
         
         return (
             isCompleted: isCompleted,

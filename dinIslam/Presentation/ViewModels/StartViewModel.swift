@@ -147,6 +147,22 @@ final class StartViewModel {
         )
         visualEffectsManager.startGlowAnimationIfNeeded()
         visualEffectsManager.createParticlesIfNeeded()
+        
+        // Keep question bank up to date with a lightweight ETag revalidation.
+        Task { [weak self] in
+            guard let self = self, let enhancedUseCase = self.enhancedQuizUseCase else { return }
+            
+            // Avoid spamming the network if StartView appears frequently.
+            let minimumInterval: TimeInterval = 5 * 60
+            let cacheStatus = enhancedUseCase.getCacheStatus()
+            if let lastUpdate = cacheStatus.lastUpdate,
+               Date().timeIntervalSince(lastUpdate) < minimumInterval {
+                return
+            }
+            
+            AppLogger.info("Revalidating question bank…", category: AppLogger.network)
+            _ = await enhancedUseCase.forceSync(language: self.cachedLanguageCode)
+        }
     }
 
     func onDisappear() {
@@ -300,4 +316,3 @@ final class StartViewModel {
         settingsManager.settings.language.locale?.language.languageCode?.identifier ?? "ru"
     }
 }
-

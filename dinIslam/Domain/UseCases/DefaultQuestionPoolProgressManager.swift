@@ -38,12 +38,39 @@ struct DefaultQuestionPoolProgressManager: QuestionPoolProgressManaging {
         userDefaults.set(false, forKey: reviewModeKey)
     }
     
+    // MARK: - Legacy Progress Methods (without intersection)
+    
     func getProgressStats(total: Int, version: Int) -> (used: Int, remaining: Int) {
         let usedIds = getUsedIds(version: version)
         let usedCount = usedIds.count
         let remainingCount = max(0, total - usedCount)
         return (used: usedCount, remaining: remainingCount)
     }
+    
+    func isBankCompleted(total: Int, version: Int) -> Bool {
+        let usedIds = getUsedIds(version: version)
+        return usedIds.count >= total
+    }
+    
+    // MARK: - New Progress Methods (with intersection)
+    
+    func getProgressStats(total: Int, currentQuestionIds: Set<String>, version: Int) -> (used: Int, remaining: Int) {
+        let usedIds = getUsedIds(version: version)
+        // Calculate intersection: only count usedIds that actually exist in current question bank
+        let actuallyUsed = usedIds.intersection(currentQuestionIds)
+        let usedCount = actuallyUsed.count
+        let remainingCount = max(0, total - usedCount)
+        return (used: usedCount, remaining: remainingCount)
+    }
+    
+    func isBankCompleted(currentQuestionIds: Set<String>, version: Int) -> Bool {
+        let usedIds = getUsedIds(version: version)
+        // Calculate intersection: only count usedIds that actually exist in current question bank
+        let actuallyUsed = usedIds.intersection(currentQuestionIds)
+        return actuallyUsed.count >= currentQuestionIds.count
+    }
+    
+    // MARK: - Review Mode
     
     func isReviewMode(version: Int) -> Bool {
         ensureVersion(version)
@@ -53,11 +80,6 @@ struct DefaultQuestionPoolProgressManager: QuestionPoolProgressManaging {
     func setReviewMode(_ enabled: Bool, version: Int) {
         ensureVersion(version)
         userDefaults.set(enabled, forKey: reviewModeKey)
-    }
-    
-    func isBankCompleted(total: Int, version: Int) -> Bool {
-        let usedIds = getUsedIds(version: version)
-        return usedIds.count >= total
     }
     
     private func ensureVersion(_ currentVersion: Int) {

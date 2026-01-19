@@ -15,6 +15,11 @@ protocol EnhancedQuestionsRepositoryProtocol {
     func preloadQuestions(for languages: [String]) async
     func clearCache() async
     func getCacheStatus() -> CacheStatus
+    
+    // Update checking
+    func checkForUpdates(language: String) async
+    func hasUpdates() -> Bool
+    func forceSync(language: String) async -> [Question]
 }
 
 // MARK: - Cache Status
@@ -92,7 +97,7 @@ class EnhancedQuestionsRepository: EnhancedQuestionsRepositoryProtocol {
         let cacheSize = cacheInfo.size
         
         // Check if cache is expired (simplified check)
-        let isExpired = lastUpdate?.timeIntervalSinceNow ?? 0 < -24 * 60 * 60 // 24 hours
+        let isExpired = lastUpdate?.timeIntervalSinceNow ?? 0 < -6 * 60 * 60 // 6 hours
         
         return CacheStatus(
             hasCachedData: hasCachedData,
@@ -100,6 +105,20 @@ class EnhancedQuestionsRepository: EnhancedQuestionsRepositoryProtocol {
             cacheSize: cacheSize,
             isExpired: isExpired
         )
+    }
+    
+    func checkForUpdates(language: String) async {
+        let appLanguage: AppLanguage = language == "en" ? .english : .russian
+        await remoteService.checkForUpdates(for: appLanguage)
+    }
+    
+    func hasUpdates() -> Bool {
+        return remoteService.hasUpdates
+    }
+    
+    func forceSync(language: String) async -> [Question] {
+        let appLanguage: AppLanguage = language == "en" ? .english : .russian
+        return await remoteService.forceSync(for: appLanguage)
     }
     
     private func loadLocalQuestions(language: String) throws -> [Question] {
