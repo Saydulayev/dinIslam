@@ -371,7 +371,7 @@
 "privacy.usage.title" = "Data Usage";
 "privacy.usage.content" = "Collected information is used for:\n\n• Displaying your learning progress\n• Personalizing the learning experience\n• Improving app functionality\n• Sending notifications (if enabled)";
 "privacy.storage.title" = "Data Storage";
-"privacy.storage.content" = "All data is stored locally on your device. We do not share your data with third parties and do not use cloud services for storing personal information.";
+"privacy.storage.content" = "Data is stored locally on your device. When signed in with Sign in with Apple, your learning statistics sync via iCloud (Apple CloudKit) for access across devices. We do not share your data with third-party companies.";
 "privacy.thirdParty.title" = "Third Party Services";
 "privacy.thirdParty.content" = "The app may use the following third-party services:\n\n• App Store (for app updates)\n• iOS system notifications\n\nThese services have their own privacy policies.";
 "privacy.rights.title" = "Your Rights";

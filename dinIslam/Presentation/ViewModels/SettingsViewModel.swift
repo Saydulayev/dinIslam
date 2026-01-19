@@ -101,7 +101,7 @@ class SettingsViewModel {
     func openAppStore() {
         hapticManager.selectionChanged()
         
-        if let url = URL(string: "https://apps.apple.com/app/dinislam-quiz/id1234567890") {
+        if let url = URL(string: "https://apps.apple.com/app/id6754708587") {
             UIApplication.shared.open(url)
         }
     }
@@ -122,7 +122,7 @@ class SettingsViewModel {
         let activityViewController = UIActivityViewController(
             activityItems: [
                 NSLocalizedString("settings.share.text", comment: "Share text"),
-                URL(string: "https://apps.apple.com/app/dinislam-quiz/id1234567890")!
+                URL(string: "https://apps.apple.com/app/id6754708587")!
             ],
             applicationActivities: nil
         )

@@ -4,8 +4,6 @@
 <dict>
 	<key>CloudKitContainerIdentifier</key>
 	<string>iCloud.com.saydulayev.wien.swiftdataproject</string>
-	<key>NSContactsUsageDescription</key>
-	<string>We use contacts access to update your profile information.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Your profile photo is selected from your photo library.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>

@@ -33,8 +33,8 @@ class CacheManager {
         self.configuration = configuration
         
         // Create cache directory
-        let documentsPath = fileManager.urls(for: .documentDirectory, in: .userDomainMask)[0]
-        cacheDirectory = documentsPath.appendingPathComponent("QuestionsCache")
+        let cachesPath = fileManager.urls(for: .cachesDirectory, in: .userDomainMask)[0]
+        cacheDirectory = cachesPath.appendingPathComponent("QuestionsCache")
         
         try? fileManager.createDirectory(at: cacheDirectory, withIntermediateDirectories: true)
     }
