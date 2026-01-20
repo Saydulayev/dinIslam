@@ -60,7 +60,7 @@
 
 // Start View
 "app.name" = "Tabiin Academy";
-"start.description" = "Знание – прежде слов и деяний!";
+"start.description" = "Знание – прежде слов и дел!";
 "start.begin" = "Начать изучение";
 "start.loading" = "Загрузка...";
 "start.bestScore" = "Лучший результат";
