@@ -8,5 +8,7 @@
 	<string>Your profile photo is selected from your photo library.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>We may save your profile photo to your photo library.</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 </dict>
 </plist>
