@@ -6,72 +6,115 @@
   <title>Privacy Policy — Tabiin Academy</title>
   <style>
     * { box-sizing: border-box; }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding: 1.5rem; max-width: 42rem; margin-left: auto; margin-right: auto; line-height: 1.65; color: #1a1a1a; background: #fff; }
-    a { color: #2563eb; }
-    a:hover { text-decoration: none; }
-    h1 { font-size: 1.75rem; margin-bottom: 0.25rem; }
-    .updated { font-size: 0.9rem; color: #64748b; margin-bottom: 2rem; }
-    h2 { font-size: 1.15rem; margin-top: 1.75rem; margin-bottom: 0.5rem; }
-    p, ul { margin: 0 0 1rem; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(180deg, #0a0a1a 0%, #000000 100%);
+      color: #fff;
+      padding: 24px;
+      line-height: 1.6;
+    }
+    .wrap { max-width: 480px; margin: 0 auto; }
+    nav { margin-bottom: 24px; }
+    nav a {
+      font-size: 14px; font-weight: 500; color: #a78bfa; text-decoration: none;
+    }
+    nav a:hover { text-decoration: underline; }
+    h1 { font-size: 20px; font-weight: 600; margin: 0 0 4px; }
+    .updated { font-size: 12px; color: #9ca3af; margin-bottom: 32px; }
+    .section {
+      padding: 24px;
+      margin-bottom: 20px;
+      border-radius: 16px;
+      border: 1.5px solid rgba(167, 139, 250, 0.35);
+      background: rgba(38, 38, 38, 0.4);
+      box-shadow: 0 0 12px rgba(167, 139, 250, 0.12);
+    }
+    h2 { font-size: 18px; font-weight: 600; margin: 0 0 12px; color: #fff; }
+    p, ul { margin: 0 0 12px; font-size: 16px; color: #9ca3af; }
     ul { padding-left: 1.5rem; }
+    .section p:last-child { margin-bottom: 0; }
+    a { color: #60a5fa; }
+    a:hover { text-decoration: none; }
+    .back { margin-top: 32px; }
+    .back a { color: #a78bfa; }
   </style>
 </head>
 <body>
-  <nav><a href="index.html">← Language</a></nav>
+  <div class="wrap">
+    <nav><a href="index.html">← Language</a></nav>
 
-  <h1>Privacy Policy</h1>
-  <p class="updated">Last updated: October 20, 2025</p>
+    <h1>Privacy Policy</h1>
+    <p class="updated">Last updated: October 20, 2025</p>
 
-  <h2>Introduction</h2>
-  <p>Tabiin Academy respects your privacy and is committed to protecting your personal data. This privacy policy explains how we collect, use, and protect your information when using our app.</p>
+    <section class="section">
+      <h2>Introduction</h2>
+      <p>Tabiin Academy respects your privacy and is committed to protecting your personal data. This privacy policy explains how we collect, use, and protect your information when using our app.</p>
+    </section>
 
-  <h2>Information Collection</h2>
-  <p>We collect only the minimum necessary information for app functionality:</p>
-  <ul>
-    <li>Learning statistics (number of questions answered, correct and incorrect answers)</li>
-    <li>App settings (language, sound, notifications)</li>
-    <li>Achievement and progress data</li>
-  </ul>
-  <p>We do <strong>not</strong> collect personal information such as name, email, or phone number. If you use Sign in with Apple, the app receives only an anonymous identifier to sync data across your devices.</p>
-  <p>When you add a profile photo, the app accesses your photo library only with your permission; we do not upload these images to our servers — they are stored on your device and in your iCloud if sync is enabled.</p>
+    <section class="section">
+      <h2>Information Collection</h2>
+      <p>We collect only the minimum necessary information for app functionality:</p>
+      <ul>
+        <li>Learning statistics (number of questions answered, correct and incorrect answers)</li>
+        <li>App settings (language, sound, notifications)</li>
+        <li>Achievement and progress data</li>
+      </ul>
+      <p>We do <strong>not</strong> collect personal information such as name, email, or phone number. If you use Sign in with Apple, the app receives only an anonymous identifier to sync data across your devices.</p>
+      <p>When you add a profile photo, the app accesses your photo library only with your permission; we do not upload these images to our servers — they are stored on your device and in your iCloud if sync is enabled.</p>
+    </section>
 
-  <h2>Data Usage</h2>
-  <p>Collected information is used for:</p>
-  <ul>
-    <li>Displaying your learning progress</li>
-    <li>Personalizing the learning experience</li>
-    <li>Improving app functionality</li>
-    <li>Sending notifications (only if you have enabled them)</li>
-  </ul>
+    <section class="section">
+      <h2>Data Usage</h2>
+      <p>Collected information is used for:</p>
+      <ul>
+        <li>Displaying your learning progress</li>
+        <li>Personalizing the learning experience</li>
+        <li>Improving app functionality</li>
+        <li>Sending notifications (only if you have enabled them)</li>
+      </ul>
+    </section>
 
-  <h2>Data Storage</h2>
-  <p>Data is stored locally on your device. When signed in with Sign in with Apple, your learning statistics sync via iCloud (Apple CloudKit) for access across devices. We do not share your data with third-party companies and do not use analytics or advertising SDKs.</p>
+    <section class="section">
+      <h2>Data Storage</h2>
+      <p>Data is stored locally on your device. When signed in with Sign in with Apple, your learning statistics sync via iCloud (Apple CloudKit) for access across devices. We do not share your data with third-party companies and do not use analytics or advertising SDKs.</p>
+    </section>
 
-  <h2>Third Party Services</h2>
-  <p>The app may use the following third-party services:</p>
-  <ul>
-    <li>App Store — for app updates and rating</li>
-    <li>iOS system notifications — for study reminders (at your choice)</li>
-    <li>Apple iCloud (CloudKit) — for syncing progress when using Sign in with Apple</li>
-  </ul>
-  <p>These services have their own privacy policies.</p>
+    <section class="section">
+      <h2>Third Party Services</h2>
+      <p>The app may use the following third-party services:</p>
+      <ul>
+        <li>App Store — for app updates and rating</li>
+        <li>iOS system notifications — for study reminders (at your choice)</li>
+        <li>Apple iCloud (CloudKit) — for syncing progress when using Sign in with Apple</li>
+      </ul>
+      <p>These services have their own privacy policies.</p>
+    </section>
 
-  <h2>Your Rights</h2>
-  <p>You have the right to:</p>
-  <ul>
-    <li>View your data in the app’s statistics section</li>
-    <li>Reset all data through settings</li>
-    <li>Disable notifications at any time</li>
-    <li>Delete the app — all local data will be removed</li>
-  </ul>
+    <section class="section">
+      <h2>Your Rights</h2>
+      <p>You have the right to:</p>
+      <ul>
+        <li>View your data in the app’s statistics section</li>
+        <li>Reset all data through settings</li>
+        <li>Disable notifications at any time</li>
+        <li>Delete the app — all local data will be removed</li>
+      </ul>
+    </section>
 
-  <h2>Policy Changes</h2>
-  <p>We may update this privacy policy. We will notify you of any significant changes through app updates or on this page.</p>
+    <section class="section">
+      <h2>Policy Changes</h2>
+      <p>We may update this privacy policy. We will notify you of any significant changes through app updates or on this page.</p>
+    </section>
 
-  <h2>Contact Information</h2>
-  <p>If you have questions about this privacy policy, contact us:</p>
-  <p>Email: <a href="mailto:saydulayev.wien@gmail.com">saydulayev.wien@gmail.com</a></p>
+    <section class="section">
+      <h2>Contact Information</h2>
+      <p>If you have questions about this privacy policy, contact us:</p>
+      <p>Email: <a href="mailto:saydulayev.wien@gmail.com">saydulayev.wien@gmail.com</a></p>
+    </section>
 
-  <p style="margin-top: 2rem;"><a href="index.html">← Language</a></p>
+    <p class="back"><a href="index.html">← Language</a></p>
+  </div>
 </body>
 </html>
