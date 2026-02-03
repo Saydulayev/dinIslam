@@ -127,18 +127,17 @@ final class CloudKitProfileService {
             let fileExtension = assetURL.pathExtension.isEmpty ? "dat" : assetURL.pathExtension
             profile.avatarURL = localStore.saveAvatarData(avatarData, for: profile.id, fileExtension: fileExtension)
         } else {
-            // Аватара нет в CloudKit (либо удален, либо никогда не был)
-            // Если поле "avatar" присутствует в записи, но это не CKAsset - значит оно было установлено в nil (удалено)
-            // Если поле отсутствует - это может быть старая запись или первая синхронизация
+            // Аватара нет в CloudKit (удален, задержка репликации или CKAsset без fileURL после save)
+            // Удаляем локальный аватар только если в записи явно установлено avatar = nil (удалено на другом устройстве).
+            // Не удаляем при отсутствии ключа/ассета — иначе после добавления фото refreshFromCloud
+            // подтянет старую запись без аватара и сотрёт только что загруженное фото.
             let avatarWasExplicitlyDeleted = record.allKeys().contains("avatar") && !hasAvatarAsset
-            let wasSyncedBefore = profile.metadata.lastSyncedAt != nil
             
-            if avatarWasExplicitlyDeleted || (wasSyncedBefore && !hasAvatarAsset) {
-                // Аватар был явно удален в CloudKit или это не первая синхронизация - удаляем локально
+            if avatarWasExplicitlyDeleted {
                 localStore.deleteAvatar(for: profile.id)
                 profile.avatarURL = nil
             } else if let existingAvatar = localStore.loadAvatar(for: profile.id) {
-                // Первая синхронизация или аватар был только локально - сохраняем локальный аватар
+                // Сохраняем локальный аватар (репликация ещё не подтянула или ответ save без fileURL)
                 profile.avatarURL = existingAvatar
             } else {
                 profile.avatarURL = nil
