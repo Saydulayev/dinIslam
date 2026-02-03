@@ -13,6 +13,7 @@
 		C23D8F122F0A9C3D003A897D /* dinIslam.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = dinIslam.xcodeproj; sourceTree = "<group>"; };
 		C23E762F2EC932A3006206DC /* dinIslam.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = dinIslam.xcodeproj; sourceTree = "<group>"; };
 		C24927CF2EBFD9FD009A4CC4 /* dinIslam.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = dinIslam.xcodeproj; sourceTree = "<group>"; };
+		C25AC6022F3227E300A29FBB /* dinIslam.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = dinIslam.xcodeproj; sourceTree = "<group>"; };
 		C275F25A2EBFD775002BEE44 /* dinIslam.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = dinIslam.xcodeproj; sourceTree = "<group>"; };
 		C28FBDDF2EC681DE0075C1DC /* dinIslam.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = dinIslam.xcodeproj; sourceTree = "<group>"; };
 		C2B4017E2EC634070063FCCE /* dinIslam.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = dinIslam.xcodeproj; sourceTree = "<group>"; };
@@ -94,6 +95,11 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		C25AC6052F3227E300A29FBB /* Products */ = {
+			isa = PBXGroup;
+			name = Products;
+			sourceTree = "<group>";
+		};
 		C275F25B2EBFD775002BEE44 /* Products */ = {
 			isa = PBXGroup;
 			name = Products;
@@ -157,7 +163,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 2600;
-				LastUpgradeCheck = 2600;
+				LastUpgradeCheck = 2620;
 				TargetAttributes = {
 					C22747732EA631EA00F2199B = {
 						CreatedOnToolsVersion = 26.0.1;
@@ -219,6 +225,10 @@
 					ProjectRef = C235C3732ECA4D51006A6CF3 /* dinIslam.xcodeproj */;
 				},
 				{
+					ProductGroup = C25AC6052F3227E300A29FBB /* Products */;
+					ProjectRef = C25AC6022F3227E300A29FBB /* dinIslam.xcodeproj */;
+				},
+				{
 					ProductGroup = C24927D12EBFD9FD009A4CC4 /* Products */;
 					ProjectRef = C24927CF2EBFD9FD009A4CC4 /* dinIslam.xcodeproj */;
 				},
@@ -256,6 +266,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -310,6 +321,7 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -320,6 +332,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -367,6 +380,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				VALIDATE_PRODUCT = YES;
 			};

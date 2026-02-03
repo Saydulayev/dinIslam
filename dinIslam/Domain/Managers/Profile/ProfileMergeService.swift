@@ -150,7 +150,11 @@ final class ProfileMergeService {
     private func maxMastery(_ lhs: MasteryLevel, _ rhs: MasteryLevel) -> MasteryLevel {
         if lhs == rhs { return lhs }
         let order: [MasteryLevel] = [.novice, .learning, .proficient, .expert]
-        return order.firstIndex(of: lhs)! > order.firstIndex(of: rhs)! ? lhs : rhs
+        guard let idxL = order.firstIndex(of: lhs),
+              let idxR = order.firstIndex(of: rhs) else {
+            return lhs
+        }
+        return idxL > idxR ? lhs : rhs
     }
 
     private func mergeQuizHistory(remote: [QuizHistoryEntry], local: [QuizHistoryEntry]) -> [QuizHistoryEntry] {

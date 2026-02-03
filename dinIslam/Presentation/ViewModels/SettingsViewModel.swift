@@ -119,10 +119,15 @@ class SettingsViewModel {
     func shareApp() {
         hapticManager.selectionChanged()
         
+        guard let shareURL = URL(string: "https://apps.apple.com/app/id6754708587") else {
+            AppLogger.warning("Share URL is invalid, skipping share sheet", category: AppLogger.ui)
+            return
+        }
+        
         let activityViewController = UIActivityViewController(
             activityItems: [
                 NSLocalizedString("settings.share.text", comment: "Share text"),
-                URL(string: "https://apps.apple.com/app/id6754708587")!
+                shareURL
             ],
             applicationActivities: nil
         )
