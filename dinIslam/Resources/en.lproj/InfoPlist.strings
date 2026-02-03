@@ -1,0 +1,3 @@
+/* Photo library permission strings - English */
+"NSPhotoLibraryUsageDescription" = "Your profile photo is selected from your photo library.";
+"NSPhotoLibraryAddUsageDescription" = "We may save your profile photo to your photo library.";

@@ -4,10 +4,6 @@
 <dict>
 	<key>CloudKitContainerIdentifier</key>
 	<string>iCloud.com.saydulayev.dinIslam</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Your profile photo is selected from your photo library.</string>
-	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>We may save your profile photo to your photo library.</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 </dict>
