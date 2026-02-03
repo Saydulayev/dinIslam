@@ -91,7 +91,7 @@ struct ProfileCardView: View {
             // User name with edit functionality
             HStack(spacing: DesignTokens.Spacing.sm) {
                 if isEditingDisplayName {
-                    TextField("profile.displayName.placeholder".localized, text: $editingDisplayName)
+                    TextField("profile.displayName.placeholder".localized, text: displayNameBinding)
                         .font(DesignTokens.Typography.h1)
                         .foregroundStyle(DesignTokens.Colors.textPrimary)
                         .textFieldStyle(.plain)
@@ -110,7 +110,8 @@ struct ProfileCardView: View {
                         if isEditingDisplayName {
                             saveDisplayName()
                         } else {
-                            editingDisplayName = manager.profile.customDisplayName ?? manager.displayName
+                            let name = manager.profile.customDisplayName ?? manager.displayName
+                            editingDisplayName = String(name.prefix(DesignTokens.Limits.maxDisplayNameLength))
                             isEditingDisplayName = true
                         }
                     }) {
@@ -196,6 +197,16 @@ struct ProfileCardView: View {
                     x: 0,
                     y: 0
                 )
+        )
+    }
+    
+    private var displayNameBinding: Binding<String> {
+        Binding(
+            get: { editingDisplayName },
+            set: { newValue in
+                let maxLen = DesignTokens.Limits.maxDisplayNameLength
+                editingDisplayName = String(newValue.prefix(maxLen))
+            }
         )
     }
     

@@ -188,5 +188,11 @@ struct DesignTokens {
         // Max width
         static let maxContainerWidth: CGFloat = 448
     }
+    
+    // MARK: - Limits (validation / input)
+    struct Limits {
+        /// Максимальная длина отображаемого имени (вместо «Гость»). 20 символов — достаточно для имени или никнейма.
+        static let maxDisplayNameLength: Int = 20
+    }
 }
 
