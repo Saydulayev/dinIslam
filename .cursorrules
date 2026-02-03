@@ -4,8 +4,6 @@
 
 Этот проект таргетируется на **iOS 17+**, использует **современный SwiftUI** и архитектуру MVVM + DI + Use Cases.
 
-Всегда следуй правилам из `SWIFTUI_GUIDELINES_IOS17.md` в корне проекта.
-
 По умолчанию используй:
 - `@Observable`, `@Bindable`, `@Environment(SomeType.self)` (Observation)
 - `NavigationStack` + `navigationDestination`
