@@ -48,6 +48,7 @@
 "profile.sync.error.permission" = "Нет доступа к iCloud. Проверьте настройки";
 "profile.sync.error.auth" = "Ошибка авторизации. Войдите снова";
 "profile.sync.error.generic" = "Не удалось синхронизировать. Попробуйте позже";
+"profile.sync.retry" = "Повторить синхронизацию";
 "profile.sync.signin.required" = "Войдите в аккаунт для синхронизации прогресса на всех устройствах";
 "profile.signin.prompt.title" = "Синхронизация прогресса";
 "profile.signin.prompt.message" = "Войдите в аккаунт, чтобы сохранять прогресс на всех ваших устройствах и не потерять данные";
@@ -59,7 +60,7 @@
 
 // Start View
 "app.name" = "Tabiin Academy";
-"start.description" = "Знание – прежде слов и деяний!";
+"start.description" = "Знание – прежде слов и дел!";
 "start.begin" = "Начать изучение";
 "start.loading" = "Загрузка...";
 "start.bestScore" = "Лучший результат";
@@ -116,7 +117,7 @@
 "settings.theme.light" = "Светлая";
 "settings.theme.dark" = "Темная";
 "settings.sound.title" = "Звук";
-"settings.haptic.title" = "Тактильная обратная связь";
+"settings.haptic.title" = "Тактильность";
 "settings.notifications.title" = "Уведомления";
 
 // Support
@@ -162,6 +163,7 @@
 
 // Quiz Loading
 "quiz.loading" = "Загрузка...";
+"quiz.bankCompleted" = "Все вопросы уже изучены. Перейдите в режим повторения.";
 
 // Stats View - Pluralization Support
 "stats.title" = "Статистика";
@@ -255,6 +257,7 @@
 
 // Achievements
 "achievements.title" = "Достижения";
+"achievements.singular" = "Достижение";
 "achievements.unlocked" = "Разблокировано";
 "achievements.locked" = "Заблокировано";
 "achievements.progress" = "Прогресс";
@@ -283,7 +286,7 @@
 // Achievement Descriptions (Locked)
 "achievements.firstQuiz.description" = "Пройдите первую викторину";
 "achievements.perfectScore.description" = "Получите 100% в любой викторине";
-"achievements.speedRunner.description" = "Пройдите викторину менее чем за 2 минуты";
+"achievements.speedRunner.description" = "Пройдите викторину менее чем за 2 минуты с результатом 80%+";
 "achievements.scholar.description" = "Изучите 100 вопросов";
 "achievements.dedicated.description" = "Пройдите 10 викторин";
 "achievements.master.description" = "Пройдите 50 викторин";
@@ -295,7 +298,7 @@
 // Achievement Descriptions (Unlocked)
 "achievements.firstQuiz.description.unlocked" = "Вы прошли первую викторину";
 "achievements.perfectScore.description.unlocked" = "Вы получили 100% в викторине";
-"achievements.speedRunner.description.unlocked" = "Вы прошли викторину менее чем за 2 минуты";
+"achievements.speedRunner.description.unlocked" = "Вы прошли викторину менее чем за 2 минуты с результатом 80%+";
 "achievements.scholar.description.unlocked" = "Вы изучили 100 вопросов";
 "achievements.dedicated.description.unlocked" = "Вы прошли 10 викторин";
 "achievements.master.description.unlocked" = "Вы прошли 50 викторин";
@@ -384,7 +387,7 @@
 "privacy.usage.title" = "Использование данных";
 "privacy.usage.content" = "Собранная информация используется для:\n\n• Отображения вашего прогресса обучения\n• Персонализации опыта обучения\n• Улучшения функциональности приложения\n• Отправки уведомлений (если включены)";
 "privacy.storage.title" = "Хранение данных";
-"privacy.storage.content" = "Все данные хранятся локально на вашем устройстве. Мы не передаем ваши данные третьим лицам и не используем облачные сервисы для хранения персональной информации.";
+"privacy.storage.content" = "Данные хранятся локально на вашем устройстве. При входе через Sign in with Apple статистика обучения синхронизируется через iCloud (Apple CloudKit) для доступа с разных устройств. Мы не передаем ваши данные сторонним компаниям.";
 "privacy.thirdParty.title" = "Сторонние сервисы";
 "privacy.thirdParty.content" = "Приложение может использовать следующие сторонние сервисы:\n\n• App Store (для обновлений приложения)\n• Системные уведомления iOS\n\nЭти сервисы имеют свои собственные политики конфиденциальности.";
 "privacy.rights.title" = "Ваши права";
@@ -510,3 +513,11 @@
 "start.loading" = "Загрузка...";
 "start.begin" = "Начать викторину";
 "start.examMode" = "Режим экзамена";
+
+// Bank Completion
+"bank.completion.title" = "Все вопросы изучены!";
+"bank.completion.subtitle" = "Поздравляем! Вы прошли весь банк вопросов.";
+"bank.completion.questionsCompleted" = "Вопросов изучено";
+"bank.completion.startOver" = "Начать заново";
+"bank.completion.review" = "Повторение";
+"bank.completion.bankCompleted" = "Банк завершён";

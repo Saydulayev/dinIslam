@@ -44,5 +44,9 @@ final class DefaultStartNavigationCoordinator: StartNavigationCoordinating {
             navigationPath.removeLast()
         }
     }
+    
+    func showBankCompletion(totalQuestions: Int) {
+        navigationPath.append(StartRoute.bankCompletion(totalQuestions: totalQuestions))
+    }
 }
 

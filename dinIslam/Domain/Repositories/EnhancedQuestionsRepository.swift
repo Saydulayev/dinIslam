@@ -7,6 +7,7 @@
 
 import Foundation
 import Combine
+import OSLog
 
 // MARK: - Enhanced Questions Repository Protocol
 protocol EnhancedQuestionsRepositoryProtocol {
@@ -14,6 +15,11 @@ protocol EnhancedQuestionsRepositoryProtocol {
     func preloadQuestions(for languages: [String]) async
     func clearCache() async
     func getCacheStatus() -> CacheStatus
+    
+    // Update checking
+    func checkForUpdates(language: String) async
+    func hasUpdates() -> Bool
+    func forceSync(language: String) async -> [Question]
 }
 
 // MARK: - Cache Status
@@ -48,7 +54,7 @@ class EnhancedQuestionsRepository: EnhancedQuestionsRepositoryProtocol {
         
         // Check network connectivity
         guard networkManager.isConnected || !useRemoteQuestions else {
-            print("📱 No internet connection, falling back to local questions")
+            AppLogger.info("No internet connection, falling back to local questions", category: AppLogger.network)
             return try loadLocalQuestions(language: language)
         }
         
@@ -70,18 +76,18 @@ class EnhancedQuestionsRepository: EnhancedQuestionsRepositoryProtocol {
             return
         }
         
-        print("🚀 Preloading questions for languages: \(uniqueLanguages)")
+        AppLogger.info("Preloading questions for languages: \(uniqueLanguages)", category: AppLogger.data)
         
         for language in uniqueLanguages {
             let appLanguage: AppLanguage = language == "en" ? .english : .russian
             _ = await remoteService.fetchQuestions(for: appLanguage, manageLoadingState: false)
-            print("✅ Preloaded questions for \(language)")
+            AppLogger.info("Preloaded questions for \(language)", category: AppLogger.data)
         }
     }
     
     func clearCache() async {
         remoteService.clearCache()
-        print("🗑️ Questions cache cleared")
+        AppLogger.info("Questions cache cleared", category: AppLogger.data)
     }
     
     func getCacheStatus() -> CacheStatus {
@@ -91,7 +97,7 @@ class EnhancedQuestionsRepository: EnhancedQuestionsRepositoryProtocol {
         let cacheSize = cacheInfo.size
         
         // Check if cache is expired (simplified check)
-        let isExpired = lastUpdate?.timeIntervalSinceNow ?? 0 < -24 * 60 * 60 // 24 hours
+        let isExpired = lastUpdate?.timeIntervalSinceNow ?? 0 < -6 * 60 * 60 // 6 hours
         
         return CacheStatus(
             hasCachedData: hasCachedData,
@@ -99,6 +105,20 @@ class EnhancedQuestionsRepository: EnhancedQuestionsRepositoryProtocol {
             cacheSize: cacheSize,
             isExpired: isExpired
         )
+    }
+    
+    func checkForUpdates(language: String) async {
+        let appLanguage: AppLanguage = language == "en" ? .english : .russian
+        await remoteService.checkForUpdates(for: appLanguage)
+    }
+    
+    func hasUpdates() -> Bool {
+        return remoteService.hasUpdates
+    }
+    
+    func forceSync(language: String) async -> [Question] {
+        let appLanguage: AppLanguage = language == "en" ? .english : .russian
+        return await remoteService.forceSync(for: appLanguage)
     }
     
     private func loadLocalQuestions(language: String) throws -> [Question] {

@@ -11,7 +11,7 @@ struct StatsView: View {
     @Environment(\.localizationProvider) private var localizationProvider
     @Bindable var statsManager: StatsManager
     @Environment(\.settingsManager) private var settingsManager
-    @EnvironmentObject private var remoteService: RemoteQuestionsService
+    @Environment(\.remoteQuestionsService) private var remoteService: RemoteQuestionsService
     @Environment(\.dismiss) private var dismiss
     @State private var mistakesViewModel: QuizViewModel?
     @State private var showingMistakesReview = false
@@ -32,12 +32,12 @@ struct StatsView: View {
     
     var body: some View {
         ZStack {
-            // Gradient background
+            // Background - очень темный градиент с оттенками индиго/фиолетового (как на главном экране)
             LinearGradient(
-                colors: [
-                    DesignTokens.Colors.background1,
-                    DesignTokens.Colors.background2
-                ],
+                gradient: Gradient(colors: [
+                    Color(hex: "#0a0a1a"), // темно-индиго сверху
+                    Color(hex: "#000000") // черный снизу
+                ]),
                 startPoint: .top,
                 endPoint: .bottom
             )
@@ -81,8 +81,8 @@ struct StatsView: View {
                             icon: "exclamationmark.circle",
                             value: "\(statsManager.stats.correctedMistakes)",
                             label: "stats.correctedMistakes.title".localized,
-                            iconColor: DesignTokens.Colors.iconOrange,
-                            backgroundColor: DesignTokens.Colors.iconOrange.opacity(0.2)
+                            iconColor: DesignTokens.Colors.iconYellow,
+                            backgroundColor: DesignTokens.Colors.iconYellow.opacity(0.2)
                         )
                         
                         ProgressCardView(
@@ -126,7 +126,8 @@ struct StatsView: View {
                 .foregroundColor(DesignTokens.Colors.iconRed)
             }
         }
-        .toolbarBackground(DesignTokens.Colors.background1, for: .navigationBar)
+        .toolbarBackground(.clear, for: .navigationBar) // прозрачный toolbar для градиента
+        .toolbarBackground(.visible, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
         .navigationDestination(isPresented: $showingMistakesReview) {
             if let viewModel = mistakesViewModel {
@@ -201,13 +202,26 @@ struct StatsView: View {
             }
         }
         .padding(DesignTokens.Spacing.xxl)
-        .cardStyle(
-            cornerRadius: DesignTokens.CornerRadius.xlarge,
-            fillColor: DesignTokens.Colors.cardBackground,
-            borderColor: DesignTokens.Colors.iconRed.opacity(0.3),
-            shadowColor: Color.black.opacity(0.2),
-            shadowRadius: 8,
-            shadowYOffset: 4
+        .background(
+            // Прозрачная рамка с фиолетовым свечением (как на главном экране)
+            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xlarge)
+                .stroke(
+                    LinearGradient(
+                        gradient: Gradient(colors: [
+                            DesignTokens.Colors.iconPurpleLight.opacity(0.5),
+                            DesignTokens.Colors.iconPurpleLight.opacity(0.2)
+                        ]),
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 1.5
+                )
+                .shadow(
+                    color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
+                    radius: 12,
+                    x: 0,
+                    y: 0
+                )
         )
     }
     
@@ -286,13 +300,26 @@ struct StatsView: View {
             }
         }
         .padding(DesignTokens.Spacing.xxl)
-        .cardStyle(
-            cornerRadius: DesignTokens.CornerRadius.xlarge,
-            fillColor: DesignTokens.Colors.cardBackground,
-            borderColor: DesignTokens.Colors.iconBlue.opacity(0.3),
-            shadowColor: Color.black.opacity(0.2),
-            shadowRadius: 8,
-            shadowYOffset: 4
+        .background(
+            // Прозрачная рамка с фиолетовым свечением (как на главном экране)
+            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xlarge)
+                .stroke(
+                    LinearGradient(
+                        gradient: Gradient(colors: [
+                            DesignTokens.Colors.iconPurpleLight.opacity(0.5),
+                            DesignTokens.Colors.iconPurpleLight.opacity(0.2)
+                        ]),
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 1.5
+                )
+                .shadow(
+                    color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
+                    radius: 12,
+                    x: 0,
+                    y: 0
+                )
         )
     }
     
@@ -375,5 +402,5 @@ struct StatsView: View {
 #Preview {
     StatsView(statsManager: StatsManager())
         .environment(\.settingsManager, SettingsManager())
-        .environmentObject(RemoteQuestionsService())
+        .environment(\.remoteQuestionsService, RemoteQuestionsService())
 }

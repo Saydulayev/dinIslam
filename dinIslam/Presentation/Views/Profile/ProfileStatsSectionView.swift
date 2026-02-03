@@ -11,6 +11,9 @@ struct ProfileStatsSectionView: View {
     @Bindable var manager: ProfileManager
     @Bindable var statsManager: StatsManager
     let totalQuestionsCount: Int
+    let isResettingProfile: Bool
+    let statsRefreshTrigger: Int
+    @State private var studiedCount: Int = 0
     
     var body: some View {
         VStack(alignment: .leading, spacing: DesignTokens.Spacing.xxl) {
@@ -28,7 +31,7 @@ struct ProfileStatsSectionView: View {
                 // Questions Studied
                 ProgressCardView(
                     icon: "questionmark.circle",
-                    value: "\(manager.isSignedIn ? manager.progress.totalQuestionsAnswered : statsManager.stats.totalQuestionsStudied)",
+                    value: "\(studiedCount) / \(totalQuestionsCount)",
                     label: manager.isSignedIn ? "profile.progress.questions".localized : "stats.questionsStudied.title".localized,
                     iconColor: DesignTokens.Colors.iconBlue,
                     backgroundColor: DesignTokens.Colors.iconBlue.opacity(0.2)
@@ -57,8 +60,8 @@ struct ProfileStatsSectionView: View {
                     icon: "exclamationmark.circle",
                     value: "\(manager.isSignedIn ? manager.progress.correctedMistakes : statsManager.stats.correctedMistakes)",
                     label: manager.isSignedIn ? "profile.progress.corrected".localized : "stats.correctedMistakes.title".localized,
-                    iconColor: DesignTokens.Colors.iconOrange,
-                    backgroundColor: DesignTokens.Colors.iconOrange.opacity(0.2)
+                    iconColor: DesignTokens.Colors.iconYellow,
+                    backgroundColor: DesignTokens.Colors.iconYellow.opacity(0.2)
                 )
                 
                 // Accuracy or Quizzes Completed (для обоих показываем одинаково)
@@ -89,16 +92,16 @@ struct ProfileStatsSectionView: View {
                         icon: "flame",
                         value: "\(manager.progress.currentStreak)",
                         label: "profile.progress.streak".localized,
-                        iconColor: DesignTokens.Colors.iconOrange,
-                        backgroundColor: DesignTokens.Colors.iconOrange.opacity(0.2)
+                        iconColor: DesignTokens.Colors.iconFlame,
+                        backgroundColor: DesignTokens.Colors.iconFlame.opacity(0.2)
                     )
                 } else {
                     ProgressCardView(
                         icon: "flame",
                         value: "\(statsManager.stats.currentStreak)",
                         label: "profile.progress.streak".localized,
-                        iconColor: DesignTokens.Colors.iconOrange,
-                        backgroundColor: DesignTokens.Colors.iconOrange.opacity(0.2)
+                        iconColor: DesignTokens.Colors.iconFlame,
+                        backgroundColor: DesignTokens.Colors.iconFlame.opacity(0.2)
                     )
                 }
             }
@@ -107,31 +110,106 @@ struct ProfileStatsSectionView: View {
             HStack(spacing: DesignTokens.Spacing.lg) {
                 Image(systemName: "book.closed")
                     .font(.system(size: DesignTokens.Sizes.iconMedium))
-                    .foregroundColor(DesignTokens.Colors.iconPurple)
+                    .foregroundColor(.white) // Белая иконка для лучшей видимости на градиенте
                     .frame(width: 40, height: 40)
                 
                 VStack(alignment: .leading, spacing: DesignTokens.Spacing.xs) {
                     Text("stats.totalQuestions.title".localized)
                         .font(DesignTokens.Typography.label)
-                        .foregroundColor(DesignTokens.Colors.textPrimary)
+                        .foregroundColor(.white.opacity(0.9)) // Белый текст с небольшой прозрачностью
                     
                     Text("\(totalQuestionsCount)")
                         .font(DesignTokens.Typography.statsValue)
-                        .foregroundColor(DesignTokens.Colors.textPrimary)
+                        .foregroundColor(.white) // Белый текст для лучшей читаемости
                 }
                 
                 Spacer()
             }
             .padding(DesignTokens.Spacing.lg)
-            .cardStyle(
-                cornerRadius: DesignTokens.CornerRadius.medium,
-                fillColor: DesignTokens.Colors.iconPurple.opacity(0.2),
-                borderColor: DesignTokens.Colors.iconPurple.opacity(0.55),
-                shadowColor: Color.black.opacity(0.22)
+            .background(
+                ZStack {
+                    // Градиентный фон (как у карточек)
+                    LinearGradient(
+                        gradient: Gradient(colors: [
+                            DesignTokens.Colors.purpleGradientStart,
+                            DesignTokens.Colors.purpleGradientEnd
+                        ]),
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                    
+                    // Рамка с градиентом и свечением
+                    RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
+                        .stroke(
+                            LinearGradient(
+                                gradient: Gradient(colors: [
+                                    DesignTokens.Colors.iconPurpleLight.opacity(0.5),
+                                    DesignTokens.Colors.iconPurpleLight.opacity(0.2)
+                                ]),
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            lineWidth: 1.5
+                        )
+                        .shadow(
+                            color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
+                            radius: 12,
+                            x: 0,
+                            y: 0
+                        )
+                }
+            )
+            .clipShape(RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium))
+            .shadow(
+                color: DesignTokens.Colors.purpleGradientStart.opacity(0.5),
+                radius: 12,
+                y: 6
             )
         }
         .padding(DesignTokens.Spacing.xxl)
-        .cardStyle(cornerRadius: DesignTokens.CornerRadius.xlarge)
+        .background(
+            // Прозрачная рамка с фиолетовым свечением (как на главном экране)
+            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xlarge)
+                .stroke(
+                    LinearGradient(
+                        gradient: Gradient(colors: [
+                            DesignTokens.Colors.iconPurpleLight.opacity(0.5),
+                            DesignTokens.Colors.iconPurpleLight.opacity(0.2)
+                        ]),
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 1.5
+                )
+                .shadow(
+                    color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
+                    radius: 12,
+                    x: 0,
+                    y: 0
+                )
+        )
+        .onAppear {
+            loadProgressStats()
+        }
+        .onChange(of: totalQuestionsCount) { _, _ in
+            loadProgressStats()
+        }
+        .onChange(of: isResettingProfile) { _, newValue in
+            // Когда сброс завершён (isResettingProfile становится false), обновляем статистику
+            if !newValue {
+                loadProgressStats()
+            }
+        }
+        .onChange(of: statsRefreshTrigger) { _, _ in
+            // Обновляем статистику при изменении триггера (например, после сброса для неавторизованных)
+            loadProgressStats()
+        }
+    }
+    
+    private func loadProgressStats() {
+        let manager = DefaultQuestionPoolProgressManager()
+        let stats = manager.getProgressStats(total: totalQuestionsCount, version: 1)
+        studiedCount = stats.used
     }
 }
 

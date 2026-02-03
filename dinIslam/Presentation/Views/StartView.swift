@@ -18,6 +18,7 @@ enum StartRoute: Hashable {
     case settings
     case profile
     case exam
+    case bankCompletion(totalQuestions: Int)
     
     struct ResultSnapshot: Hashable {
         let totalQuestions: Int
@@ -45,6 +46,7 @@ enum StartRoute: Hashable {
 
 struct StartView: View {
     @State private var model: StartViewModel
+    @Environment(\.achievementManager) private var achievementManager
     
     init(model: StartViewModel) {
         _model = State(initialValue: model)
@@ -57,12 +59,14 @@ struct StartView: View {
         profileManager: ProfileManager,
         examUseCase: ExamUseCaseProtocol,
         examStatisticsManager: ExamStatisticsManager,
-        enhancedQuizUseCase: EnhancedQuizUseCaseProtocol
+        enhancedQuizUseCase: EnhancedQuizUseCaseProtocol,
+        achievementManager: AchievementManager
     ) {
         let quizViewModel = QuizViewModel(
             quizUseCase: quizUseCase,
             statsManager: statsManager,
-            settingsManager: settingsManager
+            settingsManager: settingsManager,
+            achievementManager: achievementManager
         )
         let questionsPreloading = DefaultQuestionsPreloadingService(
             enhancedQuizUseCase: enhancedQuizUseCase
@@ -75,7 +79,8 @@ struct StartView: View {
                 profileManager: profileManager,
                 examUseCase: examUseCase,
                 examStatisticsManager: examStatisticsManager,
-                questionsPreloading: questionsPreloading
+                questionsPreloading: questionsPreloading,
+                enhancedQuizUseCase: enhancedQuizUseCase
             )
         )
     }
@@ -87,12 +92,14 @@ struct StartView: View {
         profileManager: ProfileManager,
         examUseCase: ExamUseCaseProtocol,
         examStatisticsManager: ExamStatisticsManager,
-        enhancedContainer: EnhancedDIContainer
+        enhancedContainer: EnhancedDIContainer,
+        achievementManager: AchievementManager
     ) {
         let quizViewModel = QuizViewModel(
             quizUseCase: quizUseCase,
             statsManager: statsManager,
-            settingsManager: settingsManager
+            settingsManager: settingsManager,
+            achievementManager: achievementManager
         )
         let questionsPreloading = DefaultQuestionsPreloadingService(
             enhancedQuizUseCase: enhancedContainer.enhancedQuizUseCase
@@ -105,7 +112,8 @@ struct StartView: View {
                 profileManager: profileManager,
                 examUseCase: examUseCase,
                 examStatisticsManager: examStatisticsManager,
-                questionsPreloading: questionsPreloading
+                questionsPreloading: questionsPreloading,
+                enhancedQuizUseCase: enhancedContainer.enhancedQuizUseCase
             )
         )
     }
@@ -119,11 +127,11 @@ struct StartView: View {
         let model = bindingModel.wrappedValue
         return NavigationStack(path: bindingModel.navigationPath) {
             ZStack {
-                // Gradient Background
+                // Background - очень темный градиент с оттенками индиго/фиолетового
                 LinearGradient(
                     gradient: Gradient(colors: [
-                        DesignTokens.Colors.background1,
-                        DesignTokens.Colors.background2
+                        Color(hex: "#0a0a1a"), // темно-индиго сверху
+                        Color(hex: "#000000") // черный снизу
                     ]),
                     startPoint: .top,
                     endPoint: .bottom
@@ -142,7 +150,7 @@ struct StartView: View {
                         .padding(.bottom, DesignTokens.Spacing.xxxl)
                         .frame(minHeight: proxy.size.height, alignment: .bottom)
                     }
-                    .scrollDisabled(false)
+                    .scrollDisabled(true)
                 }
             }
             .navigationDestination(for: StartRoute.self) { route in
@@ -166,7 +174,7 @@ struct StartView: View {
                         }
                     )
                 case .achievements:
-                    AchievementsView()
+                    AchievementsView(achievementManager: achievementManager)
                 case .settings:
                     SettingsViewWithDependencies(settingsManager: model.settingsManager)
                 case .profile:
@@ -177,6 +185,19 @@ struct StartView: View {
                             model.finishExamSession()
                         }
                     }
+                case .bankCompletion(let totalQuestions):
+                    BankCompletionView(
+                        totalQuestions: totalQuestions,
+                        onStartOver: {
+                            model.resetQuestionPool()
+                            model.resetQuiz()
+                        },
+                        onStartReview: {
+                            model.enableReviewMode()
+                            model.resetQuiz()
+                            model.startQuiz()
+                        }
+                    )
                 }
             }
             .sheet(isPresented: bindingModel.showingExamSettings) {
@@ -186,7 +207,7 @@ struct StartView: View {
                 .environment(\.settingsManager, model.settingsManager)
             }
             .navigationBarTitleDisplayMode(.inline)
-            .toolbarBackground(DesignTokens.Colors.background1, for: .navigationBar)
+            .toolbarBackground(.clear, for: .navigationBar) // прозрачный toolbar для градиента
             .toolbarBackground(.visible, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbar {
@@ -254,35 +275,8 @@ struct StartView: View {
     // MARK: - View Sections
     private func heroSection(model: StartViewModel) -> some View {
         VStack(spacing: DesignTokens.Spacing.lg) {
-            ZStack {
-                Circle()
-                    .fill(
-                        RadialGradient(
-                            colors: [
-                                DesignTokens.Colors.iconBlue.opacity(0.3 * model.logoGlowIntensity),
-                                DesignTokens.Colors.iconPurple.opacity(0.2 * model.logoGlowIntensity),
-                                .clear
-                            ],
-                            center: .center,
-                            startRadius: 30,
-                            endRadius: 80
-                        )
-                    )
-                    .frame(width: 160, height: 160)
-                    .blur(radius: 20)
-                
-                Image("image")
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: 120, height: 120)
-                    .clipShape(Circle())
-                    .shadow(color: DesignTokens.Colors.iconBlue.opacity(0.4 * model.logoGlowIntensity), radius: 20, x: 0, y: 10)
-                    .shadow(color: DesignTokens.Colors.iconPurple.opacity(0.3 * model.logoGlowIntensity), radius: 30, x: 0, y: 0)
-                
-                TimelineView(.animation) { timeline in
-                    ParticleFieldView(particles: model.particlesSnapshot(for: timeline.date))
-                }
-            }
+            // Используем новый оптимизированный компонент логотипа
+            LogoView(glowIntensity: model.logoGlowIntensity)
             
             VStack(spacing: DesignTokens.Spacing.sm) {
                 LocalizedText("app.name")
@@ -303,18 +297,31 @@ struct StartView: View {
             statsCard(model: model)
             
             Divider()
-                .background(DesignTokens.Colors.borderSubtle)
+                .background(Color.white.opacity(0.1))
             
             actionsSection(model: model)
         }
         .padding(DesignTokens.Spacing.xxl)
-        .cardStyle(
-            cornerRadius: DesignTokens.CornerRadius.xlarge,
-            fillColor: DesignTokens.Colors.cardBackground,
-            borderColor: DesignTokens.Colors.iconBlue.opacity(0.3),
-            shadowColor: Color.black.opacity(0.2),
-            shadowRadius: 8,
-            shadowYOffset: 4
+        .background(
+            // Прозрачная рамка с фиолетовым свечением
+            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xlarge)
+                .stroke(
+                    LinearGradient(
+                        gradient: Gradient(colors: [
+                            DesignTokens.Colors.iconPurpleLight.opacity(0.5),
+                            DesignTokens.Colors.iconPurpleLight.opacity(0.2)
+                        ]),
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 1.5
+                )
+                .shadow(
+                    color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
+                    radius: 12,
+                    x: 0,
+                    y: 0
+                )
         )
     }
     
@@ -328,7 +335,7 @@ struct StartView: View {
                     
                     Text("\(Int(model.statsManager.getAverageRecentScore()))%")
                         .font(DesignTokens.Typography.h1)
-                        .foregroundStyle(DesignTokens.Colors.iconBlue)
+                        .foregroundStyle(DesignTokens.Colors.iconBlueLight)
                     
                     Text("start.basedOnGames".localized(count: model.statsManager.getRecentGamesCount(), arguments: model.statsManager.getRecentGamesCount()))
                         .font(DesignTokens.Typography.label)
@@ -366,33 +373,64 @@ struct StartView: View {
             HStack(spacing: DesignTokens.Spacing.md) {
                 if model.quizViewModel.isLoading {
                     ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle(tint: DesignTokens.Colors.iconBlue))
+                        .progressViewStyle(CircularProgressViewStyle(tint: .white))
                         .scaleEffect(0.8)
                 } else {
                     Image(systemName: "play.fill")
                         .font(.system(size: DesignTokens.Sizes.iconMedium))
-                        .foregroundColor(DesignTokens.Colors.iconBlue)
+                        .foregroundColor(.white)
                 }
                 
                 LocalizedText(model.quizViewModel.isLoading ? "start.loading" : "start.begin")
                     .font(DesignTokens.Typography.secondarySemibold)
-                    .foregroundStyle(DesignTokens.Colors.textPrimary)
+                    .foregroundStyle(.white)
                 
                 Spacer()
                 
                 Image(systemName: "chevron.right")
                     .font(.system(size: DesignTokens.Sizes.iconSmall))
-                    .foregroundColor(DesignTokens.Colors.textSecondary)
+                    .foregroundColor(.white)
             }
             .padding(DesignTokens.Spacing.lg)
             .frame(maxWidth: .infinity)
-            .cardStyle(
-                cornerRadius: DesignTokens.CornerRadius.medium,
-                fillColor: DesignTokens.Colors.iconBlue.opacity(0.15),
-                borderColor: DesignTokens.Colors.iconBlue.opacity(0.35),
-                shadowColor: Color.black.opacity(0.2),
-                shadowRadius: 8,
-                shadowYOffset: 4
+            .background(
+                ZStack {
+                    // Градиентный фон кнопки
+                    LinearGradient(
+                        gradient: Gradient(colors: [
+                            DesignTokens.Colors.quizButtonGradientStart,
+                            DesignTokens.Colors.quizButtonGradientEnd
+                        ]),
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                    
+                    // Рамка в стиле логотипа с градиентом и свечением
+                    RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
+                        .stroke(
+                            LinearGradient(
+                                gradient: Gradient(colors: [
+                                    DesignTokens.Colors.iconPurpleLight.opacity(0.5),
+                                    DesignTokens.Colors.iconPurpleLight.opacity(0.2)
+                                ]),
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            lineWidth: 1.5
+                        )
+                        .shadow(
+                            color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
+                            radius: 12,
+                            x: 0,
+                            y: 0
+                        )
+                }
+            )
+            .clipShape(RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium))
+            .shadow(
+                color: DesignTokens.Colors.quizButtonGradientStart.opacity(0.5),
+                radius: 12,
+                y: 6
             )
         }
         .buttonStyle(.plain)
@@ -406,48 +444,63 @@ struct StartView: View {
             HStack(spacing: DesignTokens.Spacing.md) {
                 Image(systemName: "timer")
                     .font(.system(size: DesignTokens.Sizes.iconMedium))
-                    .foregroundColor(DesignTokens.Colors.iconOrange)
+                    .foregroundColor(.white)
                 
                 LocalizedText("start.examMode")
                     .font(DesignTokens.Typography.secondarySemibold)
-                    .foregroundStyle(DesignTokens.Colors.textPrimary)
+                    .foregroundStyle(.white)
                 
                 Spacer()
                 
                 Image(systemName: "chevron.right")
                     .font(.system(size: DesignTokens.Sizes.iconSmall))
-                    .foregroundColor(DesignTokens.Colors.textSecondary)
+                    .foregroundColor(.white)
             }
             .padding(DesignTokens.Spacing.lg)
             .frame(maxWidth: .infinity)
-            .cardStyle(
-                cornerRadius: DesignTokens.CornerRadius.medium,
-                fillColor: DesignTokens.Colors.iconOrange.opacity(0.15),
-                borderColor: DesignTokens.Colors.iconOrange.opacity(0.35),
-                shadowColor: Color.black.opacity(0.2),
-                shadowRadius: 8,
-                shadowYOffset: 4
+            .background(
+                ZStack {
+                    // Градиентный фон кнопки
+                    LinearGradient(
+                        gradient: Gradient(colors: [
+                            DesignTokens.Colors.examButtonGradientStart,
+                            DesignTokens.Colors.examButtonGradientEnd
+                        ]),
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                    
+                    // Рамка в стиле логотипа с градиентом и свечением
+                    RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
+                        .stroke(
+                            LinearGradient(
+                                gradient: Gradient(colors: [
+                                    DesignTokens.Colors.iconPurpleLight.opacity(0.5),
+                                    DesignTokens.Colors.iconPurpleLight.opacity(0.2)
+                                ]),
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            lineWidth: 1.5
+                        )
+                        .shadow(
+                            color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
+                            radius: 12,
+                            x: 0,
+                            y: 0
+                        )
+                }
+            )
+            .clipShape(RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium))
+            .shadow(
+                color: DesignTokens.Colors.examButtonGradientStart.opacity(0.5),
+                radius: 12,
+                y: 6
             )
         }
         .buttonStyle(.plain)
     }
     
-}
-
-private struct ParticleFieldView: View {
-    let particles: [StartViewModel.Particle]
-
-    var body: some View {
-        ZStack {
-            ForEach(particles) { particle in
-                Circle()
-                    .fill(.yellow.opacity(particle.opacity))
-                    .frame(width: particle.size, height: particle.size)
-                    .offset(x: particle.x, y: particle.y)
-                    .blur(radius: 1)
-            }
-        }
-    }
 }
 
 #Preview {
@@ -459,6 +512,11 @@ private struct ParticleFieldView: View {
         adaptiveEngine: adaptiveEngine,
         statsManager: statsManager,
         examStatisticsManager: examStatsManager
+    )
+    let notificationManager = NotificationManager()
+    let achievementManager = AchievementManager(
+        notificationManager: notificationManager,
+        localizationProvider: LocalizationManager()
     )
     let adaptiveStrategy = AdaptiveQuestionSelectionStrategy(adaptiveEngine: adaptiveEngine)
     let fallbackStrategy = FallbackQuestionSelectionStrategy()
@@ -486,10 +544,12 @@ private struct ParticleFieldView: View {
         profileManager: profileManager,
         examUseCase: examUseCase,
         examStatisticsManager: examStatsManager,
-        enhancedQuizUseCase: enhancedDependencies.enhancedQuizUseCase
+        enhancedQuizUseCase: enhancedDependencies.enhancedQuizUseCase,
+        achievementManager: achievementManager
     )
     .environment(\.settingsManager, settingsManager)
     .environment(\.statsManager, statsManager)
     .environment(\.profileManager, profileManager)
+    .environment(\.achievementManager, achievementManager)
 }
 

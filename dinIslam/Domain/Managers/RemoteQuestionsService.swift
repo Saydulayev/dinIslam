@@ -85,7 +85,7 @@ class RemoteQuestionsService: ObservableObject {
         let fileName = language == .russian ? "questions.json" : "questions_en.json"
         let urlString = "\(baseURL)/\(fileName)"
         
-        print("🔄 RemoteQuestionsService: Attempting to fetch from \(urlString)")
+        AppLogger.info("RemoteQuestionsService: Attempting to fetch from \(urlString)", category: AppLogger.network)
         
         guard let url = URL(string: urlString) else {
             AppLogger.error("RemoteQuestionsError: Invalid URL for \(fileName)", category: AppLogger.network)
@@ -100,8 +100,9 @@ class RemoteQuestionsService: ObservableObject {
         }
         
         let remoteQuestions = try JSONDecoder().decode([RemoteQuestion].self, from: data)
-        print("✅ RemoteQuestionsService: Successfully loaded \(remoteQuestions.count) questions from \(fileName)")
+        AppLogger.info("RemoteQuestionsService: Successfully loaded \(remoteQuestions.count) questions from \(fileName)", category: AppLogger.network)
         
+        #if DEBUG
         // Преобразуем ID в строки для логирования
         let questionIds = remoteQuestions.map { question -> String in
             switch question.id {
@@ -111,17 +112,30 @@ class RemoteQuestionsService: ObservableObject {
                 return String(num)
             }
         }
-        print("📋 Remote question IDs: \(questionIds.joined(separator: ", "))")
+        AppLogger.debug("Remote question IDs: \(questionIds.joined(separator: ", "))", category: AppLogger.network)
         
         // Проверяем, есть ли q31
         let hasQ31 = questionIds.contains("q31")
         if hasQ31 {
-            print("🎯 Found q31 in remote questions!")
+            AppLogger.debug("Found q31 in remote questions!", category: AppLogger.network)
         } else {
-            print("❌ q31 NOT found in remote questions")
+            AppLogger.debug("q31 NOT found in remote questions", category: AppLogger.network)
+        }
+        #endif
+        
+        let questions = remoteQuestions.map { $0.toQuestion() }
+        
+        // Validate questions before returning
+        let validator = QuestionValidator()
+        do {
+            try validator.validate(questions)
+            AppLogger.info("RemoteQuestionsService: All \(questions.count) questions validated successfully", category: AppLogger.network)
+        } catch let validationError as ValidationError {
+            AppLogger.error("RemoteQuestionsService: Validation failed", error: validationError, category: AppLogger.network)
+            throw RemoteQuestionsError.decodingError
         }
         
-        return remoteQuestions.map { $0.toQuestion() }
+        return questions
     }
     
     private func cacheQuestions(_ questions: [Question], for language: AppLanguage) async {
@@ -130,15 +144,18 @@ class RemoteQuestionsService: ObservableObject {
         do {
             let data = try JSONEncoder().encode(questions)
             userDefaults.set(data, forKey: cacheKey)
-            print("💾 RemoteQuestionsService: Cached \(questions.count) questions for \(language.rawValue)")
-            print("📋 Cached question IDs: \(questions.map { $0.id }.joined(separator: ", "))")
+            AppLogger.info("RemoteQuestionsService: Cached \(questions.count) questions for \(language.rawValue)", category: AppLogger.data)
+            
+            #if DEBUG
+            AppLogger.debug("Cached question IDs: \(questions.map { $0.id }.joined(separator: ", "))", category: AppLogger.data)
             
             // Проверяем, есть ли q31 в кэше
             if questions.contains(where: { $0.id == "q31" }) {
-                print("🎯 q31 is cached successfully!")
+                AppLogger.debug("q31 is cached successfully!", category: AppLogger.data)
             } else {
-                print("❌ q31 NOT cached")
+                AppLogger.debug("q31 NOT cached", category: AppLogger.data)
             }
+            #endif
         } catch {
             AppLogger.error("Failed to cache questions", error: error, category: AppLogger.data)
         }
@@ -150,6 +167,17 @@ class RemoteQuestionsService: ObservableObject {
         guard let url = Bundle.main.url(forResource: fileName, withExtension: "json"),
               let data = try? Data(contentsOf: url),
               let questions = try? JSONDecoder().decode([Question].self, from: data) else {
+            return []
+        }
+        
+        // Validate local questions
+        let validator = QuestionValidator()
+        do {
+            try validator.validate(questions)
+            AppLogger.info("RemoteQuestionsService: Local questions validated successfully (\(questions.count) questions)", category: AppLogger.data)
+        } catch {
+            AppLogger.error("RemoteQuestionsService: Local questions validation failed", error: error, category: AppLogger.data)
+            // Return empty array if local questions are invalid
             return []
         }
         
@@ -180,9 +208,10 @@ class RemoteQuestionsService: ObservableObject {
             await MainActor.run {
                 remoteQuestionsCount = remoteCount
                 cachedQuestionsCount = cachedCount
-                hasUpdates = remoteCount > cachedCount
+                // Use != instead of > to detect both additions and content changes
+                hasUpdates = remoteCount != cachedCount
                 
-                print("🔄 Update check: Remote=\(remoteCount), Cached=\(cachedCount), HasUpdates=\(hasUpdates)")
+                AppLogger.info("Update check: Remote=\(remoteCount), Cached=\(cachedCount), HasUpdates=\(hasUpdates)", category: AppLogger.network)
             }
         } catch {
             AppLogger.error("Failed to check for updates", error: error, category: AppLogger.network)
@@ -193,7 +222,7 @@ class RemoteQuestionsService: ObservableObject {
     }
     
     func forceSync(for language: AppLanguage) async -> [Question] {
-        print("🔄 Force sync started for \(language.rawValue)")
+        AppLogger.info("Force sync started for \(language.rawValue)", category: AppLogger.network)
         
         await MainActor.run {
             isLoading = true
@@ -221,7 +250,7 @@ class RemoteQuestionsService: ObservableObject {
                 remoteQuestionsCount = remoteQuestions.count
             }
             
-            print("✅ Force sync completed: \(remoteQuestions.count) questions")
+            AppLogger.info("Force sync completed: \(remoteQuestions.count) questions", category: AppLogger.network)
             return remoteQuestions
         } catch {
             AppLogger.error("Force sync failed", error: error, category: AppLogger.network)

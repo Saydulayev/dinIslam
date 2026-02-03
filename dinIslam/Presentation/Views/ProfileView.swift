@@ -2,7 +2,7 @@
 //  ProfileView.swift
 //  dinIslam
 //
-//  Created by GPT-5 Codex on 09.11.25.
+//  Created by Saydulayev on 12.01.26.
 //
 
 import AuthenticationServices
@@ -61,7 +61,8 @@ struct ProfileView: View {
                 .foregroundColor(DesignTokens.Colors.textPrimary)
             }
         }
-        .toolbarBackground(DesignTokens.Colors.background1, for: .navigationBar)
+        .toolbarBackground(.clear, for: .navigationBar) // прозрачный toolbar для градиента
+        .toolbarBackground(.visible, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
         .onAppear {
             manager.validateAvatar()
@@ -255,8 +256,8 @@ struct ProfileView: View {
                     icon: "exclamationmark.circle",
                     value: "\(progress.correctedMistakes)",
                     label: "profile.progress.corrected".localized,
-                    iconColor: DesignTokens.Colors.iconOrange,
-                    backgroundColor: DesignTokens.Colors.iconOrange.opacity(0.2)
+                    iconColor: DesignTokens.Colors.iconYellow,
+                    backgroundColor: DesignTokens.Colors.iconYellow.opacity(0.2)
                 )
                 
                 ProgressCardView(
@@ -271,8 +272,8 @@ struct ProfileView: View {
                     icon: "flame",
                     value: "\(progress.currentStreak)",
                     label: "profile.progress.streak".localized,
-                    iconColor: DesignTokens.Colors.iconOrange,
-                    backgroundColor: DesignTokens.Colors.iconOrange.opacity(0.2)
+                    iconColor: DesignTokens.Colors.iconFlame,
+                    backgroundColor: DesignTokens.Colors.iconFlame.opacity(0.2)
                 )
             }
         }

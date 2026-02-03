@@ -2,11 +2,12 @@
 //  CloudKitProfileService.swift
 //  dinIslam
 //
-//  Created by GPT-5 Codex on 09.11.25.
+//  Created by Saydulayev on 12.01.26.
 //
 
 import CloudKit
 import Foundation
+import OSLog
 
 enum CloudKitProfileError: Error, LocalizedError {
     case encodingFailed
@@ -83,7 +84,7 @@ final class CloudKitProfileService {
         do {
             try await delete(recordID: recordID)
         } catch let error as CKError where error.code == .unknownItem {
-            print("⚠️ Profile \(userId) already deleted: \(error)")
+            AppLogger.warning("Profile \(userId) already deleted: \(error.localizedDescription)", category: AppLogger.data)
         }
     }
 

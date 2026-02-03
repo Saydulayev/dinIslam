@@ -25,7 +25,15 @@ private struct LocalizationProviderKey: EnvironmentKey {
 }
 
 private struct AchievementManagerKey: EnvironmentKey {
-    static let defaultValue: AchievementManaging? = nil
+    static let defaultValue: AchievementManager? = nil
+}
+
+private struct RemoteQuestionsServiceKey: EnvironmentKey {
+    static let defaultValue: RemoteQuestionsService? = nil
+}
+
+private struct NotificationManagerKey: EnvironmentKey {
+    static let defaultValue: NotificationManager? = nil
 }
 
 extension EnvironmentValues {
@@ -38,10 +46,21 @@ extension EnvironmentValues {
         }
     }
     
-    var achievementManager: AchievementManaging {
+    var achievementManager: AchievementManager {
         get { 
-            self[AchievementManagerKey.self] ?? AchievementManager(
-                notificationManager: NotificationManager()
+            if let manager = self[AchievementManagerKey.self] {
+                return manager
+            }
+            
+            // Fallback for previews/tests - use notificationManager from environment if available
+            // to maintain single source of truth for NotificationManager
+            let notificationManager = self[NotificationManagerKey.self] ?? NotificationManager()
+            let localizationProvider = self[LocalizationProviderKey.self] ?? LocalizationManager()
+            
+            // Create fallback instance (only used in previews/tests or if not set in environment)
+            return AchievementManager(
+                notificationManager: notificationManager,
+                localizationProvider: localizationProvider
             )
         }
         set { 
@@ -78,6 +97,24 @@ extension EnvironmentValues {
         }
         set { 
             self[ProfileManagerKey.self] = newValue 
+        }
+    }
+    
+    var remoteQuestionsService: RemoteQuestionsService {
+        get {
+            self[RemoteQuestionsServiceKey.self] ?? RemoteQuestionsService()
+        }
+        set {
+            self[RemoteQuestionsServiceKey.self] = newValue
+        }
+    }
+    
+    var notificationManager: NotificationManager {
+        get {
+            self[NotificationManagerKey.self] ?? NotificationManager()
+        }
+        set {
+            self[NotificationManagerKey.self] = newValue
         }
     }
 }
@@ -122,16 +159,17 @@ struct dinIslamApp: App {
                 profileManager: dependencies.profileManager,
                 examUseCase: dependencies.examUseCase,
                 examStatisticsManager: dependencies.examStatisticsManager,
-                enhancedQuizUseCase: enhancedDependencies.enhancedQuizUseCase
+                enhancedQuizUseCase: enhancedDependencies.enhancedQuizUseCase,
+                achievementManager: dependencies.achievementManager
             )
-            .environment(\.settingsManager, dependencies.settingsManager)
-            .environment(\.localizationProvider, dependencies.localizationProvider)
+            // Set achievementManager first to ensure it's available before any views access it
             .environment(\.achievementManager, dependencies.achievementManager)
-            .environmentObject(dependencies.achievementManager as? AchievementManager ?? AchievementManager(notificationManager: dependencies.notificationManager))
-            .environmentObject(dependencies.remoteQuestionsService)
-            .environmentObject(dependencies.notificationManager)
+            .environment(\.notificationManager, dependencies.notificationManager)
+            .environment(\.localizationProvider, dependencies.localizationProvider)
+            .environment(\.settingsManager, dependencies.settingsManager)
             .environment(\.statsManager, dependencies.statsManager)
             .environment(\.profileManager, dependencies.profileManager)
+            .environment(\.remoteQuestionsService, dependencies.remoteQuestionsService)
             .preferredColorScheme(.dark)
         }
     }

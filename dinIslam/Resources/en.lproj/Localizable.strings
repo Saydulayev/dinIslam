@@ -48,6 +48,7 @@
 "profile.sync.error.permission" = "No iCloud access. Check your settings";
 "profile.sync.error.auth" = "Authentication error. Please sign in again";
 "profile.sync.error.generic" = "Failed to sync. Please try again later";
+"profile.sync.retry" = "Retry Sync";
 "profile.sync.signin.required" = "Sign in to sync your progress across all devices";
 "profile.signin.prompt.title" = "Sync Your Progress";
 "profile.signin.prompt.message" = "Sign in to save your progress across all your devices and never lose your data";
@@ -115,7 +116,7 @@
 "settings.theme.light" = "Light";
 "settings.theme.dark" = "Dark";
 "settings.sound.title" = "Sound";
-"settings.haptic.title" = "Haptic Feedback";
+"settings.haptic.title" = "Haptic";
 "settings.notifications.title" = "Notifications";
 
 // Support
@@ -161,6 +162,7 @@
 
 // Quiz Loading
 "quiz.loading" = "Loading...";
+"quiz.bankCompleted" = "All questions have been studied. Switch to review mode.";
 
 // Stats View - Pluralization Support
 "stats.title" = "Statistics";
@@ -246,6 +248,7 @@
 
 // Achievements
 "achievements.title" = "Achievements";
+"achievements.singular" = "Achievement";
 "achievements.unlocked" = "Unlocked";
 "achievements.locked" = "Locked";
 "achievements.progress" = "Progress";
@@ -274,7 +277,7 @@
 // Achievement Descriptions (Locked)
 "achievements.firstQuiz.description" = "Complete your first quiz";
 "achievements.perfectScore.description" = "Get 100% in any quiz";
-"achievements.speedRunner.description" = "Complete a quiz in under 2 minutes";
+"achievements.speedRunner.description" = "Complete a quiz in under 2 minutes with 80%+ score";
 "achievements.scholar.description" = "Study 100 questions";
 "achievements.dedicated.description" = "Complete 10 quizzes";
 "achievements.master.description" = "Complete 50 quizzes";
@@ -286,7 +289,7 @@
 // Achievement Descriptions (Unlocked)
 "achievements.firstQuiz.description.unlocked" = "You completed your first quiz";
 "achievements.perfectScore.description.unlocked" = "You got 100% in a quiz";
-"achievements.speedRunner.description.unlocked" = "You completed a quiz in under 2 minutes";
+"achievements.speedRunner.description.unlocked" = "You completed a quiz in under 2 minutes with 80%+ score";
 "achievements.scholar.description.unlocked" = "You studied 100 questions";
 "achievements.dedicated.description.unlocked" = "You completed 10 quizzes";
 "achievements.master.description.unlocked" = "You completed 50 quizzes";
@@ -368,7 +371,7 @@
 "privacy.usage.title" = "Data Usage";
 "privacy.usage.content" = "Collected information is used for:\n\n• Displaying your learning progress\n• Personalizing the learning experience\n• Improving app functionality\n• Sending notifications (if enabled)";
 "privacy.storage.title" = "Data Storage";
-"privacy.storage.content" = "All data is stored locally on your device. We do not share your data with third parties and do not use cloud services for storing personal information.";
+"privacy.storage.content" = "Data is stored locally on your device. When signed in with Sign in with Apple, your learning statistics sync via iCloud (Apple CloudKit) for access across devices. We do not share your data with third-party companies.";
 "privacy.thirdParty.title" = "Third Party Services";
 "privacy.thirdParty.content" = "The app may use the following third-party services:\n\n• App Store (for app updates)\n• iOS system notifications\n\nThese services have their own privacy policies.";
 "privacy.rights.title" = "Your Rights";
@@ -494,3 +497,11 @@
 "start.loading" = "Loading...";
 "start.begin" = "Start Quiz";
 "start.examMode" = "Exam Mode";
+
+// Bank Completion
+"bank.completion.title" = "All Questions Studied!";
+"bank.completion.subtitle" = "Congratulations! You've completed the entire question bank.";
+"bank.completion.questionsCompleted" = "Questions Completed";
+"bank.completion.startOver" = "Start Over";
+"bank.completion.review" = "Review";
+"bank.completion.bankCompleted" = "Bank Completed";

@@ -11,7 +11,7 @@ import MessageUI
 struct SettingsView: View {
     @Bindable var viewModel: SettingsViewModel
     @Environment(\.dismiss) private var dismiss
-    @EnvironmentObject private var notificationManager: NotificationManager
+    @Environment(\.notificationManager) private var notificationManager: NotificationManager
     @State private var showingNotificationSettings = false
     
     init(viewModel: SettingsViewModel) {
@@ -20,12 +20,12 @@ struct SettingsView: View {
     
     var body: some View {
         ZStack {
-            // Gradient background
+            // Background - очень темный градиент с оттенками индиго/фиолетового (как на главном экране)
             LinearGradient(
-                colors: [
-                    DesignTokens.Colors.background1,
-                    DesignTokens.Colors.background2
-                ],
+                gradient: Gradient(colors: [
+                    Color(hex: "#0a0a1a"), // темно-индиго сверху
+                    Color(hex: "#000000") // черный снизу
+                ]),
                 startPoint: .top,
                 endPoint: .bottom
             )
@@ -52,7 +52,7 @@ struct SettingsView: View {
                             }
                             
                             Divider()
-                                .background(DesignTokens.Colors.borderSubtle)
+                                .background(Color.white.opacity(0.1))
                             
                             // Sound Setting
                             HStack(spacing: DesignTokens.Spacing.md) {
@@ -75,7 +75,7 @@ struct SettingsView: View {
                             .padding(.vertical, DesignTokens.Spacing.xs)
                             
                             Divider()
-                                .background(DesignTokens.Colors.borderSubtle)
+                                .background(Color.white.opacity(0.1))
                             
                             // Haptic Feedback Setting
                             HStack(spacing: DesignTokens.Spacing.md) {
@@ -86,6 +86,8 @@ struct SettingsView: View {
                                 Text("settings.haptic.title".localized)
                                     .font(DesignTokens.Typography.bodyRegular)
                                     .foregroundColor(DesignTokens.Colors.textPrimary)
+                                    .lineLimit(2)
+                                    .minimumScaleFactor(0.85)
                                 
                                 Spacer()
                                 
@@ -98,7 +100,7 @@ struct SettingsView: View {
                             .padding(.vertical, DesignTokens.Spacing.xs)
                             
                             Divider()
-                                .background(DesignTokens.Colors.borderSubtle)
+                                .background(Color.white.opacity(0.1))
                             
                             // Notifications Setting
                             SettingRow(
@@ -113,13 +115,26 @@ struct SettingsView: View {
                         }
                     }
                     .padding(DesignTokens.Spacing.xxl)
-                    .cardStyle(
-                        cornerRadius: DesignTokens.CornerRadius.xlarge,
-                        fillColor: DesignTokens.Colors.cardBackground,
-                        borderColor: DesignTokens.Colors.iconBlue.opacity(0.3),
-                        shadowColor: Color.black.opacity(0.2),
-                        shadowRadius: 8,
-                        shadowYOffset: 4
+                    .background(
+                        // Прозрачная рамка с фиолетовым свечением (как на главном экране)
+                        RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xlarge)
+                            .stroke(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [
+                                        DesignTokens.Colors.iconPurpleLight.opacity(0.5),
+                                        DesignTokens.Colors.iconPurpleLight.opacity(0.2)
+                                    ]),
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                ),
+                                lineWidth: 1.5
+                            )
+                            .shadow(
+                                color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
+                                radius: 12,
+                                x: 0,
+                                y: 0
+                            )
                     )
                     
                     // MARK: - Support Section
@@ -143,7 +158,7 @@ struct SettingsView: View {
                             }
                             
                             Divider()
-                                .background(DesignTokens.Colors.borderSubtle)
+                                .background(Color.white.opacity(0.1))
                             
                             // Rate App
                             SettingRow(
@@ -157,7 +172,7 @@ struct SettingsView: View {
                             }
                             
                             Divider()
-                                .background(DesignTokens.Colors.borderSubtle)
+                                .background(Color.white.opacity(0.1))
                             
                             // Share App
                             SettingRow(
@@ -172,13 +187,26 @@ struct SettingsView: View {
                         }
                     }
                     .padding(DesignTokens.Spacing.xxl)
-                    .cardStyle(
-                        cornerRadius: DesignTokens.CornerRadius.xlarge,
-                        fillColor: DesignTokens.Colors.cardBackground,
-                        borderColor: DesignTokens.Colors.iconGreen.opacity(0.3),
-                        shadowColor: Color.black.opacity(0.2),
-                        shadowRadius: 8,
-                        shadowYOffset: 4
+                    .background(
+                        // Прозрачная рамка с фиолетовым свечением (как на главном экране)
+                        RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xlarge)
+                            .stroke(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [
+                                        DesignTokens.Colors.iconPurpleLight.opacity(0.5),
+                                        DesignTokens.Colors.iconPurpleLight.opacity(0.2)
+                                    ]),
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                ),
+                                lineWidth: 1.5
+                            )
+                            .shadow(
+                                color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
+                                radius: 12,
+                                x: 0,
+                                y: 0
+                            )
                     )
                     
                     // MARK: - About Section
@@ -208,7 +236,7 @@ struct SettingsView: View {
                             .padding(.vertical, DesignTokens.Spacing.xs)
                             
                             Divider()
-                                .background(DesignTokens.Colors.borderSubtle)
+                                .background(Color.white.opacity(0.1))
                             
                             // Privacy Policy
                             SettingRow(
@@ -222,7 +250,7 @@ struct SettingsView: View {
                             }
                             
                             Divider()
-                                .background(DesignTokens.Colors.borderSubtle)
+                                .background(Color.white.opacity(0.1))
                             
                             // Terms of Service
                             SettingRow(
@@ -237,13 +265,26 @@ struct SettingsView: View {
                         }
                     }
                     .padding(DesignTokens.Spacing.xxl)
-                    .cardStyle(
-                        cornerRadius: DesignTokens.CornerRadius.xlarge,
-                        fillColor: DesignTokens.Colors.cardBackground,
-                        borderColor: DesignTokens.Colors.iconPurple.opacity(0.3),
-                        shadowColor: Color.black.opacity(0.2),
-                        shadowRadius: 8,
-                        shadowYOffset: 4
+                    .background(
+                        // Прозрачная рамка с фиолетовым свечением (как на главном экране)
+                        RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xlarge)
+                            .stroke(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [
+                                        DesignTokens.Colors.iconPurpleLight.opacity(0.5),
+                                        DesignTokens.Colors.iconPurpleLight.opacity(0.2)
+                                    ]),
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                ),
+                                lineWidth: 1.5
+                            )
+                            .shadow(
+                                color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
+                                radius: 12,
+                                x: 0,
+                                y: 0
+                            )
                     )
                 }
                 .padding(.horizontal, DesignTokens.Spacing.xxl)
@@ -263,7 +304,7 @@ struct SettingsView: View {
                 .foregroundColor(DesignTokens.Colors.textPrimary)
             }
         }
-        .toolbarBackground(DesignTokens.Colors.background1, for: .navigationBar)
+        .toolbarBackground(.clear, for: .navigationBar) // прозрачный toolbar для градиента
         .toolbarColorScheme(.dark, for: .navigationBar)
         .navigationBarBackButtonHidden(false)
         .sheet(isPresented: $viewModel.showingLanguagePicker) {
@@ -274,7 +315,7 @@ struct SettingsView: View {
         .sheet(isPresented: $showingNotificationSettings) {
             NavigationStack {
                 NotificationSettingsView()
-                    .environmentObject(notificationManager)
+                    .environment(\.notificationManager, notificationManager)
             }
         }
         .sheet(isPresented: $viewModel.showingPrivacyPolicy) {
@@ -341,12 +382,12 @@ struct SettingsView: View {
         
         var body: some View {
             ZStack {
-                // Gradient background
+                // Background - очень темный градиент с оттенками индиго/фиолетового (как на главном экране)
                 LinearGradient(
-                    colors: [
-                        DesignTokens.Colors.background1,
-                        DesignTokens.Colors.background2
-                    ],
+                    gradient: Gradient(colors: [
+                        Color(hex: "#0a0a1a"), // темно-индиго сверху
+                        Color(hex: "#000000") // черный снизу
+                    ]),
                     startPoint: .top,
                     endPoint: .bottom
                 )
@@ -376,18 +417,31 @@ struct SettingsView: View {
                             
                             if language != AppLanguage.allCases.last {
                                 Divider()
-                                    .background(DesignTokens.Colors.borderSubtle)
+                                    .background(Color.white.opacity(0.1))
                             }
                         }
                     }
                     .padding(DesignTokens.Spacing.xxl)
-                    .cardStyle(
-                        cornerRadius: DesignTokens.CornerRadius.xlarge,
-                        fillColor: DesignTokens.Colors.cardBackground,
-                        borderColor: DesignTokens.Colors.iconOrange.opacity(0.3),
-                        shadowColor: Color.black.opacity(0.2),
-                        shadowRadius: 8,
-                        shadowYOffset: 4
+                    .background(
+                        // Прозрачная рамка с фиолетовым свечением (как на главном экране)
+                        RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xlarge)
+                            .stroke(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [
+                                        DesignTokens.Colors.iconPurpleLight.opacity(0.5),
+                                        DesignTokens.Colors.iconPurpleLight.opacity(0.2)
+                                    ]),
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                ),
+                                lineWidth: 1.5
+                            )
+                            .shadow(
+                                color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
+                                radius: 12,
+                                x: 0,
+                                y: 0
+                            )
                     )
                     .padding(.horizontal, DesignTokens.Spacing.xxl)
                     .padding(.top, DesignTokens.Spacing.lg)
@@ -404,7 +458,7 @@ struct SettingsView: View {
                     .foregroundColor(DesignTokens.Colors.textPrimary)
                 }
             }
-            .toolbarBackground(DesignTokens.Colors.background1, for: .navigationBar)
+            .toolbarBackground(.clear, for: .navigationBar) // прозрачный toolbar для градиента
             .toolbarColorScheme(.dark, for: .navigationBar)
         }
     }

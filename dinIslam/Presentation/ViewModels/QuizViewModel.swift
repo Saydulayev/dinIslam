@@ -132,7 +132,12 @@ class QuizViewModel {
         }
     }
     
-    convenience init(quizUseCase: QuizUseCaseProtocol, statsManager: StatsManager, settingsManager: SettingsManager) {
+    convenience init(
+        quizUseCase: QuizUseCaseProtocol,
+        statsManager: StatsManager,
+        settingsManager: SettingsManager,
+        achievementManager: AchievementManager
+    ) {
         // Create default services
         let hapticManager = HapticManager(settingsManager: settingsManager)
         let soundManager = SoundManager(settingsManager: settingsManager)
@@ -142,7 +147,7 @@ class QuizViewModel {
         )
         let statisticsRecorder = DefaultQuizStatisticsRecorder(statsManager: statsManager)
         let achievementChecker = DefaultQuizAchievementChecker(
-            achievementManager: AchievementManager(notificationManager: NotificationManager())
+            achievementManager: achievementManager
         )
         
         self.init(
@@ -162,6 +167,16 @@ class QuizViewModel {
         
         do {
             let loadedQuestions = try await quizUseCase.startQuiz(language: language)
+            
+            // Проверяем, что вопросы действительно получены
+            guard !loadedQuestions.isEmpty else {
+                // Если банк завершён, это должно быть обработано в StartViewModel,
+                // но на случай если проверка не сработала, показываем ошибку
+                errorMessage = localizationProvider.localizedString(for: "quiz.bankCompleted")
+                state = .idle
+                isLoading = false
+                return
+            }
             
             // Shuffle answers (simple CPU work; safe to do on main actor for small arrays)
             let processedQuestions = loadedQuestions.map { quizUseCase.shuffleAnswers(for: $0) }
@@ -270,6 +285,10 @@ class QuizViewModel {
             
             // Check for new achievements
             achievementChecker.checkAchievements(for: statisticsRecorder.stats, quizResult: quizResult)
+            
+            // Помечаем вопросы как использованные только после полного завершения викторины
+            let questionIds = questions.map { $0.id }
+            quizUseCase.markQuestionsUsed(questionIds)
         }
         
         state = .completed(.finished)

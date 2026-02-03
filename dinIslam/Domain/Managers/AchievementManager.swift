@@ -258,7 +258,9 @@ class AchievementManager: ObservableObject, AchievementManaging {
             // Используем >= 99.99 для учета погрешности округления при расчете процента
             return (quizResult?.percentage ?? 0) >= 99.99
         case .speedRunner:
-            return quizResult?.timeSpent ?? 0 < 120 // 2 minutes
+            // Проверяем, что викторина завершена менее чем за 2 минуты И с минимум 80% правильных ответов
+            guard let result = quizResult else { return false }
+            return result.timeSpent < 120 && result.percentage >= 80.0
         case .scholar:
             return stats.totalQuestionsStudied >= 100
         case .dedicated:

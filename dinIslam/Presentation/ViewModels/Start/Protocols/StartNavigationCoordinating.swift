@@ -18,5 +18,6 @@ protocol StartNavigationCoordinating: AnyObject {
     func showExam()
     func resetNavigation()
     func finishExamSession()
+    func showBankCompletion(totalQuestions: Int)
 }
 

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct AchievementsView: View {
-    @EnvironmentObject private var achievementManager: AchievementManager
+    @ObservedObject var achievementManager: AchievementManager
     @Environment(\.dismiss) private var dismiss
     @Environment(\.settingsManager) private var settingsManager
     @Environment(\.statsManager) private var statsManager: StatsManager
@@ -16,32 +16,72 @@ struct AchievementsView: View {
     @State private var showingResetAlert = false
     @State private var selectedAchievement: Achievement?
     
+    init(achievementManager: AchievementManager? = nil) {
+        // Use the provided manager, or create a fallback (for previews)
+        _achievementManager = ObservedObject(wrappedValue: achievementManager ?? AchievementManager(
+            notificationManager: NotificationManager(),
+            localizationProvider: LocalizationManager()
+        ))
+    }
+    
+    private var backgroundGradient: some View {
+        // Background - очень темный градиент с оттенками индиго/фиолетового (как на главном экране)
+        LinearGradient(
+            gradient: Gradient(colors: [
+                Color(hex: "#0a0a1a"), // темно-индиго сверху
+                Color(hex: "#000000") // черный снизу
+            ]),
+            startPoint: .top,
+            endPoint: .bottom
+        )
+    }
+    
+    private var achievementsList: some View {
+        ScrollView {
+            LazyVStack(spacing: DesignTokens.Spacing.lg) {
+                ForEach(achievementManager.achievements) { achievement in
+                    AchievementCard(
+                        achievement: achievement,
+                        onTap: { selectedAchievement = achievement }
+                    )
+                }
+            }
+            .padding(.horizontal, DesignTokens.Spacing.xxl)
+            .padding(.top, DesignTokens.Spacing.lg)
+            .padding(.bottom, DesignTokens.Spacing.xxxl)
+        }
+    }
+    
+    private var expandedCardOverlay: some View {
+        Group {
+            if let achievement = selectedAchievement, achievement.isUnlocked {
+                ZStack {
+                    Color.black.opacity(0.7)
+                        .ignoresSafeArea()
+                        .onTapGesture {
+                            withAnimation {
+                                selectedAchievement = nil
+                            }
+                        }
+                    
+                    ExpandedAchievementCard(
+                        achievement: achievement,
+                        isPresented: Binding(
+                            get: { selectedAchievement != nil },
+                            set: { if !$0 { selectedAchievement = nil } }
+                        )
+                    )
+                }
+            }
+        }
+    }
+    
     var body: some View {
         ZStack {
-            // Gradient background
-            LinearGradient(
-                colors: [
-                    DesignTokens.Colors.background1,
-                    DesignTokens.Colors.background2
-                ],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea()
+            backgroundGradient
+                .ignoresSafeArea()
             
-            ScrollView {
-                LazyVStack(spacing: DesignTokens.Spacing.lg) {
-                    ForEach(achievementManager.achievements) { achievement in
-                        AchievementCard(
-                            achievement: achievement,
-                            onTap: { selectedAchievement = achievement }
-                        )
-                    }
-                }
-                .padding(.horizontal, DesignTokens.Spacing.xxl)
-                .padding(.top, DesignTokens.Spacing.lg)
-                .padding(.bottom, DesignTokens.Spacing.xxxl)
-            }
+            achievementsList
         }
         .navigationTitle("achievements.title".localized)
         .navigationBarTitleDisplayMode(.inline)
@@ -54,7 +94,7 @@ struct AchievementsView: View {
                 .foregroundColor(DesignTokens.Colors.iconRed)
             }
         }
-        .toolbarBackground(DesignTokens.Colors.background1, for: .navigationBar)
+        .toolbarBackground(.clear, for: .navigationBar) // прозрачный toolbar для градиента
         .toolbarColorScheme(.dark, for: .navigationBar)
         .alert(
             "achievements.reset.confirm.title".localized,
@@ -70,30 +110,7 @@ struct AchievementsView: View {
         } message: {
             Text("achievements.reset.confirm.message".localized)
         }
-        .overlay(
-            // Expanded Achievement Card Overlay
-            Group {
-                if let achievement = selectedAchievement, achievement.isUnlocked {
-                    ZStack {
-                        Color.black.opacity(0.7)
-                            .ignoresSafeArea()
-                            .onTapGesture {
-                                withAnimation {
-                                    selectedAchievement = nil
-                                }
-                            }
-                        
-                        ExpandedAchievementCard(
-                            achievement: achievement,
-                            isPresented: Binding(
-                                get: { selectedAchievement != nil },
-                                set: { if !$0 { selectedAchievement = nil } }
-                            )
-                        )
-                    }
-                }
-            }
-        )
+        .overlay(expandedCardOverlay)
     }
 }
 
@@ -102,7 +119,7 @@ struct AchievementCard: View {
     let onTap: () -> Void
     @Environment(\.localizationProvider) private var localizationProvider
     @Environment(\.settingsManager) private var settingsManager
-    @EnvironmentObject private var achievementManager: AchievementManager
+    @Environment(\.achievementManager) private var achievementManager: AchievementManager
     @Environment(\.statsManager) private var statsManager: StatsManager
     
     private var isUnlocked: Bool {
@@ -193,14 +210,28 @@ struct AchievementCard: View {
             }
         }
         .padding(DesignTokens.Spacing.xl)
-        .cardStyle(
-            cornerRadius: DesignTokens.CornerRadius.medium,
-            borderColor: isUnlocked ? achievement.color.opacity(0.45) : DesignTokens.Colors.borderDefault,
-            shadowColor: Color.black.opacity(0.24),
-            shadowRadius: 8,
-            shadowYOffset: 4
+        .background(
+            // Прозрачная рамка с фиолетовым свечением (как на главном экране)
+            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
+                .stroke(
+                    LinearGradient(
+                        gradient: Gradient(colors: [
+                            DesignTokens.Colors.iconPurpleLight.opacity(isUnlocked ? 0.5 : 0.3),
+                            DesignTokens.Colors.iconPurpleLight.opacity(isUnlocked ? 0.2 : 0.1)
+                        ]),
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 1.5
+                )
+                .shadow(
+                    color: DesignTokens.Colors.iconPurpleLight.opacity(isUnlocked ? 0.3 : 0.15),
+                    radius: 12,
+                    x: 0,
+                    y: 0
+                )
         )
-        .opacity(isUnlocked ? 1.0 : 0.7)
+        .opacity(isUnlocked ? 1.0 : 0.6)
         .animation(.easeInOut(duration: 0.3), value: isUnlocked)
         .onTapGesture {
             if isUnlocked {
@@ -255,68 +286,65 @@ struct ExpandedAchievementCard: View {
             
             // Buttons
             VStack(spacing: DesignTokens.Spacing.sm) {
-                // Share Button - стилизованная
-                Button(action: {
+                // Share Button - в стиле MinimalButton
+                MinimalButton(
+                    icon: "square.and.arrow.up",
+                    title: "achievements.share".localized,
+                    foregroundColor: achievement.color
+                ) {
                     shareAchievement()
-                }) {
-                    HStack(spacing: DesignTokens.Spacing.sm) {
-                        Image(systemName: "square.and.arrow.up")
-                            .font(.system(size: DesignTokens.Sizes.iconSmall))
-                        Text("achievements.share".localized)
-                            .font(DesignTokens.Typography.secondaryRegular)
-                    }
-                    .foregroundColor(achievement.color)
-                    .frame(maxWidth: .infinity)
-                    .padding(.horizontal, DesignTokens.Spacing.xl)
-                    .padding(.vertical, DesignTokens.Spacing.md)
-                    .cardStyle(
-                        cornerRadius: DesignTokens.CornerRadius.medium,
-                        borderColor: .clear,
-                        borderWidth: 0,
-                        shadowColor: Color.black.opacity(0.22),
-                        shadowRadius: 6,
-                        shadowYOffset: 3
-                    )
-                    .overlay(
-                        RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
-                            .stroke(achievement.color.opacity(0.5), lineWidth: 1)
-                    )
                 }
                 
-                // Close Button
-                Button(action: {
+                // Close Button - в стиле MinimalButton
+                MinimalButton(
+                    icon: "checkmark.square",
+                    title: localizationProvider.localizedString(for: "settings.done"),
+                    foregroundColor: DesignTokens.Colors.textSecondary
+                ) {
                     withAnimation(.easeInOut(duration: 0.3)) {
                         isPresented = false
                     }
-                }) {
-                    Text(localizationProvider.localizedString(for: "settings.done"))
-                        .font(DesignTokens.Typography.secondaryRegular)
-                        .foregroundColor(DesignTokens.Colors.textSecondary)
-                        .frame(maxWidth: .infinity)
-                        .padding(.horizontal, DesignTokens.Spacing.xl)
-                        .padding(.vertical, DesignTokens.Spacing.md)
-                        .cardStyle(
-                            cornerRadius: DesignTokens.CornerRadius.medium,
-                            borderColor: DesignTokens.Colors.borderDefault,
-                            shadowColor: Color.black.opacity(0.18),
-                            shadowRadius: 4,
-                            shadowYOffset: 2
-                        )
                 }
             }
         }
         .padding(DesignTokens.Spacing.xxl)
-        .cardStyle(
-            cornerRadius: DesignTokens.CornerRadius.xlarge,
-            borderColor: .clear,
-            borderWidth: 0,
-            shadowColor: Color.black.opacity(0.35),
-            shadowRadius: 20,
-            shadowYOffset: 12
+        .background(
+            ZStack {
+                // Прозрачный темный фон
+                RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xlarge)
+                    .fill(Color.black.opacity(0.4))
+                    .background(
+                        // Блюр эффект для глубины
+                        RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xlarge)
+                            .fill(.ultraThinMaterial)
+                    )
+                
+                // Рамка с фиолетовым свечением
+                RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xlarge)
+                    .stroke(
+                        LinearGradient(
+                            gradient: Gradient(colors: [
+                                DesignTokens.Colors.iconPurpleLight.opacity(0.5),
+                                DesignTokens.Colors.iconPurpleLight.opacity(0.2)
+                            ]),
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 1.5
+                    )
+                    .shadow(
+                        color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
+                        radius: 12,
+                        x: 0,
+                        y: 0
+                    )
+            }
         )
-        .overlay(
-            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xlarge)
-                .stroke(achievement.color.opacity(0.5), lineWidth: 2)
+        .clipShape(RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xlarge))
+        .shadow(
+            color: achievement.color.opacity(0.3),
+            radius: 20,
+            y: 12
         )
         .padding(.horizontal, DesignTokens.Spacing.xxxl)
         .scaleEffect(isPresented ? 1.0 : 0.8)
@@ -324,6 +352,7 @@ struct ExpandedAchievementCard: View {
         .animation(.spring(response: 0.6, dampingFraction: 0.8), value: isPresented)
     }
     
+    // MARK: - Helper
     private func shareAchievement() {
         guard let shareImage = generateShareImage() else {
             // Fallback to text if image generation fails
@@ -342,9 +371,8 @@ struct ExpandedAchievementCard: View {
         let renderer = ImageRenderer(content: shareableCard)
         renderer.scale = UIScreen.main.scale
         
-        // Устанавливаем размер изображения
-        // Размер карточки 1000x1200 + padding 60 с каждой стороны = 1120x1320
-        let targetSize = CGSize(width: 1120, height: 1320)
+        // Устанавливаем размер изображения (Instagram story size: 1080x1920)
+        let targetSize = CGSize(width: 1080, height: 1920)
         renderer.proposedSize = .init(width: targetSize.width, height: targetSize.height)
         
         // Даем время на рендеринг
@@ -391,78 +419,129 @@ struct ShareableAchievementCardView: View {
     @Environment(\.localizationProvider) private var localizationProvider
     
     var body: some View {
-        VStack(spacing: 40) {
-            // Icon
-            ZStack {
-                Circle()
-                    .fill(achievement.color.opacity(0.2))
-                    .frame(width: 200, height: 200)
-                
-                Image(systemName: achievement.icon)
-                    .font(.system(size: 100, weight: .semibold))
-                    .foregroundColor(achievement.color)
-            }
-            .padding(.top, 60)
+        ZStack {
+            // Background - темный градиент как на главном экране
+            LinearGradient(
+                gradient: Gradient(colors: [
+                    Color(hex: "#0a0a1a"), // темно-индиго сверху
+                    Color(hex: "#000000") // черный снизу
+                ]),
+                startPoint: .top,
+                endPoint: .bottom
+            )
             
-            // Title and Description
-            VStack(spacing: 20) {
-                Text(achievement.title)
-                    .font(.system(size: 64, weight: .bold))
-                    .foregroundColor(Color.black)
-                    .multilineTextAlignment(.center)
-                
-                Text(achievement.displayDescription(using: localizationProvider))
-                    .font(.system(size: 32))
-                    .foregroundColor(Color.gray)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 60)
-                
-                if let unlockedDate = achievement.unlockedDate {
-                    Text(localizationProvider.localizedString(for: "achievements.unlocked") + " " + 
-                         unlockedDate.formatted(date: .abbreviated, time: .omitted))
-                    .font(.system(size: 22))
-                    .foregroundColor(Color(red: 0.0, green: 0.7, blue: 0.0))
-                    .fontWeight(.medium)
-                    .padding(.top, 16)
+            VStack(spacing: 60) {
+                // App Logo at top
+                VStack(spacing: 20) {
+                    Image("image")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 180, height: 180)
+                    
+                    Text(localizationProvider.localizedString(for: "app.name"))
+                        .font(.system(size: 48, weight: .bold))
+                        .foregroundColor(.white)
                 }
-            }
-            
-            Spacer()
-            
-            // App Logo and Name at bottom
-            VStack(spacing: 20) {
-                Image("image")
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: 180, height: 180)
+                .padding(.top, 80)
                 
-                Text(localizationProvider.localizedString(for: "app.name"))
-                    .font(.system(size: 36, weight: .semibold))
-                    .foregroundColor(achievement.color)
+                Spacer()
+                
+                // Achievement Card - УВЕЛИЧЕНА
+                VStack(spacing: 50) {
+                    // Icon - УВЕЛИЧЕН
+                    ZStack {
+                        Circle()
+                            .fill(achievement.color.opacity(0.2))
+                            .frame(width: 280, height: 280)
+                        
+                        Image(systemName: achievement.icon)
+                            .font(.system(size: 140, weight: .semibold))
+                            .foregroundColor(achievement.color)
+                    }
+                    
+                    // Title and Description - УВЕЛИЧЕНЫ ШРИФТЫ
+                    VStack(spacing: 24) {
+                        Text(achievement.title)
+                            .font(.system(size: 60, weight: .bold))
+                            .foregroundColor(.white)
+                            .multilineTextAlignment(.center)
+                            .lineLimit(3)
+                        
+                        Text(achievement.displayDescription(using: localizationProvider))
+                            .font(.system(size: 36))
+                            .foregroundColor(Color.white.opacity(0.75))
+                            .multilineTextAlignment(.center)
+                            .lineLimit(4)
+                            .padding(.horizontal, 40)
+                        
+                        if let unlockedDate = achievement.unlockedDate {
+                            HStack(spacing: 12) {
+                                Image(systemName: "checkmark.circle.fill")
+                                    .font(.system(size: 32))
+                                    .foregroundColor(DesignTokens.Colors.iconGreen)
+                                
+                                Text(localizationProvider.localizedString(for: "achievements.unlocked") + " " + 
+                                     unlockedDate.formatted(date: .abbreviated, time: .omitted))
+                                .font(.system(size: 32, weight: .medium))
+                                .foregroundColor(DesignTokens.Colors.iconGreen)
+                            }
+                            .padding(.top, 16)
+                        }
+                    }
+                }
+                .padding(60)
+                .background(
+                    ZStack {
+                        // Прозрачная рамка с фиолетовым свечением (как на главном экране)
+                        RoundedRectangle(cornerRadius: 32)
+                            .fill(Color.white.opacity(0.05))
+                        
+                        RoundedRectangle(cornerRadius: 32)
+                            .stroke(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [
+                                        DesignTokens.Colors.iconPurpleLight.opacity(0.6),
+                                        DesignTokens.Colors.iconPurpleLight.opacity(0.3)
+                                    ]),
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                ),
+                                lineWidth: 3
+                            )
+                    }
+                )
+                .shadow(
+                    color: DesignTokens.Colors.iconPurpleLight.opacity(0.5),
+                    radius: 30,
+                    x: 0,
+                    y: 0
+                )
+                .padding(.horizontal, 80)
+                
+                Spacer()
+                
+                // Trophy icon at bottom - УВЕЛИЧЕН
+                HStack(spacing: 16) {
+                    Image(systemName: "trophy.fill")
+                        .font(.system(size: 40))
+                        .foregroundColor(achievement.color)
+                    
+                    Text("achievements.singular".localized)
+                        .font(.system(size: 40, weight: .semibold))
+                        .foregroundColor(.white.opacity(0.8))
+                }
+                .padding(.bottom, 80)
             }
-            .padding(.bottom, 60)
         }
-        .frame(width: 1000, height: 1200)
-        .background(
-            ZStack {
-                // Фон (белый)
-                RoundedRectangle(cornerRadius: 24)
-                    .fill(Color.white)
-                
-                // Обводка
-                RoundedRectangle(cornerRadius: 24)
-                    .stroke(achievement.color.opacity(0.3), lineWidth: 3)
-            }
-            .shadow(color: Color.black.opacity(0.1), radius: 20, x: 0, y: 10)
-        )
-        .padding(60)
+        .frame(width: 1080, height: 1920) // Instagram story size
+        .clipShape(RoundedRectangle(cornerRadius: 0))
     }
 }
 
 #Preview {
     NavigationStack {
         AchievementsView()
-            .environmentObject(AchievementManager(notificationManager: NotificationManager()))
+            .environment(\.achievementManager, AchievementManager(notificationManager: NotificationManager()))
             .environment(\.settingsManager, SettingsManager())
             .environment(\.localizationProvider, LocalizationManager())
     }

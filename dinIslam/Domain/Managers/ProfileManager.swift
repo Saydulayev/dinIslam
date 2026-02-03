@@ -2,7 +2,7 @@
 //  ProfileManager.swift
 //  dinIslam
 //
-//  Created by GPT-5 Codex on 09.11.25.
+//  Created by Saydulayev on 12.01.26.
 //
 
 import AuthenticationServices
@@ -219,6 +219,11 @@ final class ProfileManager {
         localStore.deleteAvatar(for: profileId)
         progressService.rebuildProgressFromLocalStats(profile: &profile)
         localStore.saveProfile(profile)
+        
+        // Очищаем прогресс изучения вопросов (usedIds)
+        let questionPoolProgressManager = DefaultQuestionPoolProgressManager()
+        questionPoolProgressManager.reset(version: 1)
+        questionPoolProgressManager.setReviewMode(false, version: 1)
 
         if isSignedIn {
             do {
@@ -243,6 +248,10 @@ final class ProfileManager {
         localStore.saveProfile(profile)
         if isSignedIn {
             await performSync()
+            // Проверяем статус синхронизации после завершения
+            if case .failed(let message) = syncState {
+                AppLogger.warning("Failed to sync avatar update to CloudKit: \(message)", category: AppLogger.data)
+            }
         }
     }
 
@@ -251,6 +260,10 @@ final class ProfileManager {
         localStore.saveProfile(profile)
         if isSignedIn {
             await performSync()
+            // Проверяем статус синхронизации после завершения
+            if case .failed(let message) = syncState {
+                AppLogger.warning("Failed to sync avatar deletion to CloudKit: \(message)", category: AppLogger.data)
+            }
         }
     }
     
@@ -261,6 +274,10 @@ final class ProfileManager {
         localStore.saveProfile(profile)
         if isSignedIn {
             await performSync()
+            // Проверяем статус синхронизации после завершения
+            if case .failed(let message) = syncState {
+                AppLogger.warning("Failed to sync display name update to CloudKit: \(message)", category: AppLogger.data)
+            }
         }
     }
 

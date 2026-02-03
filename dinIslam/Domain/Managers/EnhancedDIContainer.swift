@@ -66,11 +66,7 @@ class EnhancedDIContainer {
     }
     
     var achievementManager: AchievementManager {
-        // Cast to AchievementManager for backward compatibility
-        if let manager = _dependencies?.baseDependencies.achievementManager as? AchievementManager {
-            return manager
-        }
-        return AppDependencies().achievementManager as? AchievementManager ?? AchievementManager(notificationManager: NotificationManager())
+        _dependencies?.baseDependencies.achievementManager ?? AppDependencies().achievementManager
     }
     
     var localizationManager: LocalizationManager {
@@ -308,6 +304,13 @@ protocol EnhancedQuizUseCaseProtocol {
     func preloadQuestions(for languages: [String]) async
     func getCacheStatus() -> CacheStatus
     func clearCache() async
+    func isBankCompleted(language: String) async throws -> (isCompleted: Bool, totalQuestions: Int, studiedCount: Int)
+    func markQuestionsUsed(_ questionIds: [String])
+    
+    // Update checking
+    func checkForUpdates(language: String) async
+    func hasUpdates() -> Bool
+    func forceSync(language: String) async -> [Question]
 }
 
 // MARK: - Enhanced Quiz Use Case
@@ -335,36 +338,86 @@ class EnhancedQuizUseCase: EnhancedQuizUseCaseProtocol {
     
     func startQuiz(language: String) async throws -> [Question] {
         let allQuestions = try await questionsRepository.loadQuestions(language: language)
+        let currentQuestionIds = Set(allQuestions.map { $0.id })
         let used = questionPoolProgressManager.getUsedIds(version: questionPoolVersion)
-        
-        let sessionCount = min(20, allQuestions.count)
-        var selected = adaptiveEngine.selectQuestions(
-            from: allQuestions,
-            progress: profileManager.progress,
-            usedQuestionIds: used,
-            sessionCount: sessionCount
+        let isReviewMode = questionPoolProgressManager.isReviewMode(version: questionPoolVersion)
+        let isCompleted = questionPoolProgressManager.isBankCompleted(
+            currentQuestionIds: currentQuestionIds,
+            version: questionPoolVersion
         )
         
-        if selected.count < sessionCount {
-            let remainingNewQuestions = allQuestions.filter { question in
-                !used.contains(question.id) && !selected.contains(where: { $0.id == question.id })
+        // Если банк завершён и не в режиме повторения, возвращаем пустой массив (показываем экран завершения)
+        if isCompleted && !isReviewMode {
+            return []
+        }
+        
+        let sessionCount = min(20, allQuestions.count)
+        
+        // В режиме изучения (не reviewMode) выбираем только новые вопросы
+        if !isReviewMode {
+            let newQuestions = allQuestions.filter { !used.contains($0.id) }
+            let actualSessionCount = min(sessionCount, newQuestions.count)
+            
+            var selected = adaptiveEngine.selectQuestions(
+                from: allQuestions,
+                progress: profileManager.progress,
+                usedQuestionIds: used,
+                sessionCount: actualSessionCount
+            )
+            
+            // Фильтруем только новые вопросы (без повторов)
+            selected = selected.filter { !used.contains($0.id) }
+            
+            // Если не набрали достаточно, добавляем оставшиеся новые
+            if selected.count < actualSessionCount {
+                let alreadySelectedIds = Set(selected.map { $0.id })
+                let remainingNewQuestions = allQuestions.filter { question in
+                    !used.contains(question.id) && !alreadySelectedIds.contains(question.id)
+                }
+                if !remainingNewQuestions.isEmpty {
+                    let remainingNeeded = actualSessionCount - selected.count
+                    selected.append(contentsOf: Array(remainingNewQuestions.shuffled().prefix(remainingNeeded)))
+                }
             }
-            if !remainingNewQuestions.isEmpty {
+            
+            // Ограничиваем размер сессии количеством оставшихся новых вопросов
+            let finalSelected = Array(selected.prefix(actualSessionCount))
+            // НЕ помечаем как использованные здесь - только при завершении викторины
+            return finalSelected
+        } else {
+            // Режим повторения: используем текущую логику с повторами
+            var selected = adaptiveEngine.selectQuestions(
+                from: allQuestions,
+                progress: profileManager.progress,
+                usedQuestionIds: used,
+                sessionCount: sessionCount
+            )
+            
+            if selected.count < sessionCount {
+                let remainingNewQuestions = allQuestions.filter { question in
+                    !used.contains(question.id) && !selected.contains(where: { $0.id == question.id })
+                }
+                if !remainingNewQuestions.isEmpty {
+                    let remainingNeeded = sessionCount - selected.count
+                    selected.append(contentsOf: Array(remainingNewQuestions.shuffled().prefix(remainingNeeded)))
+                }
+            }
+            
+            if selected.count < sessionCount {
+                let fallback = allQuestions.filter { question in
+                    !selected.contains(where: { $0.id == question.id })
+                }
                 let remainingNeeded = sessionCount - selected.count
-                selected.append(contentsOf: Array(remainingNewQuestions.shuffled().prefix(remainingNeeded)))
+                selected.append(contentsOf: Array(fallback.shuffled().prefix(remainingNeeded)))
             }
+            
+            // НЕ помечаем как использованные здесь - только при завершении викторины
+            return selected
         }
-        
-        if selected.count < sessionCount {
-            let fallback = allQuestions.filter { question in
-                !selected.contains(where: { $0.id == question.id })
-            }
-            let remainingNeeded = sessionCount - selected.count
-            selected.append(contentsOf: Array(fallback.shuffled().prefix(remainingNeeded)))
-        }
-        
-        questionPoolProgressManager.markUsed(selected.map { $0.id }, version: questionPoolVersion)
-        return selected
+    }
+    
+    func markQuestionsUsed(_ questionIds: [String]) {
+        questionPoolProgressManager.markUsed(questionIds, version: questionPoolVersion)
     }
     
     func shuffleAnswers(for question: Question) -> Question {
@@ -409,5 +462,38 @@ class EnhancedQuizUseCase: EnhancedQuizUseCaseProtocol {
     
     func clearCache() async {
         await questionsRepository.clearCache()
+    }
+    
+    func isBankCompleted(language: String) async throws -> (isCompleted: Bool, totalQuestions: Int, studiedCount: Int) {
+        let allQuestions = try await questionsRepository.loadQuestions(language: language)
+        let currentQuestionIds = Set(allQuestions.map { $0.id })
+        let totalQuestions = allQuestions.count
+        let isCompleted = questionPoolProgressManager.isBankCompleted(
+            currentQuestionIds: currentQuestionIds,
+            version: questionPoolVersion
+        )
+        let stats = questionPoolProgressManager.getProgressStats(
+            total: totalQuestions,
+            currentQuestionIds: currentQuestionIds,
+            version: questionPoolVersion
+        )
+        
+        return (
+            isCompleted: isCompleted,
+            totalQuestions: totalQuestions,
+            studiedCount: stats.used
+        )
+    }
+    
+    func checkForUpdates(language: String) async {
+        await questionsRepository.checkForUpdates(language: language)
+    }
+    
+    func hasUpdates() -> Bool {
+        return questionsRepository.hasUpdates()
+    }
+    
+    func forceSync(language: String) async -> [Question] {
+        return await questionsRepository.forceSync(language: language)
     }
 }

@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ProfileSyncSectionView: View {
     @Bindable var manager: ProfileManager
-    @EnvironmentObject var remoteService: RemoteQuestionsService
+    @Environment(\.remoteQuestionsService) var remoteService: RemoteQuestionsService
     @Environment(\.settingsManager) private var settingsManager
     
     let isResettingProfile: Bool
@@ -43,22 +43,54 @@ struct ProfileSyncSectionView: View {
                         .foregroundStyle(DesignTokens.Colors.textSecondary)
                 }
                 
-                MinimalButton(
-                    icon: "icloud.fill",
-                    title: "profile.sync.refresh".localized,
-                    foregroundColor: DesignTokens.Colors.iconBlue
-                ) {
-                    Task { @MainActor [manager] in
-                        await manager.refreshFromCloud(mergeStrategy: .newest)
+                // Показываем более заметное сообщение об ошибке при неудачной синхронизации
+                if case .failed(let message) = manager.syncState {
+                    VStack(alignment: .leading, spacing: DesignTokens.Spacing.sm) {
+                        HStack(spacing: DesignTokens.Spacing.sm) {
+                            Image(systemName: "exclamationmark.triangle.fill")
+                                .font(.system(size: DesignTokens.Sizes.iconSmall))
+                                .foregroundColor(DesignTokens.Colors.iconOrange)
+                            
+                            Text(message)
+                                .font(DesignTokens.Typography.secondaryRegular)
+                                .foregroundStyle(DesignTokens.Colors.iconOrange)
+                        }
+                        .padding(DesignTokens.Spacing.md)
+                        .background(
+                            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
+                                .fill(DesignTokens.Colors.iconOrange.opacity(0.1))
+                        )
+                        
+                        MinimalButton(
+                            icon: "arrow.clockwise",
+                            title: "profile.sync.retry".localized,
+                            foregroundColor: DesignTokens.Colors.iconOrange
+                        ) {
+                            Task { @MainActor [manager] in
+                                await manager.refreshFromCloud(mergeStrategy: .newest)
+                            }
+                        }
+                        .disabled(isResettingProfile || manager.isLoading)
+                        .opacity((isResettingProfile || manager.isLoading) ? 0.6 : 1.0)
                     }
+                } else {
+                    MinimalButton(
+                        icon: "icloud.fill",
+                        title: "profile.sync.refresh".localized,
+                        foregroundColor: DesignTokens.Colors.iconBlue
+                    ) {
+                        Task { @MainActor [manager] in
+                            await manager.refreshFromCloud(mergeStrategy: .newest)
+                        }
+                    }
+                    .disabled(isResettingProfile || manager.isLoading)
+                    .opacity((isResettingProfile || manager.isLoading) ? 0.6 : 1.0)
                 }
-                .disabled(isResettingProfile || manager.isLoading)
-                .opacity((isResettingProfile || manager.isLoading) ? 0.6 : 1.0)
             }
             
             // Divider
             Divider()
-                .background(DesignTokens.Colors.borderSubtle)
+                .background(Color.white.opacity(0.1))
             
             // Questions Sync Section
             VStack(alignment: .leading, spacing: DesignTokens.Spacing.md) {
@@ -131,7 +163,27 @@ struct ProfileSyncSectionView: View {
             }
         }
         .padding(DesignTokens.Spacing.xxl)
-        .cardStyle(cornerRadius: DesignTokens.CornerRadius.xlarge)
+        .background(
+            // Прозрачная рамка с фиолетовым свечением (как на главном экране)
+            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xlarge)
+                .stroke(
+                    LinearGradient(
+                        gradient: Gradient(colors: [
+                            DesignTokens.Colors.iconPurpleLight.opacity(0.5),
+                            DesignTokens.Colors.iconPurpleLight.opacity(0.2)
+                        ]),
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 1.5
+                )
+                .shadow(
+                    color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
+                    radius: 12,
+                    x: 0,
+                    y: 0
+                )
+        )
     }
     
     // MARK: - Questions Sync Section (for non-signed in users)
@@ -205,7 +257,27 @@ struct ProfileSyncSectionView: View {
             }
         }
         .padding(DesignTokens.Spacing.xxl)
-        .cardStyle(cornerRadius: DesignTokens.CornerRadius.xlarge)
+        .background(
+            // Прозрачная рамка с фиолетовым свечением (как на главном экране)
+            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xlarge)
+                .stroke(
+                    LinearGradient(
+                        gradient: Gradient(colors: [
+                            DesignTokens.Colors.iconPurpleLight.opacity(0.5),
+                            DesignTokens.Colors.iconPurpleLight.opacity(0.2)
+                        ]),
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 1.5
+                )
+                .shadow(
+                    color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
+                    radius: 12,
+                    x: 0,
+                    y: 0
+                )
+        )
     }
 }
 

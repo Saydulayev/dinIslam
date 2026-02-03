@@ -11,7 +11,7 @@ import SwiftUI
 struct UnifiedProfileView: View {
     @Environment(\.profileManager) private var profileManager
     @Environment(\.settingsManager) private var settingsManager
-    @EnvironmentObject private var remoteService: RemoteQuestionsService
+    @Environment(\.remoteQuestionsService) private var remoteService: RemoteQuestionsService
     @Bindable var statsManager: StatsManager
     
     @State private var avatarPickerItem: PhotosPickerItem?
@@ -21,6 +21,7 @@ struct UnifiedProfileView: View {
     @State private var showingMistakesReview = false
     @State private var totalQuestionsCount: Int = 0
     @State private var showingResetAlert = false
+    @State private var statsRefreshTrigger: Int = 0
     @State private var isEditingDisplayName = false
     @State private var editingDisplayName = ""
     @State private var showingMistakesError = false
@@ -40,12 +41,12 @@ struct UnifiedProfileView: View {
         @Bindable var manager = profileManager
         
         ZStack {
-            // Gradient background
+            // Background - очень темный градиент с оттенками индиго/фиолетового (как на главном экране)
             LinearGradient(
-                colors: [
-                    DesignTokens.Colors.background1,
-                    DesignTokens.Colors.background2
-                ],
+                gradient: Gradient(colors: [
+                    Color(hex: "#0a0a1a"), // темно-индиго сверху
+                    Color(hex: "#000000") // черный снизу
+                ]),
                 startPoint: .top,
                 endPoint: .bottom
             )
@@ -66,7 +67,9 @@ struct UnifiedProfileView: View {
                     ProfileStatsSectionView(
                         manager: manager,
                         statsManager: statsManager,
-                        totalQuestionsCount: totalQuestionsCount
+                        totalQuestionsCount: totalQuestionsCount,
+                        isResettingProfile: isResettingProfile,
+                        statsRefreshTrigger: statsRefreshTrigger
                     )
                     
                     // Wrong Questions Section
@@ -110,7 +113,7 @@ struct UnifiedProfileView: View {
                 }
             }
         }
-        .toolbarBackground(DesignTokens.Colors.background1, for: .navigationBar)
+        .toolbarBackground(.clear, for: .navigationBar) // прозрачный toolbar для градиента
         .toolbarColorScheme(.dark, for: .navigationBar)
         .onAppear {
             manager.validateAvatar()
@@ -133,6 +136,8 @@ struct UnifiedProfileView: View {
                     isResettingProfile = true
                     await manager.resetProfileData()
                     isResettingProfile = false
+                    // Триггерим обновление статистики после сброса
+                    statsRefreshTrigger += 1
                 }
             }
             Button("profile.sync.reset.cancel".localized, role: .cancel) { }
@@ -148,7 +153,13 @@ struct UnifiedProfileView: View {
             }
             Button("stats.reset.confirm.ok".localized, role: .destructive) {
                 statsManager.resetStatsExceptTotalQuestions()
+                // Очищаем прогресс изучения вопросов (usedIds)
+                let questionPoolProgressManager = DefaultQuestionPoolProgressManager()
+                questionPoolProgressManager.reset(version: 1)
+                questionPoolProgressManager.setReviewMode(false, version: 1)
                 showingResetAlert = false
+                // Триггерим обновление статистики
+                statsRefreshTrigger += 1
             }
         } message: {
             Text("stats.reset.confirm.message".localized)
@@ -272,5 +283,5 @@ struct UnifiedProfileView: View {
     }
     .environment(\.profileManager, profileManager)
     .environment(\.settingsManager, SettingsManager())
-    .environmentObject(RemoteQuestionsService())
+    .environment(\.remoteQuestionsService, RemoteQuestionsService())
 }

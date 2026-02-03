@@ -21,11 +21,11 @@ struct ResultView: View {
     
     var body: some View {
         ZStack {
-            // Gradient Background
+            // Background - очень темный градиент с оттенками индиго/фиолетового (как на главном экране)
             LinearGradient(
                 gradient: Gradient(colors: [
-                    DesignTokens.Colors.background1,
-                    DesignTokens.Colors.background2
+                    Color(hex: "#0a0a1a"), // темно-индиго сверху
+                    Color(hex: "#000000") // черный снизу
                 ]),
                 startPoint: .top,
                 endPoint: .bottom
@@ -83,13 +83,26 @@ struct ResultView: View {
                         }
                     }
                     .padding(DesignTokens.Spacing.xxl)
-                    .cardStyle(
-                        cornerRadius: DesignTokens.CornerRadius.xlarge,
-                        fillColor: DesignTokens.Colors.cardBackground,
-                        borderColor: DesignTokens.Colors.iconBlue.opacity(0.3),
-                        shadowColor: Color.black.opacity(0.2),
-                        shadowRadius: 8,
-                        shadowYOffset: 4
+                    .background(
+                        // Прозрачная рамка с фиолетовым свечением (как на главном экране)
+                        RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xlarge)
+                            .stroke(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [
+                                        DesignTokens.Colors.iconPurpleLight.opacity(0.5),
+                                        DesignTokens.Colors.iconPurpleLight.opacity(0.2)
+                                    ]),
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                ),
+                                lineWidth: 1.5
+                            )
+                            .shadow(
+                                color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
+                                radius: 12,
+                                x: 0,
+                                y: 0
+                            )
                     )
                     .padding(.horizontal, DesignTokens.Spacing.xxl)
                     
@@ -104,17 +117,26 @@ struct ResultView: View {
                     }
                     .padding(DesignTokens.Spacing.lg)
                     .frame(maxWidth: .infinity)
-                    .cardStyle(
-                        cornerRadius: DesignTokens.CornerRadius.medium,
-                        fillColor: feedbackColor.opacity(0.15),
-                        borderColor: feedbackColor.opacity(0.35),
-                        shadowColor: Color.black.opacity(0.2),
-                        shadowRadius: 8,
-                        shadowYOffset: 4
-                    )
-                    .overlay(
+                    .background(
+                        // Прозрачная рамка с фиолетовым свечением (как на главном экране)
                         RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
-                            .stroke(feedbackColor, lineWidth: 1)
+                            .stroke(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [
+                                        DesignTokens.Colors.iconPurpleLight.opacity(0.5),
+                                        DesignTokens.Colors.iconPurpleLight.opacity(0.2)
+                                    ]),
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                ),
+                                lineWidth: 1.5
+                            )
+                            .shadow(
+                                color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
+                                radius: 12,
+                                x: 0,
+                                y: 0
+                            )
                     )
                     .padding(.horizontal, DesignTokens.Spacing.xxl)
                     
@@ -133,17 +155,26 @@ struct ResultView: View {
                             .foregroundColor(DesignTokens.Colors.iconBlue)
                             .frame(maxWidth: .infinity)
                             .frame(height: 56)
-                            .cardStyle(
-                                cornerRadius: DesignTokens.CornerRadius.medium,
-                                fillColor: DesignTokens.Colors.iconBlue.opacity(0.15),
-                                borderColor: DesignTokens.Colors.iconBlue.opacity(0.35),
-                                shadowColor: Color.black.opacity(0.2),
-                                shadowRadius: 8,
-                                shadowYOffset: 4
-                            )
-                            .overlay(
+                            .background(
+                                // Прозрачная рамка с фиолетовым свечением (как на главном экране)
                                 RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
-                                    .stroke(DesignTokens.Colors.borderSubtle, lineWidth: 1)
+                                    .stroke(
+                                        LinearGradient(
+                                            gradient: Gradient(colors: [
+                                                DesignTokens.Colors.iconPurpleLight.opacity(0.5),
+                                                DesignTokens.Colors.iconPurpleLight.opacity(0.2)
+                                            ]),
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        ),
+                                        lineWidth: 1.5
+                                    )
+                                    .shadow(
+                                        color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
+                                        radius: 12,
+                                        x: 0,
+                                        y: 0
+                                    )
                             )
                         }
                         
@@ -157,17 +188,26 @@ struct ResultView: View {
                             .foregroundColor(DesignTokens.Colors.iconBlue)
                             .frame(maxWidth: .infinity)
                             .frame(height: 56)
-                            .cardStyle(
-                                cornerRadius: DesignTokens.CornerRadius.medium,
-                                fillColor: DesignTokens.Colors.iconBlue.opacity(0.15),
-                                borderColor: DesignTokens.Colors.iconBlue.opacity(0.35),
-                                shadowColor: Color.black.opacity(0.2),
-                                shadowRadius: 8,
-                                shadowYOffset: 4
-                            )
-                            .overlay(
+                            .background(
+                                // Прозрачная рамка с фиолетовым свечением (как на главном экране)
                                 RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
-                                    .stroke(DesignTokens.Colors.borderSubtle, lineWidth: 1)
+                                    .stroke(
+                                        LinearGradient(
+                                            gradient: Gradient(colors: [
+                                                DesignTokens.Colors.iconPurpleLight.opacity(0.5),
+                                                DesignTokens.Colors.iconPurpleLight.opacity(0.2)
+                                            ]),
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        ),
+                                        lineWidth: 1.5
+                                    )
+                                    .shadow(
+                                        color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
+                                        radius: 12,
+                                        x: 0,
+                                        y: 0
+                                    )
                             )
                         }
                     }
@@ -180,7 +220,7 @@ struct ResultView: View {
         }
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
-        .toolbarBackground(DesignTokens.Colors.background1, for: .navigationBar)
+        .toolbarBackground(.clear, for: .navigationBar)
         .toolbarBackground(.visible, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
         .overlay(
