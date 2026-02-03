@@ -20,7 +20,27 @@
 		C2BAD0952F1E6FCE00DBB8A9 /* dinIslam.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = dinIslam.xcodeproj; sourceTree = "<group>"; };
 		C2D3B6042EC0B407009AA1DD /* dinIslam.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = dinIslam.xcodeproj; sourceTree = "<group>"; };
 		C2E892FA2ED0F5F7003AFF44 /* dinIslam.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = dinIslam.xcodeproj; sourceTree = "<group>"; };
+		T22747742EA631EA00F2199C /* dinIslamTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = dinIslamTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		T22747752EA631EA00F2199C /* QuestionValidatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuestionValidatorTests.swift; sourceTree = "<group>"; };
+		T22747762EA631EA00F2199C /* DefaultExamStatisticsCalculatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultExamStatisticsCalculatorTests.swift; sourceTree = "<group>"; };
+		T22747772EA631EA00F2199C /* ExamResultTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExamResultTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXBuildFile section */
+		T227477A2EA631EA00F2199C /* QuestionValidatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T22747752EA631EA00F2199C /* QuestionValidatorTests.swift */; };
+		T227477B2EA631EA00F2199C /* DefaultExamStatisticsCalculatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T22747762EA631EA00F2199C /* DefaultExamStatisticsCalculatorTests.swift */; };
+		T227477C2EA631EA00F2199C /* ExamResultTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T22747772EA631EA00F2199C /* ExamResultTests.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		T22747792EA631EA00F2199C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C227476C2EA631EA00F2199B /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C22747732EA631EA00F2199B;
+			remoteInfo = dinIslam;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
 		C2D3B64C2EC0C30F009AA1DD /* Exceptions for "dinIslam" folder in "dinIslam" target */ = {
@@ -51,6 +71,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		T22747712EA631EA00F2199C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -63,6 +90,7 @@
 			isa = PBXGroup;
 			children = (
 				C22747762EA631EA00F2199B /* dinIslam */,
+				T227476B2EA631EA00F2199C /* dinIslamTests */,
 				C22747752EA631EA00F2199B /* Products */,
 			);
 			sourceTree = "<group>";
@@ -71,8 +99,20 @@
 			isa = PBXGroup;
 			children = (
 				C22747742EA631EA00F2199B /* dinIslam.app */,
+				T22747742EA631EA00F2199C /* dinIslamTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		T227476B2EA631EA00F2199C /* dinIslamTests */ = {
+			isa = PBXGroup;
+			children = (
+				T22747752EA631EA00F2199C /* QuestionValidatorTests.swift */,
+				T22747762EA631EA00F2199C /* DefaultExamStatisticsCalculatorTests.swift */,
+				T22747772EA631EA00F2199C /* ExamResultTests.swift */,
+			);
+			name = dinIslamTests;
+			path = dinIslamTests;
 			sourceTree = "<group>";
 		};
 		C235C3762ECA4D51006A6CF3 /* Products */ = {
@@ -155,6 +195,23 @@
 			productReference = C22747742EA631EA00F2199B /* dinIslam.app */;
 			productType = "com.apple.product-type.application";
 		};
+		T22747732EA631EA00F2199C /* dinIslamTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = T227477F2EA631EB00F2199C /* Build configuration list for PBXNativeTarget "dinIslamTests" */;
+			buildPhases = (
+				T22747702EA631EA00F2199C /* Sources */,
+				T22747712EA631EA00F2199C /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				T22747782EA631EA00F2199C /* PBXTargetDependency */,
+			);
+			name = dinIslamTests;
+			productName = dinIslamTests;
+			productReference = T22747742EA631EA00F2199C /* dinIslamTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -166,6 +223,9 @@
 				LastUpgradeCheck = 2620;
 				TargetAttributes = {
 					C22747732EA631EA00F2199B = {
+						CreatedOnToolsVersion = 26.0.1;
+					};
+					T22747732EA631EA00F2199C = {
 						CreatedOnToolsVersion = 26.0.1;
 					};
 				};
@@ -236,9 +296,18 @@
 			projectRoot = "";
 			targets = (
 				C22747732EA631EA00F2199B /* dinIslam */,
+				T22747732EA631EA00F2199C /* dinIslamTests */,
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXTargetDependency section */
+		T22747782EA631EA00F2199C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C22747732EA631EA00F2199B /* dinIslam */;
+			targetProxy = T22747792EA631EA00F2199C /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXResourcesBuildPhase section */
 		C22747722EA631EA00F2199B /* Resources */ = {
@@ -255,6 +324,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		T22747702EA631EA00F2199C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				T227477A2EA631EA00F2199C /* QuestionValidatorTests.swift in Sources */,
+				T227477B2EA631EA00F2199C /* DefaultExamStatisticsCalculatorTests.swift in Sources */,
+				T227477C2EA631EA00F2199C /* ExamResultTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -458,6 +537,44 @@
 			};
 			name = Release;
 		};
+		T22747802EA631EB00F2199C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 93NA5FP2X8;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "saydulayev.wien-gmail.com.dinIslamTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/dinIslam.app/dinIslam";
+			};
+			name = Debug;
+		};
+		T22747812EA631EB00F2199C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 93NA5FP2X8;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "saydulayev.wien-gmail.com.dinIslamTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/dinIslam.app/dinIslam";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -475,6 +592,15 @@
 			buildConfigurations = (
 				C22747802EA631EB00F2199B /* Debug */,
 				C22747812EA631EB00F2199B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		T227477F2EA631EB00F2199C /* Build configuration list for PBXNativeTarget "dinIslamTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				T22747802EA631EB00F2199C /* Debug */,
+				T22747812EA631EB00F2199C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

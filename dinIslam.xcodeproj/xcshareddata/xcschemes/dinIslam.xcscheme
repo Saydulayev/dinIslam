@@ -35,8 +35,8 @@
             parallelizable = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "C282B4EE2EB9088D00024B17"
-               BuildableName = "dinIslamTests"
+               BlueprintIdentifier = "T22747732EA631EA00F2199C"
+               BuildableName = "dinIslamTests.xctest"
                BlueprintName = "dinIslamTests"
                ReferencedContainer = "container:dinIslam.xcodeproj">
             </BuildableReference>
