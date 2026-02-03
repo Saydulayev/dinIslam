@@ -122,6 +122,9 @@ class QuizUseCase: QuizUseCaseProtocol {
     }
     
     func shuffleAnswers(for question: Question) -> Question {
+        guard question.correctIndex >= 0, question.correctIndex < question.answers.count else {
+            return question
+        }
         let shuffledAnswers = question.answers.shuffled()
         let correctAnswer = question.answers[question.correctIndex]
         

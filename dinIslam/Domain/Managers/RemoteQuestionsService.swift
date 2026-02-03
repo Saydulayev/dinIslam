@@ -293,15 +293,31 @@ struct RemoteQuestion: Codable {
         }
         
         // Преобразуем answers в нужный формат
-        let questionAnswers: [Answer]
+        let rawAnswers: [Answer]
         switch answers {
         case .objects(let answerObjects):
-            questionAnswers = answerObjects.map { $0.toAnswer() }
+            rawAnswers = answerObjects.map { $0.toAnswer() }
         case .strings(let answerStrings):
-            // Генерируем ID для строковых ответов
-            questionAnswers = answerStrings.enumerated().map { index, text in
+            rawAnswers = answerStrings.enumerated().map { index, text in
                 Answer(id: "a\(index + 1)", text: text)
             }
+        }
+        
+        // Отсекаем пустые ответы (защита от лишних "" в JSON) и пересчитываем correctIndex
+        let trimmed = rawAnswers.map { a in
+            Answer(id: a.id, text: a.text.trimmingCharacters(in: .whitespacesAndNewlines))
+        }
+        var filtered: [(originalIndex: Int, answer: Answer)] = []
+        for (idx, a) in trimmed.enumerated() {
+            guard !a.text.isEmpty else { continue }
+            filtered.append((originalIndex: idx, answer: a))
+        }
+        let questionAnswers = filtered.map(\.answer)
+        let newCorrectIndex: Int
+        if let found = filtered.firstIndex(where: { $0.originalIndex == correctIndex }) {
+            newCorrectIndex = found
+        } else {
+            newCorrectIndex = min(max(0, correctIndex), questionAnswers.count - 1)
         }
         
         // Определяем difficulty
@@ -313,11 +329,15 @@ struct RemoteQuestion: Codable {
             questionDifficulty = .medium
         }
         
+        let finalAnswers = questionAnswers.isEmpty ? rawAnswers : questionAnswers
+        let finalCorrectIndex = questionAnswers.isEmpty ? correctIndex : newCorrectIndex
+        let safeCorrectIndex = finalAnswers.isEmpty ? 0 : max(0, min(finalCorrectIndex, finalAnswers.count - 1))
+
         return Question(
             id: questionId,
             text: questionText,
-            answers: questionAnswers,
-            correctIndex: correctIndex,
+            answers: finalAnswers,
+            correctIndex: safeCorrectIndex,
             category: questionCategory,
             difficulty: questionDifficulty
         )

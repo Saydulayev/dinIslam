@@ -32,8 +32,8 @@ class CacheManager {
     init(configuration: CacheConfiguration = .default) {
         self.configuration = configuration
         
-        // Create cache directory
-        let cachesPath = fileManager.urls(for: .cachesDirectory, in: .userDomainMask)[0]
+        // Create cache directory (fallback to temporaryDirectory if caches URL is unavailable)
+        let cachesPath = fileManager.urls(for: .cachesDirectory, in: .userDomainMask).first ?? fileManager.temporaryDirectory
         cacheDirectory = cachesPath.appendingPathComponent("QuestionsCache")
         
         try? fileManager.createDirectory(at: cacheDirectory, withIntermediateDirectories: true)

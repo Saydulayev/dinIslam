@@ -34,7 +34,7 @@ final class ProfileLocalStore {
         decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
 
-        let baseDirectory = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
+        let baseDirectory = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first ?? fileManager.temporaryDirectory
         directoryURL = baseDirectory.appendingPathComponent(Constants.directoryName, isDirectory: true)
         avatarsDirectoryURL = directoryURL.appendingPathComponent("Avatars", isDirectory: true)
         ensureDirectoryExists()
