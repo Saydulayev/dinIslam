@@ -28,8 +28,8 @@
 "profile.avatar.change" = "Сменить фото";
 "profile.avatar.delete" = "Удалить фото";
 "profile.sync.reset" = "Сбросить данные";
-"profile.sync.reset.title" = "Сбросить прогресс?";
-"profile.sync.reset.message" = "Все локальные и облачные данные профиля будут удалены. Продолжить?";
+"profile.sync.reset.title" = "Сбросить прогресс и имя?";
+"profile.sync.reset.message" = "Будут сброшены статистика, прогресс и отображаемое имя (локально и в iCloud). Фото профиля не изменится.";
 "profile.sync.reset.confirm" = "Сбросить";
 "profile.sync.reset.cancel" = "Отмена";
 "profile.sync.reset.inProgress" = "Сбрасываем данные…";

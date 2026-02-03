@@ -203,20 +203,20 @@ final class ProfileManager {
         localStore.deleteAvatar(for: signedInProfileId)
     }
 
+    /// Сброс статистики и отображаемого имени. Фото профиля не затрагивается — для удаления есть отдельная кнопка.
     func resetProfileData() async {
         isLoading = true
         syncService.cancelSync()
-        let profileId = profile.id
         errorMessage = nil
 
         statsManager.resetStats()
         examStatisticsManager.resetStatistics()
         lastRecommendations = []
         profile.progress = ProfileProgress()
-        profile.avatarURL = nil
+        profile.customDisplayName = nil
         profile.metadata.updatedAt = Date()
         profile.metadata.lastSyncedAt = nil
-        localStore.deleteAvatar(for: profileId)
+        // Фото не сбрасываем — удаляется только через кнопку «Удалить фото»
         progressService.rebuildProgressFromLocalStats(profile: &profile)
         localStore.saveProfile(profile)
         
@@ -226,14 +226,7 @@ final class ProfileManager {
         questionPoolProgressManager.setReviewMode(false, version: 1)
 
         if isSignedIn {
-            do {
-                try await cloudService.deleteProfile(with: profileId)
-                await performSync()
-            } catch {
-                let friendlyMessage = ProfileErrorHandler.userFriendlyErrorMessage(from: error)
-                errorMessage = friendlyMessage
-                syncState = .failed(friendlyMessage)
-            }
+            await performSync()
         } else {
             syncState = .idle
         }

@@ -28,8 +28,8 @@
 "profile.avatar.change" = "Change Photo";
 "profile.avatar.delete" = "Delete Photo";
 "profile.sync.reset" = "Reset Data";
-"profile.sync.reset.title" = "Reset progress?";
-"profile.sync.reset.message" = "This will remove all profile data locally and in iCloud. Continue?";
+"profile.sync.reset.title" = "Reset progress and name?";
+"profile.sync.reset.message" = "Statistics, progress, and display name will be reset locally and in iCloud. Your profile photo will not be changed.";
 "profile.sync.reset.confirm" = "Reset";
 "profile.sync.reset.cancel" = "Cancel";
 "profile.sync.reset.inProgress" = "Resetting data…";
