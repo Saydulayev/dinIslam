@@ -6,26 +6,6 @@
 	objectVersion = 77;
 	objects = {
 
-/* Begin PBXFileReference section */
-		C20EB7D12EC89DC700C1BC2F /* dinIslam.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = dinIslam.xcodeproj; sourceTree = "<group>"; };
-		C22747742EA631EA00F2199B /* dinIslam.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = dinIslam.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		C235C3732ECA4D51006A6CF3 /* dinIslam.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = dinIslam.xcodeproj; sourceTree = "<group>"; };
-		C23D8F122F0A9C3D003A897D /* dinIslam.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = dinIslam.xcodeproj; sourceTree = "<group>"; };
-		C23E762F2EC932A3006206DC /* dinIslam.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = dinIslam.xcodeproj; sourceTree = "<group>"; };
-		C24927CF2EBFD9FD009A4CC4 /* dinIslam.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = dinIslam.xcodeproj; sourceTree = "<group>"; };
-		C25AC6022F3227E300A29FBB /* dinIslam.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = dinIslam.xcodeproj; sourceTree = "<group>"; };
-		C275F25A2EBFD775002BEE44 /* dinIslam.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = dinIslam.xcodeproj; sourceTree = "<group>"; };
-		C28FBDDF2EC681DE0075C1DC /* dinIslam.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = dinIslam.xcodeproj; sourceTree = "<group>"; };
-		C2B4017E2EC634070063FCCE /* dinIslam.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = dinIslam.xcodeproj; sourceTree = "<group>"; };
-		C2BAD0952F1E6FCE00DBB8A9 /* dinIslam.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = dinIslam.xcodeproj; sourceTree = "<group>"; };
-		C2D3B6042EC0B407009AA1DD /* dinIslam.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = dinIslam.xcodeproj; sourceTree = "<group>"; };
-		C2E892FA2ED0F5F7003AFF44 /* dinIslam.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = dinIslam.xcodeproj; sourceTree = "<group>"; };
-		T22747742EA631EA00F2199C /* dinIslamTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = dinIslamTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		T22747752EA631EA00F2199C /* QuestionValidatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuestionValidatorTests.swift; sourceTree = "<group>"; };
-		T22747762EA631EA00F2199C /* DefaultExamStatisticsCalculatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultExamStatisticsCalculatorTests.swift; sourceTree = "<group>"; };
-		T22747772EA631EA00F2199C /* ExamResultTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExamResultTests.swift; sourceTree = "<group>"; };
-/* End PBXFileReference section */
-
 /* Begin PBXBuildFile section */
 		T227477A2EA631EA00F2199C /* QuestionValidatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T22747752EA631EA00F2199C /* QuestionValidatorTests.swift */; };
 		T227477B2EA631EA00F2199C /* DefaultExamStatisticsCalculatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T22747762EA631EA00F2199C /* DefaultExamStatisticsCalculatorTests.swift */; };
@@ -41,6 +21,27 @@
 			remoteInfo = dinIslam;
 		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		C20EB7D12EC89DC700C1BC2F /* dinIslam.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = dinIslam.xcodeproj; sourceTree = "<group>"; };
+		C22747742EA631EA00F2199B /* dinIslam.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = dinIslam.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C235C3732ECA4D51006A6CF3 /* dinIslam.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = dinIslam.xcodeproj; sourceTree = "<group>"; };
+		C23D8F122F0A9C3D003A897D /* dinIslam.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = dinIslam.xcodeproj; sourceTree = "<group>"; };
+		C23E762F2EC932A3006206DC /* dinIslam.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = dinIslam.xcodeproj; sourceTree = "<group>"; };
+		C24927CF2EBFD9FD009A4CC4 /* dinIslam.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = dinIslam.xcodeproj; sourceTree = "<group>"; };
+		C25AC6022F3227E300A29FBB /* dinIslam.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = dinIslam.xcodeproj; sourceTree = "<group>"; };
+		C275F25A2EBFD775002BEE44 /* dinIslam.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = dinIslam.xcodeproj; sourceTree = "<group>"; };
+		C28FBDDF2EC681DE0075C1DC /* dinIslam.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = dinIslam.xcodeproj; sourceTree = "<group>"; };
+		C2B4017E2EC634070063FCCE /* dinIslam.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = dinIslam.xcodeproj; sourceTree = "<group>"; };
+		C2BAD0952F1E6FCE00DBB8A9 /* dinIslam.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = dinIslam.xcodeproj; sourceTree = "<group>"; };
+		C2CFEEF52F34C2480012C6F6 /* dinIslam.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = dinIslam.xcodeproj; sourceTree = "<group>"; };
+		C2D3B6042EC0B407009AA1DD /* dinIslam.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = dinIslam.xcodeproj; sourceTree = "<group>"; };
+		C2E892FA2ED0F5F7003AFF44 /* dinIslam.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = dinIslam.xcodeproj; sourceTree = "<group>"; };
+		T22747742EA631EA00F2199C /* dinIslamTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = dinIslamTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		T22747752EA631EA00F2199C /* QuestionValidatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuestionValidatorTests.swift; sourceTree = "<group>"; };
+		T22747762EA631EA00F2199C /* DefaultExamStatisticsCalculatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultExamStatisticsCalculatorTests.swift; sourceTree = "<group>"; };
+		T22747772EA631EA00F2199C /* ExamResultTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExamResultTests.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
 		C2D3B64C2EC0C30F009AA1DD /* Exceptions for "dinIslam" folder in "dinIslam" target */ = {
@@ -104,17 +105,6 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		T227476B2EA631EA00F2199C /* dinIslamTests */ = {
-			isa = PBXGroup;
-			children = (
-				T22747752EA631EA00F2199C /* QuestionValidatorTests.swift */,
-				T22747762EA631EA00F2199C /* DefaultExamStatisticsCalculatorTests.swift */,
-				T22747772EA631EA00F2199C /* ExamResultTests.swift */,
-			);
-			name = dinIslamTests;
-			path = dinIslamTests;
-			sourceTree = "<group>";
-		};
 		C235C3762ECA4D51006A6CF3 /* Products */ = {
 			isa = PBXGroup;
 			name = Products;
@@ -160,6 +150,11 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		C2CFEEF82F34C2480012C6F6 /* Products */ = {
+			isa = PBXGroup;
+			name = Products;
+			sourceTree = "<group>";
+		};
 		C2D3B6062EC0B407009AA1DD /* Products */ = {
 			isa = PBXGroup;
 			name = Products;
@@ -168,6 +163,16 @@
 		C2E892FD2ED0F5F7003AFF44 /* Products */ = {
 			isa = PBXGroup;
 			name = Products;
+			sourceTree = "<group>";
+		};
+		T227476B2EA631EA00F2199C /* dinIslamTests */ = {
+			isa = PBXGroup;
+			children = (
+				T22747752EA631EA00F2199C /* QuestionValidatorTests.swift */,
+				T22747762EA631EA00F2199C /* DefaultExamStatisticsCalculatorTests.swift */,
+				T22747772EA631EA00F2199C /* ExamResultTests.swift */,
+			);
+			path = dinIslamTests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -265,6 +270,10 @@
 					ProjectRef = C23D8F122F0A9C3D003A897D /* dinIslam.xcodeproj */;
 				},
 				{
+					ProductGroup = C2CFEEF82F34C2480012C6F6 /* Products */;
+					ProjectRef = C2CFEEF52F34C2480012C6F6 /* dinIslam.xcodeproj */;
+				},
+				{
 					ProductGroup = C20EB7D42EC89DC700C1BC2F /* Products */;
 					ProjectRef = C20EB7D12EC89DC700C1BC2F /* dinIslam.xcodeproj */;
 				},
@@ -301,14 +310,6 @@
 		};
 /* End PBXProject section */
 
-/* Begin PBXTargetDependency section */
-		T22747782EA631EA00F2199C /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = C22747732EA631EA00F2199B /* dinIslam */;
-			targetProxy = T22747792EA631EA00F2199C /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
-
 /* Begin PBXResourcesBuildPhase section */
 		C22747722EA631EA00F2199B /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
@@ -338,6 +339,14 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		T22747782EA631EA00F2199C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C22747732EA631EA00F2199B /* dinIslam */;
+			targetProxy = T22747792EA631EA00F2199C /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		C227477D2EA631EB00F2199B /* Debug */ = {
@@ -492,12 +501,16 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "saydulayev.wien-gmail.com.dinIslam";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -528,12 +541,16 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "saydulayev.wien-gmail.com.dinIslam";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
