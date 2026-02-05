@@ -116,7 +116,7 @@
   },
   {
     "id": "q6",
-    "text": "From the hadith: On one of the canals of Paradise there is a valley called Butkhan. Where is this valley?",
+    "text": "From the hadith: \"Buthan is one of the rivers of Paradise.\" Where is the valley of Buthan on earth?",
     "answers": [
       {
         "id": "a1",
@@ -135,11 +135,11 @@
         "text": "Between Medina and Mecca"
       }
     ],
-    "correctIndex": 3
+    "correctIndex": 1
   },
   {
     "id": "q7",
-    "text": "Is Basmallah part of Surah Al-Fatihah?",
+    "text": "According to the majority of scholars, is the basmallah an ayah of Surah Al-Fatiha?",
     "answers": [
       {
         "id": "a1",
@@ -155,14 +155,14 @@
       },
       {
         "id": "a4",
-        "text": "She is part of all surahs of the Quran"
+        "text": "It is part of all surahs of the Qur'an"
       }
     ],
-    "correctIndex": 1
+    "correctIndex": 0
   },
   {
     "id": "q8",
-    "text": "Which surah, according to the hadith, is proof that basmallah is not part of the surahs other than Al-Fatiha?",
+    "text": "Which surah in the Qur'an does not begin with the basmallah?",
     "answers": [
       {
         "id": "a1",
@@ -181,7 +181,7 @@
         "text": "\"Al-Mulk\""
       }
     ],
-    "correctIndex": 3
+    "correctIndex": 2
   },
   {
     "id": "q9",
@@ -208,26 +208,26 @@
   },
   {
     "id": "q10",
-    "text": "Itikaf is a retreat for worship in...?",
+    "text": "Itikaf is seclusion for worship in a mosque. Where is it performed (minimum condition)?",
     "answers": [
       {
         "id": "a1",
-        "text": "On the roof of your house"
-      },
-      {
-        "id": "a2",
         "text": "In any mosque"
       },
       {
+        "id": "a2",
+        "text": "Only in a mosque where Juma prayer is held"
+      },
+      {
         "id": "a3",
-        "text": "Only in the mosque where Juma prayer is read"
+        "text": "On the roof of your house"
       },
       {
         "id": "a4",
         "text": "All options are suitable"
       }
     ],
-    "correctIndex": 2
+    "correctIndex": 0
   },
   {
     "id": "q11",
@@ -277,15 +277,15 @@
   },
   {
     "id": "q13",
-    "text": "What is mu'awwizat?",
+    "text": "What is al-mu'awwidhatayn?",
     "answers": [
       {
         "id": "a1",
-        "text": "The last three suras of the Koran"
+        "text": "The last three suras of the Qur'an"
       },
       {
         "id": "a2",
-        "text": "The last two suras of the Koran"
+        "text": "The last two suras of the Qur'an (Al-Falak and An-Nas)"
       },
       {
         "id": "a3",
@@ -296,7 +296,7 @@
         "text": "Surah An-Nas"
       }
     ],
-    "correctIndex": 0
+    "correctIndex": 1
   },
   {
     "id": "q14",
@@ -327,11 +327,11 @@
     "answers": [
       {
         "id": "a1",
-        "text": "Protects from arrows, bullets and oppression from the wife"
+        "text": "They were found written only with Abu Khuzayma ibn Thabit, and his testimony was accepted as two"
       },
       {
         "id": "a2",
-        "text": "They are preserved only in the Hafsa scrolls"
+        "text": "They are preserved only in Hafsa's scrolls"
       },
       {
         "id": "a3",
@@ -342,11 +342,11 @@
         "text": "They are usually read before a battle"
       }
     ],
-    "correctIndex": 2
+    "correctIndex": 0
   },
   {
     "id": "q16",
-    "text": "Which of His names did Allah leave on earth?",
+    "text": "Which of these names of Allah in the Qur'an is used only for Allah and not for creation?",
     "answers": [
       {
         "id": "a1",
@@ -358,14 +358,14 @@
       },
       {
         "id": "a3",
-        "text": "As-Sami'i'"
+        "text": "As-Sami'"
       },
       {
         "id": "a4",
-        "text": "Al-Salam"
+        "text": "As-Salam"
       }
     ],
-    "correctIndex": 3
+    "correctIndex": 0
   },
   {
     "id": "q17",
@@ -599,7 +599,7 @@
   },
   {
     "id": "q27",
-    "text": "There are verses of prostration in the Koran. How many are there?",
+    "text": "According to the majority of scholars, how many prostration verses (sujud at-tilawah) are in the Qur'an?",
     "answers": [
       {
         "id": "a1",
@@ -622,7 +622,7 @@
   },
   {
     "id": "q28",
-    "text": "What is the legal status of collective prayer?",
+    "text": "According to the Hanafi madhhab, what is the legal status of congregational prayer for men?",
     "answers": [
       {
         "id": "a1",
@@ -721,7 +721,7 @@
   },
   {
     "id": "q33",
-    "text": "What is the name of the fourth obligatory prayer?",
+    "text": "Which obligatory prayer is the fourth in time during the day?",
     "answers": [
       {
         "id": "a1",
@@ -740,11 +740,11 @@
         "text": "Isha"
       }
     ],
-    "correctIndex": 3
+    "correctIndex": 2
   },
   {
     "id": "q34",
-    "text": "By order of his Lord, Ibrahim (alaihis-salam) took Hajar and Ismail (alaihis-salam) to a desert valley. What was it called?",
+    "text": "Which name of Makkah is mentioned in the Qur'an (3:96)?",
     "answers": [
       {
         "id": "a1",
@@ -1008,23 +1008,23 @@
   },
   {
     "id": "q46",
-    "text": "From the hadith: whoever commits bloodletting ... on the day of the lunar month will be cured of all diseases. What number are we talking about?",
+    "text": "In the hadiths about hijama (cupping), preferred days of the month are mentioned. Which?",
     "answers": [
       {
         "id": "a1",
-        "text": "17th"
+        "text": "17th, 19th and 21st"
       },
       {
         "id": "a2",
-        "text": "19th"
+        "text": "14th, 15th and 16th"
       },
       {
         "id": "a3",
-        "text": "21st"
+        "text": "1st, 10th and 20th"
       },
       {
         "id": "a4",
-        "text": "14th"
+        "text": "Any odd day"
       }
     ],
     "correctIndex": 0
@@ -1146,26 +1146,26 @@
   },
   {
     "id": "q52",
-    "text": "From the hadith: Allah will write among the inhabitants of Paradise the one who performs five deeds during the day: visiting the sick, attending a funeral, fasting, freeing a slave and...?",
+    "text": "From the hadith: whoever in a day combines four deeds — visits the sick, attends a funeral, fasts and ... — will be written among the people of Paradise. What is the fourth deed?",
     "answers": [
       {
         "id": "a1",
-        "text": "Performs dukha prayer"
+        "text": "Performs Duha prayer"
       },
       {
         "id": "a2",
-        "text": "Dug a well"
+        "text": "Gave charity"
       },
       {
         "id": "a3",
-        "text": "Gave alms"
+        "text": "Goes to Friday prayers"
       },
       {
         "id": "a4",
-        "text": "Goes to Friday prayers"
+        "text": "Dug a well"
       }
     ],
-    "correctIndex": 3
+    "correctIndex": 1
   },
   {
     "id": "q53",
@@ -1365,14 +1365,14 @@
       },
       {
         "id": "a3",
-        "text": "After straightening in kiyama"
+        "text": "After straightening in qiyam"
       },
       {
         "id": "a4",
         "text": "There's no difference"
       }
     ],
-    "correctIndex": 3
+    "correctIndex": 1
   },
   {
     "id": "q62",
@@ -1384,14 +1384,14 @@
       },
       {
         "id": "a2",
-        "text": "No, it's not allowed"
+        "text": "No, it is not allowed (not established in the Sunnah)"
       },
       {
         "id": "a3",
         "text": "Only Shiites do this"
       }
     ],
-    "correctIndex": 0
+    "correctIndex": 1
   },
   {
     "id": "q63",
@@ -1510,7 +1510,7 @@
   },
   {
     "id": "q68",
-    "text": "Is continuity a prerequisite for performing wudu?",
+    "text": "According to the Hanbali madhhab, is continuity (muwalat) a required condition for wudu?",
     "answers": [
       {
         "id": "a1",
@@ -1518,7 +1518,7 @@
       },
       {
         "id": "a2",
-        "text": "No it is not"
+        "text": "No, it is not"
       }
     ],
     "correctIndex": 0
@@ -1552,22 +1552,22 @@
     "answers": [
       {
         "id": "a1",
-        "text": "Sujud, which is performed while reading certain verses of the Qur'an"
+        "text": "Two prostrations performed due to forgetfulness in prayer (before or after salam)"
       },
       {
         "id": "a2",
-        "text": "Judgment of gratitude to Allah for the good news"
+        "text": "Prostration performed when reciting certain verses of the Qur'an"
       },
       {
         "id": "a3",
-        "text": "Sujud before taslim in prayer"
+        "text": "Prostration of gratitude to Allah for good news"
       },
       {
         "id": "a4",
-        "text": "Sujud before the rulers"
+        "text": "Prostration before rulers"
       }
     ],
-    "correctIndex": 2
+    "correctIndex": 0
   },
   {
     "id": "q71",
@@ -1617,7 +1617,7 @@
   },
   {
     "id": "q73",
-    "text": "Do the following words in salawat relate to the Sunnah: “To Muhammad son of Abdullah”, “Seal of the Prophets”, “Imam of the God-fearing”, “Messenger of Mercy”?",
+    "text": "Do the following words belong to the established form of salawat: \"to Muhammad son of Abdullah\", \"Seal of the Prophets\", \"Imam of the God-fearing\", \"Messenger of Mercy\"?",
     "answers": [
       {
         "id": "a1",
@@ -1625,53 +1625,53 @@
       },
       {
         "id": "a2",
-        "text": "Only the words \"Seal of the Prophets\" are Sunnah"
+        "text": "Only the words \"Seal of the Prophets\" are sunnah"
       },
       {
         "id": "a3",
-        "text": "Only “to Muhammad son of Abdullah” is sunnah"
+        "text": "Only \"to Muhammad son of Abdullah\" is sunnah"
       },
       {
         "id": "a4",
-        "text": "These expressions are allowed but not required"
+        "text": "These expressions are allowed but are not the established form of salawat"
       }
     ],
-    "correctIndex": 0
+    "correctIndex": 3
   },
   {
     "id": "q74",
-    "text": "Is reciting dua kunut in witr prayer sunnah?",
+    "text": "According to the Hanafi madhhab, the dua qunut in witr prayer is read...",
     "answers": [
       {
         "id": "a1",
-        "text": "Read always"
+        "text": "Always"
       },
       {
         "id": "a2",
-        "text": "Read sometimes"
+        "text": "Sometimes"
       },
       {
         "id": "a3",
-        "text": "Don't read at all"
+        "text": "Not at all"
       },
       {
         "id": "a4",
         "text": "Only in Ramadan"
       }
     ],
-    "correctIndex": 1
+    "correctIndex": 0
   },
   {
     "id": "q75",
-    "text": "In Witr prayer, dua-kunut is read...",
+    "text": "According to the Hanafi madhhab, in witr prayer the dua qunut is read...",
     "answers": [
       {
         "id": "a1",
-        "text": "Before bowing from the waist"
+        "text": "Before bowing"
       },
       {
         "id": "a2",
-        "text": "After a bow"
+        "text": "After bowing"
       },
       {
         "id": "a3",
@@ -1824,23 +1824,23 @@
   },
   {
     "id": "q82",
-    "text": "How many times has the verse about the condemnation of drinking alcohol been revealed?",
+    "text": "How was the prohibition of wine established in the Qur'an?",
     "answers": [
       {
         "id": "a1",
-        "text": "3 times"
+        "text": "Gradually in three stages (Al-Baqarah 2:219, An-Nisa 4:43, Al-Maida 5:90-91)"
       },
       {
         "id": "a2",
-        "text": "1 time"
+        "text": "By a single verse"
       },
       {
         "id": "a3",
-        "text": "2 times"
+        "text": "By two verses"
       },
       {
         "id": "a4",
-        "text": "Several times with a gradual ban on wine (indications: Al-Baqarah 2:219, An-Nisa 4:43, Al-Maida 5:91)"
+        "text": "There is no prohibition in the Qur'an"
       }
     ],
     "correctIndex": 0
@@ -1985,23 +1985,23 @@
   },
   {
     "id": "q89",
-    "text": "A week consists of 7 days. Adam (alayhis salam) was created on Friday evening. On what day was the earth created?",
+    "text": "How many days, according to the Qur'an, did the creation of the heavens and the earth take?",
     "answers": [
       {
         "id": "a1",
-        "text": "On Saturday"
+        "text": "6"
       },
       {
         "id": "a2",
-        "text": "On Monday"
+        "text": "7"
       },
       {
         "id": "a3",
-        "text": "On Wednesday"
+        "text": "8"
       },
       {
         "id": "a4",
-        "text": "Thursday"
+        "text": "10"
       }
     ],
     "correctIndex": 0
@@ -2077,26 +2077,26 @@
   },
   {
     "id": "q93",
-    "text": "On the Day of Judgment, a bridge will be built after the scales. The Prophet ﷺ said that this is the place where...",
+    "text": "In the hadith about the Sirat it is said that this is the place where...",
     "answers": [
       {
         "id": "a1",
-        "text": "Thinner than a hair"
-      },
-      {
-        "id": "a2",
-        "text": "Sharper than the sword"
-      },
-      {
-        "id": "a3",
         "text": "Feet will slip"
       },
       {
+        "id": "a2",
+        "text": "Everyone passes without trial"
+      },
+      {
+        "id": "a3",
+        "text": "No one is afraid"
+      },
+      {
         "id": "a4",
-        "text": "There are sadaan thorns"
+        "text": "Passage is only for prophets"
       }
     ],
-    "correctIndex": 2
+    "correctIndex": 0
   },
   {
     "id": "q94",
@@ -2173,7 +2173,7 @@
     "answers": [
       {
         "id": "a1",
-        "text": "The place where a person puts on ihram when performing Hajj and ‘Umrah"
+        "text": "The set boundaries that cannot be crossed without ihram (for Hajj and 'Umrah)"
       },
       {
         "id": "a2",
@@ -2181,14 +2181,14 @@
       },
       {
         "id": "a3",
-        "text": "Place to say “Labbayka Allahumma Labbayk”"
+        "text": "Place to say \"Labbayka Allahumma Labbayk\""
       },
       {
         "id": "a4",
-        "text": "Place of entry into ihram during Hajj and Umrah"
+        "text": "Any place in Mecca"
       }
     ],
-    "correctIndex": 3
+    "correctIndex": 0
   },
   {
     "id": "q98",
@@ -2261,23 +2261,23 @@
   },
   {
     "id": "q101",
-    "text": "The person did not enter Mecca through the miqat. Will his pilgrimage be valid?",
+    "text": "If a person passes the miqat without ihram and does not return to it, will his pilgrimage be valid?",
     "answers": [
       {
         "id": "a1",
-        "text": "No it won't"
+        "text": "No, it will not"
       },
       {
         "id": "a2",
-        "text": "Yes it will"
+        "text": "Yes, it will"
       },
       {
         "id": "a3",
-        "text": "It will be if he makes atonement"
+        "text": "Yes, but he must offer expiation (dam)"
       },
       {
         "id": "a4",
-        "text": "It will be if he returns to miqat and puts on ihram again"
+        "text": "Only if he returns to the miqat and enters ihram again"
       }
     ],
     "correctIndex": 2
@@ -2813,7 +2813,7 @@
   },
   {
     "id": "q125",
-    "text": "Where did the Prophet ﷺ change the qibla during prayer after the revelation of the verse (Baqarah, 144)?",
+    "text": "Where did the Prophet ﷺ change the qibla during prayer after the revelation of the verse (Al-Baqarah 2:144)?",
     "answers": [
       {
         "id": "a1",
@@ -2821,18 +2821,18 @@
       },
       {
         "id": "a2",
-        "text": "In Medina"
+        "text": "In Medina (Masjid Banu Salama, Masjid al-Qiblatayn)"
       },
       {
         "id": "a3",
-        "text": "In the village of Cuba"
+        "text": "In the village of Quba"
       },
       {
         "id": "a4",
         "text": "In Khaybar"
       }
     ],
-    "correctIndex": 2
+    "correctIndex": 1
   },
   {
     "id": "q126",
@@ -2924,15 +2924,15 @@
   },
   {
     "id": "q130",
-    "text": "What to say when passing by a cemetery of non-believers?",
+    "text": "What should be said when passing by a cemetery of non-believers?",
     "answers": [
       {
         "id": "a1",
-        "text": "We apologize for them"
+        "text": "There is no prescribed greeting; it is better to remain silent"
       },
       {
         "id": "a2",
-        "text": "We don't say anything"
+        "text": "We ask forgiveness for them"
       },
       {
         "id": "a3",
@@ -2940,10 +2940,10 @@
       },
       {
         "id": "a4",
-        "text": "We pronounce salavat"
+        "text": "We pronounce salawat"
       }
     ],
-    "correctIndex": 2
+    "correctIndex": 0
   },
   {
     "id": "q131",
@@ -3039,26 +3039,26 @@
   },
   {
     "id": "q135",
-    "text": "Which of the following is the sunnah for entering a house?",
+    "text": "Which is the Sunnah when entering a house?",
     "answers": [
       {
         "id": "a1",
-        "text": "Read verse al-Kursi"
+        "text": "Say \"As-salamu 'alaykum\" and \"Bismillah\""
       },
       {
         "id": "a2",
-        "text": "Give salam even if there are no people"
+        "text": "Read Ayat al-Kursi"
       },
       {
         "id": "a3",
-        "text": "Say \"Bismillah\""
+        "text": "Enter silently"
       },
       {
         "id": "a4",
-        "text": "All of the above"
+        "text": "Say only \"Bismillah\" without salam"
       }
     ],
-    "correctIndex": 3
+    "correctIndex": 0
   },
   {
     "id": "q136",
@@ -3154,11 +3154,11 @@
   },
   {
     "id": "q140",
-    "text": "Who are the people who will be on the high place (Al-A'raf) between Heaven and Hell?",
+    "text": "Who are the people on the heights (Al-A'raf) according to the most common interpretation?",
     "answers": [
       {
         "id": "a1",
-        "text": "Those whose good deeds are equal to their sins"
+        "text": "Those whose good deeds equal their sins"
       },
       {
         "id": "a2",
@@ -3166,10 +3166,14 @@
       },
       {
         "id": "a3",
-        "text": "Both categories"
+        "text": "Only martyrs"
+      },
+      {
+        "id": "a4",
+        "text": "Only scholars"
       }
     ],
-    "correctIndex": 2
+    "correctIndex": 0
   },
   {
     "id": "q141",
@@ -3246,7 +3250,7 @@
     "answers": [
       {
         "id": "a1",
-        "text": "7 years"
+        "text": "10 years"
       },
       {
         "id": "a2",
@@ -3261,11 +3265,11 @@
         "text": "6 years"
       }
     ],
-    "correctIndex": 1
+    "correctIndex": 0
   },
   {
     "id": "q145",
-    "text": "Who was the third to accept Islam?",
+    "text": "Who was the first of the children to accept Islam?",
     "answers": [
       {
         "id": "a1",
@@ -3281,7 +3285,7 @@
       },
       {
         "id": "a4",
-        "text": "‘Ali ibn Abu Talib (radiyallahu anhu)"
+        "text": "'Ali ibn Abu Talib (radiyallahu anhu)"
       }
     ],
     "correctIndex": 3
@@ -3380,7 +3384,7 @@
   },
   {
     "id": "q150",
-    "text": "What to do with a lost item whose owner will not look for it?",
+    "text": "What should be done with a lost item whose owner is not found?",
     "answers": [
       {
         "id": "a1",
@@ -3392,14 +3396,14 @@
       },
       {
         "id": "a3",
-        "text": "Search owner 1 year"
+        "text": "Search for owner 1 year, then you may use it while remaining obliged to return"
       },
       {
         "id": "a4",
-        "text": "No need to declare"
+        "text": "No need to announce"
       }
     ],
-    "correctIndex": 3
+    "correctIndex": 2
   },
   {
     "id": "q151",
@@ -3518,7 +3522,7 @@
   },
   {
     "id": "q156",
-    "text": "What is the second longest verse in the Qur'an?",
+    "text": "Name the longest verse in the Qur'an.",
     "answers": [
       {
         "id": "a1",
@@ -3534,14 +3538,14 @@
       },
       {
         "id": "a4",
-        "text": "Al-Bakara, 102"
+        "text": "Al-Baqarah, verse 102"
       }
     ],
-    "correctIndex": 2
+    "correctIndex": 0
   },
   {
     "id": "q157",
-    "text": "Name the prophet to whom the scripture was revealed.",
+    "text": "To whom was the Zabur revealed?",
     "answers": [
       {
         "id": "a1",
@@ -3748,26 +3752,26 @@
   },
   {
     "id": "q166",
-    "text": "Changing the word order in the verse of Surah Kaf 50:19: “The agony of death will come with the truth” - if you say “The true agony will appear at death.” What is the ruling?",
+    "text": "Deliberately changing the Qur'anic text while reciting is...",
     "answers": [
       {
         "id": "a1",
-        "text": "This is a way out of religion if one does it knowing"
+        "text": "Forbidden; deliberate distortion of meaning can be kufr"
       },
       {
         "id": "a2",
-        "text": "This is considered a great sin"
+        "text": "Considered a major sin but does not take one out of Islam"
       },
       {
         "id": "a3",
-        "text": "Undesirable, but not a sin"
+        "text": "Disliked but not a sin"
       },
       {
         "id": "a4",
-        "text": "This is allowed"
+        "text": "It is allowed"
       }
     ],
-    "correctIndex": 3
+    "correctIndex": 0
   },
   {
     "id": "q167",
@@ -4323,7 +4327,7 @@
   },
   {
     "id": "q191",
-    "text": "How many steps (levels) are there in Paradise?",
+    "text": "How many levels are there in Paradise?",
     "answers": [
       {
         "id": "a1",
@@ -4331,38 +4335,38 @@
       },
       {
         "id": "a2",
-        "text": "As many as there are suras in the Koran"
+        "text": "As many as there are suras in the Qur'an"
       },
       {
         "id": "a3",
-        "text": "The same number of verses in the Quran"
+        "text": "The same number of verses in the Qur'an"
       },
       {
         "id": "a4",
-        "text": "As many as there are juzes in the Koran"
+        "text": "As many as there are juz' in the Qur'an"
       }
     ],
-    "correctIndex": 2
+    "correctIndex": 0
   },
   {
     "id": "q192",
-    "text": "How many parts is Firdaus divided into?",
+    "text": "If you ask Allah for Paradise, which level should you ask for (according to the hadith)?",
     "answers": [
       {
         "id": "a1",
-        "text": "100"
+        "text": "Al-Firdaus"
       },
       {
         "id": "a2",
-        "text": "114"
+        "text": "Adn"
       },
       {
         "id": "a3",
-        "text": "More than 6000"
+        "text": "'Illiyyun"
       },
       {
         "id": "a4",
-        "text": "30"
+        "text": "Sijjin"
       }
     ],
     "correctIndex": 0
@@ -4549,14 +4553,14 @@
   },
   {
     "id": "q205",
-    "question": "What four rivers flow in Paradise? (indicate the missing one)",
+    "question": "Which four rivers are mentioned in the Qur'an as rivers of Paradise? (47:15)",
     "answers": [
-      "Musk",
-      "Euphrates",
-      "Argun",
-      "Salsabil"
+      "Water, milk, wine and honey",
+      "Water, honey, vinegar and milk",
+      "Water, wine, olive oil and milk",
+      "Water, milk, wine and blood"
     ],
-    "correctIndex": 3
+    "correctIndex": 0
   },
   {
     "id": "q206",
@@ -4661,12 +4665,12 @@
     "id": "q215",
     "question": "What is the meaning of the word \"Hawiyah\"?",
     "answers": [
-      "Blazing Fire",
+      "Abyss, chasm",
+      "Blazing fire",
       "Raging fire",
-      "That which breaks into pieces",
       "Flame"
     ],
-    "correctIndex": 1
+    "correctIndex": 0
   },
   {
     "id": "q216",
@@ -4868,14 +4872,14 @@
   },
   {
     "id": "q234",
-    "question": "The thickness of the skin of a non-believer will be equal to...",
+    "question": "In the hadith it says the thickness of the skin of a disbeliever will be...",
     "answers": [
-      "One day's journey",
-      "One and a half days journey",
-      "Two days' journey",
-      "Three days' journey"
+      "7 cubits",
+      "42 cubits",
+      "70 cubits",
+      "100 cubits"
     ],
-    "correctIndex": 3
+    "correctIndex": 1
   },
   {
     "id": "q235",
@@ -4911,14 +4915,14 @@
   },
   {
     "id": "q238",
-    "question": "The road to Hell is paved...",
+    "question": "What are the two conditions for deeds to be accepted in Islam?",
     "answers": [
-      "Paving stones",
-      "Rose petals",
-      "With good intentions",
-      "Insidious plans"
+      "Sincerity for Allah and conformity to the Sunnah",
+      "Many deeds and publicity",
+      "Noble lineage and wealth",
+      "Intention alone without following the Sunnah"
     ],
-    "correctIndex": 2
+    "correctIndex": 0
   },
   {
     "id": "q239",
@@ -4955,14 +4959,14 @@
   },
   {
     "id": "q242",
-    "question": "\"I was sent...\"",
+    "question": "\"I was sent...\" (hadith about the nearness of the Hour). What is correct?",
     "answers": [
-      "With the proclamation of this Hour",
-      "With the breath of this Hour",
-      "As this Hour approaches",
-      "With the delay of this Hour"
+      "...with the approach of this Hour",
+      "...with the blowing of this Hour",
+      "...with the delay of this Hour",
+      "...with the destruction of this Hour"
     ],
-    "correctIndex": 1
+    "correctIndex": 0
   },
   {
     "id": "q243",
@@ -5054,13 +5058,13 @@
   },
   {
     "id": "q251",
-    "question": "As-Sahih 1468. Abu Malik (radiyallahu anhu) said: The Prophet ﷺ was asked about the children of polytheists. He ﷺ said: “They will...”",
+    "question": "There is disagreement about the children of polytheists. According to one strong opinion, what will happen to them on the Day of Judgment?",
     "answers": [
-      "Tested on Judgment Day",
-      "Inhabitants of Paradise",
-      "Servants of the inhabitants of Paradise"
+      "They will be tested",
+      "They will enter Paradise without testing",
+      "They will be servants of the people of Paradise"
     ],
-    "correctIndex": 2
+    "correctIndex": 0
   },
   {
     "id": "q252",
@@ -5086,14 +5090,14 @@
   },
   {
     "id": "q254",
-    "question": "The person completes the prayer, gives salam and reads dua. Which of the following duas did the Messenger of Allah ﷺ recite after salam?",
+    "question": "Which of the following remembrances is authentically established after the obligatory prayer?",
     "answers": [
-      "“Astagfirullah” (3 times), “Allahumma anta as-Salamu wa minka as-Salamu, tabarakta ya Zal-Jalali wal-Ikram”",
-      "\"Allahumma, a'inni 'ala zikrika wa shukrika wa husni 'ibadatik\"",
-      "“Allahumma, Rabbana atina fid-dunya hasana, wa fil-akhirati hasana, wa kina ‘azaba-n-Nar”",
-      "All three duas were read after salam"
+      "\"Astaghfirullah\" (3 times), then \"Allahumma anta as-Salamu wa minka as-Salam...\"",
+      "\"Allahumma Rabbana atina fid-dunya hasana...\"",
+      "A long personal dua with raised hands after every fard",
+      "There is no prescribed dhikr after fard"
     ],
-    "correctIndex": 3
+    "correctIndex": 0
   },
   {
     "id": "q255",
@@ -5161,12 +5165,12 @@
   },
   {
     "id": "q261",
-    "question": "What is the position in the sunnah of one who performs night prayer with ablution done in the evening?",
+    "question": "What is the sunnah ruling for someone who performs night prayer with wudu made in the evening?",
     "answers": [
-      "It is undesirable to do this (the correct option according to the votes, but not the truth)",
-      "This is the sunnah",
-      "This is not sunnah, but it is advisable",
-      "It's forbidden"
+      "It is permissible and recommended to keep one's wudu",
+      "It is disliked",
+      "It is forbidden",
+      "It is permissible only when ill"
     ],
     "correctIndex": 0
   },
@@ -5227,12 +5231,12 @@
   },
   {
     "id": "q267",
-    "question": "Is it a sin to refuse to share excess water? (Surah Al-Mulk, verse 30)",
+    "question": "According to hadiths, is it forbidden to withhold surplus water (when others need it)?",
     "answers": [
-      "It's a big sin",
-      "Minor sin",
-      "Undesirable",
-      "It's not a sin"
+      "Yes, it is forbidden",
+      "No, it is allowed",
+      "It is disliked but not forbidden",
+      "Only if the water was purchased"
     ],
     "correctIndex": 0
   },
@@ -5490,9 +5494,9 @@
   },
   {
     "id": "q291",
-    "question": "The khutbah begins with the words: “Verily, the best speech is the Book of Allah, and the best guidance is the guidance of Muhammad ﷺ.” What is the most serious sin after shirk?",
+    "question": "In the khutbah it is said: \"The worst matters are ...\". What is meant?",
     "answers": [
-      "Innovations",
+      "Innovations in religion",
       "Lie",
       "Slander",
       "Disobedience to parents"
@@ -5544,25 +5548,25 @@
   },
   {
     "id": "q296",
-    "question": "Tawhid and two testimonies in lexical meaning are...?",
+    "question": "Are the terms \"tawhid\" and \"shahada\" synonyms?",
     "answers": [
-      "Synonyms",
-      "Antonyms",
-      "Homonyms",
-      "Paronyms"
+      "No, they are different concepts",
+      "Yes, they are synonyms",
+      "They are antonyms",
+      "They are homonyms"
     ],
     "correctIndex": 0
   },
   {
     "id": "q297",
-    "question": "This surah comes after Surah Al-Baqarah (The Cow) in terms of the number of verses. What surah is this?",
+    "question": "Which surah is second in length (by number of verses) after Al-Baqarah?",
     "answers": [
-      "An-Nisa (Women)",
-      "Ali 'Imran (Family of Imran)",
-      "Ash-Shu'ara (Poets)",
-      "Al-Maida (Meal)"
+      "Ali 'Imran",
+      "An-Nisa",
+      "Ash-Shu'ara",
+      "Al-Maida"
     ],
-    "correctIndex": 2
+    "correctIndex": 0
   },
   {
     "id": "q298",
@@ -5576,10 +5580,10 @@
   },
   {
     "id": "q299",
-    "question": "Is it permissible to pay zakat to slaves?",
+    "question": "Is it permissible to give zakat under the category of fi ar-riqab (freeing slaves/mukatab)?",
     "answers": [
-      "No, it's not allowed",
-      "Allowed"
+      "Yes, it is",
+      "No, it is not"
     ],
     "correctIndex": 0
   },
@@ -5594,25 +5598,25 @@
   },
   {
     "id": "q301",
-    "question": "According to the hadith, the miskin will enter Paradise half a day earlier than the rich. Who is considered a miskin in Sharia?",
+    "question": "Who is a miskin in Sharia?",
     "answers": [
-      "A man with only one wife",
-      "A person with one week's worth of food",
-      "A person with enough food for a month",
-      "A person with food supply for one year"
+      "A person who has some means but not enough for basic needs",
+      "A person with no property or income at all",
+      "A person with enough for a year",
+      "A person with two wives"
     ],
-    "correctIndex": 3
+    "correctIndex": 0
   },
   {
     "id": "q302",
-    "question": "It is believed that a certain branch of Buddhists began their calendar with a miraculous event that is described in the Koran. What event are we talking about?",
+    "question": "In which surah is the splitting of the moon mentioned?",
     "answers": [
-      "Sura 7 \"Al-A'raf\", verse 73 - the miracle of the camel",
-      "Sura 54 \"Al-Qamar\", verse 1 - \"The Hour has approached, and the month has split\"",
-      "Sura 11 Hud, verse 44 - the landing of the Ark of Nuh at Mount Judi",
-      "Sura 20 “Ta Ha”, verses 77–79 - the passage of Musa and his people along the bottom of the sea"
+      "Al-Qamar",
+      "Al-Buruj",
+      "Al-Inshiqaq",
+      "Az-Zalzalah"
     ],
-    "correctIndex": 1
+    "correctIndex": 0
   },
   {
     "id": "q303",
@@ -5638,14 +5642,14 @@
   },
   {
     "id": "q305",
-    "question": "According to Sharia, a person is considered poor if he cannot save food for...?",
+    "question": "Who is a faqir (poor person) in Sharia?",
     "answers": [
-      "One day",
-      "For three days",
-      "For seven days",
-      "For three months"
+      "A person who does not have enough for basic needs",
+      "A person with half the required means",
+      "A person with a year's food supply",
+      "A person with wealth above nisab"
     ],
-    "correctIndex": 1
+    "correctIndex": 0
   },
   {
     "id": "q306",
@@ -5792,11 +5796,11 @@
   },
   {
     "id": "q319",
-    "question": "In the pre-Islamic period, zihar (\"you are like my mother's back\") divorce was practiced. What kind of atonement (kaffarat) is established for this in Islam?",
+    "question": "What is the kaffarah for zihar according to the Qur'an (58:3-4)?",
     "answers": [
-      "Fast for two months or feed 60 poor people",
+      "Free a slave; if unable, fast two months; if unable, feed 60 poor people",
       "Fast for three days or feed 10 poor people",
-      "Make tawbah (repentance)",
+      "Only tawbah (repentance)",
       "Ask your wife for forgiveness"
     ],
     "correctIndex": 0
@@ -5957,22 +5961,22 @@
   },
   {
     "id": "q334",
-    "question": "How many types of abrogation of religious injunctions (naskh) are there in Sharia?",
+    "question": "How many main types of naskh (abrogation) are identified in 'ulum al-Qur'an?",
     "answers": [
-      "1 type",
-      "2 types",
-      "3 types",
-      "4 types"
+      "1",
+      "2",
+      "3",
+      "4"
     ],
-    "correctIndex": 3
+    "correctIndex": 2
   },
   {
     "id": "q335",
-    "question": "How did the Messenger of Allah ﷺ find out about the end of a particular surah?",
+    "question": "How did the Messenger of Allah ﷺ know the end of a particular surah?",
     "answers": [
-      "According to Basmala",
-      "Jibril reported",
-      "Through suggestion"
+      "By the revelation of the basmallah",
+      "Jibril informed him",
+      "Through inspiration"
     ],
     "correctIndex": 0
   },
@@ -6089,12 +6093,12 @@
     "id": "q346",
     "question": "She was called \"the luckiest old woman.\" She married her daughters to the most eminent men of her time, and one of her daughters married the Messenger of Allah ﷺ and died in the same place where she married him. Who is she?",
     "answers": [
-      "‘Aisha رضي الله عنها",
+      "Hind bint 'Awf",
       "Khadija رضي الله عنها",
       "Maimuna رضي الله عنها",
       "Safiyya رضي الله عنها"
     ],
-    "correctIndex": 2
+    "correctIndex": 0
   },
   {
     "id": "q347",
@@ -6173,14 +6177,14 @@
   },
   {
     "id": "q354",
-    "question": "It is known that during the life of the Messenger of Allah ﷺ there were several scribes who wrote down the Quran. And the hadiths of that period...?",
+    "question": "Were hadith written during the life of the Messenger of Allah ﷺ?",
     "answers": [
-      "They were not written down, as it was prohibited, so as not to be confused with the verses",
-      "Only remembered",
-      "The Messenger of Allah ﷺ encouraged the recording of hadith",
-      "There is not a single reliable report of the recording of hadiths"
+      "Yes, some companions wrote them with his permission",
+      "No, writing hadith was completely forbidden",
+      "There is no authentic report of writing hadith",
+      "They were written only after the Prophet's death"
     ],
-    "correctIndex": 2
+    "correctIndex": 0
   },
   {
     "id": "q355",
@@ -6191,7 +6195,7 @@
       "At the Battle of Yamama",
       "At the Battle of Uhud"
     ],
-    "correctIndex": 0
+    "correctIndex": 2
   },
   {
     "id": "q356",
@@ -6267,11 +6271,11 @@
   },
   {
     "id": "q363",
-    "question": "If a Christian or Jew entered Muslim territory and was killed by accident, is he entitled to a diya?",
+    "question": "According to the Shafi'i madhhab, what is the amount of diya for a Christian or Jew (ahl al-dhimma) killed by accident?",
     "answers": [
-      "Required in the amount of a Muslim's diya",
-      "Required in the amount of half a Muslim's diya",
-      "There is no payment of diya except for a Muslim"
+      "Equal to a Muslim's diya",
+      "Half of a Muslim's diya",
+      "No diya is due except for a Muslim"
     ],
     "correctIndex": 1
   },
@@ -6284,7 +6288,7 @@
       "3",
       "1"
     ],
-    "correctIndex": 2
+    "correctIndex": 3
   },
   {
     "id": "q365",
@@ -6427,14 +6431,14 @@
   },
   {
     "id": "q378",
-    "question": "Which of these prayers is the most difficult for hypocrites?",
+    "question": "Which two prayers are described as the hardest for hypocrites?",
     "answers": [
-      "Asr",
-      "‘Isha",
-      "Spirit",
-      "Prayer between adhan and iqama"
+      "Fajr and 'Isha",
+      "Zuhr and Asr",
+      "Maghrib and Duha",
+      "Witr and Tahajjud"
     ],
-    "correctIndex": 1
+    "correctIndex": 0
   },
   {
     "id": "q379",
@@ -6449,11 +6453,11 @@
   },
   {
     "id": "q380",
-    "question": "Jamaat prayer. First row. Who in the front row receives the greatest reward?",
+    "question": "Which side of the rows (in congregational prayer) receives the blessing of Allah and the angels?",
     "answers": [
-      "The one who stands to the right of all",
-      "The one who stands immediately behind the imam",
-      "The one who stands to the left of everyone",
+      "The right side",
+      "The left side",
+      "Only the spots immediately behind the imam",
       "The reward is the same for everyone"
     ],
     "correctIndex": 0
@@ -6525,13 +6529,13 @@
   },
   {
     "id": "q387",
-    "question": "How many vowels are there in the Arabic alphabet?",
+    "question": "How many basic short vowel sounds (harakat) are there in Arabic?",
     "answers": [
+      "2",
       "3",
-      "5",
       "4",
-      "None"
+      "5"
     ],
-    "correctIndex": 3
+    "correctIndex": 1
   }
 ]
