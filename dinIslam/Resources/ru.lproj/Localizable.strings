@@ -124,6 +124,12 @@
 "settings.support" = "Поддержка";
 "settings.feedback.title" = "Обратная связь";
 "settings.feedback.subtitle" = "Поделитесь своими мыслями";
+"settings.feedback.technical.title" = "Техническая поддержка";
+"settings.feedback.technical.subtitle" = "Ошибки, сбои приложения, предложения";
+"settings.feedback.technical.subject" = "Tabiin Academy — Технический вопрос";
+"settings.feedback.religious.title" = "Религиозные вопросы";
+"settings.feedback.religious.subtitle" = "Вопросы по исламу и содержанию";
+"settings.feedback.religious.subject" = "Tabiin Academy — Религиозный вопрос";
 "settings.feedback.message" = "Выберите способ отправки отзыва";
 "settings.feedback.email" = "Отправить email";
 "settings.feedback.appStore" = "Оценить в App Store";

@@ -123,6 +123,12 @@
 "settings.support" = "Support";
 "settings.feedback.title" = "Send Feedback";
 "settings.feedback.subtitle" = "Share your thoughts";
+"settings.feedback.technical.title" = "Technical Support";
+"settings.feedback.technical.subtitle" = "Bugs, app issues, suggestions";
+"settings.feedback.technical.subject" = "Tabiin Academy — Technical";
+"settings.feedback.religious.title" = "Religious Questions";
+"settings.feedback.religious.subtitle" = "Questions about Islam and content";
+"settings.feedback.religious.subject" = "Tabiin Academy — Religious Question";
 "settings.feedback.message" = "Choose how to send your feedback";
 "settings.feedback.email" = "Send Email";
 "settings.feedback.appStore" = "Rate in App Store";

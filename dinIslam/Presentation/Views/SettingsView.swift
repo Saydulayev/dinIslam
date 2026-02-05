@@ -144,15 +144,33 @@ struct SettingsView: View {
                             .foregroundStyle(DesignTokens.Colors.textPrimary)
                         
                         VStack(spacing: DesignTokens.Spacing.sm) {
-                            // Send Feedback
+                            // Technical feedback
                             SettingRow(
-                                icon: "envelope",
+                                icon: "gearshape",
                                 iconColor: DesignTokens.Colors.iconBlue,
-                                title: "settings.feedback.title".localized,
-                                subtitle: "settings.feedback.subtitle".localized,
+                                title: "settings.feedback.technical.title".localized,
+                                subtitle: "settings.feedback.technical.subtitle".localized,
                                 showChevron: false
                             ) {
-                                if let url = URL(string: "mailto:saydulayev.wien@gmail.com?subject=Feedback&body=") {
+                                let techSubject = "settings.feedback.technical.subject".localized.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "Technical"
+                                if let url = URL(string: "mailto:saydulayev.wien@gmail.com?subject=\(techSubject)&body=") {
+                                    UIApplication.shared.open(url)
+                                }
+                            }
+                            
+                            Divider()
+                                .background(Color.white.opacity(0.1))
+                            
+                            // Religious questions
+                            SettingRow(
+                                icon: "book.closed",
+                                iconColor: DesignTokens.Colors.iconPurpleLight,
+                                title: "settings.feedback.religious.title".localized,
+                                subtitle: "settings.feedback.religious.subtitle".localized,
+                                showChevron: false
+                            ) {
+                                let relSubject = "settings.feedback.religious.subject".localized.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "Religious"
+                                if let url = URL(string: "mailto:amigomuslim65@gmail.com?subject=\(relSubject)&body=") {
                                     UIApplication.shared.open(url)
                                 }
                             }
