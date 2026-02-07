@@ -345,6 +345,7 @@ struct RemoteQuestion: Codable {
     
     enum CodingKeys: String, CodingKey {
         case id, text, question, answers, correctIndex, category, difficulty
+        case q, a, c // Короткие ключи для компактного JSON
     }
     
     init(from decoder: Decoder) throws {
@@ -365,14 +366,17 @@ struct RemoteQuestion: Codable {
             )
         }
         
-        // Обрабатываем текст вопроса (может быть "text" или "question")
+        // Текст вопроса: text | question | q (короткий)
         text = try? container.decode(String.self, forKey: .text)
-        question = try? container.decode(String.self, forKey: .question)
+        question = (try? container.decode(String.self, forKey: .question))
+            ?? (try? container.decode(String.self, forKey: .q))
         
-        // Обрабатываем answers (может быть массив объектов или массив строк)
+        // Answers: массив объектов, массив строк, или короткий ключ "a"
         if let answerObjects = try? container.decode([RemoteAnswer].self, forKey: .answers) {
             answers = .objects(answerObjects)
         } else if let answerStrings = try? container.decode([String].self, forKey: .answers) {
+            answers = .strings(answerStrings)
+        } else if let answerStrings = try? container.decode([String].self, forKey: .a) {
             answers = .strings(answerStrings)
         } else {
             throw DecodingError.typeMismatch(
@@ -384,7 +388,20 @@ struct RemoteQuestion: Codable {
             )
         }
         
-        correctIndex = try container.decode(Int.self, forKey: .correctIndex)
+        // correctIndex или короткий "c"
+        if let c = try? container.decode(Int.self, forKey: .correctIndex) {
+            correctIndex = c
+        } else if let c = try? container.decode(Int.self, forKey: .c) {
+            correctIndex = c
+        } else {
+            throw DecodingError.keyNotFound(
+                CodingKeys.correctIndex,
+                DecodingError.Context(
+                    codingPath: decoder.codingPath,
+                    debugDescription: "correctIndex or c is required"
+                )
+            )
+        }
         category = try? container.decode(String.self, forKey: .category)
         difficulty = try? container.decode(String.self, forKey: .difficulty)
     }
