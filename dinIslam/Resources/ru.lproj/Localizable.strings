@@ -429,6 +429,16 @@
 // Error Messages
 "error.title" = "Ошибка";
 "error.ok" = "ОК";
+"error.fileNotFound" = "Файл с вопросами не найден";
+"error.emptyData" = "Не удалось найти ни одного вопроса";
+"error.decodingError" = "Не удалось прочитать вопросы";
+"error.networkUnavailable" = "Нет подключения к интернету";
+"error.cacheError" = "Ошибка сохранённых данных";
+"error.timeout" = "Сервер не ответил вовремя";
+"error.recoverySuggestion.reload" = "Попробуйте перезапустить приложение";
+"error.recoverySuggestion.checkConnection" = "Проверьте подключение к интернету";
+"error.recoverySuggestion.clearCache" = "Попробуйте очистить кэш";
+"error.recoverySuggestion.retry" = "Попробуйте ещё раз";
 
 // Exam Mode
 "exam.title" = "Экзамен";

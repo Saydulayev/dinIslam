@@ -413,6 +413,16 @@
 // Error Messages
 "error.title" = "Error";
 "error.ok" = "OK";
+"error.fileNotFound" = "Questions file not found";
+"error.emptyData" = "No questions found";
+"error.decodingError" = "Failed to read questions";
+"error.networkUnavailable" = "No internet connection";
+"error.cacheError" = "Saved data error";
+"error.timeout" = "The server did not respond in time";
+"error.recoverySuggestion.reload" = "Try restarting the app";
+"error.recoverySuggestion.checkConnection" = "Check your internet connection";
+"error.recoverySuggestion.clearCache" = "Try clearing the cache";
+"error.recoverySuggestion.retry" = "Please try again";
 
 // Exam Mode
 "exam.title" = "Exam";
