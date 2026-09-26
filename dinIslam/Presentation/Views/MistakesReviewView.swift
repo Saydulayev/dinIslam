@@ -258,7 +258,7 @@ struct MistakesReviewView: View {
     let fallbackStrategy = FallbackQuestionSelectionStrategy()
     let questionPoolProgressManager = DefaultQuestionPoolProgressManager()
     let quizUseCase = QuizUseCase(
-        questionsRepository: QuestionsRepository(),
+        questionsRepository: EnhancedQuestionsRepository(),
         profileProgressProvider: profileManager, // ProfileManager implements ProfileProgressProviding
         questionSelectionStrategy: adaptiveStrategy,
         fallbackStrategy: fallbackStrategy,

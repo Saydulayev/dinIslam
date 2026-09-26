@@ -20,7 +20,7 @@ struct AppDependencies: AppDependenciesProtocol {
     let questionsRepository: QuestionsRepositoryProtocol
     let hapticManager: HapticManager
     let soundManager: SoundManager
-    let remoteQuestionsService: RemoteQuestionsService
+    let remoteQuestionsService: EnhancedRemoteQuestionsService
     let notificationManager: NotificationManager
     let questionPoolProgressManager: QuestionPoolProgressManaging
     
@@ -60,8 +60,15 @@ struct AppDependencies: AppDependenciesProtocol {
         statsManager.setProfileProgressSyncer(profileManager)
         examStatisticsManager.setProfileProgressSyncer(profileManager)
         
-        // Initialize repositories
-        self.questionsRepository = QuestionsRepository()
+        // Initialize questions loading (GitHub → cache → bundled)
+        EnhancedRemoteQuestionsService.removeLegacyCache(from: userDefaults)
+        let networkManager = NetworkManager()
+        let remoteQuestionsService = EnhancedRemoteQuestionsService(networkManager: networkManager)
+        self.remoteQuestionsService = remoteQuestionsService
+        self.questionsRepository = EnhancedQuestionsRepository(
+            remoteService: remoteQuestionsService,
+            networkManager: networkManager
+        )
         
         // Initialize question pool progress manager with injected UserDefaults
         self.questionPoolProgressManager = DefaultQuestionPoolProgressManager(userDefaults: userDefaults)
@@ -87,7 +94,6 @@ struct AppDependencies: AppDependenciesProtocol {
         // Initialize managers
         self.hapticManager = HapticManager(settingsManager: settingsManager)
         self.soundManager = SoundManager(settingsManager: settingsManager)
-        self.remoteQuestionsService = RemoteQuestionsService()
     }
 }
 

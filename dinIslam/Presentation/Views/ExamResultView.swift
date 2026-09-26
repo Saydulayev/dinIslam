@@ -424,7 +424,7 @@ struct ExamResultActionsView: View {
             ),
             viewModel: ExamViewModel(
                 examUseCase: ExamUseCase(
-                    questionsRepository: QuestionsRepository(),
+                    questionsRepository: EnhancedQuestionsRepository(),
                     examStatisticsManager: examStatsManager
                 ),
                 examStatisticsManager: examStatsManager,

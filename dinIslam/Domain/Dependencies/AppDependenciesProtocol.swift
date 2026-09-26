@@ -20,7 +20,7 @@ protocol AppDependenciesProtocol {
     var questionsRepository: QuestionsRepositoryProtocol { get }
     var hapticManager: HapticManager { get }
     var soundManager: SoundManager { get }
-    var remoteQuestionsService: RemoteQuestionsService { get }
+    var remoteQuestionsService: EnhancedRemoteQuestionsService { get }
     var notificationManager: NotificationManager { get }
     var questionPoolProgressManager: QuestionPoolProgressManaging { get }
 }
