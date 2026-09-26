@@ -4,6 +4,8 @@
 //
 //  Загрузка вопросов: GitHub → кэш → встроенные. Сеть подменяется через URLProtocol,
 //  кэш пишется во временную папку — реальный кэш приложения не трогается.
+//  Тесты помечены @MainActor: в приложении типы по умолчанию привязаны к главному
+//  потоку (SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor).
 //
 
 import XCTest
@@ -29,6 +31,7 @@ final class QuestionsLoadingTests: XCTestCase {
 
     // MARK: - GitHub
 
+    @MainActor
     func testNoCache_loadsFromGitHub_andSavesToCache() async {
         StubURLProtocol.respond(status: 200, etag: "\"v1\"", body: Self.remoteJSON(ids: ["q1", "q2"]))
         let (service, cache) = makeService()
@@ -43,6 +46,7 @@ final class QuestionsLoadingTests: XCTestCase {
         XCTAssertEqual(cached?.etag, "\"v1\"")
     }
 
+    @MainActor
     func testEnglish_requestsEnglishFile() async {
         StubURLProtocol.respond(status: 200, etag: nil, body: Self.remoteJSON(ids: ["e1"]))
         let (service, _) = makeService()
@@ -55,6 +59,7 @@ final class QuestionsLoadingTests: XCTestCase {
 
     // MARK: - Кэш
 
+    @MainActor
     func testFreshCache_isUsedWithoutNetworkRequest() async {
         let (service, cache) = makeService()
         cache.cacheData(Self.questions(ids: ["c1", "c2"]), for: "questions_ru", etag: "\"v1\"")
@@ -65,6 +70,7 @@ final class QuestionsLoadingTests: XCTestCase {
         XCTAssertTrue(StubURLProtocol.requests.isEmpty, "Свежий кэш не должен вызывать запрос в сеть")
     }
 
+    @MainActor
     func testExpiredCache_304_returnsCachedQuestions_andSendsETag() async {
         StubURLProtocol.respond(status: 304, etag: "\"v1\"", body: Data())
         let (service, cache) = makeService(ttl: -1) // кэш сразу считается устаревшим
@@ -76,6 +82,7 @@ final class QuestionsLoadingTests: XCTestCase {
         XCTAssertEqual(StubURLProtocol.requests.first?.value(forHTTPHeaderField: "If-None-Match"), "\"v1\"")
     }
 
+    @MainActor
     func testExpiredCache_200_replacesCache() async {
         StubURLProtocol.respond(status: 200, etag: "\"v2\"", body: Self.remoteJSON(ids: ["n1", "n2", "n3"]))
         let (service, cache) = makeService(ttl: -1)
@@ -89,6 +96,7 @@ final class QuestionsLoadingTests: XCTestCase {
         XCTAssertEqual(cached?.etag, "\"v2\"")
     }
 
+    @MainActor
     func testNetworkError_usesExpiredCache() async {
         StubURLProtocol.fail(with: URLError(.notConnectedToInternet))
         let (service, cache) = makeService(ttl: -1)
@@ -102,6 +110,7 @@ final class QuestionsLoadingTests: XCTestCase {
     // MARK: - Ошибки в данных
 
     /// Один неправильный вопрос пропускается, остальные загружаются.
+    @MainActor
     func testOneInvalidQuestion_isSkipped_restAreLoaded() async {
         var items = Self.remoteItems(ids: ["n1", "n2"])
         items.append(["id": "bad", "q": "Вопрос с одним ответом", "a": ["Единственный"], "c": 0])
@@ -118,6 +127,7 @@ final class QuestionsLoadingTests: XCTestCase {
     }
 
     /// Вопрос, который вообще не читается (нет ответов), тоже не ломает весь файл.
+    @MainActor
     func testUndecodableQuestion_isSkipped_restAreLoaded() async {
         var items = Self.remoteItems(ids: ["n1"])
         items.append(["id": "broken", "q": "Нет ответов"])
@@ -131,6 +141,7 @@ final class QuestionsLoadingTests: XCTestCase {
     }
 
     /// Повторяющийся id: остаётся первый вопрос, файл не отбрасывается.
+    @MainActor
     func testDuplicateId_keepsFirst() async {
         let items = Self.remoteItems(ids: ["n1", "n2", "n1"])
         StubURLProtocol.respond(status: 200, etag: nil, body: Self.json(items))
@@ -142,6 +153,7 @@ final class QuestionsLoadingTests: XCTestCase {
     }
 
     /// Если в файле нет ни одного правильного вопроса — остаётся старый кэш.
+    @MainActor
     func testNoValidQuestions_keepsOldCache() async {
         let items: [[String: Any]] = [["id": "bad", "q": "", "a": ["A", "B"], "c": 0]]
         StubURLProtocol.respond(status: 200, etag: "\"v2\"", body: Self.json(items))
@@ -157,6 +169,7 @@ final class QuestionsLoadingTests: XCTestCase {
     // MARK: - Встроенные вопросы
 
     /// Нет сети и нет кэша → загружаются вопросы, встроенные в приложение.
+    @MainActor
     func testNoNetwork_noCache_fallsBackToBundledQuestions() async throws {
         StubURLProtocol.fail(with: URLError(.notConnectedToInternet))
         let (service, _) = makeService()
@@ -168,6 +181,7 @@ final class QuestionsLoadingTests: XCTestCase {
     }
 
     /// Все встроенные вопросы правильные: ни один не отбрасывается при загрузке.
+    @MainActor
     func testBundledQuestions_allAreValid() throws {
         for language in [AppLanguage.russian, .english] {
             let url = try XCTUnwrap(Bundle.main.url(forResource: QuestionsFile.name(for: language), withExtension: "json"))
@@ -177,6 +191,7 @@ final class QuestionsLoadingTests: XCTestCase {
         }
     }
 
+    @MainActor
     func testBundledQuestionFiles_existAndAreNotEmpty() throws {
         for name in ["questions", "questions_en"] {
             let url = try XCTUnwrap(Bundle.main.url(forResource: name, withExtension: "json"), "\(name).json нет в приложении")
@@ -187,6 +202,7 @@ final class QuestionsLoadingTests: XCTestCase {
 
     // MARK: - Старая система
 
+    @MainActor
     func testRemoveLegacyCache_deletesOldUserDefaultsKeys() throws {
         let suiteName = "QuestionsLoadingTests-\(UUID().uuidString)"
         let defaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
