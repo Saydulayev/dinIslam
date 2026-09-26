@@ -10,6 +10,7 @@
 		T227477A2EA631EA00F2199C /* QuestionValidatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T22747752EA631EA00F2199C /* QuestionValidatorTests.swift */; };
 		T227477B2EA631EA00F2199C /* DefaultExamStatisticsCalculatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T22747762EA631EA00F2199C /* DefaultExamStatisticsCalculatorTests.swift */; };
 		T227477C2EA631EA00F2199C /* ExamResultTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T22747772EA631EA00F2199C /* ExamResultTests.swift */; };
+		T227477E2EA631EA00F2199C /* QuestionsLoadingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T227477D2EA631EA00F2199C /* QuestionsLoadingTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -28,6 +29,7 @@
 		T22747752EA631EA00F2199C /* QuestionValidatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuestionValidatorTests.swift; sourceTree = "<group>"; };
 		T22747762EA631EA00F2199C /* DefaultExamStatisticsCalculatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultExamStatisticsCalculatorTests.swift; sourceTree = "<group>"; };
 		T22747772EA631EA00F2199C /* ExamResultTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExamResultTests.swift; sourceTree = "<group>"; };
+		T227477D2EA631EA00F2199C /* QuestionsLoadingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuestionsLoadingTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -93,6 +95,7 @@
 				T22747752EA631EA00F2199C /* QuestionValidatorTests.swift */,
 				T22747762EA631EA00F2199C /* DefaultExamStatisticsCalculatorTests.swift */,
 				T22747772EA631EA00F2199C /* ExamResultTests.swift */,
+				T227477D2EA631EA00F2199C /* QuestionsLoadingTests.swift */,
 			);
 			path = dinIslamTests;
 			sourceTree = "<group>";
@@ -203,6 +206,7 @@
 				T227477A2EA631EA00F2199C /* QuestionValidatorTests.swift in Sources */,
 				T227477B2EA631EA00F2199C /* DefaultExamStatisticsCalculatorTests.swift in Sources */,
 				T227477C2EA631EA00F2199C /* ExamResultTests.swift in Sources */,
+				T227477E2EA631EA00F2199C /* QuestionsLoadingTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

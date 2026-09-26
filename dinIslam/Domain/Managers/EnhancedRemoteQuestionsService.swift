@@ -29,14 +29,19 @@ class CacheManager {
     private let cacheDirectory: URL
     private let configuration: CacheConfiguration
     
-    init(configuration: CacheConfiguration = .default) {
+    /// - Parameter cacheDirectory: custom cache folder (used by tests); defaults to Caches/QuestionsCache.
+    init(configuration: CacheConfiguration = .default, cacheDirectory: URL? = nil) {
         self.configuration = configuration
         
-        // Create cache directory (fallback to temporaryDirectory if caches URL is unavailable)
-        let cachesPath = fileManager.urls(for: .cachesDirectory, in: .userDomainMask).first ?? fileManager.temporaryDirectory
-        cacheDirectory = cachesPath.appendingPathComponent("QuestionsCache")
+        if let cacheDirectory {
+            self.cacheDirectory = cacheDirectory
+        } else {
+            // Create cache directory (fallback to temporaryDirectory if caches URL is unavailable)
+            let cachesPath = fileManager.urls(for: .cachesDirectory, in: .userDomainMask).first ?? fileManager.temporaryDirectory
+            self.cacheDirectory = cachesPath.appendingPathComponent("QuestionsCache")
+        }
         
-        try? fileManager.createDirectory(at: cacheDirectory, withIntermediateDirectories: true)
+        try? fileManager.createDirectory(at: self.cacheDirectory, withIntermediateDirectories: true)
     }
     
     func cacheData<T: Codable>(_ data: T, for key: String, etag: String? = nil, lastModified: Date? = nil) {

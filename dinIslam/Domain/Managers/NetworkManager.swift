@@ -90,16 +90,28 @@ class NetworkManager: ObservableObject {
     
     @Published var isConnected = true
     
-    init(configuration: NetworkConfiguration = .default) {
+    /// - Parameters:
+    ///   - session: custom URLSession (used by tests to stub network responses).
+    ///   - monitorsNetwork: pass `false` in tests to keep `isConnected` under test control.
+    init(
+        configuration: NetworkConfiguration = .default,
+        session: URLSession? = nil,
+        monitorsNetwork: Bool = true
+    ) {
         self.configuration = configuration
         
-        let sessionConfig = URLSessionConfiguration.default
-        sessionConfig.timeoutIntervalForRequest = configuration.timeout
-        sessionConfig.timeoutIntervalForResource = configuration.timeout * 2
+        if let session {
+            self.session = session
+        } else {
+            let sessionConfig = URLSessionConfiguration.default
+            sessionConfig.timeoutIntervalForRequest = configuration.timeout
+            sessionConfig.timeoutIntervalForResource = configuration.timeout * 2
+            self.session = URLSession(configuration: sessionConfig)
+        }
         
-        self.session = URLSession(configuration: sessionConfig)
-        
-        startNetworkMonitoring()
+        if monitorsNetwork {
+            startNetworkMonitoring()
+        }
     }
     
     deinit {
