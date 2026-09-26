@@ -110,30 +110,6 @@ final class StartViewModel {
         self.cachedLanguageCode = StartViewModel.languageCode(from: settingsManager)
     }
 
-    convenience init(
-        quizViewModel: QuizViewModel,
-        statsManager: StatsManager,
-        settingsManager: SettingsManager,
-        profileManager: ProfileManager,
-        examUseCase: ExamUseCaseProtocol,
-        examStatisticsManager: ExamStatisticsManager,
-        enhancedContainer: EnhancedDIContainer
-    ) {
-        let questionsPreloading = DefaultQuestionsPreloadingService(
-            enhancedQuizUseCase: enhancedContainer.enhancedQuizUseCase
-        )
-        self.init(
-            quizViewModel: quizViewModel,
-            statsManager: statsManager,
-            settingsManager: settingsManager,
-            profileManager: profileManager,
-            examUseCase: examUseCase,
-            examStatisticsManager: examStatisticsManager,
-            questionsPreloading: questionsPreloading,
-            enhancedQuizUseCase: enhancedContainer.enhancedQuizUseCase
-        )
-    }
-    
 
     // MARK: - Lifecycle
     func onAppear() {

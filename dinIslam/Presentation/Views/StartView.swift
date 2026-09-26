@@ -85,39 +85,6 @@ struct StartView: View {
         )
     }
     
-    init(
-        quizUseCase: QuizUseCaseProtocol,
-        statsManager: StatsManager,
-        settingsManager: SettingsManager,
-        profileManager: ProfileManager,
-        examUseCase: ExamUseCaseProtocol,
-        examStatisticsManager: ExamStatisticsManager,
-        enhancedContainer: EnhancedDIContainer,
-        achievementManager: AchievementManager
-    ) {
-        let quizViewModel = QuizViewModel(
-            quizUseCase: quizUseCase,
-            statsManager: statsManager,
-            settingsManager: settingsManager,
-            achievementManager: achievementManager
-        )
-        let questionsPreloading = DefaultQuestionsPreloadingService(
-            enhancedQuizUseCase: enhancedContainer.enhancedQuizUseCase
-        )
-        _model = State(
-            initialValue: StartViewModel(
-                quizViewModel: quizViewModel,
-                statsManager: statsManager,
-                settingsManager: settingsManager,
-                profileManager: profileManager,
-                examUseCase: examUseCase,
-                examStatisticsManager: examStatisticsManager,
-                questionsPreloading: questionsPreloading,
-                enhancedQuizUseCase: enhancedContainer.enhancedQuizUseCase
-            )
-        )
-    }
-    
     var body: some View {
         navigationContent(bindingModel: $model)
             .id(model.settingsManager.settings.language)
