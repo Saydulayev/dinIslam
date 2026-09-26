@@ -106,6 +106,9 @@ class NetworkManager: ObservableObject {
             let sessionConfig = URLSessionConfiguration.default
             sessionConfig.timeoutIntervalForRequest = configuration.timeout
             sessionConfig.timeoutIntervalForResource = configuration.timeout * 2
+            // Без URLCache: иначе система сама отвечает на If-None-Match и превращает 304 в 200,
+            // и мы заново скачиваем и разбираем файл вместо использования своего кэша.
+            sessionConfig.urlCache = nil
             self.session = URLSession(configuration: sessionConfig)
         }
         
