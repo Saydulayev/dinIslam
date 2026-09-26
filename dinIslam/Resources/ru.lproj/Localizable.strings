@@ -515,11 +515,6 @@
 "exam.grade.satisfactory" = "Удовлетворительно";
 "exam.grade.unsatisfactory" = "Неудовлетворительно";
 
-// Start View
-"start.loading" = "Загрузка...";
-"start.begin" = "Начать викторину";
-"start.examMode" = "Режим экзамена";
-
 // Bank Completion
 "bank.completion.title" = "Все вопросы изучены!";
 "bank.completion.subtitle" = "Поздравляем! Вы прошли весь банк вопросов.";

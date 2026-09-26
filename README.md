@@ -1,11 +1,5 @@
 # Tabiin Academy
 
-<p align="center">
-  <img src="https://github.com/Saydulayev/dinIslam/blob/main/dinIslam/Sreen./Simulator%20Screenshot%20-%20iPhone%2017%20Pro%20-%202026-02-05%20at%2013.09.13.png?raw=1" alt="Tabiin Academy Screenshot 1" width="240">
-  <img src="https://github.com/Saydulayev/dinIslam/blob/main/dinIslam/Sreen./Simulator%20Screenshot%20-%20iPhone%2017%20Pro%20-%202026-02-05%20at%2013.11.07.png?raw=1" alt="Tabiin Academy Screenshot 2" width="240">
-  <img src="https://github.com/Saydulayev/dinIslam/blob/main/dinIslam/Sreen./Simulator%20Screenshot%20-%20iPhone%2017%20Pro%20-%202026-02-05%20at%2013.12.00.png?raw=1" alt="Tabiin Academy Screenshot 3" width="240">
-</p>
-
 `Tabiin Academy` — iOS-приложение для изучения исламских знаний в формате квиза и экзамена.  
 Проект написан на SwiftUI и организован по принципам Clean Architecture + MVVM.
 
