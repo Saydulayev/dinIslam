@@ -197,22 +197,11 @@ struct UnifiedProfileView: View {
     // MARK: - Helper Methods
     private func loadTotalQuestionsCount() {
         loadQuestionsTask?.cancel()
-        loadQuestionsTask = Task { @MainActor [settingsManager] in
-            do {
-                let questionsRepository = EnhancedQuestionsRepository()
-                let currentLanguage = settingsManager.settings.language.rawValue
-                
-                let questions = try await questionsRepository.loadQuestions(language: currentLanguage)
-                
-                await MainActor.run {
-                    totalQuestionsCount = questions.count
-                }
-            } catch {
-                AppLogger.error("UnifiedProfileView: Failed to load questions count", error: error, category: AppLogger.data)
-                await MainActor.run {
-                    totalQuestionsCount = 0
-                }
-            }
+        loadQuestionsTask = Task { @MainActor [settingsManager, remoteService] in
+            // Same service as the quiz: fresh cache is used without a network request
+            let language: AppLanguage = settingsManager.settings.language == .english ? .english : .russian
+            let questions = await remoteService.fetchQuestions(for: language, manageLoadingState: false)
+            totalQuestionsCount = questions.count
         }
     }
     

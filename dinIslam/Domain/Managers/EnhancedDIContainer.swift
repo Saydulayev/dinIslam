@@ -17,126 +17,20 @@ class EnhancedDIContainer {
 }
 
 // MARK: - Enhanced Dependencies
+/// Uses the same questions service as AppDependencies, so the whole app shares one cache and one network manager.
 struct EnhancedDependencies {
     let baseDependencies: AppDependenciesProtocol
-    
-    var networkManager: NetworkManager
-    var networkConfiguration: NetworkConfiguration
-    var cacheManager: CacheManager
-    var cacheConfiguration: CacheConfiguration
-    var enhancedRemoteQuestionsService: EnhancedRemoteQuestionsService
-    var enhancedQuestionsRepository: EnhancedQuestionsRepositoryProtocol
-    var enhancedQuizUseCase: EnhancedQuizUseCaseProtocol
+    let enhancedQuizUseCase: EnhancedQuizUseCaseProtocol
     
     init(baseDependencies: AppDependenciesProtocol) {
         self.baseDependencies = baseDependencies
-        
-        // Initialize enhanced services
-        self.networkConfiguration = NetworkConfiguration.default
-        self.networkManager = NetworkManager(configuration: networkConfiguration)
-        
-        self.cacheConfiguration = CacheConfiguration.default
-        self.cacheManager = CacheManager(configuration: cacheConfiguration)
-        
-        self.enhancedRemoteQuestionsService = EnhancedRemoteQuestionsService(
-            networkManager: networkManager,
-            cacheManager: cacheManager,
-            configuration: cacheConfiguration
-        )
-        
-        self.enhancedQuestionsRepository = EnhancedQuestionsRepository(
-            remoteService: enhancedRemoteQuestionsService,
-            useRemoteQuestions: true,
-            networkManager: networkManager
-        )
-        
         self.enhancedQuizUseCase = EnhancedQuizUseCase(
-            questionsRepository: enhancedQuestionsRepository,
-            networkManager: networkManager,
+            questionsRepository: baseDependencies.questionsRepository,
+            networkManager: baseDependencies.networkManager,
             adaptiveEngine: baseDependencies.adaptiveLearningEngine,
             profileManager: baseDependencies.profileManager,
             questionPoolProgressManager: baseDependencies.questionPoolProgressManager
         )
-    }
-    
-    // MARK: - Configuration Methods
-    func withNetworkConfiguration(
-        timeout: TimeInterval? = nil,
-        maxRetries: Int? = nil,
-        retryDelay: TimeInterval? = nil
-    ) -> EnhancedDependencies {
-        let config = NetworkConfiguration(
-            timeout: timeout ?? networkConfiguration.timeout,
-            maxRetries: maxRetries ?? networkConfiguration.maxRetries,
-            retryDelay: retryDelay ?? networkConfiguration.retryDelay,
-            maxRetryDelay: networkConfiguration.maxRetryDelay
-        )
-        
-        var updated = self
-        updated.networkConfiguration = config
-        updated.networkManager = NetworkManager(configuration: config)
-        
-        // Recreate dependent services with new network manager
-        updated.enhancedRemoteQuestionsService = EnhancedRemoteQuestionsService(
-            networkManager: updated.networkManager,
-            cacheManager: updated.cacheManager,
-            configuration: updated.cacheConfiguration
-        )
-        
-        updated.enhancedQuestionsRepository = EnhancedQuestionsRepository(
-            remoteService: updated.enhancedRemoteQuestionsService,
-            useRemoteQuestions: true,
-            networkManager: updated.networkManager
-        )
-        
-        updated.enhancedQuizUseCase = EnhancedQuizUseCase(
-            questionsRepository: updated.enhancedQuestionsRepository,
-            networkManager: updated.networkManager,
-            adaptiveEngine: baseDependencies.adaptiveLearningEngine,
-            profileManager: baseDependencies.profileManager,
-            questionPoolProgressManager: baseDependencies.questionPoolProgressManager
-        )
-        
-        return updated
-    }
-    
-    func withCacheConfiguration(
-        ttl: TimeInterval? = nil,
-        maxCacheSize: Int? = nil,
-        compressionEnabled: Bool? = nil
-    ) -> EnhancedDependencies {
-        let config = CacheConfiguration(
-            ttl: ttl ?? cacheConfiguration.ttl,
-            maxCacheSize: maxCacheSize ?? cacheConfiguration.maxCacheSize,
-            compressionEnabled: compressionEnabled ?? cacheConfiguration.compressionEnabled
-        )
-        
-        var updated = self
-        updated.cacheConfiguration = config
-        updated.cacheManager = CacheManager(configuration: config)
-        
-        // Recreate dependent services with new cache manager
-        updated.enhancedRemoteQuestionsService = EnhancedRemoteQuestionsService(
-            networkManager: updated.networkManager,
-            cacheManager: updated.cacheManager,
-            configuration: updated.cacheConfiguration
-        )
-        
-        updated.enhancedQuestionsRepository = EnhancedQuestionsRepository(
-            remoteService: updated.enhancedRemoteQuestionsService,
-            useRemoteQuestions: true,
-            networkManager: updated.networkManager
-        )
-        
-        updated.enhancedQuizUseCase = EnhancedQuizUseCase(
-            questionsRepository: updated.enhancedQuestionsRepository,
-            networkManager: updated.networkManager,
-            adaptiveEngine: baseDependencies.adaptiveLearningEngine,
-            profileManager: baseDependencies.profileManager,
-            questionPoolProgressManager: baseDependencies.questionPoolProgressManager
-        )
-        
-        return updated
     }
 }
 

@@ -16,7 +16,7 @@ struct CacheConfiguration {
     let compressionEnabled: Bool
     
     static let `default` = CacheConfiguration(
-        ttl: 6 * 60 * 60, // 6 hours - shorter TTL for faster updates
+        ttl: 24 * 60 * 60, // 24 hours; after that the file is revalidated via ETag (304 if unchanged)
         maxCacheSize: 100 * 1024 * 1024, // 100MB
         compressionEnabled: true
     )

@@ -131,23 +131,8 @@ struct dinIslamApp: App {
         // Set global localization provider for use in enum properties and String extensions
         GlobalLocalizationProvider.setInstance(dependencies.localizationProvider)
         
-        // Create enhanced dependencies with production configuration
-        var enhancedDeps = EnhancedDIContainer.createEnhancedDependencies(baseDependencies: dependencies)
-        
-        // Настройка улучшенной сетевой архитектуры
-        enhancedDeps = enhancedDeps.withNetworkConfiguration(
-            timeout: 30.0,      // 30 секунд таймаут
-            maxRetries: 3,      // 3 попытки
-            retryDelay: 1.0     // 1 секунда между попытками
-        )
-        
-        enhancedDeps = enhancedDeps.withCacheConfiguration(
-            ttl: 24 * 60 * 60,  // 24 часа TTL
-            maxCacheSize: 100 * 1024 * 1024, // 100MB
-            compressionEnabled: true
-        )
-        
-        self.enhancedDependencies = enhancedDeps
+        // Enhanced dependencies reuse the questions service from `dependencies`
+        self.enhancedDependencies = EnhancedDIContainer.createEnhancedDependencies(baseDependencies: dependencies)
     }
     
     var body: some Scene {

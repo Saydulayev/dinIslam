@@ -101,7 +101,7 @@ class EnhancedQuestionsRepository: EnhancedQuestionsRepositoryProtocol {
         let cacheSize = cacheInfo.size
         
         // Check if cache is expired (simplified check)
-        let isExpired = lastUpdate?.timeIntervalSinceNow ?? 0 < -6 * 60 * 60 // 6 hours
+        let isExpired = lastUpdate?.timeIntervalSinceNow ?? 0 < -CacheConfiguration.default.ttl
         
         return CacheStatus(
             hasCachedData: hasCachedData,

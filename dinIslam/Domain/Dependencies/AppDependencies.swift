@@ -17,7 +17,8 @@ struct AppDependencies: AppDependenciesProtocol {
     let localizationProvider: LocalizationProviding
     let quizUseCase: QuizUseCaseProtocol
     let examUseCase: ExamUseCaseProtocol
-    let questionsRepository: QuestionsRepositoryProtocol
+    let questionsRepository: EnhancedQuestionsRepositoryProtocol
+    let networkManager: NetworkManager
     let hapticManager: HapticManager
     let soundManager: SoundManager
     let remoteQuestionsService: EnhancedRemoteQuestionsService
@@ -62,8 +63,10 @@ struct AppDependencies: AppDependenciesProtocol {
         
         // Initialize questions loading (GitHub → cache → bundled)
         EnhancedRemoteQuestionsService.removeLegacyCache(from: userDefaults)
+        // One instance for the whole app (quiz, exam, enhanced quiz, profile and stats screens)
         let networkManager = NetworkManager()
         let remoteQuestionsService = EnhancedRemoteQuestionsService(networkManager: networkManager)
+        self.networkManager = networkManager
         self.remoteQuestionsService = remoteQuestionsService
         self.questionsRepository = EnhancedQuestionsRepository(
             remoteService: remoteQuestionsService,
