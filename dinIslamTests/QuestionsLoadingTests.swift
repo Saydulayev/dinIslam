@@ -185,6 +185,25 @@ final class QuestionsLoadingTests: XCTestCase {
         }
     }
 
+    // MARK: - Старая система
+
+    func testRemoveLegacyCache_deletesOldUserDefaultsKeys() throws {
+        let suiteName = "QuestionsLoadingTests-\(UUID().uuidString)"
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+        defaults.set(Data("[]".utf8), forKey: "cached_questions_ru")
+        defaults.set(Data("[]".utf8), forKey: "cached_questions_en")
+        defaults.set(Date(), forKey: "last_questions_update")
+        defaults.set("keep", forKey: "other_key")
+
+        EnhancedRemoteQuestionsService.removeLegacyCache(from: defaults)
+
+        XCTAssertNil(defaults.object(forKey: "cached_questions_ru"))
+        XCTAssertNil(defaults.object(forKey: "cached_questions_en"))
+        XCTAssertNil(defaults.object(forKey: "last_questions_update"))
+        XCTAssertEqual(defaults.string(forKey: "other_key"), "keep")
+    }
+
     // MARK: - Helpers
 
     private func makeService(ttl: TimeInterval = 6 * 60 * 60) -> (EnhancedRemoteQuestionsService, CacheManager) {

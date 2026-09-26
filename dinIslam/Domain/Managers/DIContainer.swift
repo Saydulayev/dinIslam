@@ -79,7 +79,7 @@ class DIContainer {
         _dependencies?.soundManager ?? AppDependencies().soundManager
     }
     
-    var remoteQuestionsService: RemoteQuestionsService {
+    var remoteQuestionsService: EnhancedRemoteQuestionsService {
         _dependencies?.remoteQuestionsService ?? AppDependencies().remoteQuestionsService
     }
     

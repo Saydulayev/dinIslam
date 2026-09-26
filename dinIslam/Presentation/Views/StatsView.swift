@@ -11,7 +11,7 @@ struct StatsView: View {
     @Environment(\.localizationProvider) private var localizationProvider
     @Bindable var statsManager: StatsManager
     @Environment(\.settingsManager) private var settingsManager
-    @Environment(\.remoteQuestionsService) private var remoteService: RemoteQuestionsService
+    @Environment(\.remoteQuestionsService) private var remoteService: EnhancedRemoteQuestionsService
     @Environment(\.dismiss) private var dismiss
     @State private var mistakesViewModel: QuizViewModel?
     @State private var showingMistakesReview = false
@@ -402,5 +402,5 @@ struct StatsView: View {
 #Preview {
     StatsView(statsManager: StatsManager())
         .environment(\.settingsManager, SettingsManager())
-        .environment(\.remoteQuestionsService, RemoteQuestionsService())
+        .environment(\.remoteQuestionsService, EnhancedRemoteQuestionsService())
 }

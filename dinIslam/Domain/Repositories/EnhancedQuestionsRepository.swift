@@ -9,9 +9,13 @@ import Foundation
 import Combine
 import OSLog
 
-// MARK: - Enhanced Questions Repository Protocol
-protocol EnhancedQuestionsRepositoryProtocol {
+// MARK: - Questions Repository Protocol
+protocol QuestionsRepositoryProtocol {
     func loadQuestions(language: String) async throws -> [Question]
+}
+
+// MARK: - Enhanced Questions Repository Protocol
+protocol EnhancedQuestionsRepositoryProtocol: QuestionsRepositoryProtocol {
     func preloadQuestions(for languages: [String]) async
     func clearCache() async
     func getCacheStatus() -> CacheStatus

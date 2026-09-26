@@ -386,6 +386,12 @@ class EnhancedRemoteQuestionsService: ObservableObject {
         }
     }
     
+    /// Удаляет кэш старой системы загрузки (RemoteQuestionsService хранил вопросы в UserDefaults).
+    static func removeLegacyCache(from userDefaults: UserDefaults = .standard) {
+        let legacyKeys = AppLanguage.allCases.map { "cached_questions_\($0.rawValue)" } + ["last_questions_update"]
+        legacyKeys.forEach { userDefaults.removeObject(forKey: $0) }
+    }
+    
     func clearCache() {
         cacheManager.clearAllCache()
         AppLogger.info("Cache cleared", category: AppLogger.data)

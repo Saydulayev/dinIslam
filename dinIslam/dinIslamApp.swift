@@ -29,7 +29,7 @@ private struct AchievementManagerKey: EnvironmentKey {
 }
 
 private struct RemoteQuestionsServiceKey: EnvironmentKey {
-    static let defaultValue: RemoteQuestionsService? = nil
+    static let defaultValue: EnhancedRemoteQuestionsService? = nil
 }
 
 private struct NotificationManagerKey: EnvironmentKey {
@@ -100,9 +100,9 @@ extension EnvironmentValues {
         }
     }
     
-    var remoteQuestionsService: RemoteQuestionsService {
+    var remoteQuestionsService: EnhancedRemoteQuestionsService {
         get {
-            self[RemoteQuestionsServiceKey.self] ?? RemoteQuestionsService()
+            self[RemoteQuestionsServiceKey.self] ?? EnhancedRemoteQuestionsService()
         }
         set {
             self[RemoteQuestionsServiceKey.self] = newValue
