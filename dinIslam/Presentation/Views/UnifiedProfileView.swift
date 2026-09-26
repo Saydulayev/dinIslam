@@ -199,7 +199,7 @@ struct UnifiedProfileView: View {
         loadQuestionsTask?.cancel()
         loadQuestionsTask = Task { @MainActor [settingsManager] in
             do {
-                let questionsRepository = QuestionsRepository()
+                let questionsRepository = EnhancedQuestionsRepository()
                 let currentLanguage = settingsManager.settings.language.rawValue
                 
                 let questions = try await questionsRepository.loadQuestions(language: currentLanguage)
