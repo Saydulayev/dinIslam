@@ -2,8 +2,7 @@
 //  QuestionsLoadingTests.swift
 //  dinIslamTests
 //
-//  Фиксируют ТЕКУЩЕЕ поведение загрузки вопросов (GitHub → кэш → встроенные)
-//  перед рефакторингом Этапа 3. Сеть подменяется через URLProtocol,
+//  Загрузка вопросов: GitHub → кэш → встроенные. Сеть подменяется через URLProtocol,
 //  кэш пишется во временную папку — реальный кэш приложения не трогается.
 //
 
@@ -102,9 +101,8 @@ final class QuestionsLoadingTests: XCTestCase {
 
     // MARK: - Ошибки в данных
 
-    /// ТЕКУЩЕЕ поведение: один неправильный вопрос отбрасывает весь файл с GitHub.
-    /// После Этапа 3 плохой вопрос должен пропускаться, а остальные — загружаться.
-    func testOneInvalidQuestion_currentlyRejectsWholeFile() async {
+    /// Один неправильный вопрос пропускается, остальные загружаются.
+    func testOneInvalidQuestion_isSkipped_restAreLoaded() async {
         var items = Self.remoteItems(ids: ["n1", "n2"])
         items.append(["id": "bad", "q": "Вопрос с одним ответом", "a": ["Единственный"], "c": 0])
         StubURLProtocol.respond(status: 200, etag: "\"v2\"", body: Self.json(items))
@@ -113,23 +111,70 @@ final class QuestionsLoadingTests: XCTestCase {
 
         let questions = await service.fetchQuestions(for: .russian, manageLoadingState: false)
 
-        XCTAssertEqual(questions.map(\.id), ["c1"], "Сейчас весь файл отбрасывается и берётся старый кэш")
+        XCTAssertEqual(questions.map(\.id), ["n1", "n2"])
+        let cached = cache.getCachedDataWithMetadata([Question].self, for: "questions_ru")
+        XCTAssertEqual(cached?.data.map(\.id), ["n1", "n2"])
+        XCTAssertEqual(cached?.etag, "\"v2\"")
+    }
+
+    /// Вопрос, который вообще не читается (нет ответов), тоже не ломает весь файл.
+    func testUndecodableQuestion_isSkipped_restAreLoaded() async {
+        var items = Self.remoteItems(ids: ["n1"])
+        items.append(["id": "broken", "q": "Нет ответов"])
+        items += Self.remoteItems(ids: ["n2"])
+        StubURLProtocol.respond(status: 200, etag: nil, body: Self.json(items))
+        let (service, _) = makeService()
+
+        let questions = await service.fetchQuestions(for: .russian, manageLoadingState: false)
+
+        XCTAssertEqual(questions.map(\.id), ["n1", "n2"])
+    }
+
+    /// Повторяющийся id: остаётся первый вопрос, файл не отбрасывается.
+    func testDuplicateId_keepsFirst() async {
+        let items = Self.remoteItems(ids: ["n1", "n2", "n1"])
+        StubURLProtocol.respond(status: 200, etag: nil, body: Self.json(items))
+        let (service, _) = makeService()
+
+        let questions = await service.fetchQuestions(for: .russian, manageLoadingState: false)
+
+        XCTAssertEqual(questions.map(\.id), ["n1", "n2"])
+    }
+
+    /// Если в файле нет ни одного правильного вопроса — остаётся старый кэш.
+    func testNoValidQuestions_keepsOldCache() async {
+        let items: [[String: Any]] = [["id": "bad", "q": "", "a": ["A", "B"], "c": 0]]
+        StubURLProtocol.respond(status: 200, etag: "\"v2\"", body: Self.json(items))
+        let (service, cache) = makeService(ttl: -1)
+        cache.cacheData(Self.questions(ids: ["c1"]), for: "questions_ru", etag: "\"v1\"")
+
+        let questions = await service.fetchQuestions(for: .russian, manageLoadingState: false)
+
+        XCTAssertEqual(questions.map(\.id), ["c1"])
+        XCTAssertEqual(cache.getCachedDataWithMetadata([Question].self, for: "questions_ru")?.etag, "\"v1\"")
     }
 
     // MARK: - Встроенные вопросы
 
-    /// Нет сети и нет кэша → должны загрузиться вопросы, встроенные в приложение.
-    /// ИЗВЕСТНАЯ ОШИБКА: встроенные файлы в коротком формате (q/a/c), а код читает
-    /// их как полный формат (text/answers) и получает пустой список.
-    /// Когда ошибку исправят, XCTExpectFailure сообщит об этом — его нужно будет убрать.
-    func testNoNetwork_noCache_fallsBackToBundledQuestions() async {
+    /// Нет сети и нет кэша → загружаются вопросы, встроенные в приложение.
+    func testNoNetwork_noCache_fallsBackToBundledQuestions() async throws {
         StubURLProtocol.fail(with: URLError(.notConnectedToInternet))
         let (service, _) = makeService()
 
         let questions = await service.fetchQuestions(for: .russian, manageLoadingState: false)
 
-        XCTExpectFailure("Известная ошибка: встроенные вопросы не декодируются (формат q/a/c)")
         XCTAssertFalse(questions.isEmpty, "Встроенные вопросы должны загружаться без сети")
+        XCTAssertEqual(questions.map(\.id), try QuestionsFile.loadBundled(for: .russian).map(\.id))
+    }
+
+    /// Все встроенные вопросы правильные: ни один не отбрасывается при загрузке.
+    func testBundledQuestions_allAreValid() throws {
+        for language in [AppLanguage.russian, .english] {
+            let url = try XCTUnwrap(Bundle.main.url(forResource: QuestionsFile.name(for: language), withExtension: "json"))
+            let raw = try JSONDecoder().decode([RemoteQuestion].self, from: Data(contentsOf: url))
+            let loaded = try QuestionsFile.loadBundled(for: language)
+            XCTAssertEqual(loaded.count, raw.count, "В \(language.rawValue) есть неправильные вопросы")
+        }
     }
 
     func testBundledQuestionFiles_existAndAreNotEmpty() throws {
@@ -138,6 +183,25 @@ final class QuestionsLoadingTests: XCTestCase {
             let items = try JSONDecoder().decode([RemoteQuestion].self, from: Data(contentsOf: url))
             XCTAssertFalse(items.isEmpty, "\(name).json пустой")
         }
+    }
+
+    // MARK: - Старая система
+
+    func testRemoveLegacyCache_deletesOldUserDefaultsKeys() throws {
+        let suiteName = "QuestionsLoadingTests-\(UUID().uuidString)"
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+        defaults.set(Data("[]".utf8), forKey: "cached_questions_ru")
+        defaults.set(Data("[]".utf8), forKey: "cached_questions_en")
+        defaults.set(Date(), forKey: "last_questions_update")
+        defaults.set("keep", forKey: "other_key")
+
+        EnhancedRemoteQuestionsService.removeLegacyCache(from: defaults)
+
+        XCTAssertNil(defaults.object(forKey: "cached_questions_ru"))
+        XCTAssertNil(defaults.object(forKey: "cached_questions_en"))
+        XCTAssertNil(defaults.object(forKey: "last_questions_update"))
+        XCTAssertEqual(defaults.string(forKey: "other_key"), "keep")
     }
 
     // MARK: - Helpers

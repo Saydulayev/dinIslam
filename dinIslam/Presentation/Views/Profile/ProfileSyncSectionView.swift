@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ProfileSyncSectionView: View {
     @Bindable var manager: ProfileManager
-    @Environment(\.remoteQuestionsService) var remoteService: RemoteQuestionsService
+    @Environment(\.remoteQuestionsService) var remoteService: EnhancedRemoteQuestionsService
     @Environment(\.settingsManager) private var settingsManager
     
     let isResettingProfile: Bool

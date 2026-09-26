@@ -9,9 +9,13 @@ import Foundation
 import Combine
 import OSLog
 
-// MARK: - Enhanced Questions Repository Protocol
-protocol EnhancedQuestionsRepositoryProtocol {
+// MARK: - Questions Repository Protocol
+protocol QuestionsRepositoryProtocol {
     func loadQuestions(language: String) async throws -> [Question]
+}
+
+// MARK: - Enhanced Questions Repository Protocol
+protocol EnhancedQuestionsRepositoryProtocol: QuestionsRepositoryProtocol {
     func preloadQuestions(for languages: [String]) async
     func clearCache() async
     func getCacheStatus() -> CacheStatus
@@ -122,20 +126,8 @@ class EnhancedQuestionsRepository: EnhancedQuestionsRepositoryProtocol {
     }
     
     private func loadLocalQuestions(language: String) throws -> [Question] {
-        let fileName = language == "en" ? "questions_en" : "questions"
-        
-        guard let url = bundle.url(forResource: fileName, withExtension: "json") else {
-            throw EnhancedQuestionsError.fileNotFound
-        }
-        
-        let data = try Data(contentsOf: url)
-        let questions = try JSONDecoder().decode([Question].self, from: data)
-        
-        guard !questions.isEmpty else {
-            throw EnhancedQuestionsError.emptyData
-        }
-        
-        return questions
+        let appLanguage: AppLanguage = language == "en" ? .english : .russian
+        return try QuestionsFile.loadBundled(for: appLanguage, bundle: bundle)
     }
 }
 

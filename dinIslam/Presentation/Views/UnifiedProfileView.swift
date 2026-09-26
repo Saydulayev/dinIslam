@@ -11,7 +11,7 @@ import SwiftUI
 struct UnifiedProfileView: View {
     @Environment(\.profileManager) private var profileManager
     @Environment(\.settingsManager) private var settingsManager
-    @Environment(\.remoteQuestionsService) private var remoteService: RemoteQuestionsService
+    @Environment(\.remoteQuestionsService) private var remoteService: EnhancedRemoteQuestionsService
     @Bindable var statsManager: StatsManager
     
     @State private var avatarPickerItem: PhotosPickerItem?
@@ -199,7 +199,7 @@ struct UnifiedProfileView: View {
         loadQuestionsTask?.cancel()
         loadQuestionsTask = Task { @MainActor [settingsManager] in
             do {
-                let questionsRepository = QuestionsRepository()
+                let questionsRepository = EnhancedQuestionsRepository()
                 let currentLanguage = settingsManager.settings.language.rawValue
                 
                 let questions = try await questionsRepository.loadQuestions(language: currentLanguage)
@@ -284,5 +284,5 @@ struct UnifiedProfileView: View {
     }
     .environment(\.profileManager, profileManager)
     .environment(\.settingsManager, SettingsManager())
-    .environment(\.remoteQuestionsService, RemoteQuestionsService())
+    .environment(\.remoteQuestionsService, EnhancedRemoteQuestionsService())
 }

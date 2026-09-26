@@ -360,7 +360,7 @@ struct ExamHeaderView: View {
 #Preview {
     ExamView(viewModel: ExamViewModel(
         examUseCase: ExamUseCase(
-            questionsRepository: QuestionsRepository(),
+            questionsRepository: EnhancedQuestionsRepository(),
             examStatisticsManager: ExamStatisticsManager()
         ),
         examStatisticsManager: ExamStatisticsManager(),
