@@ -17,7 +17,8 @@ protocol AppDependenciesProtocol {
     var localizationProvider: LocalizationProviding { get }
     var quizUseCase: QuizUseCaseProtocol { get }
     var examUseCase: ExamUseCaseProtocol { get }
-    var questionsRepository: QuestionsRepositoryProtocol { get }
+    var questionsRepository: EnhancedQuestionsRepositoryProtocol { get }
+    var networkManager: NetworkManager { get }
     var hapticManager: HapticManager { get }
     var soundManager: SoundManager { get }
     var remoteQuestionsService: EnhancedRemoteQuestionsService { get }
