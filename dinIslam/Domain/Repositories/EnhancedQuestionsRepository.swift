@@ -143,30 +143,30 @@ enum EnhancedQuestionsError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .fileNotFound:
-            return NSLocalizedString("error.fileNotFound", comment: "Questions file not found")
+            return "error.fileNotFound".localized
         case .emptyData:
-            return NSLocalizedString("error.emptyData", comment: "No questions found")
+            return "error.emptyData".localized
         case .decodingError:
-            return NSLocalizedString("error.decodingError", comment: "Failed to decode questions")
+            return "error.decodingError".localized
         case .networkUnavailable:
-            return NSLocalizedString("error.networkUnavailable", comment: "Network unavailable")
+            return "error.networkUnavailable".localized
         case .cacheError:
-            return NSLocalizedString("error.cacheError", comment: "Cache error")
+            return "error.cacheError".localized
         case .timeout:
-            return NSLocalizedString("error.timeout", comment: "Request timeout")
+            return "error.timeout".localized
         }
     }
     
     var recoverySuggestion: String? {
         switch self {
         case .fileNotFound, .emptyData, .decodingError:
-            return NSLocalizedString("error.recoverySuggestion.reload", comment: "Try reloading the app")
+            return "error.recoverySuggestion.reload".localized
         case .networkUnavailable:
-            return NSLocalizedString("error.recoverySuggestion.checkConnection", comment: "Check your internet connection")
+            return "error.recoverySuggestion.checkConnection".localized
         case .cacheError:
-            return NSLocalizedString("error.recoverySuggestion.clearCache", comment: "Try clearing the cache")
+            return "error.recoverySuggestion.clearCache".localized
         case .timeout:
-            return NSLocalizedString("error.recoverySuggestion.retry", comment: "Try again")
+            return "error.recoverySuggestion.retry".localized
         }
     }
 }

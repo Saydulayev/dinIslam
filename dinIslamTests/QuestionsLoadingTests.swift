@@ -204,6 +204,20 @@ final class QuestionsLoadingTests: XCTestCase {
         XCTAssertEqual(defaults.string(forKey: "other_key"), "keep")
     }
 
+    // MARK: - Тексты ошибок
+
+    /// У каждой ошибки загрузки есть перевод: на экран не должен попадать ключ вида "error.emptyData".
+    @MainActor
+    func testQuestionsErrors_haveTranslations() {
+        let errors: [EnhancedQuestionsError] = [.fileNotFound, .emptyData, .decodingError, .networkUnavailable, .cacheError, .timeout]
+        for error in errors {
+            let description = error.errorDescription ?? ""
+            let suggestion = error.recoverySuggestion ?? ""
+            XCTAssertFalse(description.isEmpty || description.hasPrefix("error."), "Нет перевода для \(error): \(description)")
+            XCTAssertFalse(suggestion.isEmpty || suggestion.hasPrefix("error."), "Нет перевода подсказки для \(error): \(suggestion)")
+        }
+    }
+
     // MARK: - Helpers
 
     private func makeService(ttl: TimeInterval = 6 * 60 * 60) -> (EnhancedRemoteQuestionsService, CacheManager) {
