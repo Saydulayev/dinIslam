@@ -399,22 +399,6 @@ class EnhancedRemoteQuestionsService: ObservableObject {
     
     // MARK: - Private Methods
     
-    private func loadFromRemote(language: AppLanguage) async throws -> [Question] {
-        let fileName = language == .russian ? "questions.json" : "questions_en.json"
-        let urlString = "\(baseURL)/\(fileName)"
-        
-        AppLogger.info("EnhancedRemoteQuestionsService: Attempting to fetch from \(urlString)", category: AppLogger.network)
-        
-        // Используем RemoteQuestion из RemoteQuestionsService, который поддерживает оба формата
-        let remoteQuestions = try await networkManager.request(
-            url: urlString,
-            responseType: [RemoteQuestion].self
-        )
-        
-        AppLogger.info("EnhancedRemoteQuestionsService: Successfully loaded \(remoteQuestions.count) questions from \(fileName)", category: AppLogger.network)
-        return remoteQuestions.map { $0.toQuestion() }
-    }
-    
     private func loadFromRemoteWithETag(
         language: AppLanguage,
         cachedEtag: String?,
@@ -426,11 +410,11 @@ class EnhancedRemoteQuestionsService: ObservableObject {
         AppLogger.info("EnhancedRemoteQuestionsService: Attempting to fetch from \(urlString) with ETag support", category: AppLogger.network)
         
         // Make request with ETag support
-        // Note: We pass nil for cachedData because RemoteQuestion doesn't have a memberwise init
-        // Instead, we'll handle 304 response by returning our cached [Question] data
+        // Note: We pass nil for cachedData; on 304 we return our cached [Question] data instead.
+        // LossyDecodable: a question that can't be decoded is skipped, not the whole file.
         let response = try await networkManager.requestWithMetadata(
             url: urlString,
-            responseType: [RemoteQuestion].self,
+            responseType: [LossyDecodable<RemoteQuestion>].self,
             cachedEtag: cachedEtag,
             cachedData: nil
         )
@@ -449,18 +433,10 @@ class EnhancedRemoteQuestionsService: ObservableObject {
             )
         }
         
-        // If content was modified (200), convert and validate
-        let questions = response.data.map { $0.toQuestion() }
-        
-        // Validate questions
-        let validator = QuestionValidator()
-        do {
-            try validator.validate(questions)
-            AppLogger.info("EnhancedRemoteQuestionsService: Validated \(questions.count) questions successfully", category: AppLogger.network)
-        } catch {
-            AppLogger.error("EnhancedRemoteQuestionsService: Validation failed", error: error, category: AppLogger.network)
-            throw error
-        }
+        // If content was modified (200), convert and validate: invalid questions are skipped,
+        // the file is rejected only when no valid question is left
+        let questions = try QuestionsFile.questions(from: response.data)
+        AppLogger.info("EnhancedRemoteQuestionsService: Loaded \(questions.count) valid questions", category: AppLogger.network)
         
         return NetworkResponse(
             data: questions,
@@ -471,17 +447,12 @@ class EnhancedRemoteQuestionsService: ObservableObject {
     }
     
     private func loadLocalQuestions(for language: AppLanguage) -> [Question] {
-        let fileName = language == .russian ? "questions" : "questions_en"
-        
-        guard let url = Bundle.main.url(forResource: fileName, withExtension: "json"),
-              let data = try? Data(contentsOf: url),
-              let questions = try? JSONDecoder().decode([Question].self, from: data) else {
-            AppLogger.error("Failed to load local questions for \(language.rawValue)", category: AppLogger.data)
+        do {
+            return try QuestionsFile.loadBundled(for: language)
+        } catch {
+            AppLogger.error("Failed to load local questions for \(language.rawValue)", error: error, category: AppLogger.data)
             return []
         }
-        
-        AppLogger.info("Loaded \(questions.count) local questions for \(language.rawValue)", category: AppLogger.data)
-        return questions
     }
 }
 

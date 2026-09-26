@@ -38,19 +38,8 @@ class QuestionsRepository: QuestionsRepositoryProtocol {
     }
     
     private func loadLocalQuestions(language: String) throws -> [Question] {
-        let fileName = language == "en" ? "questions_en" : "questions"
-        guard let url = bundle.url(forResource: fileName, withExtension: "json") else {
-            throw QuestionsError.fileNotFound
-        }
-        
-        let data = try Data(contentsOf: url)
-        let questions = try JSONDecoder().decode([Question].self, from: data)
-        
-        guard !questions.isEmpty else {
-            throw QuestionsError.emptyData
-        }
-        
-        return questions
+        let appLanguage: AppLanguage = language == "en" ? .english : .russian
+        return try QuestionsFile.loadBundled(for: appLanguage, bundle: bundle)
     }
 }
 

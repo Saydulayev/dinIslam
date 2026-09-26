@@ -112,6 +112,22 @@ final class QuestionValidatorTests: XCTestCase {
         } match: { if case .emptyAnswerText = $0 { return true }; return false }
     }
 
+    // MARK: - validQuestions (skip invalid)
+
+    func testValidQuestions_skipsInvalidAndDuplicates_keepsOrder() {
+        let questions = [
+            makeQuestion(id: "q1", text: "Q1?", answers: ["A", "B"], correctIndex: 0),
+            makeQuestion(id: "bad", text: "Q?", answers: ["A"], correctIndex: 0),
+            makeQuestion(id: "q2", text: "Q2?", answers: ["A", "B"], correctIndex: 1),
+            makeQuestion(id: "q1", text: "Duplicate", answers: ["A", "B"], correctIndex: 0)
+        ]
+
+        let valid = sut.validQuestions(from: questions)
+
+        XCTAssertEqual(valid.map(\.id), ["q1", "q2"])
+        XCTAssertEqual(valid.first?.text, "Q1?")
+    }
+
     // MARK: - Helpers
 
     private func makeQuestion(id: String, text: String, answers: [String], correctIndex: Int) -> Question {

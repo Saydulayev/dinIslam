@@ -69,6 +69,26 @@ class QuestionValidator: QuestionValidating {
         AppLogger.info("Successfully validated \(questions.count) questions", category: AppLogger.data)
     }
     
+    /// Returns only valid questions, skipping invalid ones and repeated IDs (the first occurrence is kept)
+    /// - Parameter questions: Array of questions to filter
+    /// - Returns: Valid questions in the original order
+    func validQuestions(from questions: [Question]) -> [Question] {
+        var seenIds = Set<String>()
+        let valid = questions.filter { question in
+            guard isValid(question) else { return false }
+            guard seenIds.insert(question.id).inserted else {
+                AppLogger.error("Skipped duplicate question ID '\(question.id)'", category: AppLogger.data)
+                return false
+            }
+            return true
+        }
+
+        if valid.count < questions.count {
+            AppLogger.warning("Skipped \(questions.count - valid.count) invalid question(s), kept \(valid.count)", category: AppLogger.data)
+        }
+        return valid
+    }
+
     /// Checks if a single question is valid without throwing
     /// - Parameter question: Question to check
     /// - Returns: true if valid, false otherwise
