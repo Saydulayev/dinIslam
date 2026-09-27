@@ -92,33 +92,24 @@ final class AdaptiveLearningEngine {
         }
 
         var selection: [Question] = []
-        let weakTopics = Set(progress.topicProgress.filter { $0.masteryLevel == .novice || $0.masteryLevel == .learning }.map(\.topicId))
-        let moderateTopics = Set(progress.topicProgress.filter { $0.masteryLevel == .proficient }.map(\.topicId))
+        // Оценка темы по одному-двум ответам случайна, поэтому слабыми считаем темы с достаточным числом ответов
+        let weakTopics = Set(progress.topicProgress.filter {
+            $0.totalAnswers >= Self.minimumAnswersForTopicAssessment &&
+            ($0.masteryLevel == .novice || $0.masteryLevel == .learning)
+        }.map(\.topicId))
 
         let newQuestions = allQuestions.filter { !usedQuestionIds.contains($0.id) }
         let reusedQuestions = allQuestions.filter { usedQuestionIds.contains($0.id) }
 
-        // Приоритет - слабые темы
+        // Приоритет - слабые темы, но не больше половины сессии
         let weakTopicQuestions = newQuestions.filter { weakTopics.contains($0.category) }
-        selection.append(contentsOf: Array(weakTopicQuestions.shuffled().prefix(sessionCount / 2)))
+        selection.append(contentsOf: Self.balancedByTopic(weakTopicQuestions, count: sessionCount / 2))
 
-        // Второй приоритет - средние темы и средняя сложность
+        // Остальное — новые вопросы из разных тем поровну, чтобы сессия не сводилась к одной теме
         if selection.count < sessionCount {
-            let mediumDifficulty = newQuestions.filter {
-                $0.difficulty != .hard &&
-                (moderateTopics.contains($0.category) || weakTopics.contains($0.category))
-            }
-            let needed = sessionCount - selection.count
-            selection.append(contentsOf: Array(mediumDifficulty.shuffled().prefix(needed)))
-        }
-
-        // Если не набрали, добавляем оставшиеся новые вопросы
-        if selection.count < sessionCount {
-            let remainingNewQuestions = newQuestions.filter { question in
-                !selection.contains(where: { $0.id == question.id })
-            }
-            let needed = sessionCount - selection.count
-            selection.append(contentsOf: Array(remainingNewQuestions.shuffled().prefix(needed)))
+            let selectedIds = Set(selection.map(\.id))
+            let remainingNewQuestions = newQuestions.filter { !selectedIds.contains($0.id) }
+            selection.append(contentsOf: Self.balancedByTopic(remainingNewQuestions, count: sessionCount - selection.count))
         }
 
         // Если все еще не хватает, добавляем повторные вопросы (для закрепления)
@@ -131,7 +122,7 @@ final class AdaptiveLearningEngine {
             selection = Array(selection.prefix(sessionCount))
         }
 
-        return selection
+        return selection.shuffled()
     }
 
     func computeOverallMastery(averageScore: Double, streak: Int) -> MasteryLevel {
@@ -143,6 +134,22 @@ final class AdaptiveLearningEngine {
     }
 
     // MARK: - Private Helpers
+    private static let minimumAnswersForTopicAssessment = 5
+
+    /// Берёт вопросы по кругу из разных тем: сначала по одному из каждой, затем по второму и т. д.
+    static func balancedByTopic(_ questions: [Question], count: Int) -> [Question] {
+        guard count > 0 else { return [] }
+        var queues = Dictionary(grouping: questions.shuffled(), by: \.category).values.shuffled().map { Array($0) }
+        var result: [Question] = []
+        while result.count < count, !queues.isEmpty {
+            for index in queues.indices.reversed() where result.count < count {
+                result.append(queues[index].removeFirst())
+                if queues[index].isEmpty { queues.remove(at: index) }
+            }
+        }
+        return result
+    }
+
     private func defaultSelection(from questions: [Question], usedQuestionIds: Set<String>, sessionCount: Int) -> [Question] {
         let newQuestions = questions.filter { !usedQuestionIds.contains($0.id) }
         if newQuestions.count >= sessionCount {

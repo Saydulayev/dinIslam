@@ -322,6 +322,25 @@ final class QuestionFormatTests: XCTestCase {
         XCTAssertEqual(results.first?.total, 2)
     }
 
+    func testBalancedByTopic_takesFromEveryTopicBeforeRepeating() {
+        let questions = (0..<10).map { index in
+            Question(
+                id: "q\(index)",
+                text: "?",
+                answers: [Answer(id: "a", text: "A"), Answer(id: "b", text: "B")],
+                correctIndex: 0,
+                category: index < 8 ? "fiqh" : (index == 8 ? "seerah" : "quran"),
+                difficulty: .medium
+            )
+        }
+
+        let selected = AdaptiveLearningEngine.balancedByTopic(questions, count: 5)
+
+        XCTAssertEqual(selected.count, 5)
+        XCTAssertEqual(Set(selected.map(\.category)), ["fiqh", "seerah", "quran"])
+        XCTAssertEqual(Set(selected.map(\.id)).count, 5)
+    }
+
     func testBundledQuestions_useKnownCategoriesAndDifficulties() throws {
         for language in [AppLanguage.russian, .english] {
             let questions = try QuestionsFile.loadBundled(for: language)

@@ -541,7 +541,7 @@
 "start.streak.start" = "start a streak";
 "start.daily.title" = "Daily practice";
 "start.daily.subtitle" = "%d questions · ~2 minutes";
-"start.daily.completed" = "Done today ✓ · %d more questions";
+"start.daily.completed" = "Done ✓ · %d more questions";
 "start.review.title" = "Review mistakes";
 "start.review.subtitle" = "Time to reinforce";
 "start.quiz.subtitle" = "%d questions";

@@ -558,7 +558,7 @@
 "start.streak.start" = "начни серию";
 "start.daily.title" = "Ежедневная практика";
 "start.daily.subtitle" = "%d вопросов · ~2 минуты";
-"start.daily.completed" = "Выполнено сегодня ✓ · ещё %d вопросов";
+"start.daily.completed" = "Выполнено ✓ · ещё %d вопросов";
 "start.review.title" = "Повторение ошибок";
 "start.review.subtitle" = "Пора закрепить";
 "start.quiz.subtitle" = "%d вопросов";
