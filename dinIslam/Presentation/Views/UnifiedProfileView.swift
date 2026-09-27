@@ -72,6 +72,9 @@ struct UnifiedProfileView: View {
                         statsRefreshTrigger: statsRefreshTrigger
                     )
                     
+                    // Knowledge by topic
+                    ProfileKnowledgeSectionView(statsManager: statsManager)
+                    
                     // Wrong Questions Section
                     if !statsManager.stats.wrongQuestionIds.isEmpty {
                         ProfileWrongQuestionsSectionView(

@@ -30,6 +30,9 @@ class QuizViewModel {
     var quizResult: QuizResult?
     var errorMessage: String?
     var isLoading: Bool = false
+    var sessionKind: QuizSessionKind = .standard
+    /// Итог последней завершённой сессии (для экрана результата)
+    var lastSessionReport: SessionReport?
     
     // MARK: - Achievement Properties
     var newAchievements: [Achievement] {
@@ -74,6 +77,16 @@ class QuizViewModel {
     
     var isLastQuestion: Bool {
         return currentQuestionIndex == questions.count - 1
+    }
+    
+    /// После ответа на вопрос с пояснением ждём, пока пользователь прочитает его и нажмёт «Далее»
+    var isAwaitingContinue: Bool {
+        isAnswerSelected && (currentQuestion?.hasExplanation ?? false)
+    }
+    
+    var wasLastAnswerCorrect: Bool {
+        guard let selectedAnswerIndex, let currentQuestion else { return false }
+        return selectedAnswerIndex == currentQuestion.correctIndex
     }
     
     // MARK: - Initialization
@@ -160,13 +173,23 @@ class QuizViewModel {
     
     // MARK: - Public Methods
     @MainActor
-    func startQuiz(language: String) async {
+    func startQuiz(language: String, kind: QuizSessionKind = .standard) async {
         state = .active(.loading)
         isLoading = true
         errorMessage = nil
+        sessionKind = kind
+        resetSessionTracking()
         
         do {
-            let loadedQuestions = try await quizUseCase.startQuiz(language: language)
+            let loadedQuestions: [Question]
+            if kind == .daily {
+                loadedQuestions = try await quizUseCase.startDailyQuiz(language: language)
+            } else {
+                loadedQuestions = try await quizUseCase.startQuiz(
+                    language: language,
+                    sessionSize: QuizUseCase.standardSessionSize
+                )
+            }
             
             // Проверяем, что вопросы действительно получены
             guard !loadedQuestions.isEmpty else {
@@ -220,12 +243,21 @@ class QuizViewModel {
             feedbackProvider.answerSelected(isCorrect: isCorrect)
         }
         
+        // Вопрос с пояснением ждёт нажатия «Далее»
+        guard !isAwaitingContinue else { return }
+        
         // Show result briefly before moving to next question
         nextQuestionTask?.cancel()
         nextQuestionTask = Task { @MainActor [weak self] in
             try? await Task.sleep(nanoseconds: 1_500_000_000) // 1.5 seconds
             self?.nextQuestion()
         }
+    }
+    
+    @MainActor
+    func continueToNextQuestion() {
+        guard isAnswerSelected else { return }
+        nextQuestion()
     }
     
     @MainActor
@@ -282,6 +314,17 @@ class QuizViewModel {
             )
             
             statisticsRecorder.recordQuizSession(summary)
+            if sessionKind == .daily {
+                statisticsRecorder.registerDailyGoal()
+            }
+            
+            lastSessionReport = SessionReport(
+                kind: sessionKind,
+                topicResults: SessionReport.topicResults(for: outcomes),
+                mistakeIds: outcomes.filter { !$0.isCorrect }.map(\.questionId),
+                dayStreak: statisticsRecorder.dayStreak,
+                review: nil
+            )
             
             // Check for new achievements
             achievementChecker.checkAchievements(for: statisticsRecorder.stats, quizResult: quizResult)
@@ -299,8 +342,22 @@ class QuizViewModel {
     
     @MainActor
     func forceFinishQuiz() {
-        // Force finish quiz with current progress - don't update stats for incomplete quiz
-        finishQuiz(isComplete: false)
+        nextQuestionTask?.cancel()
+        if state == .active(.mistakesReview) {
+            // В повторении сохраняем ответы, которые уже даны
+            finishMistakesReview()
+        } else {
+            // Force finish quiz with current progress - don't update stats for incomplete quiz
+            finishQuiz(isComplete: false)
+        }
+    }
+    
+    private func resetSessionTracking() {
+        lastSessionReport = nil
+        questionResults.removeAll()
+        nextQuestionTask?.cancel()
+        memoizedProgress = nil
+        memoizedCurrentQuestion = nil
     }
     
     @MainActor
@@ -314,6 +371,8 @@ class QuizViewModel {
         showResult = false
         quizResult = nil
         errorMessage = nil
+        lastSessionReport = nil
+        sessionKind = .standard
         questionResults.removeAll()
         nextQuestionTask?.cancel()
         nextQuestionTask = nil
@@ -325,20 +384,24 @@ class QuizViewModel {
     
     // MARK: - Mistakes Review Methods
     @MainActor
-    func startMistakesReview(language: String) async {
+    func startMistakesReview(language: String, scope: MistakesReviewScope = .all) async {
         state = .active(.loading)
         isLoading = true
         errorMessage = nil
+        sessionKind = .review
+        resetSessionTracking()
         
         do {
             // Get all questions to find the wrong ones
             let allQuestions = try await quizUseCase.loadAllQuestions(language: language)
             
             // Filter only wrong questions
-            let wrongQuestions = statisticsRecorder.getWrongQuestions(from: allQuestions)
+            let wrongQuestions = statisticsRecorder.getWrongQuestions(from: allQuestions, scope: scope)
             
             guard !wrongQuestions.isEmpty else {
-                errorMessage = localizationProvider.localizedString(for: "mistakes.noWrongQuestions")
+                errorMessage = localizationProvider.localizedString(
+                    for: scope == .due ? "review.nothingDue" : "mistakes.noWrongQuestions"
+                )
                 state = .idle
                 isLoading = false
                 return
@@ -371,15 +434,24 @@ class QuizViewModel {
             timeSpent: timeSpent
         )
         
-        // Update stats - remove correctly answered questions from wrong list
-        let correctlyAnsweredIds = questionResults.compactMap { (questionId, isCorrect) in
-            return isCorrect ? questionId : nil
+        // Продвигаем вопросы по расписанию повторения; выученные уходят из списка ошибок
+        let reviewSummary = statisticsRecorder.recordReviewAnswers(questionResults)
+        let outcomes = questions.compactMap { question -> QuizQuestionOutcome? in
+            guard let isCorrect = questionResults[question.id] else { return nil }
+            return QuizQuestionOutcome(
+                questionId: question.id,
+                category: question.category,
+                difficulty: question.difficulty,
+                isCorrect: isCorrect
+            )
         }
-        
-        // Remove correctly answered questions from wrong questions list
-        for questionId in correctlyAnsweredIds {
-            statisticsRecorder.removeWrongQuestion(questionId)
-        }
+        lastSessionReport = SessionReport(
+            kind: .review,
+            topicResults: SessionReport.topicResults(for: outcomes),
+            mistakeIds: outcomes.filter { !$0.isCorrect }.map(\.questionId),
+            dayStreak: statisticsRecorder.dayStreak,
+            review: reviewSummary
+        )
         
         state = .completed(.mistakesFinished)
         

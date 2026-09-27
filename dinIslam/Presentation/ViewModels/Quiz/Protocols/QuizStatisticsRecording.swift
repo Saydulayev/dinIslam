@@ -10,8 +10,11 @@ import Foundation
 protocol QuizStatisticsRecording {
     var stats: UserStats { get }
     
+    var dayStreak: Int { get }
+    
     func recordQuizSession(_ summary: QuizSessionSummary)
-    func getWrongQuestions(from allQuestions: [Question]) -> [Question]
-    func removeWrongQuestion(_ questionId: String)
+    func registerDailyGoal()
+    func getWrongQuestions(from allQuestions: [Question], scope: MistakesReviewScope) -> [Question]
+    func recordReviewAnswers(_ answers: [String: Bool]) -> ReviewSessionSummary
 }
 

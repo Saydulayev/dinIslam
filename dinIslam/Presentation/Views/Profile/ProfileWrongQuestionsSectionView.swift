@@ -29,6 +29,30 @@ struct ProfileWrongQuestionsSectionView: View {
                         .foregroundColor(DesignTokens.Colors.iconRed)
                 }
                 
+                HStack {
+                    Text("stats.reviewDueToday.title".localized)
+                        .font(DesignTokens.Typography.secondaryRegular)
+                        .foregroundColor(DesignTokens.Colors.textSecondary)
+                    Spacer()
+                    Text("\(statsManager.dueReviewCount)")
+                        .font(DesignTokens.Typography.bodyRegular)
+                        .fontWeight(.semibold)
+                        .foregroundColor(DesignTokens.Colors.iconOrange)
+                }
+                
+                if statsManager.dueReviewCount == 0, let next = ReviewDateText.nextReview(statsManager.nextReviewDate) {
+                    Text(next)
+                        .font(DesignTokens.Typography.label)
+                        .foregroundColor(DesignTokens.Colors.textTertiary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                
+                Text("review.summary.howItWorks".localized)
+                    .font(DesignTokens.Typography.label)
+                    .foregroundColor(DesignTokens.Colors.textTertiary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .fixedSize(horizontal: false, vertical: true)
+                
                 MinimalButton(
                     icon: "exclamationmark.triangle",
                     title: "stats.repeatMistakes".localized,

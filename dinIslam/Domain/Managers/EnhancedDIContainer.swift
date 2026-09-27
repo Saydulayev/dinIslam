@@ -170,14 +170,7 @@ class EnhancedQuizUseCase: EnhancedQuizUseCaseProtocol {
             return question
         }
         
-        return Question(
-            id: question.id,
-            text: question.text,
-            answers: shuffledAnswers,
-            correctIndex: newCorrectIndex,
-            category: question.category,
-            difficulty: question.difficulty
-        )
+        return question.withAnswers(shuffledAnswers, correctIndex: newCorrectIndex)
     }
     
     func loadAllQuestions(language: String) async throws -> [Question] {

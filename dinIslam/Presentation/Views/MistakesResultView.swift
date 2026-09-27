@@ -11,6 +11,7 @@ struct MistakesResultView: View {
     let result: QuizResult
     let onRepeat: () -> Void
     let onBackToStart: () -> Void
+    var report: SessionReport? = nil
     @Environment(\.localizationProvider) private var localizationProvider
     
     var body: some View {
@@ -26,6 +27,7 @@ struct MistakesResultView: View {
             )
             .ignoresSafeArea()
             
+            ScrollView {
             VStack(spacing: 32) {
                 Spacer()
                 
@@ -131,6 +133,10 @@ struct MistakesResultView: View {
                                     .stroke(DesignTokens.Colors.iconOrange.opacity(0.3), lineWidth: 1)
                             )
                     )
+                }
+                
+                if let review = report?.review {
+                    ReviewSummaryCard(summary: review)
                 }
                 
                 Spacer()
@@ -240,6 +246,7 @@ struct MistakesResultView: View {
                 .padding(.horizontal, DesignTokens.Spacing.xxl)
             }
             .padding(DesignTokens.Spacing.xxl)
+            }
         }
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)

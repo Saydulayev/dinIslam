@@ -25,12 +25,14 @@ enum StartRoute: Hashable {
         let correctAnswers: Int
         let percentage: Double
         let timeSpent: Double
+        let report: SessionReport?
         
-        init(from result: QuizResult) {
+        init(from result: QuizResult, report: SessionReport? = nil) {
             totalQuestions = result.totalQuestions
             correctAnswers = result.correctAnswers
             percentage = result.percentage
             timeSpent = result.timeSpent
+            self.report = report
         }
         
         func makeQuizResult() -> QuizResult {
@@ -117,7 +119,7 @@ struct StartView: View {
                         .padding(.bottom, DesignTokens.Spacing.xxxl)
                         .frame(minHeight: proxy.size.height, alignment: .bottom)
                     }
-                    .scrollDisabled(true)
+                    .scrollBounceBehavior(.basedOnSize)
                 }
             }
             .navigationDestination(for: StartRoute.self) { route in
@@ -138,6 +140,10 @@ struct StartView: View {
                         },
                         onAchievementsCleared: {
                             model.clearNewAchievements()
+                        },
+                        report: snapshot.report,
+                        onRepeatMistakes: { mistakeIds in
+                            model.startReview(scope: .questions(Set(mistakeIds)))
                         }
                     )
                 case .achievements:
@@ -293,179 +299,127 @@ struct StartView: View {
     }
     
     private func statsCard(model: StartViewModel) -> some View {
-        Group {
-            if model.statsManager.hasRecentGames() {
-                VStack(spacing: DesignTokens.Spacing.sm) {
-                    LocalizedText("start.averageScore")
-                        .font(DesignTokens.Typography.bodyRegular)
-                        .foregroundStyle(DesignTokens.Colors.textSecondary)
-                    
-                    Text("\(Int(model.statsManager.getAverageRecentScore()))%")
-                        .font(DesignTokens.Typography.h1)
-                        .foregroundStyle(DesignTokens.Colors.iconBlueLight)
-                    
-                    Text("start.basedOnGames".localized(count: model.statsManager.getRecentGamesCount(), arguments: model.statsManager.getRecentGamesCount()))
-                        .font(DesignTokens.Typography.label)
-                        .foregroundStyle(DesignTokens.Colors.textTertiary)
-                }
-                .padding(DesignTokens.Spacing.lg)
-                .frame(maxWidth: .infinity)
-            } else {
-                VStack(spacing: DesignTokens.Spacing.sm) {
-                    LocalizedText("start.noGamesYet")
-                        .font(DesignTokens.Typography.bodyRegular)
-                        .foregroundStyle(DesignTokens.Colors.textSecondary)
-                    
-                    Text("—")
-                        .font(DesignTokens.Typography.h1)
-                        .foregroundStyle(DesignTokens.Colors.textTertiary)
-                }
-                .padding(DesignTokens.Spacing.lg)
-                .frame(maxWidth: .infinity)
+        HStack(spacing: DesignTokens.Spacing.md) {
+            streakTile(model: model)
+            averageScoreTile(model: model)
+        }
+    }
+    
+    private func streakTile(model: StartViewModel) -> some View {
+        let streak = model.statsManager.dayStreak
+        let isActiveToday = model.statsManager.isActiveToday
+        let caption: String
+        if isActiveToday {
+            caption = "start.streak.activeToday".localized
+        } else if streak > 0 {
+            caption = "start.streak.keepGoing".localized
+        } else {
+            caption = "start.streak.start".localized
+        }
+        
+        return VStack(spacing: DesignTokens.Spacing.xs) {
+            HStack(spacing: DesignTokens.Spacing.xs) {
+                Image(systemName: "flame.fill")
+                    .foregroundStyle(streak > 0 ? DesignTokens.Colors.iconOrange : DesignTokens.Colors.textTertiary)
+                Text("\(streak)")
+                    .font(DesignTokens.Typography.h1)
+                    .foregroundStyle(DesignTokens.Colors.textPrimary)
+            }
+            Text("streak.days".localized(count: streak))
+                .font(DesignTokens.Typography.label)
+                .foregroundStyle(DesignTokens.Colors.textSecondary)
+            Text(caption)
+                .font(DesignTokens.Typography.label)
+                .foregroundStyle(isActiveToday ? DesignTokens.Colors.statusGreen : DesignTokens.Colors.textTertiary)
+                .multilineTextAlignment(.center)
+        }
+        .padding(DesignTokens.Spacing.md)
+        .frame(maxWidth: .infinity, minHeight: 96)
+        .cardStyle(fillColor: Color.white.opacity(0.04), borderColor: Color.white.opacity(0.08), shadowColor: .clear)
+        .accessibilityElement(children: .combine)
+    }
+    
+    private func averageScoreTile(model: StartViewModel) -> some View {
+        let hasGames = model.statsManager.hasRecentGames()
+        return VStack(spacing: DesignTokens.Spacing.xs) {
+            Text(hasGames ? "\(Int(model.statsManager.getAverageRecentScore()))%" : "—")
+                .font(DesignTokens.Typography.h1)
+                .foregroundStyle(hasGames ? DesignTokens.Colors.iconBlueLight : DesignTokens.Colors.textTertiary)
+            LocalizedText(hasGames ? "start.averageScore" : "start.noGamesYet")
+                .font(DesignTokens.Typography.label)
+                .foregroundStyle(DesignTokens.Colors.textSecondary)
+            if hasGames {
+                Text("start.basedOnGames".localized(count: model.statsManager.getRecentGamesCount(), arguments: model.statsManager.getRecentGamesCount()))
+                    .font(DesignTokens.Typography.label)
+                    .foregroundStyle(DesignTokens.Colors.textTertiary)
             }
         }
+        .padding(DesignTokens.Spacing.md)
+        .frame(maxWidth: .infinity, minHeight: 96)
+        .cardStyle(fillColor: Color.white.opacity(0.04), borderColor: Color.white.opacity(0.08), shadowColor: .clear)
+        .accessibilityElement(children: .combine)
     }
     
     private func actionsSection(model: StartViewModel) -> some View {
         VStack(spacing: DesignTokens.Spacing.md) {
+            dailyButton(model: model)
+            if model.statsManager.dueReviewCount > 0 {
+                reviewButton(model: model)
+            }
             quizButton(model: model)
             examButton(model: model)
         }
     }
     
-    private func quizButton(model: StartViewModel) -> some View {
-        Button(action: {
-            model.startQuiz()
-        }) {
-            HStack(spacing: DesignTokens.Spacing.md) {
-                if model.quizViewModel.isLoading {
-                    ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                        .scaleEffect(0.8)
-                } else {
-                    Image(systemName: "play.fill")
-                        .font(.system(size: DesignTokens.Sizes.iconMedium))
-                        .foregroundColor(.white)
-                }
-                
-                LocalizedText(model.quizViewModel.isLoading ? "start.loading" : "start.begin")
-                    .font(DesignTokens.Typography.secondarySemibold)
-                    .foregroundStyle(.white)
-                
-                Spacer()
-                
-                Image(systemName: "chevron.right")
-                    .font(.system(size: DesignTokens.Sizes.iconSmall))
-                    .foregroundColor(.white)
-            }
-            .padding(DesignTokens.Spacing.lg)
-            .frame(maxWidth: .infinity)
-            .background(
-                ZStack {
-                    // Градиентный фон кнопки
-                    LinearGradient(
-                        gradient: Gradient(colors: [
-                            DesignTokens.Colors.quizButtonGradientStart,
-                            DesignTokens.Colors.quizButtonGradientEnd
-                        ]),
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                    
-                    // Рамка в стиле логотипа с градиентом и свечением
-                    RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
-                        .stroke(
-                            LinearGradient(
-                                gradient: Gradient(colors: [
-                                    DesignTokens.Colors.iconPurpleLight.opacity(0.5),
-                                    DesignTokens.Colors.iconPurpleLight.opacity(0.2)
-                                ]),
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            ),
-                            lineWidth: 1.5
-                        )
-                        .shadow(
-                            color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
-                            radius: 12,
-                            x: 0,
-                            y: 0
-                        )
-                }
-            )
-            .clipShape(RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium))
-            .shadow(
-                color: DesignTokens.Colors.quizButtonGradientStart.opacity(0.5),
-                radius: 12,
-                y: 6
-            )
+    private func dailyButton(model: StartViewModel) -> some View {
+        let isCompleted = model.statsManager.isDailyGoalCompletedToday
+        return GradientActionButton(
+            icon: isCompleted ? "checkmark.circle.fill" : "sun.max.fill",
+            title: "start.daily.title".localized,
+            subtitle: (isCompleted ? "start.daily.completed" : "start.daily.subtitle").localized(arguments: DailyProgress.dailyGoalQuestions),
+            gradient: [DesignTokens.Colors.greenGradientStart, DesignTokens.Colors.greenGradientEnd],
+            isLoading: model.quizViewModel.isLoading && model.quizViewModel.sessionKind == .daily
+        ) {
+            model.startDailyPractice()
         }
-        .buttonStyle(.plain)
+        .disabled(model.quizViewModel.isLoading)
+    }
+    
+    private func reviewButton(model: StartViewModel) -> some View {
+        GradientActionButton(
+            icon: "arrow.triangle.2.circlepath",
+            title: "start.review.title".localized,
+            subtitle: "start.review.subtitle".localized,
+            badge: "\(model.statsManager.dueReviewCount)",
+            gradient: [DesignTokens.Colors.amberGradientStart, DesignTokens.Colors.amberGradientEnd],
+            isLoading: model.quizViewModel.isLoading && model.quizViewModel.sessionKind == .review
+        ) {
+            model.startReview(scope: .due)
+        }
+        .disabled(model.quizViewModel.isLoading)
+    }
+    
+    private func quizButton(model: StartViewModel) -> some View {
+        GradientActionButton(
+            icon: "play.fill",
+            title: "start.begin".localized,
+            subtitle: "start.quiz.subtitle".localized(arguments: QuizUseCase.standardSessionSize),
+            gradient: [DesignTokens.Colors.quizButtonGradientStart, DesignTokens.Colors.quizButtonGradientEnd],
+            isLoading: model.quizViewModel.isLoading && model.quizViewModel.sessionKind == .standard
+        ) {
+            model.startQuiz()
+        }
         .disabled(model.quizViewModel.isLoading)
     }
     
     private func examButton(model: StartViewModel) -> some View {
-        Button {
+        GradientActionButton(
+            icon: "timer",
+            title: "start.examMode".localized,
+            gradient: [DesignTokens.Colors.examButtonGradientStart, DesignTokens.Colors.examButtonGradientEnd]
+        ) {
             model.showingExamSettings = true
-        } label: {
-            HStack(spacing: DesignTokens.Spacing.md) {
-                Image(systemName: "timer")
-                    .font(.system(size: DesignTokens.Sizes.iconMedium))
-                    .foregroundColor(.white)
-                
-                LocalizedText("start.examMode")
-                    .font(DesignTokens.Typography.secondarySemibold)
-                    .foregroundStyle(.white)
-                
-                Spacer()
-                
-                Image(systemName: "chevron.right")
-                    .font(.system(size: DesignTokens.Sizes.iconSmall))
-                    .foregroundColor(.white)
-            }
-            .padding(DesignTokens.Spacing.lg)
-            .frame(maxWidth: .infinity)
-            .background(
-                ZStack {
-                    // Градиентный фон кнопки
-                    LinearGradient(
-                        gradient: Gradient(colors: [
-                            DesignTokens.Colors.examButtonGradientStart,
-                            DesignTokens.Colors.examButtonGradientEnd
-                        ]),
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                    
-                    // Рамка в стиле логотипа с градиентом и свечением
-                    RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
-                        .stroke(
-                            LinearGradient(
-                                gradient: Gradient(colors: [
-                                    DesignTokens.Colors.iconPurpleLight.opacity(0.5),
-                                    DesignTokens.Colors.iconPurpleLight.opacity(0.2)
-                                ]),
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            ),
-                            lineWidth: 1.5
-                        )
-                        .shadow(
-                            color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
-                            radius: 12,
-                            x: 0,
-                            y: 0
-                        )
-                }
-            )
-            .clipShape(RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium))
-            .shadow(
-                color: DesignTokens.Colors.examButtonGradientStart.opacity(0.5),
-                radius: 12,
-                y: 6
-            )
         }
-        .buttonStyle(.plain)
     }
     
 }

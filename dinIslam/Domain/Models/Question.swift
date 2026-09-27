@@ -14,9 +14,28 @@ struct Question: Codable, Identifiable, Equatable {
     let correctIndex: Int
     let category: String
     let difficulty: Difficulty
+    /// Короткое пояснение, почему ответ верный (показывается после ответа)
+    var explanation: String? = nil
     
     enum CodingKeys: String, CodingKey {
-        case id, text, answers, correctIndex, category, difficulty
+        case id, text, answers, correctIndex, category, difficulty, explanation
+    }
+    
+    var hasExplanation: Bool {
+        !(explanation?.isEmpty ?? true)
+    }
+    
+    /// Копия вопроса с другим порядком ответов; остальные поля сохраняются
+    func withAnswers(_ answers: [Answer], correctIndex: Int) -> Question {
+        Question(
+            id: id,
+            text: text,
+            answers: answers,
+            correctIndex: correctIndex,
+            category: category,
+            difficulty: difficulty,
+            explanation: explanation
+        )
     }
 }
 

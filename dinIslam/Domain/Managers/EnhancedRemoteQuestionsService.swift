@@ -203,10 +203,18 @@ class EnhancedRemoteQuestionsService: ObservableObject {
         self.cacheManager = cacheManager
         self.configuration = configuration
         
+        // Кэш прежнего формата не содержит тем и объяснений, а при неизменном ETag (304) обновился бы не скоро
+        AppLanguage.allCases.forEach { cacheManager.invalidateCache(for: "questions_\($0.rawValue)") }
+        
         // Subscribe to network status changes
         networkManager.$isConnected
             .map { $0 ? NetworkStatus.connected : NetworkStatus.disconnected }
             .assign(to: &$networkStatus)
+    }
+    
+    /// Версия в ключе сбрасывает кэш, когда в модели Question появляются новые поля
+    static func cacheKey(for language: AppLanguage) -> String {
+        "questions_v2_\(language.rawValue)"
     }
     
     // MARK: - Public Methods
@@ -229,7 +237,7 @@ class EnhancedRemoteQuestionsService: ObservableObject {
             }
         }
         
-        let cacheKey = "questions_\(language.rawValue)"
+        let cacheKey = Self.cacheKey(for: language)
         
         // Get cached data with metadata (including ETag)
         let cachedDataWithMetadata = cacheManager.getCachedDataWithMetadata([Question].self, for: cacheKey)
@@ -300,7 +308,7 @@ class EnhancedRemoteQuestionsService: ObservableObject {
         }
         
         do {
-            let cacheKey = "questions_\(language.rawValue)"
+            let cacheKey = Self.cacheKey(for: language)
             let cachedDataWithMetadata = cacheManager.getCachedDataWithMetadata([Question].self, for: cacheKey)
             
             // Fetch remote questions with ETag support
@@ -351,7 +359,7 @@ class EnhancedRemoteQuestionsService: ObservableObject {
         }
         
         do {
-            let cacheKey = "questions_\(language.rawValue)"
+            let cacheKey = Self.cacheKey(for: language)
             let cachedDataWithMetadata = cacheManager.getCachedDataWithMetadata([Question].self, for: cacheKey)
             
             // Use ETag-based loading with validation
@@ -382,7 +390,7 @@ class EnhancedRemoteQuestionsService: ObservableObject {
             
         } catch {
             AppLogger.error("Force sync failed", error: error, category: AppLogger.network)
-            return cacheManager.getCachedData([Question].self, for: "questions_\(language.rawValue)") ?? []
+            return cacheManager.getCachedData([Question].self, for: Self.cacheKey(for: language)) ?? []
         }
     }
     

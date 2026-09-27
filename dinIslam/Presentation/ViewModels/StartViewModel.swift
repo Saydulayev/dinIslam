@@ -159,7 +159,7 @@ final class StartViewModel {
         switch newState {
         case .completed(.finished), .completed(.mistakesFinished):
             guard let quizResult = quizViewModel.quizResult else { return }
-            let snapshot = StartRoute.ResultSnapshot(from: quizResult)
+            let snapshot = StartRoute.ResultSnapshot(from: quizResult, report: quizViewModel.lastSessionReport)
             navigationCoordinator.showResult(snapshot)
             navigationPath = navigationCoordinator.navigationPath
         default:
@@ -168,7 +168,26 @@ final class StartViewModel {
     }
 
     // MARK: - Actions
-    func startQuiz() {
+    func startDailyPractice() {
+        startQuiz(kind: .daily)
+    }
+    
+    /// Повторение ошибок в том же стеке навигации, что и викторина
+    func startReview(scope: MistakesReviewScope) {
+        navigationCoordinator.resetNavigation()
+        navigationPath = navigationCoordinator.navigationPath
+        quizViewModel.restartQuiz()
+        startQuizTask?.cancel()
+        startQuizTask = Task { [weak self, cachedLanguageCode] in
+            guard let self = self else { return }
+            self.navigationCoordinator.showQuiz()
+            self.navigationPath = self.navigationCoordinator.navigationPath
+            await self.quizViewModel.startMistakesReview(language: cachedLanguageCode, scope: scope)
+            self.returnToStartIfSessionFailed()
+        }
+    }
+    
+    func startQuiz(kind: QuizSessionKind = .standard) {
         navigationCoordinator.resetNavigation()
         navigationPath = navigationCoordinator.navigationPath
         startQuizTask?.cancel()
@@ -176,7 +195,8 @@ final class StartViewModel {
             guard let self = self else { return }
             
             // Проверяем завершение банка через enhancedQuizUseCase или quizUseCase
-            if let enhancedUseCase = self.enhancedQuizUseCase {
+            // (ежедневная практика доступна и после прохождения банка)
+            if kind == .standard, let enhancedUseCase = self.enhancedQuizUseCase {
                 do {
                     let completionInfo = try await enhancedUseCase.isBankCompleted(language: cachedLanguageCode)
                     let isReviewMode = await self.isReviewMode()
@@ -199,8 +219,16 @@ final class StartViewModel {
                 self.navigationCoordinator.showQuiz()
                 self.navigationPath = self.navigationCoordinator.navigationPath
             }
-            await self.quizViewModel.startQuiz(language: cachedLanguageCode)
+            await self.quizViewModel.startQuiz(language: cachedLanguageCode, kind: kind)
+            self.returnToStartIfSessionFailed()
         }
+    }
+    
+    /// Если сессия не началась (нет вопросов, ошибка сети), не оставляем пустой экран викторины
+    private func returnToStartIfSessionFailed() {
+        guard quizViewModel.state == .idle || quizViewModel.state == .error(.networkError) else { return }
+        navigationCoordinator.resetNavigation()
+        navigationPath = navigationCoordinator.navigationPath
     }
     
     private func isReviewMode() async -> Bool {

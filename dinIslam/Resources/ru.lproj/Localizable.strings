@@ -532,3 +532,63 @@
 "bank.completion.startOver" = "Начать заново";
 "bank.completion.review" = "Повторение";
 "bank.completion.bankCompleted" = "Банк завершён";
+/* Learning loop: темы, объяснения, повторение, ежедневная практика */
+"category.aqida" = "Основы веры";
+"category.pillars" = "Столпы ислама";
+"category.prophets" = "Пророки";
+"category.seerah" = "Сира";
+"category.companions" = "Сподвижники";
+"category.quran" = "Коран";
+"category.fiqh" = "Фикх";
+"category.history" = "Исламская история";
+"category.akhlaq" = "Этика и нравы";
+"category.general" = "Общее";
+
+"explanation.correct" = "Верно!";
+"explanation.incorrect" = "Запомни";
+"quiz.next" = "Далее";
+"quiz.showResult" = "Показать результат";
+
+"streak.days" = "день";
+"streak.days_2" = "дня";
+"streak.days_5" = "дней";
+
+"start.streak.activeToday" = "сегодня ✓";
+"start.streak.keepGoing" = "продолжи сегодня";
+"start.streak.start" = "начни серию";
+"start.daily.title" = "Ежедневная практика";
+"start.daily.subtitle" = "%d вопросов · ~2 минуты";
+"start.daily.completed" = "Выполнено сегодня ✓ · ещё %d вопросов";
+"start.review.title" = "Повторение ошибок";
+"start.review.subtitle" = "Пора закрепить";
+"start.quiz.subtitle" = "%d вопросов";
+
+"result.dailyGoal.completed" = "Ежедневная практика выполнена!";
+"result.streak" = "%d %@ подряд";
+"result.topics.title" = "По темам";
+"result.topics.weak" = "Стоит повторить: %@";
+"result.mistakes.added" = "%d ошибка добавлена в повторение";
+"result.mistakes.added_2" = "%d ошибки добавлены в повторение";
+"result.mistakes.added_5" = "%d ошибок добавлено в повторение";
+"result.mistakes.hint" = "Вернём эти вопросы завтра, а затем через 3, 7 и 14 дней.";
+"result.mistakes.repeatNow" = "Повторить ошибки сейчас";
+
+"review.nothingDue" = "Сегодня повторять нечего — загляни позже.";
+"review.summary.title" = "Повторение";
+"review.summary.graduated" = "Выучено";
+"review.summary.advanced" = "Закреплено, вернётся позже";
+"review.summary.reset" = "Повторим завтра";
+"review.summary.notDue" = "Срок ещё не наступил";
+"review.summary.allLearned" = "Все ошибки выучены!";
+"review.summary.howItWorks" = "Правильно ответь на вопрос через 1, 3, 7 и 14 дней — и он будет выучен. Ошибка возвращает вопрос к началу.";
+"review.next" = "Следующее повторение: %@";
+"review.when.today" = "сегодня";
+"review.when.tomorrow" = "завтра";
+"review.when.inDays" = "через %d день";
+"review.when.inDays_2" = "через %d дня";
+"review.when.inDays_5" = "через %d дней";
+
+"knowledge.title" = "Мои знания";
+"knowledge.advice" = "Стоит повторить тему «%@»";
+"knowledge.caption" = "Доля правильных ответов по каждой теме";
+"stats.reviewDueToday.title" = "Повторить сегодня";

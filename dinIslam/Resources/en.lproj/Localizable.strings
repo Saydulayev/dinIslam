@@ -516,3 +516,60 @@
 "bank.completion.startOver" = "Start Over";
 "bank.completion.review" = "Review";
 "bank.completion.bankCompleted" = "Bank Completed";
+/* Learning loop: topics, explanations, review, daily practice */
+"category.aqida" = "Creed";
+"category.pillars" = "Pillars of Islam";
+"category.prophets" = "Prophets";
+"category.seerah" = "Seerah";
+"category.companions" = "Companions";
+"category.quran" = "Quran";
+"category.fiqh" = "Fiqh";
+"category.history" = "Islamic History";
+"category.akhlaq" = "Ethics & Manners";
+"category.general" = "General";
+
+"explanation.correct" = "Correct!";
+"explanation.incorrect" = "Remember";
+"quiz.next" = "Next";
+"quiz.showResult" = "Show result";
+
+"streak.days" = "day";
+"streak.days_other" = "days";
+
+"start.streak.activeToday" = "today ✓";
+"start.streak.keepGoing" = "keep it going today";
+"start.streak.start" = "start a streak";
+"start.daily.title" = "Daily practice";
+"start.daily.subtitle" = "%d questions · ~2 minutes";
+"start.daily.completed" = "Done today ✓ · %d more questions";
+"start.review.title" = "Review mistakes";
+"start.review.subtitle" = "Time to reinforce";
+"start.quiz.subtitle" = "%d questions";
+
+"result.dailyGoal.completed" = "Daily practice complete!";
+"result.streak" = "%d %@ in a row";
+"result.topics.title" = "By topic";
+"result.topics.weak" = "Worth reviewing: %@";
+"result.mistakes.added" = "%d mistake added to review";
+"result.mistakes.added_other" = "%d mistakes added to review";
+"result.mistakes.hint" = "We'll bring these questions back tomorrow, then in 3, 7 and 14 days.";
+"result.mistakes.repeatNow" = "Review mistakes now";
+
+"review.nothingDue" = "Nothing to review today — check back later.";
+"review.summary.title" = "Review";
+"review.summary.graduated" = "Learned";
+"review.summary.advanced" = "Reinforced, will come back later";
+"review.summary.reset" = "Again tomorrow";
+"review.summary.notDue" = "Not due yet";
+"review.summary.allLearned" = "All mistakes learned!";
+"review.summary.howItWorks" = "Answer a question correctly after 1, 3, 7 and 14 days and it's learned. A mistake sends it back to the start.";
+"review.next" = "Next review: %@";
+"review.when.today" = "today";
+"review.when.tomorrow" = "tomorrow";
+"review.when.inDays" = "in %d day";
+"review.when.inDays_other" = "in %d days";
+
+"knowledge.title" = "My knowledge";
+"knowledge.advice" = "Worth reviewing: “%@”";
+"knowledge.caption" = "Share of correct answers in each topic";
+"stats.reviewDueToday.title" = "Due for review today";

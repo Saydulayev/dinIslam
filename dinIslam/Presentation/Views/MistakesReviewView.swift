@@ -16,6 +16,8 @@ struct MistakesReviewView: View {
         _viewModel = Bindable(viewModel)
     }
     
+    private static let explanationAnchor = "explanation"
+    
     // MARK: - Computed Properties
     private var progressText: String {
         "\(viewModel.currentQuestionIndex + 1) / \(viewModel.questions.count)"
@@ -79,6 +81,7 @@ struct MistakesReviewView: View {
                 // Убираем фон, чтобы был виден градиент как на главном экране
             
                 // Question content
+                ScrollViewReader { scrollProxy in
                 ScrollView {
                     VStack(spacing: DesignTokens.Spacing.xxl) {
                         // Question text
@@ -104,9 +107,14 @@ struct MistakesReviewView: View {
                                 
                                 // Category and difficulty
                                 HStack {
-                                    Label(question.category, systemImage: "tag")
+                                    if question.category != QuestionCategory.generalId {
+                                        Label(
+                                            QuestionCategory.displayName(for: question.category),
+                                            systemImage: QuestionCategory.icon(for: question.category)
+                                        )
                                         .font(DesignTokens.Typography.label)
                                         .foregroundStyle(DesignTokens.Colors.textSecondary)
+                                    }
                                     
                                     Spacer()
                                     
@@ -154,9 +162,26 @@ struct MistakesReviewView: View {
                                     .accessibilityAddTraits(viewModel.selectedAnswerIndex == index ? .isSelected : [])
                                 }
                             }
+                            
+                            if viewModel.isAwaitingContinue, let explanation = question.explanation {
+                                ExplanationCard(
+                                    isCorrect: viewModel.wasLastAnswerCorrect,
+                                    explanation: explanation
+                                )
+                                .id(Self.explanationAnchor)
+                                .transition(.opacity.combined(with: .move(edge: .bottom)))
+                            }
                         }
                     }
                     .padding(DesignTokens.Spacing.xxl)
+                    .animation(.easeInOut(duration: 0.25), value: viewModel.isAwaitingContinue)
+                }
+                .onChange(of: viewModel.isAwaitingContinue) { _, isAwaiting in
+                    guard isAwaiting else { return }
+                    withAnimation(.easeInOut(duration: 0.3)) {
+                        scrollProxy.scrollTo(Self.explanationAnchor, anchor: .bottom)
+                    }
+                }
                 }
             
                 // Stop button at the bottom
@@ -164,6 +189,20 @@ struct MistakesReviewView: View {
                     Divider()
                         .background(DesignTokens.Colors.borderSubtle)
                     
+                    if viewModel.isAwaitingContinue {
+                        GradientActionButton(
+                            icon: viewModel.isLastQuestion ? "flag.checkered" : "arrow.right",
+                            title: (viewModel.isLastQuestion ? "quiz.showResult" : "quiz.next").localized,
+                            gradient: [
+                                DesignTokens.Colors.quizButtonGradientStart,
+                                DesignTokens.Colors.quizButtonGradientEnd
+                            ]
+                        ) {
+                            viewModel.continueToNextQuestion()
+                        }
+                        .padding(.horizontal, DesignTokens.Spacing.xxl)
+                        .padding(.vertical, DesignTokens.Spacing.lg)
+                    } else {
                     Button(action: {
                         showingStopConfirm = true
                     }) {
@@ -221,6 +260,7 @@ struct MistakesReviewView: View {
                     .accessibilityLabel("Stop mistakes review")
                     .accessibilityHint("Double tap to stop the mistakes review")
                     // Убираем фон, чтобы был виден градиент как на главном экране
+                    }
                 }
             }
         }

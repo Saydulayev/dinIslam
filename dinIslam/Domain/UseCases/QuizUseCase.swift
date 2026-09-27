@@ -8,7 +8,8 @@
 import Foundation
 
 protocol QuizUseCaseProtocol {
-    func startQuiz(language: String) async throws -> [Question]
+    func startQuiz(language: String, sessionSize: Int) async throws -> [Question]
+    func startDailyQuiz(language: String) async throws -> [Question]
     func loadAllQuestions(language: String) async throws -> [Question]
     func shuffleAnswers(for question: Question) -> Question
     func calculateResult(correctAnswers: Int, totalQuestions: Int, timeSpent: TimeInterval) -> QuizResult
@@ -38,7 +39,9 @@ class QuizUseCase: QuizUseCaseProtocol {
         self.questionPoolProgressManager = questionPoolProgressManager
     }
     
-    func startQuiz(language: String) async throws -> [Question] {
+    nonisolated static let standardSessionSize = 20
+    
+    func startQuiz(language: String, sessionSize: Int = QuizUseCase.standardSessionSize) async throws -> [Question] {
         let allQuestions = try await questionsRepository.loadQuestions(language: language)
         let currentQuestionIds = Set(allQuestions.map { $0.id })
         let used = questionPoolProgressManager.getUsedIds(version: questionPoolVersion)
@@ -53,7 +56,7 @@ class QuizUseCase: QuizUseCaseProtocol {
             return []
         }
         
-        let sessionCount = min(20, allQuestions.count) // Адаптивный размер сессии
+        let sessionCount = min(sessionSize, allQuestions.count)
         
         // В режиме изучения (не reviewMode) выбираем только новые вопросы
         if !isReviewMode {
@@ -117,6 +120,20 @@ class QuizUseCase: QuizUseCaseProtocol {
         }
     }
     
+    /// Ежедневная практика: сначала новые вопросы; если их не хватает (банк пройден),
+    /// добираем уже изученными, чтобы практика была доступна всегда.
+    func startDailyQuiz(language: String) async throws -> [Question] {
+        let size = DailyProgress.dailyGoalQuestions
+        var selected = try await startQuiz(language: language, sessionSize: size)
+        guard selected.count < size else { return selected }
+        
+        let selectedIds = Set(selected.map(\.id))
+        let allQuestions = try await questionsRepository.loadQuestions(language: language)
+        let filler = allQuestions.filter { !selectedIds.contains($0.id) }.shuffled()
+        selected.append(contentsOf: filler.prefix(size - selected.count))
+        return selected
+    }
+    
     func markQuestionsUsed(_ questionIds: [String]) {
         questionPoolProgressManager.markUsed(questionIds, version: questionPoolVersion)
     }
@@ -133,14 +150,7 @@ class QuizUseCase: QuizUseCaseProtocol {
             return question
         }
         
-        return Question(
-            id: question.id,
-            text: question.text,
-            answers: shuffledAnswers,
-            correctIndex: newCorrectIndex,
-            category: question.category,
-            difficulty: question.difficulty
-        )
+        return question.withAnswers(shuffledAnswers, correctIndex: newCorrectIndex)
     }
     
     func loadAllQuestions(language: String) async throws -> [Question] {

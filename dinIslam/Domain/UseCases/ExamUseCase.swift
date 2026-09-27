@@ -88,14 +88,7 @@ class ExamUseCase: ExamUseCaseProtocol {
         // Find new index of correct answer
         let newCorrectIndex = shuffledAnswers.firstIndex { $0.id == correctAnswer.id } ?? 0
         
-        return Question(
-            id: question.id,
-            text: question.text,
-            answers: shuffledAnswers,
-            correctIndex: newCorrectIndex,
-            category: question.category,
-            difficulty: question.difficulty
-        )
+        return question.withAnswers(shuffledAnswers, correctIndex: newCorrectIndex)
     }
     
     func calculateExamResult(

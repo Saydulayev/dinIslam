@@ -56,7 +56,8 @@ struct MistakesReviewNavigationView: View {
                             onBackToStart: {
                                 viewModel.restartQuiz()
                                 dismiss()
-                            }
+                            },
+                            report: viewModel.lastSessionReport
                         )
                     } else {
                         // Fallback if result is not ready yet

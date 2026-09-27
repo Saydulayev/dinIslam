@@ -22,12 +22,27 @@ final class DefaultQuizStatisticsRecorder: QuizStatisticsRecording {
         statsManager.recordQuizSession(summary)
     }
     
-    func getWrongQuestions(from allQuestions: [Question]) -> [Question] {
-        statsManager.getWrongQuestions(from: allQuestions)
+    var dayStreak: Int {
+        statsManager.dayStreak
     }
     
-    func removeWrongQuestion(_ questionId: String) {
-        statsManager.removeWrongQuestion(questionId)
+    func registerDailyGoal() {
+        statsManager.registerDailyGoal()
+    }
+    
+    func getWrongQuestions(from allQuestions: [Question], scope: MistakesReviewScope) -> [Question] {
+        switch scope {
+        case .due:
+            return statsManager.getDueWrongQuestions(from: allQuestions)
+        case .all:
+            return statsManager.getWrongQuestions(from: allQuestions)
+        case .questions(let ids):
+            return allQuestions.filter { ids.contains($0.id) }
+        }
+    }
+    
+    func recordReviewAnswers(_ answers: [String: Bool]) -> ReviewSessionSummary {
+        statsManager.recordReviewAnswers(answers)
     }
 }
 

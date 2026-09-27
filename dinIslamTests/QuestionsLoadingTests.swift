@@ -41,7 +41,7 @@ final class QuestionsLoadingTests: XCTestCase {
         XCTAssertEqual(questions.map(\.id), ["q1", "q2"])
         XCTAssertEqual(StubURLProtocol.requests.count, 1)
         XCTAssertEqual(StubURLProtocol.requests.first?.url?.lastPathComponent, "questions.json")
-        let cached = cache.getCachedDataWithMetadata([Question].self, for: "questions_ru")
+        let cached = cache.getCachedDataWithMetadata([Question].self, for: EnhancedRemoteQuestionsService.cacheKey(for: .russian))
         XCTAssertEqual(cached?.data.map(\.id), ["q1", "q2"])
         XCTAssertEqual(cached?.etag, "\"v1\"")
     }
@@ -62,7 +62,7 @@ final class QuestionsLoadingTests: XCTestCase {
     @MainActor
     func testFreshCache_isUsedWithoutNetworkRequest() async {
         let (service, cache) = makeService()
-        cache.cacheData(Self.questions(ids: ["c1", "c2"]), for: "questions_ru", etag: "\"v1\"")
+        cache.cacheData(Self.questions(ids: ["c1", "c2"]), for: EnhancedRemoteQuestionsService.cacheKey(for: .russian), etag: "\"v1\"")
 
         let questions = await service.fetchQuestions(for: .russian, manageLoadingState: false)
 
@@ -74,7 +74,7 @@ final class QuestionsLoadingTests: XCTestCase {
     func testExpiredCache_304_returnsCachedQuestions_andSendsETag() async {
         StubURLProtocol.respond(status: 304, etag: "\"v1\"", body: Data())
         let (service, cache) = makeService(ttl: -1) // кэш сразу считается устаревшим
-        cache.cacheData(Self.questions(ids: ["c1", "c2"]), for: "questions_ru", etag: "\"v1\"")
+        cache.cacheData(Self.questions(ids: ["c1", "c2"]), for: EnhancedRemoteQuestionsService.cacheKey(for: .russian), etag: "\"v1\"")
 
         let questions = await service.fetchQuestions(for: .russian, manageLoadingState: false)
 
@@ -86,12 +86,12 @@ final class QuestionsLoadingTests: XCTestCase {
     func testExpiredCache_200_replacesCache() async {
         StubURLProtocol.respond(status: 200, etag: "\"v2\"", body: Self.remoteJSON(ids: ["n1", "n2", "n3"]))
         let (service, cache) = makeService(ttl: -1)
-        cache.cacheData(Self.questions(ids: ["c1"]), for: "questions_ru", etag: "\"v1\"")
+        cache.cacheData(Self.questions(ids: ["c1"]), for: EnhancedRemoteQuestionsService.cacheKey(for: .russian), etag: "\"v1\"")
 
         let questions = await service.fetchQuestions(for: .russian, manageLoadingState: false)
 
         XCTAssertEqual(questions.map(\.id), ["n1", "n2", "n3"])
-        let cached = cache.getCachedDataWithMetadata([Question].self, for: "questions_ru")
+        let cached = cache.getCachedDataWithMetadata([Question].self, for: EnhancedRemoteQuestionsService.cacheKey(for: .russian))
         XCTAssertEqual(cached?.data.map(\.id), ["n1", "n2", "n3"])
         XCTAssertEqual(cached?.etag, "\"v2\"")
     }
@@ -100,7 +100,7 @@ final class QuestionsLoadingTests: XCTestCase {
     func testNetworkError_usesExpiredCache() async {
         StubURLProtocol.fail(with: URLError(.notConnectedToInternet))
         let (service, cache) = makeService(ttl: -1)
-        cache.cacheData(Self.questions(ids: ["c1", "c2"]), for: "questions_ru", etag: "\"v1\"")
+        cache.cacheData(Self.questions(ids: ["c1", "c2"]), for: EnhancedRemoteQuestionsService.cacheKey(for: .russian), etag: "\"v1\"")
 
         let questions = await service.fetchQuestions(for: .russian, manageLoadingState: false)
 
@@ -116,12 +116,12 @@ final class QuestionsLoadingTests: XCTestCase {
         items.append(["id": "bad", "q": "Вопрос с одним ответом", "a": ["Единственный"], "c": 0])
         StubURLProtocol.respond(status: 200, etag: "\"v2\"", body: Self.json(items))
         let (service, cache) = makeService(ttl: -1)
-        cache.cacheData(Self.questions(ids: ["c1"]), for: "questions_ru", etag: "\"v1\"")
+        cache.cacheData(Self.questions(ids: ["c1"]), for: EnhancedRemoteQuestionsService.cacheKey(for: .russian), etag: "\"v1\"")
 
         let questions = await service.fetchQuestions(for: .russian, manageLoadingState: false)
 
         XCTAssertEqual(questions.map(\.id), ["n1", "n2"])
-        let cached = cache.getCachedDataWithMetadata([Question].self, for: "questions_ru")
+        let cached = cache.getCachedDataWithMetadata([Question].self, for: EnhancedRemoteQuestionsService.cacheKey(for: .russian))
         XCTAssertEqual(cached?.data.map(\.id), ["n1", "n2"])
         XCTAssertEqual(cached?.etag, "\"v2\"")
     }
@@ -158,12 +158,12 @@ final class QuestionsLoadingTests: XCTestCase {
         let items: [[String: Any]] = [["id": "bad", "q": "", "a": ["A", "B"], "c": 0]]
         StubURLProtocol.respond(status: 200, etag: "\"v2\"", body: Self.json(items))
         let (service, cache) = makeService(ttl: -1)
-        cache.cacheData(Self.questions(ids: ["c1"]), for: "questions_ru", etag: "\"v1\"")
+        cache.cacheData(Self.questions(ids: ["c1"]), for: EnhancedRemoteQuestionsService.cacheKey(for: .russian), etag: "\"v1\"")
 
         let questions = await service.fetchQuestions(for: .russian, manageLoadingState: false)
 
         XCTAssertEqual(questions.map(\.id), ["c1"])
-        XCTAssertEqual(cache.getCachedDataWithMetadata([Question].self, for: "questions_ru")?.etag, "\"v1\"")
+        XCTAssertEqual(cache.getCachedDataWithMetadata([Question].self, for: EnhancedRemoteQuestionsService.cacheKey(for: .russian))?.etag, "\"v1\"")
     }
 
     // MARK: - Встроенные вопросы

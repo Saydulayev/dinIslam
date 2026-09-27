@@ -14,6 +14,8 @@ struct ResultView: View {
     let onPlayAgain: () -> Void
     let onBackToStart: () -> Void
     let onAchievementsCleared: () -> Void
+    var report: SessionReport? = nil
+    var onRepeatMistakes: (([String]) -> Void)? = nil
     
     @State private var showingAchievementNotification = false
     @State private var currentAchievement: Achievement?
@@ -139,6 +141,11 @@ struct ResultView: View {
                             )
                     )
                     .padding(.horizontal, DesignTokens.Spacing.xxl)
+                    
+                    if let report {
+                        SessionReportSections(report: report, onRepeatMistakes: onRepeatMistakes)
+                            .padding(.horizontal, DesignTokens.Spacing.xxl)
+                    }
                     
                     Spacer()
                         .frame(height: DesignTokens.Spacing.xxl)
