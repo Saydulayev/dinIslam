@@ -47,7 +47,9 @@ class ExamViewModel {
     private var examStartTime: Date?
     private var totalTimeSpent: TimeInterval = 0
     private var nextQuestionTask: Task<Void, Never>?
-    
+    // Язык последнего запуска — нужен для пересдачи с той же конфигурацией
+    private var lastLanguage: String = "ru"
+
     // Timer update tracking for SwiftUI
     private var displayedTimeRemaining: TimeInterval = 0
     private var timerUpdateTask: Task<Void, Never>?
@@ -151,6 +153,7 @@ class ExamViewModel {
     // MARK: - Public Methods
     func startExam(configuration: ExamConfiguration, language: String) async {
         self.configuration = configuration
+        lastLanguage = language
         state = .active(.loading)
         isLoading = true
         errorMessage = nil
@@ -208,6 +211,8 @@ class ExamViewModel {
         nextQuestionTask?.cancel()
         nextQuestionTask = Task { @MainActor [weak self] in
             try? await Task.sleep(nanoseconds: 1_500_000_000) // 1.5 seconds
+            // try? глушит CancellationError, поэтому отмену проверяем явно
+            guard !Task.isCancelled else { return }
             self?.nextQuestion()
         }
     }
@@ -270,6 +275,11 @@ class ExamViewModel {
     }
     
     func finishExam() {
+        // Отложенный переход к следующему вопросу не должен сработать после завершения
+        nextQuestionTask?.cancel()
+        nextQuestionTask = nil
+        if case .completed = state { return }
+
         stopQuestionTimer()
         
         // Calculate total time spent
@@ -344,6 +354,12 @@ class ExamViewModel {
         // Navigate to restart
         navigationCoordinator.restartExam()
     }
+
+    /// Пересдача: новый набор вопросов с той же конфигурацией и языком
+    func retake() async {
+        restartExam()
+        await startExam(configuration: configuration, language: lastLanguage)
+    }
     
     // MARK: - Timer Methods
     private func startQuestionTimer() {
@@ -410,7 +426,7 @@ class ExamViewModel {
         nextQuestionTask?.cancel()
         nextQuestionTask = Task { @MainActor [weak self] in
             try? await Task.sleep(nanoseconds: 1_000_000_000) // 1 second
-            guard let self else { return }
+            guard let self, !Task.isCancelled else { return }
             
             if self.configuration.autoSubmit {
                 if self.isLastQuestion {
@@ -421,6 +437,8 @@ class ExamViewModel {
                     self.startQuestionTimer()
                 }
             } else {
+                // Возвращаемся из .timeUp, иначе ответы на следующие вопросы блокируются
+                self.state = .active(.playing)
                 self.nextQuestion()
             }
         }

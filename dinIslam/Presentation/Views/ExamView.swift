@@ -75,14 +75,19 @@ struct ExamView: View {
                                     .dynamicTypeSize(.large)
                                 
                                 // Category
-                                HStack {
-                                    Label(question.category, systemImage: "tag")
+                                if question.category != QuestionCategory.generalId {
+                                    HStack {
+                                        Label(
+                                            QuestionCategory.displayName(for: question.category),
+                                            systemImage: QuestionCategory.icon(for: question.category)
+                                        )
                                         .font(DesignTokens.Typography.label)
                                         .foregroundStyle(DesignTokens.Colors.textSecondary)
-                                    
-                                    Spacer()
+
+                                        Spacer()
+                                    }
+                                    .padding(.horizontal, DesignTokens.Spacing.sm)
                                 }
-                                .padding(.horizontal, DesignTokens.Spacing.sm)
                             }
                             
                             // Answer options
@@ -254,7 +259,7 @@ struct ExamView: View {
                     viewModel: viewModel,
                     onRetake: {
                         showingResult = false
-                        viewModel.restartExam()
+                        Task { await viewModel.retake() }
                     },
                     onBackToMenu: {
                         showingResult = false
@@ -311,22 +316,24 @@ struct ExamHeaderView: View {
                 Spacer()
                 
                 // Timer
-                HStack(spacing: DesignTokens.Spacing.sm) {
-                    Image(systemName: "timer")
-                        .font(.system(size: DesignTokens.Sizes.iconSmall))
-                        .foregroundColor(timerColor)
-                    
-                    Text(viewModel.timeRemainingFormatted)
-                        .font(DesignTokens.Typography.secondarySemibold)
-                        .foregroundColor(timerColor)
-                        .monospacedDigit()
+                if viewModel.configuration.showTimer {
+                    HStack(spacing: DesignTokens.Spacing.sm) {
+                        Image(systemName: "timer")
+                            .font(.system(size: DesignTokens.Sizes.iconSmall))
+                            .foregroundColor(timerColor)
+
+                        Text(viewModel.timeRemainingFormatted)
+                            .font(DesignTokens.Typography.secondarySemibold)
+                            .foregroundColor(timerColor)
+                            .monospacedDigit()
+                    }
+                    .padding(.horizontal, DesignTokens.Spacing.md)
+                    .padding(.vertical, DesignTokens.Spacing.sm)
+                    .background(
+                        RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.small)
+                            .fill(timerBackgroundColor)
+                    )
                 }
-                .padding(.horizontal, DesignTokens.Spacing.md)
-                .padding(.vertical, DesignTokens.Spacing.sm)
-                .background(
-                    RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.small)
-                        .fill(timerBackgroundColor)
-                )
             }
         }
         .padding(.horizontal, DesignTokens.Spacing.xxl)

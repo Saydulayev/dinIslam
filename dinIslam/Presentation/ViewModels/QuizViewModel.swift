@@ -237,6 +237,8 @@ class QuizViewModel {
         nextQuestionTask?.cancel()
         nextQuestionTask = Task { @MainActor [weak self] in
             try? await Task.sleep(nanoseconds: 1_500_000_000) // 1.5 seconds
+            // try? глушит CancellationError, поэтому отмену проверяем явно
+            guard !Task.isCancelled else { return }
             self?.nextQuestion()
         }
     }
