@@ -516,7 +516,7 @@
 "bank.completion.startOver" = "Start Over";
 "bank.completion.review" = "Review";
 "bank.completion.bankCompleted" = "Bank Completed";
-/* Learning loop: topics, explanations, review, daily practice */
+/* Learning loop: topics, review, daily practice */
 "category.aqida" = "Creed";
 "category.pillars" = "Pillars of Islam";
 "category.prophets" = "Prophets";
@@ -528,10 +528,6 @@
 "category.akhlaq" = "Ethics & Manners";
 "category.general" = "General";
 
-"explanation.correct" = "Correct!";
-"explanation.incorrect" = "Remember";
-"quiz.next" = "Next";
-"quiz.showResult" = "Show result";
 
 "streak.days" = "day";
 "streak.days_other" = "days";

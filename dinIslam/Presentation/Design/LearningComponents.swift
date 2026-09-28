@@ -2,7 +2,7 @@
 //  LearningComponents.swift
 //  dinIslam
 //
-//  Общие элементы учебного цикла: пояснение к ответу, кнопки действий, строки тем.
+//  Общие элементы учебного цикла: кнопки действий, строки тем.
 //
 
 import SwiftUI
@@ -103,42 +103,6 @@ struct GradientActionButton: View {
     }
 }
 
-// MARK: - Explanation Card
-
-/// Пояснение после ответа: почему верный ответ именно такой
-struct ExplanationCard: View {
-    let isCorrect: Bool
-    let explanation: String
-
-    private var accent: Color {
-        isCorrect ? DesignTokens.Colors.statusGreen : DesignTokens.Colors.iconOrange
-    }
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: DesignTokens.Spacing.sm) {
-            Label(
-                (isCorrect ? "explanation.correct" : "explanation.incorrect").localized,
-                systemImage: isCorrect ? "checkmark.seal.fill" : "lightbulb.fill"
-            )
-            .font(DesignTokens.Typography.secondarySemibold)
-            .foregroundStyle(accent)
-
-            Text(explanation)
-                .font(DesignTokens.Typography.bodyRegular)
-                .foregroundStyle(DesignTokens.Colors.textPrimary)
-                .fixedSize(horizontal: false, vertical: true)
-        }
-        .padding(DesignTokens.Spacing.lg)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .cardStyle(
-            fillColor: accent.opacity(0.12),
-            borderColor: accent.opacity(0.4),
-            shadowColor: .clear
-        )
-        .accessibilityElement(children: .combine)
-    }
-}
-
 // MARK: - Topic Row
 
 /// Тема с полосой прогресса: используется в итогах сессии и в разделе «Мои знания»
@@ -179,8 +143,6 @@ struct TopicProgressRow: View {
 
 #Preview {
     VStack(spacing: 16) {
-        ExplanationCard(isCorrect: true, explanation: "Намеренная еда днём в Рамадан нарушает пост.")
-        ExplanationCard(isCorrect: false, explanation: "Забывчивая еда пост не нарушает.")
         TopicProgressRow(categoryId: "prophets", accuracy: 0.75, detail: "3/4")
         GradientActionButton(
             icon: "sun.max.fill",

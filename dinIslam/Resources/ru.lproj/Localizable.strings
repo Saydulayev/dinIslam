@@ -532,7 +532,7 @@
 "bank.completion.startOver" = "Начать заново";
 "bank.completion.review" = "Повторение";
 "bank.completion.bankCompleted" = "Банк завершён";
-/* Learning loop: темы, объяснения, повторение, ежедневная практика */
+/* Learning loop: темы, повторение, ежедневная практика */
 "category.aqida" = "Основы веры";
 "category.pillars" = "Столпы ислама";
 "category.prophets" = "Пророки";
@@ -544,10 +544,6 @@
 "category.akhlaq" = "Этика и нравы";
 "category.general" = "Общее";
 
-"explanation.correct" = "Верно!";
-"explanation.incorrect" = "Запомни";
-"quiz.next" = "Далее";
-"quiz.showResult" = "Показать результат";
 
 "streak.days" = "день";
 "streak.days_2" = "дня";

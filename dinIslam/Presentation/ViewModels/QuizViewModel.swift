@@ -79,16 +79,6 @@ class QuizViewModel {
         return currentQuestionIndex == questions.count - 1
     }
     
-    /// После ответа на вопрос с пояснением ждём, пока пользователь прочитает его и нажмёт «Далее»
-    var isAwaitingContinue: Bool {
-        isAnswerSelected && (currentQuestion?.hasExplanation ?? false)
-    }
-    
-    var wasLastAnswerCorrect: Bool {
-        guard let selectedAnswerIndex, let currentQuestion else { return false }
-        return selectedAnswerIndex == currentQuestion.correctIndex
-    }
-    
     // MARK: - Initialization
     init(
         quizUseCase: QuizUseCaseProtocol,
@@ -243,21 +233,12 @@ class QuizViewModel {
             feedbackProvider.answerSelected(isCorrect: isCorrect)
         }
         
-        // Вопрос с пояснением ждёт нажатия «Далее»
-        guard !isAwaitingContinue else { return }
-        
         // Show result briefly before moving to next question
         nextQuestionTask?.cancel()
         nextQuestionTask = Task { @MainActor [weak self] in
             try? await Task.sleep(nanoseconds: 1_500_000_000) // 1.5 seconds
             self?.nextQuestion()
         }
-    }
-    
-    @MainActor
-    func continueToNextQuestion() {
-        guard isAnswerSelected else { return }
-        nextQuestion()
     }
     
     @MainActor

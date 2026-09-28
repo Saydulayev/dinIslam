@@ -19,7 +19,6 @@ struct RemoteQuestion: Codable {
     let correctIndex: Int
     let category: String?
     let difficulty: String?
-    let explanation: String?
     
     // Определяем текст вопроса из любого формата
     var questionText: String {
@@ -89,15 +88,14 @@ struct RemoteQuestion: Codable {
             answers: finalAnswers,
             correctIndex: safeCorrectIndex,
             category: questionCategory,
-            difficulty: questionDifficulty,
-            explanation: explanation.map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }.flatMap { $0.isEmpty ? nil : $0 }
+            difficulty: questionDifficulty
         )
     }
     
     enum CodingKeys: String, CodingKey {
-        case id, text, question, answers, correctIndex, category, difficulty, explanation
+        case id, text, question, answers, correctIndex, category, difficulty
         case q, a, c // Короткие ключи для компактного JSON
-        case cat, d, exp // Тема, сложность, пояснение (старые версии приложения их не читают)
+        case cat, d // Тема и сложность (старые версии приложения их не читают)
     }
     
     init(from decoder: Decoder) throws {
@@ -158,8 +156,6 @@ struct RemoteQuestion: Codable {
             ?? (try? container.decode(String.self, forKey: .category))
         difficulty = (try? container.decode(String.self, forKey: .d))
             ?? (try? container.decode(String.self, forKey: .difficulty))
-        explanation = (try? container.decode(String.self, forKey: .exp))
-            ?? (try? container.decode(String.self, forKey: .explanation))
     }
     
     func encode(to encoder: Encoder) throws {
@@ -194,9 +190,6 @@ struct RemoteQuestion: Codable {
         }
         if let difficulty = difficulty {
             try container.encode(difficulty, forKey: .difficulty)
-        }
-        if let explanation = explanation {
-            try container.encode(explanation, forKey: .explanation)
         }
     }
 }

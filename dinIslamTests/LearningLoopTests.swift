@@ -2,7 +2,7 @@
 //  LearningLoopTests.swift
 //  dinIslamTests
 //
-//  Интервальное повторение ошибок, серия дней, новые поля вопросов (тема, сложность, пояснение).
+//  Интервальное повторение ошибок, серия дней, новые поля вопросов (тема, сложность).
 //  Тесты помечены @MainActor: в приложении типы по умолчанию привязаны к главному потоку.
 //
 
@@ -257,17 +257,15 @@ final class StatsManagerReviewTests: XCTestCase {
 @MainActor
 final class QuestionFormatTests: XCTestCase {
 
-    func testShortKeys_categoryDifficultyExplanation() throws {
+    func testShortKeys_categoryDifficulty() throws {
         let json = """
         [{"id": "q1", "q": "Вопрос?", "a": ["А", "Б"], "c": 1,
-          "cat": "prophets", "d": "hard", "exp": "  Потому что так.  "}]
+          "cat": "prophets", "d": "hard"}]
         """
         let question = try XCTUnwrap(QuestionsFile.decode(Data(json.utf8)).first)
 
         XCTAssertEqual(question.category, "prophets")
         XCTAssertEqual(question.difficulty, .hard)
-        XCTAssertEqual(question.explanation, "Потому что так.")
-        XCTAssertTrue(question.hasExplanation)
     }
 
     func testOldFormat_withoutNewFields_stillLoads() throws {
@@ -278,32 +276,20 @@ final class QuestionFormatTests: XCTestCase {
 
         XCTAssertEqual(question.category, QuestionCategory.generalId)
         XCTAssertEqual(question.difficulty, .medium)
-        XCTAssertNil(question.explanation)
-        XCTAssertFalse(question.hasExplanation)
     }
 
-    func testEmptyExplanation_isTreatedAsMissing() throws {
-        let json = """
-        [{"id": "q1", "q": "Вопрос?", "a": ["А", "Б"], "c": 0, "exp": "   "}]
-        """
-        let question = try XCTUnwrap(QuestionsFile.decode(Data(json.utf8)).first)
-        XCTAssertNil(question.explanation)
-    }
-
-    func testShuffle_keepsExplanationAndCategory() {
+    func testShuffle_keepsCategory() {
         let question = Question(
             id: "q1",
             text: "?",
             answers: [Answer(id: "a1", text: "A"), Answer(id: "a2", text: "B"), Answer(id: "a3", text: "C")],
             correctIndex: 2,
             category: "fiqh",
-            difficulty: .easy,
-            explanation: "Пояснение"
+            difficulty: .easy
         )
 
         let shuffled = question.withAnswers(question.answers.reversed(), correctIndex: 0)
 
-        XCTAssertEqual(shuffled.explanation, "Пояснение")
         XCTAssertEqual(shuffled.category, "fiqh")
         XCTAssertEqual(shuffled.answers[shuffled.correctIndex].id, "a3")
     }
