@@ -151,7 +151,12 @@ struct StartView: View {
                 case .settings:
                     SettingsViewWithDependencies(settingsManager: model.settingsManager)
                 case .profile:
-                    UnifiedProfileView(statsManager: model.statsManager)
+                    UnifiedProfileView(
+                        statsManager: model.statsManager,
+                        onStartMistakesReview: {
+                            model.startReview(scope: .all)
+                        }
+                    )
                 case .exam:
                     if let examViewModel = model.examViewModel {
                         ExamView(viewModel: examViewModel) {

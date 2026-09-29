@@ -13,28 +13,26 @@ struct UnifiedProfileView: View {
     @Environment(\.settingsManager) private var settingsManager
     @Environment(\.remoteQuestionsService) private var remoteService: EnhancedRemoteQuestionsService
     @Bindable var statsManager: StatsManager
+    /// Повторение ошибок идёт в общем потоке викторины (StartViewModel.startReview)
+    let onStartMistakesReview: () -> Void
     
     @State private var avatarPickerItem: PhotosPickerItem?
     @State private var showResetConfirmation = false
     @State private var isResettingProfile = false
-    @State private var mistakesViewModel: QuizViewModel?
-    @State private var showingMistakesReview = false
     @State private var totalQuestionsCount: Int = 0
     @State private var showingResetAlert = false
     @State private var statsRefreshTrigger: Int = 0
     @State private var isEditingDisplayName = false
     @State private var editingDisplayName = ""
-    @State private var showingMistakesError = false
-    @State private var mistakesErrorMessage: String?
     
     // Task cancellation
     @State private var updateTask: Task<Void, Never>?
     @State private var syncTask: Task<Void, Never>?
     @State private var loadQuestionsTask: Task<Void, Never>?
-    @State private var mistakesTask: Task<Void, Never>?
     
-    init(statsManager: StatsManager) {
+    init(statsManager: StatsManager, onStartMistakesReview: @escaping () -> Void) {
         self._statsManager = Bindable(statsManager)
+        self.onStartMistakesReview = onStartMistakesReview
     }
     
     var body: some View {
@@ -79,7 +77,7 @@ struct UnifiedProfileView: View {
                     if !statsManager.stats.wrongQuestionIds.isEmpty {
                         ProfileWrongQuestionsSectionView(
                             statsManager: statsManager,
-                            onStartMistakesReview: startMistakesReview
+                            onStartMistakesReview: onStartMistakesReview
                         )
                     }
                     
@@ -132,7 +130,6 @@ struct UnifiedProfileView: View {
             updateTask?.cancel()
             syncTask?.cancel()
             loadQuestionsTask?.cancel()
-            mistakesTask?.cancel()
         }
         .alert("profile.sync.reset.title".localized, isPresented: $showResetConfirmation) {
             Button("profile.sync.reset.confirm".localized, role: .destructive) {
@@ -167,24 +164,6 @@ struct UnifiedProfileView: View {
             }
         } message: {
             Text("stats.reset.confirm.message".localized)
-        }
-        .alert(
-            "error.title".localized,
-            isPresented: $showingMistakesError
-        ) {
-            Button("error.ok".localized) {
-                showingMistakesError = false
-                mistakesErrorMessage = nil
-            }
-        } message: {
-            if let errorMessage = mistakesErrorMessage {
-                Text(errorMessage)
-            }
-        }
-        .navigationDestination(isPresented: $showingMistakesReview) {
-            if let viewModel = mistakesViewModel {
-                MistakesReviewNavigationView(viewModel: viewModel)
-            }
         }
         .onChange(of: avatarPickerItem) { previous, current in
             guard let item = current, previous != current else { return }
@@ -227,39 +206,6 @@ struct UnifiedProfileView: View {
             totalQuestionsCount = questions.count
         }
     }
-    
-    private func startMistakesReview() {
-        // Cancel any existing mistakes review task
-        mistakesTask?.cancel()
-        
-        // Используем существующие экземпляры из DI контейнера
-        let dependencies = DIContainer.createDependencies()
-        let viewModel = QuizViewModel(
-            quizUseCase: dependencies.quizUseCase, 
-            statsManager: statsManager, 
-            settingsManager: settingsManager
-        )
-        
-        mistakesViewModel = viewModel
-        showingMistakesReview = true
-        
-        // Start mistakes review task
-        mistakesTask = Task { @MainActor [viewModel, settingsManager] in
-            // Get current language from settings
-            let currentLanguage: AppLanguage = settingsManager.settings.language == .system ? 
-                (Locale.current.language.languageCode?.identifier == "en" ? .english : .russian) :
-                settingsManager.settings.language
-            
-            await viewModel.startMistakesReview(language: currentLanguage.rawValue)
-            
-            // Check for errors after completion
-            if let errorMessage = viewModel.errorMessage {
-                showingMistakesReview = false
-                mistakesErrorMessage = errorMessage
-                showingMistakesError = true
-            }
-        }
-    }
 }
 
 #Preview {
@@ -272,7 +218,7 @@ struct UnifiedProfileView: View {
         examStatisticsManager: examStatsManager
     )
     return NavigationStack {
-        UnifiedProfileView(statsManager: statsManager)
+        UnifiedProfileView(statsManager: statsManager, onStartMistakesReview: {})
     }
     .environment(\.profileManager, profileManager)
     .environment(\.settingsManager, SettingsManager())
