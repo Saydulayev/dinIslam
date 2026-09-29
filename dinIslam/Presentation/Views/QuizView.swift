@@ -153,7 +153,6 @@ struct QuizView: View {
                                                 y: 0
                                             )
                                     )
-                                    .accessibilityLabel("Question: \(question.text)")
                                     .accessibilityAddTraits(.isHeader)
                                     .dynamicTypeSize(.large)
                                 
@@ -187,9 +186,6 @@ struct QuizView: View {
                                             viewModel.selectAnswer(at: index)
                                         }
                                     )
-                                    .accessibilityLabel("Answer option \(index + 1)")
-                                    .accessibilityHint("Double tap to select this answer")
-                                    .accessibilityAddTraits(viewModel.selectedAnswerIndex == index ? .isSelected : [])
                                 }
                             }
                         }
@@ -198,6 +194,12 @@ struct QuizView: View {
                 }
                 .onChange(of: viewModel.currentQuestionIndex) { _, _ in
                     scrollProxy.scrollTo(Self.questionTopAnchor, anchor: .top)
+                }
+                .onChange(of: viewModel.isAnswerSelected) { _, isAnswerSelected in
+                    guard isAnswerSelected,
+                          let question = viewModel.currentQuestion,
+                          let selectedIndex = viewModel.selectedAnswerIndex else { return }
+                    AnswerAnnouncement.post(for: question, selectedIndex: selectedIndex)
                 }
                 }
             
@@ -242,8 +244,6 @@ struct QuizView: View {
                         .padding(.horizontal, DesignTokens.Spacing.xxl)
                         .padding(.vertical, DesignTokens.Spacing.lg)
                     }
-                    .accessibilityLabel("Finish quiz")
-                    .accessibilityHint("Double tap to finish the current quiz")
                     // Убираем фон, чтобы был виден градиент как на главном экране
                 }
             }
@@ -322,6 +322,17 @@ struct AnswerButton: View {
         }
     }
     
+    // Состояние ответа для VoiceOver: цвет и иконки ему недоступны
+    private var accessibilityStatus: String {
+        guard isAnswerSelected else { return "" }
+        if isSelected {
+            return isCorrect
+                ? "accessibility.answer.selectedCorrect".localized
+                : "accessibility.answer.selectedWrong".localized
+        }
+        return isCorrect ? "accessibility.answer.correct".localized : ""
+    }
+    
     private var buttonStyle: some ButtonStyle {
         AnswerButtonStyle(
             color: buttonColor,
@@ -340,14 +351,17 @@ struct AnswerButton: View {
                 
                 Spacer()
                 
-                if isAnswerSelected && isCorrect && isSelected {
+                // Правильный ответ отмечается иконкой и тогда, когда выбран другой вариант
+                if isAnswerSelected && isCorrect {
                     Image(systemName: "checkmark.circle.fill")
                         .font(.system(size: DesignTokens.Sizes.iconMedium))
                         .foregroundColor(DesignTokens.Colors.statusGreen)
-                } else if isAnswerSelected && !isCorrect && isSelected {
+                        .accessibilityHidden(true)
+                } else if isAnswerSelected && isSelected {
                     Image(systemName: "xmark.circle.fill")
                         .font(.system(size: DesignTokens.Sizes.iconMedium))
                         .foregroundColor(DesignTokens.Colors.iconRed)
+                        .accessibilityHidden(true)
                 }
             }
             .padding(DesignTokens.Spacing.lg)
@@ -368,6 +382,29 @@ struct AnswerButton: View {
         }
         .buttonStyle(buttonStyle)
         .disabled(isAnswerSelected)
+        .accessibilityValue(accessibilityStatus)
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
+    }
+}
+
+// MARK: - Answer Announcement
+enum AnswerAnnouncement {
+    /// Озвучивает результат ответа для VoiceOver
+    static func post(for question: Question, selectedIndex: Int) {
+        let text: String
+        if selectedIndex == question.correctIndex {
+            text = "accessibility.announce.correct".localized
+        } else if question.answers.indices.contains(question.correctIndex) {
+            text = "accessibility.announce.wrongWithAnswer".localized(
+                arguments: question.answers[question.correctIndex].text
+            )
+        } else {
+            text = "accessibility.announce.wrong".localized
+        }
+        
+        var message = AttributedString(text)
+        message.accessibilitySpeechAnnouncementPriority = .high
+        AccessibilityNotification.Announcement(message).post()
     }
 }
 

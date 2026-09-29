@@ -171,6 +171,14 @@
 "quiz.loading" = "Загрузка...";
 "quiz.bankCompleted" = "Все вопросы уже изучены. Перейдите в режим повторения.";
 
+// Answer Accessibility (VoiceOver)
+"accessibility.answer.selectedCorrect" = "Ваш ответ, верно";
+"accessibility.answer.selectedWrong" = "Ваш ответ, неверно";
+"accessibility.answer.correct" = "Правильный ответ";
+"accessibility.announce.correct" = "Верно";
+"accessibility.announce.wrong" = "Неверно";
+"accessibility.announce.wrongWithAnswer" = "Неверно. Правильный ответ: %@";
+
 // Stats View - Pluralization Support
 "stats.title" = "Статистика";
 "stats.done" = "Готово";

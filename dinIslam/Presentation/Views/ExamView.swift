@@ -20,6 +20,11 @@ struct ExamView: View {
         self.onExit = onExit
     }
     
+    private var currentAnswer: ExamAnswer? {
+        guard let question = viewModel.currentQuestion else { return nil }
+        return viewModel.answers[question.id]
+    }
+    
     var body: some View {
         ZStack {
             // Background - очень темный градиент с оттенками индиго/фиолетового (как на главном экране)
@@ -70,7 +75,6 @@ struct ExamView: View {
                                                 y: 0
                                             )
                                     )
-                                    .accessibilityLabel("Question: \(question.text)")
                                     .accessibilityAddTraits(.isHeader)
                                     .dynamicTypeSize(.large)
                                 
@@ -106,14 +110,18 @@ struct ExamView: View {
                                             viewModel.selectAnswer(at: index)
                                         }
                                     )
-                                    .accessibilityLabel("Answer option \(index + 1)")
-                                    .accessibilityHint("Double tap to select this answer")
-                                    .accessibilityAddTraits(isSelected ? .isSelected : [])
                                 }
                             }
                         }
                     }
                     .padding(DesignTokens.Spacing.xxl)
+                }
+                .onChange(of: currentAnswer) { _, answer in
+                    guard let answer,
+                          let selectedIndex = answer.selectedAnswerIndex,
+                          let question = viewModel.currentQuestion,
+                          question.id == answer.questionId else { return }
+                    AnswerAnnouncement.post(for: question, selectedIndex: selectedIndex)
                 }
                 
                 // Fixed action buttons at the bottom
@@ -158,7 +166,6 @@ struct ExamView: View {
                                         )
                                 )
                             }
-                            .accessibilityLabel("Skip question")
                         }
                         
                         // Pause/Resume button
@@ -200,7 +207,6 @@ struct ExamView: View {
                                     )
                             )
                         }
-                        .accessibilityLabel(viewModel.state == .active(.paused) ? "Resume exam" : "Pause exam")
                         
                         // Finish button
                         Button(action: {
@@ -237,8 +243,6 @@ struct ExamView: View {
                                     )
                             )
                         }
-                        .accessibilityLabel("Finish exam")
-                        .accessibilityHint("Double tap to finish the current exam")
                     }
                     .padding(.horizontal, DesignTokens.Spacing.xxl)
                     .padding(.vertical, DesignTokens.Spacing.lg)

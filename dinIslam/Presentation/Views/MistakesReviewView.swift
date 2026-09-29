@@ -98,7 +98,6 @@ struct MistakesReviewView: View {
                                         shadowRadius: 8,
                                         shadowYOffset: 4
                                     )
-                                    .accessibilityLabel("Question: \(question.text)")
                                     .accessibilityAddTraits(.isHeader)
                                     .dynamicTypeSize(.large)
                                 
@@ -154,14 +153,17 @@ struct MistakesReviewView: View {
                                             viewModel.selectAnswer(at: index)
                                         }
                                     )
-                                    .accessibilityLabel("Answer option \(index + 1)")
-                                    .accessibilityHint("Double tap to select this answer")
-                                    .accessibilityAddTraits(viewModel.selectedAnswerIndex == index ? .isSelected : [])
                                 }
                             }
                         }
                     }
                     .padding(DesignTokens.Spacing.xxl)
+                }
+                .onChange(of: viewModel.isAnswerSelected) { _, isAnswerSelected in
+                    guard isAnswerSelected,
+                          let question = viewModel.currentQuestion,
+                          let selectedIndex = viewModel.selectedAnswerIndex else { return }
+                    AnswerAnnouncement.post(for: question, selectedIndex: selectedIndex)
                 }
             
                 // Stop button at the bottom
@@ -223,8 +225,6 @@ struct MistakesReviewView: View {
                         .padding(.horizontal, DesignTokens.Spacing.xxl)
                         .padding(.vertical, DesignTokens.Spacing.lg)
                     }
-                    .accessibilityLabel("Stop mistakes review")
-                    .accessibilityHint("Double tap to stop the mistakes review")
                     // Убираем фон, чтобы был виден градиент как на главном экране
                 }
             }

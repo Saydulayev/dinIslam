@@ -170,6 +170,14 @@
 "quiz.loading" = "Loading...";
 "quiz.bankCompleted" = "All questions have been studied. Switch to review mode.";
 
+// Answer Accessibility (VoiceOver)
+"accessibility.answer.selectedCorrect" = "Your answer, correct";
+"accessibility.answer.selectedWrong" = "Your answer, incorrect";
+"accessibility.answer.correct" = "Correct answer";
+"accessibility.announce.correct" = "Correct";
+"accessibility.announce.wrong" = "Incorrect";
+"accessibility.announce.wrongWithAnswer" = "Incorrect. Correct answer: %@";
+
 // Stats View - Pluralization Support
 "stats.title" = "Statistics";
 "stats.done" = "Done";
