@@ -118,7 +118,7 @@ struct ExamSettingsView: View {
                                                     .font(DesignTokens.Typography.bodyRegular)
                                                     .foregroundStyle(DesignTokens.Colors.textPrimary)
                                                 Spacer()
-                                                Text("\(Int(customTimePerQuestion)) сек")
+                                                Text("time.seconds.short".localized(arguments: Int(customTimePerQuestion)))
                                                     .font(DesignTokens.Typography.secondarySemibold)
                                                     .foregroundColor(DesignTokens.Colors.iconBlue)
                                             }
@@ -481,7 +481,7 @@ struct ExamPreviewCard: View {
                         .font(DesignTokens.Typography.secondaryRegular)
                         .foregroundColor(DesignTokens.Colors.textSecondary)
                     Spacer()
-                    Text("\(Int(configuration.timePerQuestion)) сек")
+                    Text("time.seconds.short".localized(arguments: Int(configuration.timePerQuestion)))
                         .font(DesignTokens.Typography.secondarySemibold)
                         .foregroundColor(DesignTokens.Colors.textPrimary)
                 }

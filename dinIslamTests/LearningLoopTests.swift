@@ -171,7 +171,7 @@ final class StatsManagerReviewTests: XCTestCase {
         StatsManager(userDefaults: defaults, now: { [unowned self] in self.now })
     }
 
-    private func summary(_ outcomes: [(String, Bool)]) -> QuizSessionSummary {
+    private func summary(_ outcomes: [(String, Bool)], isComplete: Bool = true) -> QuizSessionSummary {
         let items = outcomes.map {
             QuizQuestionOutcome(questionId: $0.0, category: "fiqh", difficulty: .medium, isCorrect: $0.1)
         }
@@ -182,7 +182,8 @@ final class StatsManagerReviewTests: XCTestCase {
             percentage: Double(correct) / Double(items.count) * 100,
             duration: 60,
             completedAt: now,
-            outcomes: items
+            outcomes: items,
+            isComplete: isComplete
         )
     }
 
@@ -241,6 +242,30 @@ final class StatsManagerReviewTests: XCTestCase {
         let manager = makeManager()
 
         XCTAssertEqual(manager.dueReviewCount, 1)
+    }
+
+    func testIncompleteQuiz_countsAnswers_butNotAsCompletedSession() {
+        let manager = makeManager()
+        manager.recordQuizSession(summary([("q1", true), ("q2", false)], isComplete: false))
+
+        // Ответы учтены
+        XCTAssertEqual(manager.stats.totalQuestionsStudied, 2)
+        XCTAssertEqual(manager.stats.correctAnswers, 1)
+        XCTAssertEqual(manager.stats.wrongQuestionIds, ["q2"])
+        XCTAssertEqual(manager.dayStreak, 1)
+
+        // Сессия не засчитана как пройденная викторина
+        XCTAssertEqual(manager.stats.totalQuizzesCompleted, 0)
+        XCTAssertTrue(manager.stats.recentQuizResults.isEmpty)
+        XCTAssertEqual(manager.stats.currentStreak, 0)
+    }
+
+    func testIncompletePerfectQuiz_doesNotCountAsPerfectScore() {
+        let manager = makeManager()
+        manager.recordQuizSession(summary([("q1", true)], isComplete: false))
+
+        XCTAssertEqual(manager.stats.perfectScores, 0)
+        XCTAssertEqual(manager.stats.currentStreak, 0)
     }
 
     func testReset_clearsScheduleAndStreak() {

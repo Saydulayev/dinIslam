@@ -68,36 +68,10 @@ struct UserStats: Codable {
         }
 
         lastQuizDate = summary.completedAt
-        totalQuizzesCompleted += 1
-        lastQuizPercentage = summary.percentage
         lastActivityAt = summary.completedAt
 
-        // Добавляем результат в массив последних игр
-        let newResult = QuizResultRecord(
-            percentage: summary.percentage,
-            date: summary.completedAt,
-            questionsCount: summary.totalQuestions
-        )
-        recentQuizResults.insert(newResult, at: 0) // Добавляем в начало
-
-        // Ограничиваем массив до 10 элементов
-        if recentQuizResults.count > 10 {
-            recentQuizResults.removeLast()
-        }
-
-        // Обновляем серию побед
-        if summary.percentage >= 80.0 {
-            currentStreak += 1
-            if currentStreak > longestStreak {
-                longestStreak = currentStreak
-            }
-        } else {
-            currentStreak = 0
-        }
-
-        // Обновляем идеальные результаты (используем >= 99.99 для учета погрешности округления)
-        if summary.percentage >= 99.99 {
-            perfectScores += 1
+        if summary.isComplete {
+            recordCompletedSession(summary)
         }
 
         // Обновляем статистику по темам и сложностям
@@ -125,6 +99,40 @@ struct UserStats: Codable {
             difficultyStat.lastUpdated = summary.completedAt
             difficultyStat.updateAdaptiveScore()
             difficultyStats[difficultyKey] = difficultyStat
+        }
+    }
+    
+    /// Итоги сессии целиком — только для викторины, пройденной до конца
+    private mutating func recordCompletedSession(_ summary: QuizSessionSummary) {
+        totalQuizzesCompleted += 1
+        lastQuizPercentage = summary.percentage
+
+        // Добавляем результат в массив последних игр
+        let newResult = QuizResultRecord(
+            percentage: summary.percentage,
+            date: summary.completedAt,
+            questionsCount: summary.totalQuestions
+        )
+        recentQuizResults.insert(newResult, at: 0) // Добавляем в начало
+
+        // Ограничиваем массив до 10 элементов
+        if recentQuizResults.count > 10 {
+            recentQuizResults.removeLast()
+        }
+
+        // Обновляем серию побед
+        if summary.percentage >= 80.0 {
+            currentStreak += 1
+            if currentStreak > longestStreak {
+                longestStreak = currentStreak
+            }
+        } else {
+            currentStreak = 0
+        }
+
+        // Обновляем идеальные результаты (используем >= 99.99 для учета погрешности округления)
+        if summary.percentage >= 99.99 {
+            perfectScores += 1
         }
     }
     

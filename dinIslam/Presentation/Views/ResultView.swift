@@ -349,7 +349,7 @@ struct ResultView: View {
         if minutes > 0 {
             return String(format: "%d:%02d", minutes, seconds)
         } else {
-            return "\(seconds)s"
+            return "time.seconds.short".localized(arguments: seconds)
         }
     }
     

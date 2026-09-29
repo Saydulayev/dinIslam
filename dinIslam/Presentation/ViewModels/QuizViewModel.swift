@@ -269,16 +269,21 @@ class QuizViewModel {
     @MainActor
     func finishQuiz(isComplete: Bool = true) {
         let timeSpent = Date().timeIntervalSince(startTime ?? Date())
+        
+        // При досрочном завершении учитываем только отвеченные вопросы
+        let sessionQuestions = isComplete
+            ? questions
+            : questions.filter { questionResults[$0.id] != nil }
+        
         let result = quizUseCase.calculateResult(
             correctAnswers: correctAnswers,
-            totalQuestions: questions.count,
+            totalQuestions: sessionQuestions.count,
             timeSpent: timeSpent
         )
         quizResult = result
         
-        // Обновляем статистику только если викторина завершена полностью
-        if isComplete {
-            let outcomes = questions.map { question in
+        if !sessionQuestions.isEmpty {
+            let outcomes = sessionQuestions.map { question in
                 QuizQuestionOutcome(
                     questionId: question.id,
                     category: question.category,
@@ -289,15 +294,16 @@ class QuizViewModel {
 
             let summary = QuizSessionSummary(
                 correctAnswers: correctAnswers,
-                totalQuestions: questions.count,
-                percentage: quizResult?.percentage ?? 0,
+                totalQuestions: sessionQuestions.count,
+                percentage: result.percentage,
                 duration: timeSpent,
                 completedAt: Date(),
-                outcomes: outcomes
+                outcomes: outcomes,
+                isComplete: isComplete
             )
             
             statisticsRecorder.recordQuizSession(summary)
-            if sessionKind == .daily {
+            if isComplete && sessionKind == .daily {
                 statisticsRecorder.registerDailyGoal()
             }
             
@@ -309,12 +315,14 @@ class QuizViewModel {
                 review: nil
             )
             
-            // Check for new achievements
-            achievementChecker.checkAchievements(for: statisticsRecorder.stats, quizResult: quizResult)
+            // Достижения за результат сессии (идеальный, быстрый) — только за пройденную до конца викторину
+            achievementChecker.checkAchievements(
+                for: statisticsRecorder.stats,
+                quizResult: isComplete ? result : nil
+            )
             
-            // Помечаем вопросы как использованные только после полного завершения викторины
-            let questionIds = questions.map { $0.id }
-            quizUseCase.markQuestionsUsed(questionIds)
+            // Неотвеченные вопросы остаются в пуле и попадутся снова
+            quizUseCase.markQuestionsUsed(sessionQuestions.map(\.id))
         }
         
         state = .completed(.finished)
@@ -330,7 +338,7 @@ class QuizViewModel {
             // В повторении сохраняем ответы, которые уже даны
             finishMistakesReview()
         } else {
-            // Force finish quiz with current progress - don't update stats for incomplete quiz
+            // Досрочное завершение: сохраняем ответы, которые уже даны
             finishQuiz(isComplete: false)
         }
     }

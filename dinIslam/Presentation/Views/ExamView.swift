@@ -38,216 +38,17 @@ struct ExamView: View {
             )
             .ignoresSafeArea()
             
-            VStack(spacing: 0) {
-                // Header with timer and progress
-                ExamHeaderView(viewModel: viewModel)
-                
-                // Main content
-                ScrollView {
-                    VStack(spacing: DesignTokens.Spacing.xxl) {
-                        // Question text
-                        if let question = viewModel.currentQuestion {
-                            VStack(spacing: DesignTokens.Spacing.lg) {
-                                Text(question.text)
-                                    .font(DesignTokens.Typography.h2)
-                                    .foregroundStyle(DesignTokens.Colors.textPrimary)
-                                    .multilineTextAlignment(.center)
-                                    .padding(DesignTokens.Spacing.xxl)
-                                    .frame(maxWidth: .infinity)
-                                    .background(
-                                        // Прозрачная рамка с фиолетовым свечением (как на главном экране)
-                                        RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
-                                            .stroke(
-                                                LinearGradient(
-                                                    gradient: Gradient(colors: [
-                                                        DesignTokens.Colors.iconPurpleLight.opacity(0.5),
-                                                        DesignTokens.Colors.iconPurpleLight.opacity(0.2)
-                                                    ]),
-                                                    startPoint: .topLeading,
-                                                    endPoint: .bottomTrailing
-                                                ),
-                                                lineWidth: 1.5
-                                            )
-                                            .shadow(
-                                                color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
-                                                radius: 12,
-                                                x: 0,
-                                                y: 0
-                                            )
-                                    )
-                                    .accessibilityAddTraits(.isHeader)
-                                    .dynamicTypeSize(.large)
-                                
-                                // Category
-                                if question.category != QuestionCategory.generalId {
-                                    HStack {
-                                        Label(
-                                            QuestionCategory.displayName(for: question.category),
-                                            systemImage: QuestionCategory.icon(for: question.category)
-                                        )
-                                        .font(DesignTokens.Typography.label)
-                                        .foregroundStyle(DesignTokens.Colors.textSecondary)
-
-                                        Spacer()
-                                    }
-                                    .padding(.horizontal, DesignTokens.Spacing.sm)
-                                }
-                            }
-                            
-                            // Answer options
-                            VStack(spacing: DesignTokens.Spacing.md) {
-                                ForEach(Array(question.answers.enumerated()), id: \.element.id) { index, answer in
-                                    let isAnswered = viewModel.answers[question.id] != nil
-                                    let isSelected = viewModel.answers[question.id]?.selectedAnswerIndex == index
-                                    
-                                    AnswerButton(
-                                        answer: answer,
-                                        index: index,
-                                        isSelected: isSelected,
-                                        isCorrect: index == question.correctIndex,
-                                        isAnswerSelected: isAnswered,
-                                        action: {
-                                            viewModel.selectAnswer(at: index)
-                                        }
-                                    )
-                                }
-                            }
-                        }
-                    }
-                    .padding(DesignTokens.Spacing.xxl)
-                }
-                .onChange(of: currentAnswer) { _, answer in
-                    guard let answer,
-                          let selectedIndex = answer.selectedAnswerIndex,
-                          let question = viewModel.currentQuestion,
-                          question.id == answer.questionId else { return }
-                    AnswerAnnouncement.post(for: question, selectedIndex: selectedIndex)
-                }
-                
-                // Fixed action buttons at the bottom
-                VStack(spacing: 0) {
-                    Divider()
-                        .background(DesignTokens.Colors.borderSubtle)
-                    
-                    HStack(spacing: DesignTokens.Spacing.md) {
-                        // Skip button
-                        if viewModel.canSkipQuestion {
-                            Button(action: {
-                                viewModel.skipQuestion()
-                            }) {
-                                VStack(spacing: DesignTokens.Spacing.xs) {
-                                    Image(systemName: "forward.fill")
-                                        .font(.system(size: DesignTokens.Sizes.iconMedium))
-                                    Text("exam.skip".localized)
-                                        .font(DesignTokens.Typography.label)
-                                }
-                                .foregroundColor(DesignTokens.Colors.iconOrange)
-                                .frame(maxWidth: .infinity)
-                                .frame(height: 56)
-                                .background(
-                                    // Прозрачная рамка с фиолетовым свечением (как на главном экране)
-                                    RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
-                                        .stroke(
-                                            LinearGradient(
-                                                gradient: Gradient(colors: [
-                                                    DesignTokens.Colors.iconPurpleLight.opacity(0.5),
-                                                    DesignTokens.Colors.iconPurpleLight.opacity(0.2)
-                                                ]),
-                                                startPoint: .topLeading,
-                                                endPoint: .bottomTrailing
-                                            ),
-                                            lineWidth: 1.5
-                                        )
-                                        .shadow(
-                                            color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
-                                            radius: 12,
-                                            x: 0,
-                                            y: 0
-                                        )
-                                )
-                            }
-                        }
-                        
-                        // Pause/Resume button
-                        Button(action: {
-                            if viewModel.state == .active(.paused) {
-                                viewModel.resumeExam()
-                            } else {
-                                showingPauseAlert = true
-                            }
-                        }) {
-                            VStack(spacing: DesignTokens.Spacing.xs) {
-                                Image(systemName: viewModel.state == .active(.paused) ? "play.fill" : "pause.fill")
-                                    .font(.system(size: DesignTokens.Sizes.iconMedium))
-                                Text(viewModel.state == .active(.paused) ? "exam.resume".localized : "exam.pause".localized)
-                                    .font(DesignTokens.Typography.label)
-                            }
-                            .foregroundColor(DesignTokens.Colors.iconBlue)
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 56)
-                            .background(
-                                // Прозрачная рамка с фиолетовым свечением (как на главном экране)
-                                RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
-                                    .stroke(
-                                        LinearGradient(
-                                            gradient: Gradient(colors: [
-                                                DesignTokens.Colors.iconPurpleLight.opacity(0.5),
-                                                DesignTokens.Colors.iconPurpleLight.opacity(0.2)
-                                            ]),
-                                            startPoint: .topLeading,
-                                            endPoint: .bottomTrailing
-                                        ),
-                                        lineWidth: 1.5
-                                    )
-                                    .shadow(
-                                        color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
-                                        radius: 12,
-                                        x: 0,
-                                        y: 0
-                                    )
-                            )
-                        }
-                        
-                        // Finish button
-                        Button(action: {
-                            showingStopAlert = true
-                        }) {
-                            VStack(spacing: DesignTokens.Spacing.xs) {
-                                Image(systemName: "checkmark.circle.fill")
-                                    .font(.system(size: DesignTokens.Sizes.iconMedium))
-                                Text("quiz.finish".localized)
-                                    .font(DesignTokens.Typography.label)
-                            }
-                            .foregroundColor(DesignTokens.Colors.statusGreen)
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 56)
-                            .background(
-                                // Прозрачная рамка с фиолетовым свечением (как на главном экране)
-                                RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
-                                    .stroke(
-                                        LinearGradient(
-                                            gradient: Gradient(colors: [
-                                                DesignTokens.Colors.iconPurpleLight.opacity(0.5),
-                                                DesignTokens.Colors.iconPurpleLight.opacity(0.2)
-                                            ]),
-                                            startPoint: .topLeading,
-                                            endPoint: .bottomTrailing
-                                        ),
-                                        lineWidth: 1.5
-                                    )
-                                    .shadow(
-                                        color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
-                                        radius: 12,
-                                        x: 0,
-                                        y: 0
-                                    )
-                            )
-                        }
-                    }
-                    .padding(.horizontal, DesignTokens.Spacing.xxl)
-                    .padding(.vertical, DesignTokens.Spacing.lg)
-                    // Убираем фон, чтобы был виден градиент как на главном экране
-                }
+            switch viewModel.state {
+            case .idle, .active(.loading):
+                LoadingCardView()
+            case .error:
+                ExamErrorView(
+                    message: viewModel.errorMessage,
+                    onRetry: { Task { await viewModel.retake() } },
+                    onExit: onExit
+                )
+            default:
+                examContent
             }
         }
         .navigationTitle("exam.title".localized)
@@ -295,6 +96,221 @@ struct ExamView: View {
                 showingResult = true
             default:
                 break
+            }
+        }
+    }
+    
+    // MARK: - Exam Content
+    private var examContent: some View {
+        VStack(spacing: 0) {
+            // Header with timer and progress
+            ExamHeaderView(viewModel: viewModel)
+            
+            // Main content
+            ScrollView {
+                VStack(spacing: DesignTokens.Spacing.xxl) {
+                    // Question text
+                    if let question = viewModel.currentQuestion {
+                        VStack(spacing: DesignTokens.Spacing.lg) {
+                            Text(question.text)
+                                .font(DesignTokens.Typography.h2)
+                                .foregroundStyle(DesignTokens.Colors.textPrimary)
+                                .multilineTextAlignment(.center)
+                                .padding(DesignTokens.Spacing.xxl)
+                                .frame(maxWidth: .infinity)
+                                .background(
+                                    // Прозрачная рамка с фиолетовым свечением (как на главном экране)
+                                    RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
+                                        .stroke(
+                                            LinearGradient(
+                                                gradient: Gradient(colors: [
+                                                    DesignTokens.Colors.iconPurpleLight.opacity(0.5),
+                                                    DesignTokens.Colors.iconPurpleLight.opacity(0.2)
+                                                ]),
+                                                startPoint: .topLeading,
+                                                endPoint: .bottomTrailing
+                                            ),
+                                            lineWidth: 1.5
+                                        )
+                                        .shadow(
+                                            color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
+                                            radius: 12,
+                                            x: 0,
+                                            y: 0
+                                        )
+                                )
+                                .accessibilityAddTraits(.isHeader)
+                                .dynamicTypeSize(.large)
+                            
+                            // Category
+                            if question.category != QuestionCategory.generalId {
+                                HStack {
+                                    Label(
+                                        QuestionCategory.displayName(for: question.category),
+                                        systemImage: QuestionCategory.icon(for: question.category)
+                                    )
+                                    .font(DesignTokens.Typography.label)
+                                    .foregroundStyle(DesignTokens.Colors.textSecondary)
+
+                                    Spacer()
+                                }
+                                .padding(.horizontal, DesignTokens.Spacing.sm)
+                            }
+                        }
+                        
+                        // Answer options
+                        VStack(spacing: DesignTokens.Spacing.md) {
+                            ForEach(Array(question.answers.enumerated()), id: \.element.id) { index, answer in
+                                let isAnswered = viewModel.answers[question.id] != nil
+                                let isSelected = viewModel.answers[question.id]?.selectedAnswerIndex == index
+                                
+                                AnswerButton(
+                                    answer: answer,
+                                    index: index,
+                                    isSelected: isSelected,
+                                    isCorrect: index == question.correctIndex,
+                                    isAnswerSelected: isAnswered,
+                                    action: {
+                                        viewModel.selectAnswer(at: index)
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
+                .padding(DesignTokens.Spacing.xxl)
+            }
+            .onChange(of: currentAnswer) { _, answer in
+                guard let answer,
+                      let selectedIndex = answer.selectedAnswerIndex,
+                      let question = viewModel.currentQuestion,
+                      question.id == answer.questionId else { return }
+                AnswerAnnouncement.post(for: question, selectedIndex: selectedIndex)
+            }
+            
+            // Fixed action buttons at the bottom
+            VStack(spacing: 0) {
+                Divider()
+                    .background(DesignTokens.Colors.borderSubtle)
+                
+                HStack(spacing: DesignTokens.Spacing.md) {
+                    // Skip button
+                    if viewModel.canSkipQuestion {
+                        Button(action: {
+                            viewModel.skipQuestion()
+                        }) {
+                            VStack(spacing: DesignTokens.Spacing.xs) {
+                                Image(systemName: "forward.fill")
+                                    .font(.system(size: DesignTokens.Sizes.iconMedium))
+                                Text("exam.skip".localized)
+                                    .font(DesignTokens.Typography.label)
+                            }
+                            .foregroundColor(DesignTokens.Colors.iconOrange)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 56)
+                            .background(
+                                // Прозрачная рамка с фиолетовым свечением (как на главном экране)
+                                RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
+                                    .stroke(
+                                        LinearGradient(
+                                            gradient: Gradient(colors: [
+                                                DesignTokens.Colors.iconPurpleLight.opacity(0.5),
+                                                DesignTokens.Colors.iconPurpleLight.opacity(0.2)
+                                            ]),
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        ),
+                                        lineWidth: 1.5
+                                    )
+                                    .shadow(
+                                        color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
+                                        radius: 12,
+                                        x: 0,
+                                        y: 0
+                                    )
+                            )
+                        }
+                    }
+                    
+                    // Pause/Resume button
+                    Button(action: {
+                        if viewModel.state == .active(.paused) {
+                            viewModel.resumeExam()
+                        } else {
+                            showingPauseAlert = true
+                        }
+                    }) {
+                        VStack(spacing: DesignTokens.Spacing.xs) {
+                            Image(systemName: viewModel.state == .active(.paused) ? "play.fill" : "pause.fill")
+                                .font(.system(size: DesignTokens.Sizes.iconMedium))
+                            Text(viewModel.state == .active(.paused) ? "exam.resume".localized : "exam.pause".localized)
+                                .font(DesignTokens.Typography.label)
+                        }
+                        .foregroundColor(DesignTokens.Colors.iconBlue)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 56)
+                        .background(
+                            // Прозрачная рамка с фиолетовым свечением (как на главном экране)
+                            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
+                                .stroke(
+                                    LinearGradient(
+                                        gradient: Gradient(colors: [
+                                            DesignTokens.Colors.iconPurpleLight.opacity(0.5),
+                                            DesignTokens.Colors.iconPurpleLight.opacity(0.2)
+                                        ]),
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    ),
+                                    lineWidth: 1.5
+                                )
+                                .shadow(
+                                    color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
+                                    radius: 12,
+                                    x: 0,
+                                    y: 0
+                                )
+                        )
+                    }
+                    
+                    // Finish button
+                    Button(action: {
+                        showingStopAlert = true
+                    }) {
+                        VStack(spacing: DesignTokens.Spacing.xs) {
+                            Image(systemName: "checkmark.circle.fill")
+                                .font(.system(size: DesignTokens.Sizes.iconMedium))
+                            Text("quiz.finish".localized)
+                                .font(DesignTokens.Typography.label)
+                        }
+                        .foregroundColor(DesignTokens.Colors.statusGreen)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 56)
+                        .background(
+                            // Прозрачная рамка с фиолетовым свечением (как на главном экране)
+                            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
+                                .stroke(
+                                    LinearGradient(
+                                        gradient: Gradient(colors: [
+                                            DesignTokens.Colors.iconPurpleLight.opacity(0.5),
+                                            DesignTokens.Colors.iconPurpleLight.opacity(0.2)
+                                        ]),
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    ),
+                                    lineWidth: 1.5
+                                )
+                                .shadow(
+                                    color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
+                                    radius: 12,
+                                    x: 0,
+                                    y: 0
+                                )
+                        )
+                    }
+                }
+                .padding(.horizontal, DesignTokens.Spacing.xxl)
+                .padding(.vertical, DesignTokens.Spacing.lg)
+                // Убираем фон, чтобы был виден градиент как на главном экране
             }
         }
     }
@@ -367,6 +383,60 @@ struct ExamHeaderView: View {
 }
 
 
+// MARK: - Exam Error View
+struct ExamErrorView: View {
+    let message: String?
+    let onRetry: () -> Void
+    let onExit: () -> Void
+    
+    var body: some View {
+        VStack(spacing: DesignTokens.Spacing.xl) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .font(.largeTitle)
+                .foregroundStyle(DesignTokens.Colors.iconOrange)
+                .accessibilityHidden(true)
+            
+            VStack(spacing: DesignTokens.Spacing.sm) {
+                Text("exam.error.title".localized)
+                    .font(DesignTokens.Typography.h2)
+                    .foregroundStyle(DesignTokens.Colors.textPrimary)
+                    .multilineTextAlignment(.center)
+                    .accessibilityAddTraits(.isHeader)
+                
+                if let message, !message.isEmpty {
+                    Text(message)
+                        .font(DesignTokens.Typography.bodyRegular)
+                        .foregroundStyle(DesignTokens.Colors.textSecondary)
+                        .multilineTextAlignment(.center)
+                }
+            }
+            
+            VStack(spacing: DesignTokens.Spacing.md) {
+                Button(action: onRetry) {
+                    Label("exam.error.retry".localized, systemImage: "arrow.clockwise")
+                        .font(DesignTokens.Typography.secondarySemibold)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 56)
+                }
+                .foregroundStyle(DesignTokens.Colors.iconBlue)
+                .background(
+                    RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
+                        .stroke(DesignTokens.Colors.iconPurpleLight.opacity(0.5), lineWidth: 1.5)
+                )
+                
+                Button(action: onExit) {
+                    Label("result.backToStart".localized, systemImage: "house.fill")
+                        .font(DesignTokens.Typography.secondarySemibold)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 56)
+                }
+                .foregroundStyle(DesignTokens.Colors.textSecondary)
+            }
+        }
+        .padding(DesignTokens.Spacing.xxl)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+}
 
 #Preview {
     ExamView(viewModel: ExamViewModel(

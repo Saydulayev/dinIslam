@@ -163,12 +163,13 @@
 // Quiz Finish
 "quiz.finish" = "Завершить";
 "quiz.finish.confirm.title" = "Завершить викторину?";
-"quiz.finish.confirm.message" = "Результаты будут сохранены.";
+"quiz.finish.confirm.message" = "Отвеченные вопросы будут засчитаны, остальные попадутся в следующий раз.";
 "quiz.finish.confirm.ok" = "Завершить";
 "quiz.finish.confirm.cancel" = "Отмена";
 
 // Quiz Loading
 "quiz.loading" = "Загрузка...";
+"time.seconds.short" = "%d сек";
 "quiz.bankCompleted" = "Все вопросы уже изучены. Перейдите в режим повторения.";
 
 // Answer Accessibility (VoiceOver)
@@ -502,6 +503,8 @@
 "exam.stop.message" = "Вы уверены, что хотите остановить экзамен? Результаты будут сохранены.";
 "exam.stop.cancel" = "Отмена";
 "exam.stop.confirm" = "Остановить";
+"exam.error.title" = "Не удалось начать экзамен";
+"exam.error.retry" = "Повторить";
 
 // Exam Result
 "exam.result.title" = "Результат экзамена";

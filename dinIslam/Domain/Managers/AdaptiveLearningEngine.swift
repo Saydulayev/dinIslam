@@ -17,31 +17,35 @@ final class AdaptiveLearningEngine {
         progress.totalQuestionsAnswered += summary.totalQuestions
         progress.correctAnswers += summary.correctAnswers
         progress.incorrectAnswers += summary.incorrectAnswers
-        progress.averageQuizScore = calculateNewAverage(
-            currentAverage: progress.averageQuizScore,
-            totalSessions: progress.quizHistory.count,
-            newScore: summary.percentage
-        )
-        progress.currentStreak = summary.percentage >= 80 ? progress.currentStreak + 1 : 0
-        if progress.currentStreak > progress.longestStreak {
-            progress.longestStreak = progress.currentStreak
-        }
         progress.lastActivityAt = summary.completedAt
 
         updateDifficultyStats(&progress, summary: summary)
         updateTopicProgress(&progress, summary: summary)
 
-        let historyEntry = QuizHistoryEntry(
-            date: summary.completedAt,
-            percentage: summary.percentage,
-            correctAnswers: summary.correctAnswers,
-            totalQuestions: summary.totalQuestions,
-            difficultyBreakdown: summary.difficultyBreakdown.reduce(into: [:]) { $0[$1.key.rawValue] = $1.value },
-            topicBreakdown: summary.topicBreakdown
-        )
-        progress.quizHistory.insert(historyEntry, at: 0)
-        if progress.quizHistory.count > quizHistoryLimit {
-            progress.quizHistory.removeLast()
+        // Досрочно завершённая викторина не влияет на средний балл, серию и историю сессий
+        if summary.isComplete {
+            progress.averageQuizScore = calculateNewAverage(
+                currentAverage: progress.averageQuizScore,
+                totalSessions: progress.quizHistory.count,
+                newScore: summary.percentage
+            )
+            progress.currentStreak = summary.percentage >= 80 ? progress.currentStreak + 1 : 0
+            if progress.currentStreak > progress.longestStreak {
+                progress.longestStreak = progress.currentStreak
+            }
+
+            let historyEntry = QuizHistoryEntry(
+                date: summary.completedAt,
+                percentage: summary.percentage,
+                correctAnswers: summary.correctAnswers,
+                totalQuestions: summary.totalQuestions,
+                difficultyBreakdown: summary.difficultyBreakdown.reduce(into: [:]) { $0[$1.key.rawValue] = $1.value },
+                topicBreakdown: summary.topicBreakdown
+            )
+            progress.quizHistory.insert(historyEntry, at: 0)
+            if progress.quizHistory.count > quizHistoryLimit {
+                progress.quizHistory.removeLast()
+            }
         }
 
         let recommendations = generateRecommendationsInternal(for: progress)

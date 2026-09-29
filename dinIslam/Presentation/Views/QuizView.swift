@@ -45,206 +45,174 @@ struct QuizView: View {
             )
             .ignoresSafeArea()
             
-            // Loading overlay
-            if viewModel.isLoading {
-                VStack(spacing: DesignTokens.Spacing.lg) {
-                    ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle(tint: DesignTokens.Colors.iconBlue))
-                        .scaleEffect(1.5)
-                    
-                    Text("quiz.loading".localized)
-                        .font(DesignTokens.Typography.bodyRegular)
-                        .foregroundStyle(DesignTokens.Colors.textSecondary)
-                }
-                .padding(DesignTokens.Spacing.xxl)
-                .background(
-                    // Прозрачная рамка с фиолетовым свечением (как на главном экране)
-                    RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
-                        .stroke(
-                            LinearGradient(
-                                gradient: Gradient(colors: [
-                                    DesignTokens.Colors.iconPurpleLight.opacity(0.5),
-                                    DesignTokens.Colors.iconPurpleLight.opacity(0.2)
-                                ]),
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            ),
-                            lineWidth: 1.5
-                        )
-                        .shadow(
-                            color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
-                            radius: 12,
-                            x: 0,
-                            y: 0
-                        )
-                )
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                // Убираем затемнение, чтобы был виден градиент как на главном экране
-            }
-            
-            VStack(spacing: 0) {
-                // Header with progress and score
-                VStack(spacing: DesignTokens.Spacing.sm) {
-                    HStack {
-                        LocalizedText("quiz.question")
-                            .font(DesignTokens.Typography.label)
-                            .foregroundStyle(DesignTokens.Colors.textSecondary)
-                        
-                        Spacer()
-                        
-                        LocalizedText("quiz.score")
-                            .font(DesignTokens.Typography.label)
-                            .foregroundStyle(DesignTokens.Colors.textSecondary)
-                    }
-                    
-                    HStack {
-                        Text(progressText)
-                            .font(DesignTokens.Typography.secondarySemibold)
-                            .foregroundStyle(DesignTokens.Colors.textPrimary)
-                        
-                        Spacer()
-                        
-                        Text("\(viewModel.correctAnswers)")
-                            .font(DesignTokens.Typography.secondarySemibold)
-                            .foregroundStyle(DesignTokens.Colors.statusGreen)
-                    }
-                    
-                    // Progress bar
-                    ProgressView(value: viewModel.progress)
-                        .progressViewStyle(LinearProgressViewStyle(tint: DesignTokens.Colors.iconBlue))
-                        .scaleEffect(x: 1, y: 1.5, anchor: .center)
-                }
-                .padding(.horizontal, DesignTokens.Spacing.xxl)
-                .padding(.vertical, DesignTokens.Spacing.md)
-                // Убираем фон, чтобы был виден градиент как на главном экране
-            
-                // Question content
-                ScrollViewReader { scrollProxy in
-                ScrollView {
-                    VStack(spacing: DesignTokens.Spacing.xxl) {
-                        // Question text
-                        if let question = viewModel.currentQuestion {
-                            VStack(spacing: DesignTokens.Spacing.lg) {
-                                Text(question.text)
-                                    .id(Self.questionTopAnchor)
-                                    .font(DesignTokens.Typography.h2)
-                                    .foregroundStyle(DesignTokens.Colors.textPrimary)
-                                    .multilineTextAlignment(.center)
-                                    .padding(DesignTokens.Spacing.xxl)
-                                    .frame(maxWidth: .infinity)
-                                    .background(
-                                        // Прозрачная рамка с фиолетовым свечением (как на главном экране)
-                                        RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
-                                            .stroke(
-                                                LinearGradient(
-                                                    gradient: Gradient(colors: [
-                                                        DesignTokens.Colors.iconPurpleLight.opacity(0.5),
-                                                        DesignTokens.Colors.iconPurpleLight.opacity(0.2)
-                                                    ]),
-                                                    startPoint: .topLeading,
-                                                    endPoint: .bottomTrailing
-                                                ),
-                                                lineWidth: 1.5
-                                            )
-                                            .shadow(
-                                                color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
-                                                radius: 12,
-                                                x: 0,
-                                                y: 0
-                                            )
-                                    )
-                                    .accessibilityAddTraits(.isHeader)
-                                    .dynamicTypeSize(.large)
-                                
-                                // Category
-                                if question.category != QuestionCategory.generalId {
-                                    HStack {
-                                        Label(
-                                            QuestionCategory.displayName(for: question.category),
-                                            systemImage: QuestionCategory.icon(for: question.category)
-                                        )
-                                        .font(DesignTokens.Typography.label)
-                                        .foregroundStyle(DesignTokens.Colors.textSecondary)
-                                        
-                                        Spacer()
-                                    }
-                                    .padding(.horizontal, DesignTokens.Spacing.sm)
-                                }
-                            }
-                            
-                            // Answer options
-                            VStack(spacing: DesignTokens.Spacing.md) {
-                                ForEach(question.answers, id: \.id) { answer in
-                                    let index = answerIndices[answer.id] ?? 0
-                                    AnswerButton(
-                                        answer: answer,
-                                        index: index,
-                                        isSelected: viewModel.selectedAnswerIndex == index,
-                                        isCorrect: index == question.correctIndex,
-                                        isAnswerSelected: viewModel.isAnswerSelected,
-                                        action: {
-                                            viewModel.selectAnswer(at: index)
-                                        }
-                                    )
-                                }
-                            }
-                        }
-                    }
-                    .padding(DesignTokens.Spacing.xxl)
-                }
-                .onChange(of: viewModel.currentQuestionIndex) { _, _ in
-                    scrollProxy.scrollTo(Self.questionTopAnchor, anchor: .top)
-                }
-                .onChange(of: viewModel.isAnswerSelected) { _, isAnswerSelected in
-                    guard isAnswerSelected,
-                          let question = viewModel.currentQuestion,
-                          let selectedIndex = viewModel.selectedAnswerIndex else { return }
-                    AnswerAnnouncement.post(for: question, selectedIndex: selectedIndex)
-                }
-                }
-            
-                // Finish button at the bottom
+            // Пока вопросы не загружены, показываем только загрузку — без «1 / 0» и кнопки «Завершить»
+            if viewModel.isLoading || viewModel.questions.isEmpty {
+                LoadingCardView()
+            } else {
                 VStack(spacing: 0) {
-                    Divider()
-                        .background(DesignTokens.Colors.borderSubtle)
-                    
-                    Button(action: {
-                        showingFinishConfirm = true
-                    }) {
-                        HStack(spacing: DesignTokens.Spacing.md) {
-                            Image(systemName: "checkmark.circle.fill")
-                                .font(.system(size: DesignTokens.Sizes.iconMedium))
-                            Text("quiz.finish".localized)
-                                .font(DesignTokens.Typography.secondarySemibold)
+                    // Header with progress and score
+                    VStack(spacing: DesignTokens.Spacing.sm) {
+                        HStack {
+                            LocalizedText("quiz.question")
+                                .font(DesignTokens.Typography.label)
+                                .foregroundStyle(DesignTokens.Colors.textSecondary)
+                        
+                            Spacer()
+                        
+                            LocalizedText("quiz.score")
+                                .font(DesignTokens.Typography.label)
+                                .foregroundStyle(DesignTokens.Colors.textSecondary)
                         }
-                        .foregroundColor(DesignTokens.Colors.statusGreen)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 56)
-                        .background(
-                            // Прозрачная рамка с фиолетовым свечением (как на главном экране)
-                            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
-                                .stroke(
-                                    LinearGradient(
-                                        gradient: Gradient(colors: [
-                                            DesignTokens.Colors.iconPurpleLight.opacity(0.5),
-                                            DesignTokens.Colors.iconPurpleLight.opacity(0.2)
-                                        ]),
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    ),
-                                    lineWidth: 1.5
-                                )
-                                .shadow(
-                                    color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
-                                    radius: 12,
-                                    x: 0,
-                                    y: 0
-                                )
-                        )
-                        .padding(.horizontal, DesignTokens.Spacing.xxl)
-                        .padding(.vertical, DesignTokens.Spacing.lg)
+                    
+                        HStack {
+                            Text(progressText)
+                                .font(DesignTokens.Typography.secondarySemibold)
+                                .foregroundStyle(DesignTokens.Colors.textPrimary)
+                        
+                            Spacer()
+                        
+                            Text("\(viewModel.correctAnswers)")
+                                .font(DesignTokens.Typography.secondarySemibold)
+                                .foregroundStyle(DesignTokens.Colors.statusGreen)
+                        }
+                    
+                        // Progress bar
+                        ProgressView(value: viewModel.progress)
+                            .progressViewStyle(LinearProgressViewStyle(tint: DesignTokens.Colors.iconBlue))
+                            .scaleEffect(x: 1, y: 1.5, anchor: .center)
                     }
+                    .padding(.horizontal, DesignTokens.Spacing.xxl)
+                    .padding(.vertical, DesignTokens.Spacing.md)
                     // Убираем фон, чтобы был виден градиент как на главном экране
+            
+                    // Question content
+                    ScrollViewReader { scrollProxy in
+                    ScrollView {
+                        VStack(spacing: DesignTokens.Spacing.xxl) {
+                            // Question text
+                            if let question = viewModel.currentQuestion {
+                                VStack(spacing: DesignTokens.Spacing.lg) {
+                                    Text(question.text)
+                                        .id(Self.questionTopAnchor)
+                                        .font(DesignTokens.Typography.h2)
+                                        .foregroundStyle(DesignTokens.Colors.textPrimary)
+                                        .multilineTextAlignment(.center)
+                                        .padding(DesignTokens.Spacing.xxl)
+                                        .frame(maxWidth: .infinity)
+                                        .background(
+                                            // Прозрачная рамка с фиолетовым свечением (как на главном экране)
+                                            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
+                                                .stroke(
+                                                    LinearGradient(
+                                                        gradient: Gradient(colors: [
+                                                            DesignTokens.Colors.iconPurpleLight.opacity(0.5),
+                                                            DesignTokens.Colors.iconPurpleLight.opacity(0.2)
+                                                        ]),
+                                                        startPoint: .topLeading,
+                                                        endPoint: .bottomTrailing
+                                                    ),
+                                                    lineWidth: 1.5
+                                                )
+                                                .shadow(
+                                                    color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
+                                                    radius: 12,
+                                                    x: 0,
+                                                    y: 0
+                                                )
+                                        )
+                                        .accessibilityAddTraits(.isHeader)
+                                        .dynamicTypeSize(.large)
+                                
+                                    // Category
+                                    if question.category != QuestionCategory.generalId {
+                                        HStack {
+                                            Label(
+                                                QuestionCategory.displayName(for: question.category),
+                                                systemImage: QuestionCategory.icon(for: question.category)
+                                            )
+                                            .font(DesignTokens.Typography.label)
+                                            .foregroundStyle(DesignTokens.Colors.textSecondary)
+                                        
+                                            Spacer()
+                                        }
+                                        .padding(.horizontal, DesignTokens.Spacing.sm)
+                                    }
+                                }
+                            
+                                // Answer options
+                                VStack(spacing: DesignTokens.Spacing.md) {
+                                    ForEach(question.answers, id: \.id) { answer in
+                                        let index = answerIndices[answer.id] ?? 0
+                                        AnswerButton(
+                                            answer: answer,
+                                            index: index,
+                                            isSelected: viewModel.selectedAnswerIndex == index,
+                                            isCorrect: index == question.correctIndex,
+                                            isAnswerSelected: viewModel.isAnswerSelected,
+                                            action: {
+                                                viewModel.selectAnswer(at: index)
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                        .padding(DesignTokens.Spacing.xxl)
+                    }
+                    .onChange(of: viewModel.currentQuestionIndex) { _, _ in
+                        scrollProxy.scrollTo(Self.questionTopAnchor, anchor: .top)
+                    }
+                    .onChange(of: viewModel.isAnswerSelected) { _, isAnswerSelected in
+                        guard isAnswerSelected,
+                              let question = viewModel.currentQuestion,
+                              let selectedIndex = viewModel.selectedAnswerIndex else { return }
+                        AnswerAnnouncement.post(for: question, selectedIndex: selectedIndex)
+                    }
+                    }
+            
+                    // Finish button at the bottom
+                    VStack(spacing: 0) {
+                        Divider()
+                            .background(DesignTokens.Colors.borderSubtle)
+                    
+                        Button(action: {
+                            showingFinishConfirm = true
+                        }) {
+                            HStack(spacing: DesignTokens.Spacing.md) {
+                                Image(systemName: "checkmark.circle.fill")
+                                    .font(.system(size: DesignTokens.Sizes.iconMedium))
+                                Text("quiz.finish".localized)
+                                    .font(DesignTokens.Typography.secondarySemibold)
+                            }
+                            .foregroundColor(DesignTokens.Colors.statusGreen)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 56)
+                            .background(
+                                // Прозрачная рамка с фиолетовым свечением (как на главном экране)
+                                RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
+                                    .stroke(
+                                        LinearGradient(
+                                            gradient: Gradient(colors: [
+                                                DesignTokens.Colors.iconPurpleLight.opacity(0.5),
+                                                DesignTokens.Colors.iconPurpleLight.opacity(0.2)
+                                            ]),
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        ),
+                                        lineWidth: 1.5
+                                    )
+                                    .shadow(
+                                        color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
+                                        radius: 12,
+                                        x: 0,
+                                        y: 0
+                                    )
+                            )
+                            .padding(.horizontal, DesignTokens.Spacing.xxl)
+                            .padding(.vertical, DesignTokens.Spacing.lg)
+                        }
+                        // Убираем фон, чтобы был виден градиент как на главном экране
+                    }
                 }
             }
         }
@@ -287,6 +255,44 @@ struct QuizView: View {
                 UIApplication.shared.applicationIconBadgeNumber = 0
             }
         }
+    }
+}
+
+// MARK: - Loading Card
+struct LoadingCardView: View {
+    var body: some View {
+        VStack(spacing: DesignTokens.Spacing.lg) {
+            ProgressView()
+                .progressViewStyle(CircularProgressViewStyle(tint: DesignTokens.Colors.iconBlue))
+                .scaleEffect(1.5)
+            
+            Text("quiz.loading".localized)
+                .font(DesignTokens.Typography.bodyRegular)
+                .foregroundStyle(DesignTokens.Colors.textSecondary)
+        }
+        .padding(DesignTokens.Spacing.xxl)
+        .background(
+            // Прозрачная рамка с фиолетовым свечением (как на главном экране)
+            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
+                .stroke(
+                    LinearGradient(
+                        gradient: Gradient(colors: [
+                            DesignTokens.Colors.iconPurpleLight.opacity(0.5),
+                            DesignTokens.Colors.iconPurpleLight.opacity(0.2)
+                        ]),
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 1.5
+                )
+                .shadow(
+                    color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
+                    radius: 12,
+                    x: 0,
+                    y: 0
+                )
+        )
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
 

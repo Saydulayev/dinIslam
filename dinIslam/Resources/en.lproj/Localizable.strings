@@ -162,12 +162,13 @@
 // Quiz Finish
 "quiz.finish" = "Finish";
 "quiz.finish.confirm.title" = "Finish Quiz?";
-"quiz.finish.confirm.message" = "Results will be saved.";
+"quiz.finish.confirm.message" = "Answered questions will be counted; the rest will come up next time.";
 "quiz.finish.confirm.ok" = "Finish";
 "quiz.finish.confirm.cancel" = "Cancel";
 
 // Quiz Loading
 "quiz.loading" = "Loading...";
+"time.seconds.short" = "%d sec";
 "quiz.bankCompleted" = "All questions have been studied. Switch to review mode.";
 
 // Answer Accessibility (VoiceOver)
@@ -486,6 +487,8 @@
 "exam.stop.message" = "Are you sure you want to stop the exam? Results will be saved.";
 "exam.stop.cancel" = "Cancel";
 "exam.stop.confirm" = "Stop";
+"exam.error.title" = "Couldn't start the exam";
+"exam.error.retry" = "Try Again";
 
 // Exam Result
 "exam.result.title" = "Exam Result";

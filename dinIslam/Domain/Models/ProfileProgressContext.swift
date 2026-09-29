@@ -21,6 +21,9 @@ struct QuizSessionSummary: Codable, Equatable {
     let duration: TimeInterval
     let completedAt: Date
     let outcomes: [QuizQuestionOutcome]
+    /// false — викторину завершили досрочно: ответы учитываются,
+    /// но сессия не считается пройденной (серии, история, достижения)
+    var isComplete: Bool = true
 
     var incorrectAnswers: Int {
         return totalQuestions - correctAnswers

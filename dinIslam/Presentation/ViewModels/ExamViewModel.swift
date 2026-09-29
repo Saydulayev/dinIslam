@@ -161,6 +161,14 @@ class ExamViewModel {
         do {
             let loadedQuestions = try await examUseCase.startExam(configuration: configuration, language: language)
             
+            // Без вопросов экзамен не начинаем — иначе экран показывает «1 / 0»
+            guard !loadedQuestions.isEmpty else {
+                errorMessage = "error.emptyData".localized
+                state = .error(.dataError)
+                isLoading = false
+                return
+            }
+            
             questions = loadedQuestions
             currentQuestionIndex = 0
             answers.removeAll()
