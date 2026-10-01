@@ -86,7 +86,10 @@ struct ProfileCardView: View {
                                 .font(.system(size: DesignTokens.Sizes.editIconSize))
                                 .foregroundStyle(DesignTokens.Colors.textPrimary)
                         }
+                        .frame(width: 44, height: 44)
+                        .contentShape(Circle())
                     }
+                    .accessibilityLabel("profile.avatar.change".localized)
                 }
             }
             
@@ -120,7 +123,12 @@ struct ProfileCardView: View {
                         Image(systemName: isEditingDisplayName ? "checkmark" : "pencil")
                             .font(.system(size: DesignTokens.Sizes.iconSmall))
                             .foregroundColor(DesignTokens.Colors.textSecondary)
+                            .frame(width: 44, height: 44)
+                            .contentShape(Rectangle())
                     }
+                    .accessibilityLabel(
+                        (isEditingDisplayName ? "accessibility.displayName.save" : "accessibility.displayName.edit").localized
+                    )
                 }
             }
             

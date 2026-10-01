@@ -154,53 +154,50 @@ struct ExamSettingsView: View {
                                         
                                         // Additional options
                                         VStack(spacing: DesignTokens.Spacing.md) {
-                                            HStack {
-                                                Image(systemName: "forward.fill")
-                                                    .font(.system(size: DesignTokens.Sizes.iconMedium))
-                                                    .foregroundColor(DesignTokens.Colors.iconOrange)
-                                                    .frame(width: DesignTokens.Sizes.iconLarge)
-                                                
-                                                Text("exam.settings.allowSkip".localized)
-                                                    .font(DesignTokens.Typography.bodyRegular)
-                                                    .foregroundStyle(DesignTokens.Colors.textPrimary)
-                                                
-                                                Spacer()
-                                                
-                                                Toggle("", isOn: $allowSkip)
-                                                    .tint(DesignTokens.Colors.iconBlue)
+                                            Toggle(isOn: $allowSkip) {
+                                                HStack {
+                                                    Image(systemName: "forward.fill")
+                                                        .font(.system(size: DesignTokens.Sizes.iconMedium))
+                                                        .foregroundColor(DesignTokens.Colors.iconOrange)
+                                                        .frame(width: DesignTokens.Sizes.iconLarge)
+                                                        .accessibilityHidden(true)
+                                                    
+                                                    Text("exam.settings.allowSkip".localized)
+                                                        .font(DesignTokens.Typography.bodyRegular)
+                                                        .foregroundStyle(DesignTokens.Colors.textPrimary)
+                                                }
                                             }
+                                            .tint(DesignTokens.Colors.iconBlue)
                                             
-                                            HStack {
-                                                Image(systemName: "timer")
-                                                    .font(.system(size: DesignTokens.Sizes.iconMedium))
-                                                    .foregroundColor(DesignTokens.Colors.iconBlue)
-                                                    .frame(width: DesignTokens.Sizes.iconLarge)
-                                                
-                                                Text("exam.settings.showTimer".localized)
-                                                    .font(DesignTokens.Typography.bodyRegular)
-                                                    .foregroundStyle(DesignTokens.Colors.textPrimary)
-                                                
-                                                Spacer()
-                                                
-                                                Toggle("", isOn: $showTimer)
-                                                    .tint(DesignTokens.Colors.iconBlue)
+                                            Toggle(isOn: $showTimer) {
+                                                HStack {
+                                                    Image(systemName: "timer")
+                                                        .font(.system(size: DesignTokens.Sizes.iconMedium))
+                                                        .foregroundColor(DesignTokens.Colors.iconBlue)
+                                                        .frame(width: DesignTokens.Sizes.iconLarge)
+                                                        .accessibilityHidden(true)
+                                                    
+                                                    Text("exam.settings.showTimer".localized)
+                                                        .font(DesignTokens.Typography.bodyRegular)
+                                                        .foregroundStyle(DesignTokens.Colors.textPrimary)
+                                                }
                                             }
+                                            .tint(DesignTokens.Colors.iconBlue)
                                             
-                                            HStack {
-                                                Image(systemName: "checkmark.circle.fill")
-                                                    .font(.system(size: DesignTokens.Sizes.iconMedium))
-                                                    .foregroundColor(DesignTokens.Colors.statusGreen)
-                                                    .frame(width: DesignTokens.Sizes.iconLarge)
-                                                
-                                                Text("exam.settings.autoSubmit".localized)
-                                                    .font(DesignTokens.Typography.bodyRegular)
-                                                    .foregroundStyle(DesignTokens.Colors.textPrimary)
-                                                
-                                                Spacer()
-                                                
-                                                Toggle("", isOn: $autoSubmit)
-                                                    .tint(DesignTokens.Colors.iconBlue)
+                                            Toggle(isOn: $autoSubmit) {
+                                                HStack {
+                                                    Image(systemName: "checkmark.circle.fill")
+                                                        .font(.system(size: DesignTokens.Sizes.iconMedium))
+                                                        .foregroundColor(DesignTokens.Colors.statusGreen)
+                                                        .frame(width: DesignTokens.Sizes.iconLarge)
+                                                        .accessibilityHidden(true)
+                                                    
+                                                    Text("exam.settings.autoSubmit".localized)
+                                                        .font(DesignTokens.Typography.bodyRegular)
+                                                        .foregroundStyle(DesignTokens.Colors.textPrimary)
+                                                }
                                             }
+                                            .tint(DesignTokens.Colors.iconBlue)
                                         }
                                     }
                                     .padding(DesignTokens.Spacing.xxl)

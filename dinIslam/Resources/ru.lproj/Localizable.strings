@@ -183,6 +183,9 @@
 "accessibility.announce.correct" = "Верно";
 "accessibility.announce.wrong" = "Неверно";
 "accessibility.announce.wrongWithAnswer" = "Неверно. Правильный ответ: %@";
+"accessibility.menu" = "Меню";
+"accessibility.displayName.edit" = "Изменить имя";
+"accessibility.displayName.save" = "Сохранить имя";
 
 // Stats View - Pluralization Support
 "stats.title" = "Статистика";

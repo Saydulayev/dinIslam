@@ -147,6 +147,23 @@ struct AchievementCard: View {
     }
     
     var body: some View {
+        // Открыть подробности можно только у полученного достижения
+        if isUnlocked {
+            Button {
+                withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
+                    onTap()
+                }
+            } label: {
+                cardContent
+            }
+            .buttonStyle(.plain)
+        } else {
+            cardContent
+                .accessibilityElement(children: .combine)
+        }
+    }
+    
+    private var cardContent: some View {
         HStack(spacing: DesignTokens.Spacing.lg) {
             // Icon
             ZStack {
@@ -233,13 +250,7 @@ struct AchievementCard: View {
         )
         .opacity(isUnlocked ? 1.0 : 0.6)
         .animation(.easeInOut(duration: 0.3), value: isUnlocked)
-        .onTapGesture {
-            if isUnlocked {
-                withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
-                    onTap()
-                }
-            }
-        }
+        .contentShape(Rectangle())
     }
 }
 

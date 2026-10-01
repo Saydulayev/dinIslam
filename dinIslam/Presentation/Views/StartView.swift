@@ -216,6 +216,7 @@ struct StartView: View {
                         Image(systemName: "ellipsis")
                             .foregroundColor(DesignTokens.Colors.textPrimary)
                     }
+                    .accessibilityLabel("accessibility.menu".localized)
                 }
             }
             .alert(
@@ -308,6 +309,8 @@ struct StartView: View {
             streakTile(model: model)
             averageScoreTile(model: model)
         }
+        // Обе плитки по высоте более высокой — при крупном шрифте рамки остаются ровными
+        .fixedSize(horizontal: false, vertical: true)
     }
     
     private func streakTile(model: StartViewModel) -> some View {
@@ -339,7 +342,7 @@ struct StartView: View {
                 .multilineTextAlignment(.center)
         }
         .padding(DesignTokens.Spacing.md)
-        .frame(maxWidth: .infinity, minHeight: 96)
+        .frame(maxWidth: .infinity, minHeight: 96, maxHeight: .infinity)
         .cardStyle(fillColor: Color.white.opacity(0.04), borderColor: Color.white.opacity(0.08), shadowColor: .clear)
         .accessibilityElement(children: .combine)
     }
@@ -360,7 +363,7 @@ struct StartView: View {
             }
         }
         .padding(DesignTokens.Spacing.md)
-        .frame(maxWidth: .infinity, minHeight: 96)
+        .frame(maxWidth: .infinity, minHeight: 96, maxHeight: .infinity)
         .cardStyle(fillColor: Color.white.opacity(0.04), borderColor: Color.white.opacity(0.08), shadowColor: .clear)
         .accessibilityElement(children: .combine)
     }

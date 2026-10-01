@@ -55,48 +55,44 @@ struct SettingsView: View {
                                 .background(Color.white.opacity(0.1))
                             
                             // Sound Setting
-                            HStack(spacing: DesignTokens.Spacing.md) {
-                                Image(systemName: "speaker.wave.2")
-                                    .foregroundColor(DesignTokens.Colors.iconGreen)
-                                    .frame(width: DesignTokens.Sizes.iconLarge)
-                                
-                                Text("settings.sound.title".localized)
-                                    .font(DesignTokens.Typography.bodyRegular)
-                                    .foregroundColor(DesignTokens.Colors.textPrimary)
-                                
-                                Spacer()
-                                
-                                Toggle("", isOn: Binding(
-                                    get: { viewModel.settings.soundEnabled },
-                                    set: { viewModel.updateSoundEnabled($0) }
-                                ))
-                                .tint(DesignTokens.Colors.iconGreen)
+                            Toggle(isOn: Binding(
+                                get: { viewModel.settings.soundEnabled },
+                                set: { viewModel.updateSoundEnabled($0) }
+                            )) {
+                                HStack(spacing: DesignTokens.Spacing.md) {
+                                    Image(systemName: "speaker.wave.2")
+                                        .foregroundColor(DesignTokens.Colors.iconGreen)
+                                        .frame(width: DesignTokens.Sizes.iconLarge)
+                                        .accessibilityHidden(true)
+                                    
+                                    Text("settings.sound.title".localized)
+                                        .font(DesignTokens.Typography.bodyRegular)
+                                        .foregroundColor(DesignTokens.Colors.textPrimary)
+                                }
                             }
+                            .tint(DesignTokens.Colors.iconGreen)
                             .padding(.vertical, DesignTokens.Spacing.xs)
                             
                             Divider()
                                 .background(Color.white.opacity(0.1))
                             
                             // Haptic Feedback Setting
-                            HStack(spacing: DesignTokens.Spacing.md) {
-                                Image(systemName: "iphone.radiowaves.left.and.right")
-                                    .foregroundColor(DesignTokens.Colors.iconOrange)
-                                    .frame(width: DesignTokens.Sizes.iconLarge)
-                                
-                                Text("settings.haptic.title".localized)
-                                    .font(DesignTokens.Typography.bodyRegular)
-                                    .foregroundColor(DesignTokens.Colors.textPrimary)
-                                    .lineLimit(2)
-                                    .minimumScaleFactor(0.85)
-                                
-                                Spacer()
-                                
-                                Toggle("", isOn: Binding(
-                                    get: { viewModel.settings.hapticEnabled },
-                                    set: { viewModel.updateHapticEnabled($0) }
-                                ))
-                                .tint(DesignTokens.Colors.iconOrange)
+                            Toggle(isOn: Binding(
+                                get: { viewModel.settings.hapticEnabled },
+                                set: { viewModel.updateHapticEnabled($0) }
+                            )) {
+                                HStack(spacing: DesignTokens.Spacing.md) {
+                                    Image(systemName: "iphone.radiowaves.left.and.right")
+                                        .foregroundColor(DesignTokens.Colors.iconOrange)
+                                        .frame(width: DesignTokens.Sizes.iconLarge)
+                                        .accessibilityHidden(true)
+                                    
+                                    Text("settings.haptic.title".localized)
+                                        .font(DesignTokens.Typography.bodyRegular)
+                                        .foregroundColor(DesignTokens.Colors.textPrimary)
+                                }
                             }
+                            .tint(DesignTokens.Colors.iconOrange)
                             .padding(.vertical, DesignTokens.Spacing.xs)
                             
                             Divider()
@@ -357,36 +353,38 @@ struct SettingsView: View {
         let action: () -> Void
         
         var body: some View {
-            HStack(spacing: DesignTokens.Spacing.md) {
-                Image(systemName: icon)
-                    .foregroundColor(iconColor)
-                    .frame(width: DesignTokens.Sizes.iconLarge)
-                
-                VStack(alignment: .leading, spacing: DesignTokens.Spacing.xs) {
-                    Text(title)
-                        .font(DesignTokens.Typography.bodyRegular)
-                        .foregroundColor(DesignTokens.Colors.textPrimary)
+            Button(action: action) {
+                HStack(spacing: DesignTokens.Spacing.md) {
+                    Image(systemName: icon)
+                        .foregroundColor(iconColor)
+                        .frame(width: DesignTokens.Sizes.iconLarge)
+                        .accessibilityHidden(true)
                     
-                    if let subtitle = subtitle {
-                        Text(subtitle)
-                            .font(DesignTokens.Typography.label)
+                    VStack(alignment: .leading, spacing: DesignTokens.Spacing.xs) {
+                        Text(title)
+                            .font(DesignTokens.Typography.bodyRegular)
+                            .foregroundColor(DesignTokens.Colors.textPrimary)
+                        
+                        if let subtitle = subtitle {
+                            Text(subtitle)
+                                .font(DesignTokens.Typography.label)
+                                .foregroundColor(DesignTokens.Colors.textSecondary)
+                        }
+                    }
+                    
+                    Spacer()
+                    
+                    if showChevron {
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: DesignTokens.Sizes.iconSmall))
                             .foregroundColor(DesignTokens.Colors.textSecondary)
+                            .accessibilityHidden(true)
                     }
                 }
-                
-                Spacer()
-                
-                if showChevron {
-                    Image(systemName: "chevron.right")
-                        .font(.system(size: DesignTokens.Sizes.iconSmall))
-                        .foregroundColor(DesignTokens.Colors.textSecondary)
-                }
+                .padding(.vertical, DesignTokens.Spacing.xs)
+                .contentShape(Rectangle())
             }
-            .padding(.vertical, DesignTokens.Spacing.xs)
-            .contentShape(Rectangle())
-            .onTapGesture {
-                action()
-            }
+            .buttonStyle(.plain)
         }
     }
     
@@ -414,24 +412,28 @@ struct SettingsView: View {
                 ScrollView {
                     VStack(spacing: DesignTokens.Spacing.sm) {
                         ForEach(AppLanguage.allCases, id: \.self) { language in
-                            HStack {
-                                Text(language.displayName)
-                                    .font(DesignTokens.Typography.bodyRegular)
-                                    .foregroundColor(DesignTokens.Colors.textPrimary)
-                                
-                                Spacer()
-                                
-                                if viewModel.settings.language == language {
-                                    Image(systemName: "checkmark")
-                                        .foregroundColor(DesignTokens.Colors.iconBlue)
-                                }
-                            }
-                            .padding(DesignTokens.Spacing.lg)
-                            .contentShape(Rectangle())
-                            .onTapGesture {
+                            Button {
                                 viewModel.updateLanguage(language)
                                 dismiss()
+                            } label: {
+                                HStack {
+                                    Text(language.displayName)
+                                        .font(DesignTokens.Typography.bodyRegular)
+                                        .foregroundColor(DesignTokens.Colors.textPrimary)
+                                    
+                                    Spacer()
+                                    
+                                    if viewModel.settings.language == language {
+                                        Image(systemName: "checkmark")
+                                            .foregroundColor(DesignTokens.Colors.iconBlue)
+                                            .accessibilityHidden(true)
+                                    }
+                                }
+                                .padding(DesignTokens.Spacing.lg)
+                                .contentShape(Rectangle())
                             }
+                            .buttonStyle(.plain)
+                            .accessibilityAddTraits(viewModel.settings.language == language ? .isSelected : [])
                             
                             if language != AppLanguage.allCases.last {
                                 Divider()

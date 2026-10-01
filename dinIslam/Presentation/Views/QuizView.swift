@@ -121,7 +121,6 @@ struct QuizView: View {
                                                 )
                                         )
                                         .accessibilityAddTraits(.isHeader)
-                                        .dynamicTypeSize(.large)
                                 
                                     // Category
                                     if question.category != QuestionCategory.generalId {

@@ -131,31 +131,32 @@ struct NotificationSettingsView: View {
                             
                             VStack(spacing: DesignTokens.Spacing.sm) {
                                 // Enable/Disable Notifications
-                                HStack(spacing: DesignTokens.Spacing.md) {
-                                    Image(systemName: "bell")
-                                        .foregroundColor(DesignTokens.Colors.iconPurple)
-                                        .font(.system(size: DesignTokens.Sizes.iconMedium))
-                                        .frame(width: DesignTokens.Sizes.iconLarge)
-                                    
-                                    VStack(alignment: .leading, spacing: DesignTokens.Spacing.xs) {
-                                        Text("notification.settings.enabled".localized)
-                                            .font(DesignTokens.Typography.bodyRegular)
-                                            .foregroundColor(DesignTokens.Colors.textPrimary)
+                                Toggle(isOn: $isNotificationEnabled) {
+                                    HStack(spacing: DesignTokens.Spacing.md) {
+                                        Image(systemName: "bell")
+                                            .foregroundColor(DesignTokens.Colors.iconPurple)
+                                            .font(.system(size: DesignTokens.Sizes.iconMedium))
+                                            .frame(width: DesignTokens.Sizes.iconLarge)
+                                            .accessibilityHidden(true)
                                         
-                                        Text(isNotificationEnabled ?
-                                             "settings.on".localized :
-                                             "settings.off".localized)
-                                            .font(DesignTokens.Typography.label)
-                                            .foregroundColor(DesignTokens.Colors.textSecondary)
-                                    }
-                                    
-                                    Spacer()
-                                    
-                                    Toggle("", isOn: $isNotificationEnabled)
-                                        .tint(DesignTokens.Colors.iconPurple)
-                                        .onChange(of: isNotificationEnabled) { _, newValue in
-                                            notificationManager.toggleNotifications(newValue)
+                                        VStack(alignment: .leading, spacing: DesignTokens.Spacing.xs) {
+                                            Text("notification.settings.enabled".localized)
+                                                .font(DesignTokens.Typography.bodyRegular)
+                                                .foregroundColor(DesignTokens.Colors.textPrimary)
+                                            
+                                            // Состояние и так озвучивает переключатель
+                                            Text(isNotificationEnabled ?
+                                                 "settings.on".localized :
+                                                 "settings.off".localized)
+                                                .font(DesignTokens.Typography.label)
+                                                .foregroundColor(DesignTokens.Colors.textSecondary)
+                                                .accessibilityHidden(true)
                                         }
+                                    }
+                                }
+                                .tint(DesignTokens.Colors.iconPurple)
+                                .onChange(of: isNotificationEnabled) { _, newValue in
+                                    notificationManager.toggleNotifications(newValue)
                                 }
                                 .padding(.vertical, DesignTokens.Spacing.xs)
                                 

@@ -138,23 +138,25 @@ struct DesignTokens {
     }
     
     // MARK: - Typography
+    // Текстовые стили масштабируются вместе с Dynamic Type.
+    // В скобках — размер при стандартной настройке.
     struct Typography {
         // Headers
-        static let h1 = Font.system(size: 20, weight: .semibold)
-        static let h2 = Font.system(size: 18, weight: .semibold)
+        static let h1 = Font.system(.title3, weight: .semibold)      // 20
+        static let h2 = Font.system(.headline)                      // 17, semibold
         
         // Body text
-        static let bodyRegular = Font.system(size: 16, weight: .regular)
+        static let bodyRegular = Font.system(.callout)              // 16
         
         // Secondary text
-        static let secondaryRegular = Font.system(size: 14, weight: .regular)
-        static let secondarySemibold = Font.system(size: 14, weight: .semibold)
+        static let secondaryRegular = Font.system(.subheadline)     // 15
+        static let secondarySemibold = Font.system(.subheadline, weight: .semibold)
         
         // Labels
-        static let label = Font.system(size: 12, weight: .regular)
+        static let label = Font.system(.caption)                    // 12
         
         // Stats value
-        static let statsValue = Font.system(size: 16, weight: .regular)
+        static let statsValue = Font.system(.callout)               // 16
     }
     
     // MARK: - Sizes

@@ -58,10 +58,9 @@ struct ProgressCardView: View {
             Text(label)
                 .font(DesignTokens.Typography.label)
                 .foregroundColor(.white.opacity(0.9)) // Белый текст с небольшой прозрачностью
-                .lineLimit(2)
                 .fixedSize(horizontal: false, vertical: true)
         }
-        .frame(maxWidth: .infinity, minHeight: 110, maxHeight: 110, alignment: .leading)
+        .frame(maxWidth: .infinity, minHeight: 110, maxHeight: .infinity, alignment: .leading)
         .padding(DesignTokens.Sizes.progressCardPadding)
         .background(
             ZStack {

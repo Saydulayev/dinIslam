@@ -182,6 +182,9 @@
 "accessibility.announce.correct" = "Correct";
 "accessibility.announce.wrong" = "Incorrect";
 "accessibility.announce.wrongWithAnswer" = "Incorrect. Correct answer: %@";
+"accessibility.menu" = "Menu";
+"accessibility.displayName.edit" = "Edit name";
+"accessibility.displayName.save" = "Save name";
 
 // Stats View - Pluralization Support
 "stats.title" = "Statistics";
