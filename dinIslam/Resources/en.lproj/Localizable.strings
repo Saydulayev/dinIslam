@@ -2,6 +2,10 @@
 "profile.done" = "Done";
 "profile.anonymous" = "Guest";
 "profile.signout" = "Sign Out";
+"profile.signout.confirm.title" = "Sign Out?";
+"profile.signout.confirm.message" = "Your progress will stay on this device but will no longer sync with iCloud. Your profile photo will be removed from this device.";
+"profile.signout.confirm.ok" = "Sign Out";
+"profile.signout.confirm.cancel" = "Cancel";
 "profile.displayName.placeholder" = "Enter name";
 "profile.mastery.novice" = "Novice";
 "profile.mastery.learning" = "Learning";
@@ -525,6 +529,10 @@
 "bank.completion.subtitle" = "Congratulations! You've completed the entire question bank.";
 "bank.completion.questionsCompleted" = "Questions Completed";
 "bank.completion.startOver" = "Start Over";
+"bank.completion.startOver.confirm.title" = "Start Over?";
+"bank.completion.startOver.confirm.message" = "Your studied-question marks will be cleared and questions will be shown from the beginning again. Statistics and achievements will be kept.";
+"bank.completion.startOver.confirm.ok" = "Start Over";
+"bank.completion.startOver.confirm.cancel" = "Cancel";
 "bank.completion.review" = "Review";
 "bank.completion.bankCompleted" = "Bank Completed";
 /* Learning loop: topics, review, daily practice */

@@ -12,6 +12,8 @@ struct BankCompletionView: View {
     let onStartOver: () -> Void
     let onStartReview: () -> Void
     
+    @State private var showingStartOverConfirmation = false
+    
     var body: some View {
         ZStack {
             // Background - очень темный градиент с оттенками индиго/фиолетового
@@ -101,7 +103,9 @@ struct BankCompletionView: View {
                     // Кнопки действий
                     VStack(spacing: DesignTokens.Spacing.md) {
                         // Кнопка "Начать заново"
-                        Button(action: onStartOver) {
+                        Button {
+                            showingStartOverConfirmation = true
+                        } label: {
                             HStack(spacing: DesignTokens.Spacing.md) {
                                 Image(systemName: "arrow.counterclockwise")
                                     .font(.system(size: DesignTokens.Sizes.iconMedium))
@@ -232,6 +236,17 @@ struct BankCompletionView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(.clear, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
+        .alert(
+            "bank.completion.startOver.confirm.title".localized,
+            isPresented: $showingStartOverConfirmation
+        ) {
+            Button("bank.completion.startOver.confirm.ok".localized, role: .destructive) {
+                onStartOver()
+            }
+            Button("bank.completion.startOver.confirm.cancel".localized, role: .cancel) { }
+        } message: {
+            Text("bank.completion.startOver.confirm.message".localized)
+        }
     }
 }
 

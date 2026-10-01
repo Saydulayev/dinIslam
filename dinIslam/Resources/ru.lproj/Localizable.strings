@@ -2,6 +2,10 @@
 "profile.done" = "Готово";
 "profile.anonymous" = "Гость";
 "profile.signout" = "Выйти";
+"profile.signout.confirm.title" = "Выйти из аккаунта?";
+"profile.signout.confirm.message" = "Прогресс останется на этом устройстве, но перестанет синхронизироваться с iCloud. Фото профиля будет удалено с устройства.";
+"profile.signout.confirm.ok" = "Выйти";
+"profile.signout.confirm.cancel" = "Отмена";
 "profile.displayName.placeholder" = "Введите имя";
 "profile.mastery.novice" = "Ученик";
 "profile.mastery.learning" = "В процессе";
@@ -541,6 +545,10 @@
 "bank.completion.subtitle" = "Поздравляем! Вы прошли весь банк вопросов.";
 "bank.completion.questionsCompleted" = "Вопросов изучено";
 "bank.completion.startOver" = "Начать заново";
+"bank.completion.startOver.confirm.title" = "Начать заново?";
+"bank.completion.startOver.confirm.message" = "Отметки об изученных вопросах будут сброшены, и вопросы снова начнут показываться с начала. Статистика и достижения сохранятся.";
+"bank.completion.startOver.confirm.ok" = "Начать заново";
+"bank.completion.startOver.confirm.cancel" = "Отмена";
 "bank.completion.review" = "Повторение";
 "bank.completion.bankCompleted" = "Банк завершён";
 /* Learning loop: темы, повторение, ежедневная практика */

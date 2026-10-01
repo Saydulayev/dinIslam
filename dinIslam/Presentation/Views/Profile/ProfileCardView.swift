@@ -17,6 +17,8 @@ struct ProfileCardView: View {
     
     let hasAvatar: Bool
     
+    @State private var showingSignOutConfirmation = false
+    
     var body: some View {
         VStack(spacing: DesignTokens.Spacing.xxl) {
             // Avatar
@@ -142,7 +144,7 @@ struct ProfileCardView: View {
                         title: "profile.signout".localized,
                         foregroundColor: DesignTokens.Colors.iconRed
                     ) {
-                        manager.signOut()
+                        showingSignOutConfirmation = true
                     }
                 } else {
                     // Sign in with Apple button в стиле главного экрана
@@ -198,6 +200,17 @@ struct ProfileCardView: View {
                     y: 0
                 )
         )
+        .alert(
+            "profile.signout.confirm.title".localized,
+            isPresented: $showingSignOutConfirmation
+        ) {
+            Button("profile.signout.confirm.ok".localized, role: .destructive) {
+                manager.signOut()
+            }
+            Button("profile.signout.confirm.cancel".localized, role: .cancel) { }
+        } message: {
+            Text("profile.signout.confirm.message".localized)
+        }
     }
     
     private var displayNameBinding: Binding<String> {
