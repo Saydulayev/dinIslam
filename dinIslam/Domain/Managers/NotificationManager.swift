@@ -9,15 +9,17 @@ import Foundation
 import UserNotifications
 import OSLog
 import SwiftUI
-import Combine
 
-class NotificationManager: ObservableObject {
-    @Published var isNotificationEnabled = false
-    @Published var reminderTime = Date()
-    @Published var hasPermission = false
+/// @Observable: экраны получают менеджер через кастомный @Environment-ключ,
+/// и SwiftUI отслеживает чтение свойств только у @Observable-объектов
+@Observable
+class NotificationManager {
+    var isNotificationEnabled = false
+    var reminderTime = Date()
+    var hasPermission = false
     
-    private let center = UNUserNotificationCenter.current()
-    private let localizationProvider: LocalizationProviding
+    @ObservationIgnored private let center = UNUserNotificationCenter.current()
+    @ObservationIgnored private let localizationProvider: LocalizationProviding
     
     init(localizationProvider: LocalizationProviding? = nil) {
         self.localizationProvider = localizationProvider ?? LocalizationManager()

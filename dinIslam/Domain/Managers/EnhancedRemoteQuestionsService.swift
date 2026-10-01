@@ -7,6 +7,7 @@
 
 import Foundation
 import Combine
+import Observation
 import OSLog
 
 // MARK: - Cache Configuration
@@ -181,18 +182,22 @@ private struct CacheData: Codable {
 }
 
 // MARK: - Enhanced Remote Questions Service
-class EnhancedRemoteQuestionsService: ObservableObject {
-    @Published var isLoading = false
-    @Published var lastUpdateDate: Date?
-    @Published var hasUpdates = false
-    @Published var remoteQuestionsCount = 0
-    @Published var cachedQuestionsCount = 0
-    @Published var networkStatus: NetworkStatus = .unknown
+/// @Observable: экраны получают сервис через кастомный @Environment-ключ,
+/// и SwiftUI отслеживает чтение свойств только у @Observable-объектов
+@Observable
+class EnhancedRemoteQuestionsService {
+    var isLoading = false
+    var lastUpdateDate: Date?
+    var hasUpdates = false
+    var remoteQuestionsCount = 0
+    var cachedQuestionsCount = 0
+    var networkStatus: NetworkStatus = .unknown
     
-    private let baseURL = "https://raw.githubusercontent.com/Saydulayev/dinIslam-questions/main"
-    private let networkManager: NetworkManager
-    private let cacheManager: CacheManager
-    private let configuration: CacheConfiguration
+    @ObservationIgnored private let baseURL = "https://raw.githubusercontent.com/Saydulayev/dinIslam-questions/main"
+    @ObservationIgnored private let networkManager: NetworkManager
+    @ObservationIgnored private let cacheManager: CacheManager
+    @ObservationIgnored private let configuration: CacheConfiguration
+    @ObservationIgnored private var networkStatusCancellable: AnyCancellable?
     
     init(
         networkManager: NetworkManager = NetworkManager(),
@@ -207,9 +212,12 @@ class EnhancedRemoteQuestionsService: ObservableObject {
         AppLanguage.allCases.forEach { cacheManager.invalidateCache(for: "questions_\($0.rawValue)") }
         
         // Subscribe to network status changes
-        networkManager.$isConnected
+        networkStatusCancellable = networkManager.$isConnected
             .map { $0 ? NetworkStatus.connected : NetworkStatus.disconnected }
-            .assign(to: &$networkStatus)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] status in
+                self?.networkStatus = status
+            }
     }
     
     /// Версия в ключе сбрасывает кэш, когда в модели Question появляются новые поля
