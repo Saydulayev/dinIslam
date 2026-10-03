@@ -27,7 +27,6 @@ struct UserProfile: Codable, Identifiable, Equatable {
     var id: String
     var authMethod: AuthMethod
     var fullName: String?
-    var email: String?
     var customDisplayName: String?  // Пользовательское отображаемое имя
     var localeIdentifier: String
     var avatarURL: URL?
@@ -39,7 +38,6 @@ struct UserProfile: Codable, Identifiable, Equatable {
         id: String,
         authMethod: AuthMethod,
         fullName: String? = nil,
-        email: String? = nil,
         customDisplayName: String? = nil,
         localeIdentifier: String = Locale.current.identifier,
         avatarURL: URL? = nil,
@@ -55,7 +53,6 @@ struct UserProfile: Codable, Identifiable, Equatable {
         self.id = id
         self.authMethod = authMethod
         self.fullName = fullName
-        self.email = email
         self.customDisplayName = customDisplayName
         self.localeIdentifier = localeIdentifier
         self.avatarURL = avatarURL

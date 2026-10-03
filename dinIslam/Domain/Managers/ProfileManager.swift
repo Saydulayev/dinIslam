@@ -37,25 +37,9 @@ final class ProfileManager {
         if let fullName = profile.fullName, !fullName.isEmpty {
             return fullName
         }
-        
-        // Если fullName нет, используем email (если он не приватный)
-        if let email = profile.email, !isPrivateEmail(email) {
-            return email
-        }
-        
+
         // В последнюю очередь показываем анонимного пользователя
         return NSLocalizedString("profile.anonymous", comment: "Anonymous user placeholder")
-    }
-
-    var email: String? {
-        profile.email
-    }
-    
-    func isPrivateEmail(_ email: String) -> Bool {
-        // Apple Sign In использует приватные relay адреса с доменом @privaterelay.appleid.com
-        // Эти адреса не должны отображаться пользователю, если он выбрал скрыть email
-        return email.contains("@privaterelay.appleid.com") || 
-               email.contains("@icloud.com") && email.hasPrefix("no-reply")
     }
 
     var recommendations: [LearningRecommendation] {
@@ -203,6 +187,35 @@ final class ProfileManager {
         localStore.deleteAvatar(for: signedInProfileId)
     }
 
+    /// Удаление аккаунта: запись профиля в iCloud, все локальные профили и фото, статистика и прогресс изучения вопросов.
+    /// Если запись в iCloud удалить не удалось, бросает ошибку и локальные данные не трогает.
+    func deleteAccount() async throws {
+        guard isSignedIn else { return }
+        isLoading = true
+        defer { isLoading = false }
+
+        // Отложенная синхронизация не должна заново создать запись после удаления
+        syncService.cancelSync()
+        try await cloudService.deleteProfile(with: profile.id)
+
+        localStore.deleteAllProfiles()
+        // Сначала переключаемся на анонимный профиль: сброс статистики ниже вызывает
+        // syncStatsReset → scheduleSync, а для анонимного профиля синхронизация с iCloud не запускается
+        profile = localStore.loadOrCreateAnonymousProfile()
+        syncState = .idle
+        errorMessage = nil
+        lastRecommendations = []
+
+        statsManager.resetStats()
+        examStatisticsManager.resetStatistics()
+        let questionPoolProgressManager = DefaultQuestionPoolProgressManager()
+        questionPoolProgressManager.reset(version: 1)
+        questionPoolProgressManager.setReviewMode(false, version: 1)
+
+        progressService.rebuildProgressFromLocalStats(profile: &profile)
+        localStore.saveProfile(profile)
+    }
+
     /// Сброс статистики и отображаемого имени. Фото профиля не затрагивается — для удаления есть отдельная кнопка.
     func resetProfileData() async {
         isLoading = true
@@ -336,7 +349,6 @@ final class ProfileManager {
             id: userId,
             authMethod: .signInWithApple,
             fullName: formattedName(from: credential.fullName) ?? profile.fullName,
-            email: credential.email ?? profile.email,
             customDisplayName: profile.customDisplayName, // Сохраняем пользовательское имя
             localeIdentifier: Locale.current.identifier,
             avatarURL: profile.avatarURL,

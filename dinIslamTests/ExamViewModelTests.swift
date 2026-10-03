@@ -73,7 +73,7 @@ final class ExamViewModelTests: XCTestCase {
 
     // MARK: - Finish during pending transition
 
-    func testFinishRightAfterAnswer_doesNotAdvanceOrFinishTwice() async throws {
+    func testFinishRightAfterAnswer_doesNotAdvanceOrFinishTwice() async throws { 
         await viewModel.startExam(configuration: makeConfiguration(autoSubmit: true), language: "ru")
 
         viewModel.selectAnswer(at: 0)

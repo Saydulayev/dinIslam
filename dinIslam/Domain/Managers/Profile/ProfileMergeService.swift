@@ -20,27 +20,22 @@ final class ProfileMergeService {
         switch strategy {
         case .preferLocal:
             merged.fullName = local.fullName ?? remote.fullName
-            merged.email = local.email ?? remote.email
             merged.customDisplayName = local.customDisplayName ?? remote.customDisplayName
             merged.preferences = mergePreferences(remote: remote.preferences, local: local.preferences, preferLocal: true)
             merged.progress = mergeProgress(remote: remote.progress, local: local.progress, preferLocal: true)
             merged.avatarURL = local.avatarURL ?? merged.avatarURL
         case .preferRemote:
             merged.fullName = remote.fullName ?? local.fullName
-            merged.email = remote.email ?? local.email
             merged.customDisplayName = remote.customDisplayName ?? local.customDisplayName
             merged.preferences = mergePreferences(remote: remote.preferences, local: local.preferences, preferLocal: false)
             merged.progress = mergeProgress(remote: remote.progress, local: local.progress, preferLocal: false)
             merged.avatarURL = remote.avatarURL ?? local.avatarURL
         case .newest:
             let preferLocal = (local.metadata.updatedAt > remote.metadata.updatedAt)
-            // Сохраняем fullName, email и customDisplayName, предпочитая непустые значения
+            // Сохраняем fullName и customDisplayName, предпочитая непустые значения
             merged.fullName = preferLocal ? 
                 (local.fullName ?? remote.fullName) : 
                 (remote.fullName ?? local.fullName)
-            merged.email = preferLocal ? 
-                (local.email ?? remote.email) : 
-                (remote.email ?? local.email)
             merged.customDisplayName = preferLocal ? 
                 (local.customDisplayName ?? remote.customDisplayName) : 
                 (remote.customDisplayName ?? local.customDisplayName)

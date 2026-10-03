@@ -11,6 +11,7 @@ import SwiftUI
 
 struct ProfileCardView: View {
     @Bindable var manager: ProfileManager
+    @Environment(\.achievementManager) private var achievementManager: AchievementManager
     @Binding var avatarPickerItem: PhotosPickerItem?
     @Binding var isEditingDisplayName: Bool
     @Binding var editingDisplayName: String
@@ -18,6 +19,9 @@ struct ProfileCardView: View {
     let hasAvatar: Bool
     
     @State private var showingSignOutConfirmation = false
+    @State private var showingDeleteAccountConfirmation = false
+    @State private var isDeletingAccount = false
+    @State private var showingDeleteAccountError = false
     
     var body: some View {
         VStack(spacing: DesignTokens.Spacing.xxl) {
@@ -154,6 +158,21 @@ struct ProfileCardView: View {
                     ) {
                         showingSignOutConfirmation = true
                     }
+                    .disabled(manager.isLoading)
+                    
+                    MinimalButton(
+                        icon: "person.crop.circle.badge.xmark",
+                        title: "profile.deleteAccount".localized,
+                        foregroundColor: DesignTokens.Colors.iconRed
+                    ) {
+                        showingDeleteAccountConfirmation = true
+                    }
+                    .disabled(manager.isLoading)
+                    
+                    if isDeletingAccount {
+                        ProgressView()
+                            .tint(DesignTokens.Colors.textSecondary)
+                    }
                 } else {
                     // Sign in with Apple button в стиле главного экрана
                     SignInWithAppleButton(.signIn) { request in
@@ -219,6 +238,25 @@ struct ProfileCardView: View {
         } message: {
             Text("profile.signout.confirm.message".localized)
         }
+        .alert(
+            "profile.deleteAccount.confirm.title".localized,
+            isPresented: $showingDeleteAccountConfirmation
+        ) {
+            Button("profile.deleteAccount.confirm.ok".localized, role: .destructive) {
+                deleteAccount()
+            }
+            Button("profile.deleteAccount.confirm.cancel".localized, role: .cancel) { }
+        } message: {
+            Text("profile.deleteAccount.confirm.message".localized)
+        }
+        .alert(
+            "profile.deleteAccount.error.title".localized,
+            isPresented: $showingDeleteAccountError
+        ) {
+            Button("profile.deleteAccount.error.ok".localized, role: .cancel) { }
+        } message: {
+            Text("profile.deleteAccount.error.message".localized)
+        }
     }
     
     private var displayNameBinding: Binding<String> {
@@ -229,6 +267,20 @@ struct ProfileCardView: View {
                 editingDisplayName = String(newValue.prefix(maxLen))
             }
         )
+    }
+    
+    private func deleteAccount() {
+        Task { @MainActor [manager, achievementManager] in
+            isDeletingAccount = true
+            defer { isDeletingAccount = false }
+            do {
+                try await manager.deleteAccount()
+                achievementManager.resetAllAchievements()
+            } catch {
+                AppLogger.error("Failed to delete account", error: error, category: AppLogger.data)
+                showingDeleteAccountError = true
+            }
+        }
     }
     
     private func saveDisplayName() {

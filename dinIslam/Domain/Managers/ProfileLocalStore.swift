@@ -84,6 +84,14 @@ final class ProfileLocalStore {
         }
     }
 
+    /// Удаляет все сохранённые профили (вошедшие и анонимный) и их фото.
+    func deleteAllProfiles() {
+        try? fileManager.removeItem(at: directoryURL)
+        userDefaults.removeObject(forKey: Constants.currentProfileKey)
+        userDefaults.removeObject(forKey: Constants.anonymousProfileKey)
+        ensureDirectoryExists()
+    }
+
     func loadOrCreateAnonymousProfile() -> UserProfile {
         if let anonymousId = userDefaults.string(forKey: Constants.anonymousProfileKey),
            let storedProfile = loadProfile(withId: anonymousId) {

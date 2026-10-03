@@ -15,7 +15,7 @@ final class ProfileAuthService {
     func prepareSignInRequest(_ request: ASAuthorizationAppleIDRequest) {
         let nonce = randomNonceString()
         currentNonce = nonce
-        request.requestedScopes = [.fullName, .email]
+        request.requestedScopes = [.fullName]
         request.nonce = sha256(nonce)
     }
     
