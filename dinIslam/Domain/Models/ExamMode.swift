@@ -13,30 +13,26 @@ struct ExamConfiguration: Codable, Equatable {
     let totalQuestions: Int
     let allowSkip: Bool
     let showTimer: Bool
-    let autoSubmit: Bool
     
     static let `default` = ExamConfiguration(
         timePerQuestion: 30.0, // 30 секунд на вопрос
         totalQuestions: 20,
         allowSkip: true,
-        showTimer: true,
-        autoSubmit: true
+        showTimer: true
     )
     
     static let quick = ExamConfiguration(
         timePerQuestion: 15.0, // 15 секунд на вопрос
         totalQuestions: 10,
         allowSkip: false,
-        showTimer: true,
-        autoSubmit: true
+        showTimer: true
     )
     
     static let extended = ExamConfiguration(
         timePerQuestion: 60.0, // 1 минута на вопрос
         totalQuestions: 30,
         allowSkip: true,
-        showTimer: true,
-        autoSubmit: true
+        showTimer: true
     )
 }
 
@@ -85,6 +81,12 @@ enum ExamErrorState: Equatable {
     case dataError
     case timerError
     case unknownError
+}
+
+enum ExamTimerUrgency: Equatable {
+    case normal
+    case warning
+    case critical
 }
 
 // MARK: - Exam Result

@@ -40,7 +40,7 @@ final class ExamViewModelTests: XCTestCase {
     // MARK: - Retake
 
     func testRetake_startsNewExamWithSameConfigurationAndLanguage() async {
-        let configuration = makeConfiguration(autoSubmit: true)
+        let configuration = makeConfiguration()
         await viewModel.startExam(configuration: configuration, language: "en")
         viewModel.finishExam()
 
@@ -56,13 +56,15 @@ final class ExamViewModelTests: XCTestCase {
         XCTAssertNil(viewModel.examResult)
     }
 
-    // MARK: - Time up without auto submit
+    // MARK: - Time up
 
-    func testTimeUpWithoutAutoSubmit_nextQuestionIsAnswerable() async throws {
-        await viewModel.startExam(configuration: makeConfiguration(autoSubmit: false), language: "ru")
+    func testTimeUp_showsTimeUpThenNextQuestionIsAnswerable() async throws {
+        await viewModel.startExam(configuration: makeConfiguration(), language: "ru")
 
         timer.fireTimeUp()
-        try await Task.sleep(for: .seconds(1.3))
+        XCTAssertEqual(viewModel.state, .active(.timeUp))
+        XCTAssertEqual(viewModel.answers["q1"]?.isTimeExpired, true)
+        try await Task.sleep(for: .seconds(1.8))
 
         XCTAssertEqual(viewModel.state, .active(.playing))
         XCTAssertEqual(viewModel.currentQuestionIndex, 1)
@@ -71,10 +73,72 @@ final class ExamViewModelTests: XCTestCase {
         XCTAssertNotNil(viewModel.answers["q2"]?.selectedAnswerIndex)
     }
 
+    func testTimeUpOnLastQuestion_finishesExam() async throws {
+        await viewModel.startExam(configuration: makeConfiguration(), language: "ru")
+        viewModel.skipQuestion()
+
+        timer.fireTimeUp()
+        try await Task.sleep(for: .seconds(1.8))
+
+        XCTAssertEqual(viewModel.state, .completed(.finished))
+        XCTAssertEqual(useCase.calculateResultCallCount, 1)
+    }
+
+    // MARK: - Pause
+
+    func testPause_blocksAnswersUntilResume() async {
+        await viewModel.startExam(configuration: makeConfiguration(), language: "ru")
+
+        viewModel.pauseExam()
+        XCTAssertEqual(viewModel.state, .active(.paused))
+        XCTAssertFalse(timer.isTimerActive)
+        viewModel.selectAnswer(at: 0)
+        XCTAssertNil(viewModel.answers["q1"])
+
+        viewModel.resumeExam()
+        XCTAssertEqual(viewModel.state, .active(.playing))
+        XCTAssertTrue(timer.isTimerActive)
+        viewModel.selectAnswer(at: 0)
+        XCTAssertNotNil(viewModel.answers["q1"])
+    }
+
+    // MARK: - Timer display
+
+    func testTimeRemainingFormatted_roundsUp() async {
+        await viewModel.startExam(configuration: makeConfiguration(), language: "ru")
+
+        viewModel.timeRemaining = 28.95
+        XCTAssertEqual(viewModel.timeRemainingFormatted, "00:29")
+        viewModel.timeRemaining = 0.2
+        XCTAssertEqual(viewModel.timeRemainingFormatted, "00:01")
+        viewModel.timeRemaining = 0
+        XCTAssertEqual(viewModel.timeRemainingFormatted, "00:00")
+    }
+
+    func testTimerUrgency_dependsOnTimeLimit() async {
+        await viewModel.startExam(configuration: makeConfiguration(timePerQuestion: 15), language: "ru")
+
+        viewModel.timeRemaining = 15
+        XCTAssertEqual(viewModel.timerUrgency, .normal)
+        viewModel.timeRemaining = 7
+        XCTAssertEqual(viewModel.timerUrgency, .warning)
+        viewModel.timeRemaining = 3
+        XCTAssertEqual(viewModel.timerUrgency, .critical)
+
+        await viewModel.startExam(configuration: makeConfiguration(timePerQuestion: 60), language: "ru")
+
+        viewModel.timeRemaining = 25
+        XCTAssertEqual(viewModel.timerUrgency, .normal)
+        viewModel.timeRemaining = 20
+        XCTAssertEqual(viewModel.timerUrgency, .warning)
+        viewModel.timeRemaining = 10
+        XCTAssertEqual(viewModel.timerUrgency, .critical)
+    }
+
     // MARK: - Finish during pending transition
 
     func testFinishRightAfterAnswer_doesNotAdvanceOrFinishTwice() async throws { 
-        await viewModel.startExam(configuration: makeConfiguration(autoSubmit: true), language: "ru")
+        await viewModel.startExam(configuration: makeConfiguration(), language: "ru")
 
         viewModel.selectAnswer(at: 0)
         viewModel.finishExam()
@@ -87,7 +151,7 @@ final class ExamViewModelTests: XCTestCase {
     }
 
     func testFinishRightAfterLastAnswer_calculatesResultOnce() async throws {
-        await viewModel.startExam(configuration: makeConfiguration(autoSubmit: true), language: "ru")
+        await viewModel.startExam(configuration: makeConfiguration(), language: "ru")
         viewModel.skipQuestion()
 
         viewModel.selectAnswer(at: 0)
@@ -100,13 +164,12 @@ final class ExamViewModelTests: XCTestCase {
 
     // MARK: - Helpers
 
-    private func makeConfiguration(autoSubmit: Bool) -> ExamConfiguration {
+    private func makeConfiguration(timePerQuestion: TimeInterval = 30) -> ExamConfiguration {
         ExamConfiguration(
-            timePerQuestion: 30,
+            timePerQuestion: timePerQuestion,
             totalQuestions: 2,
             allowSkip: true,
-            showTimer: true,
-            autoSubmit: autoSubmit
+            showTimer: true
         )
     }
 }

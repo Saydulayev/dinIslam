@@ -85,9 +85,20 @@ class ExamViewModel {
     }
     
     var timeRemainingFormatted: String {
-        let minutes = Int(timeRemaining) / 60
-        let seconds = Int(timeRemaining) % 60
-        return String(format: "%02d:%02d", minutes, seconds)
+        // Округляем вверх: «00:00» появляется только когда время действительно вышло
+        let totalSeconds = Int(timeRemaining.rounded(.up))
+        return String(format: "%02d:%02d", totalSeconds / 60, totalSeconds % 60)
+    }
+    
+    /// Насколько мало осталось времени — пороги считаются от лимита на вопрос
+    var timerUrgency: ExamTimerUrgency {
+        let limit = configuration.timePerQuestion
+        if timeRemaining <= min(10, limit / 4) {
+            return .critical
+        } else if timeRemaining <= min(20, limit / 2) {
+            return .warning
+        }
+        return .normal
     }
     
     var canSkipQuestion: Bool {
@@ -385,15 +396,16 @@ class ExamViewModel {
         // Sync displayed time
         displayedTimeRemaining = timerManager.timeRemaining
         
-        // Start update task to refresh view every second
+        // Обновляем экран, когда меняется показываемая секунда; частый опрос убирает рывки и пропуски секунд
         timerUpdateTask?.cancel()
         timerUpdateTask = Task { [weak self] in
             guard let self else { return }
             while !Task.isCancelled && self.timerManager.isTimerActive {
-                try? await Task.sleep(nanoseconds: 1_000_000_000) // 1 second
+                try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 second
                 guard !Task.isCancelled else { break }
-                await MainActor.run {
-                    self.displayedTimeRemaining = self.timerManager.timeRemaining
+                let remaining = self.timerManager.timeRemaining
+                if remaining.rounded(.up) != self.displayedTimeRemaining.rounded(.up) {
+                    self.displayedTimeRemaining = remaining
                 }
             }
         }
@@ -430,25 +442,14 @@ class ExamViewModel {
         // Show time up state briefly
         state = .active(.timeUp)
         
-        // Auto-submit if enabled, otherwise move to next question
+        // Переходим к следующему вопросу (на последнем — завершаем экзамен)
         nextQuestionTask?.cancel()
         nextQuestionTask = Task { @MainActor [weak self] in
-            try? await Task.sleep(nanoseconds: 1_000_000_000) // 1 second
+            try? await Task.sleep(nanoseconds: 1_500_000_000) // 1.5 seconds, как после ответа
             guard let self, !Task.isCancelled else { return }
-            
-            if self.configuration.autoSubmit {
-                if self.isLastQuestion {
-                    self.finishExam()
-                } else {
-                    self.currentQuestionIndex += 1
-                    self.state = .active(.playing)
-                    self.startQuestionTimer()
-                }
-            } else {
-                // Возвращаемся из .timeUp, иначе ответы на следующие вопросы блокируются
-                self.state = .active(.playing)
-                self.nextQuestion()
-            }
+            // Возвращаемся из .timeUp, иначе ответы на следующие вопросы блокируются
+            self.state = .active(.playing)
+            self.nextQuestion()
         }
     }
     

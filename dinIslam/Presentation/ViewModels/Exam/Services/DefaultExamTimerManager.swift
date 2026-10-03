@@ -15,6 +15,8 @@ final class DefaultExamTimerManager: ExamTimerManaging {
     
     private var timerTask: Task<Void, Never>?
     private var onTimeUpCallback: (@MainActor () -> Void)?
+    /// Момент окончания времени: остаток считается от него, поэтому погрешность сна не накапливается
+    private var deadline: Date?
     
     func startTimer(
         timeLimit: TimeInterval,
@@ -31,6 +33,7 @@ final class DefaultExamTimerManager: ExamTimerManaging {
         
         isTimerActive = true
         questionStartTime = Date()
+        deadline = Date().addingTimeInterval(timeRemaining)
         onTimeUpCallback = onTimeUp
         
         timerTask = Task { [weak self] in
@@ -40,6 +43,11 @@ final class DefaultExamTimerManager: ExamTimerManaging {
     }
     
     func stopTimer() {
+        // Фиксируем остаток на момент остановки, чтобы после паузы продолжить с него
+        if isTimerActive, let deadline {
+            timeRemaining = max(0, deadline.timeIntervalSinceNow)
+        }
+        deadline = nil
         isTimerActive = false
         timerTask?.cancel()
         timerTask = nil
@@ -54,14 +62,13 @@ final class DefaultExamTimerManager: ExamTimerManaging {
             } catch {
                 break
             }
-            guard isTimerActive else { break }
-            timeRemaining = max(0, timeRemaining - 0.1)
+            guard isTimerActive, let deadline else { break }
+            timeRemaining = max(0, deadline.timeIntervalSinceNow)
             if timeRemaining <= 0 {
-                timeRemaining = 0
-                await MainActor.run {
-                    self.isTimerActive = false
-                    self.onTimeUpCallback?()
-                }
+                let callback = onTimeUpCallback
+                isTimerActive = false
+                self.deadline = nil
+                callback?()
                 break
             }
         }

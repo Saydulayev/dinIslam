@@ -471,6 +471,9 @@
 "exam.stop" = "Остановить";
 "exam.pause" = "Пауза";
 "exam.resume" = "Продолжить";
+"exam.timeUp" = "Время вышло";
+"exam.paused.title" = "Экзамен на паузе";
+"exam.paused.message" = "Таймер остановлен, вопрос скрыт. Нажмите «Продолжить», чтобы вернуться к экзамену.";
 "exam.skip" = "Пропустить";
 "exam.finish" = "Завершить экзамен";
 "exam.finish.title" = "Завершить экзамен";
@@ -490,7 +493,6 @@
 "exam.settings.totalQuestions" = "Количество вопросов";
 "exam.settings.allowSkip" = "Разрешить пропуск";
 "exam.settings.showTimer" = "Показывать таймер";
-"exam.settings.autoSubmit" = "Автозавершение";
 "exam.settings.preview" = "Предварительный просмотр";
 "exam.settings.preview.title" = "Параметры экзамена";
 "exam.settings.preview.questions" = "Вопросов";
@@ -499,7 +501,6 @@
 "exam.settings.preview.options" = "Опции";
 "exam.settings.preview.skip" = "Пропуск";
 "exam.settings.preview.timer" = "Таймер";
-"exam.settings.preview.autoSubmit" = "Автозавершение";
 
 // Exam Presets
 "exam.preset.quick" = "Быстрый";

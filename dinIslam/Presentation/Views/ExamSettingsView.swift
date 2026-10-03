@@ -13,7 +13,6 @@ struct ExamSettingsView: View {
     @State private var customTotalQuestions: Int = 20
     @State private var allowSkip: Bool = true
     @State private var showTimer: Bool = true
-    @State private var autoSubmit: Bool = true
     @State private var isCustomMode: Bool = false
     
     @Environment(\.dismiss) private var dismiss
@@ -68,7 +67,6 @@ struct ExamSettingsView: View {
                                             customTotalQuestions = 20
                                             allowSkip = true
                                             showTimer = true
-                                            autoSubmit = true
                                         }
                                     )
                                 }
@@ -178,21 +176,6 @@ struct ExamSettingsView: View {
                                                         .accessibilityHidden(true)
                                                     
                                                     Text("exam.settings.showTimer".localized)
-                                                        .font(DesignTokens.Typography.bodyRegular)
-                                                        .foregroundStyle(DesignTokens.Colors.textPrimary)
-                                                }
-                                            }
-                                            .tint(DesignTokens.Colors.iconBlue)
-                                            
-                                            Toggle(isOn: $autoSubmit) {
-                                                HStack {
-                                                    Image(systemName: "checkmark.circle.fill")
-                                                        .font(.system(size: DesignTokens.Sizes.iconMedium))
-                                                        .foregroundColor(DesignTokens.Colors.statusGreen)
-                                                        .frame(width: DesignTokens.Sizes.iconLarge)
-                                                        .accessibilityHidden(true)
-                                                    
-                                                    Text("exam.settings.autoSubmit".localized)
                                                         .font(DesignTokens.Typography.bodyRegular)
                                                         .foregroundStyle(DesignTokens.Colors.textPrimary)
                                                 }
@@ -311,8 +294,7 @@ struct ExamSettingsView: View {
                 timePerQuestion: customTimePerQuestion,
                 totalQuestions: customTotalQuestions,
                 allowSkip: allowSkip,
-                showTimer: showTimer,
-                autoSubmit: autoSubmit
+                showTimer: showTimer
             )
         } else {
             return selectedConfiguration
@@ -339,8 +321,7 @@ enum ExamPreset: CaseIterable {
                 timePerQuestion: 15,
                 totalQuestions: 10,
                 allowSkip: false,
-                showTimer: true,
-                autoSubmit: true
+                showTimer: true
             )
         case .standard:
             return ExamConfiguration.default
@@ -349,8 +330,7 @@ enum ExamPreset: CaseIterable {
                 timePerQuestion: 60,
                 totalQuestions: 30,
                 allowSkip: true,
-                showTimer: true,
-                autoSubmit: true
+                showTimer: true
             )
         case .custom:
             return ExamConfiguration.default
@@ -543,9 +523,6 @@ struct ExamPreviewCard: View {
         }
         if configuration.showTimer {
             options.append("exam.settings.preview.timer".localized)
-        }
-        if configuration.autoSubmit {
-            options.append("exam.settings.preview.autoSubmit".localized)
         }
         
         return options.joined(separator: ", ")

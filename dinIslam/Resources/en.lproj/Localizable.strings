@@ -455,6 +455,9 @@
 "exam.stop" = "Stop";
 "exam.pause" = "Pause";
 "exam.resume" = "Resume";
+"exam.timeUp" = "Time's up";
+"exam.paused.title" = "Exam Paused";
+"exam.paused.message" = "The timer is stopped and the question is hidden. Tap Resume to return to the exam.";
 "exam.skip" = "Skip";
 "exam.finish" = "Finish Exam";
 "exam.finish.title" = "Finish Exam";
@@ -474,7 +477,6 @@
 "exam.settings.totalQuestions" = "Number of questions";
 "exam.settings.allowSkip" = "Allow skip";
 "exam.settings.showTimer" = "Show timer";
-"exam.settings.autoSubmit" = "Auto submit";
 "exam.settings.preview" = "Preview";
 "exam.settings.preview.title" = "Exam Parameters";
 "exam.settings.preview.questions" = "Questions";
@@ -483,7 +485,6 @@
 "exam.settings.preview.options" = "Options";
 "exam.settings.preview.skip" = "Skip";
 "exam.settings.preview.timer" = "Timer";
-"exam.settings.preview.autoSubmit" = "Auto submit";
 
 // Exam Presets
 "exam.preset.quick" = "Quick";

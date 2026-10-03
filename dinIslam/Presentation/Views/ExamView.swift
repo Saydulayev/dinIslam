@@ -94,6 +94,8 @@ struct ExamView: View {
             switch newState {
             case .completed:
                 showingResult = true
+            case .active(.timeUp):
+                AccessibilityNotification.Announcement("exam.timeUp".localized).post()
             default:
                 break
             }
@@ -109,8 +111,10 @@ struct ExamView: View {
             // Main content
             ScrollView {
                 VStack(spacing: DesignTokens.Spacing.xxl) {
-                    // Question text
-                    if let question = viewModel.currentQuestion {
+                    if viewModel.state == .active(.paused) {
+                        // На паузе вопрос скрыт: таймер стоит, отвечать нельзя
+                        ExamPausedView(onResume: viewModel.resumeExam)
+                    } else if let question = viewModel.currentQuestion {
                         VStack(spacing: DesignTokens.Spacing.lg) {
                             Text(question.text)
                                 .font(DesignTokens.Typography.h2)
@@ -155,6 +159,19 @@ struct ExamView: View {
                                 }
                                 .padding(.horizontal, DesignTokens.Spacing.sm)
                             }
+                        }
+                        
+                        if viewModel.state == .active(.timeUp) {
+                            Label("exam.timeUp".localized, systemImage: "timer")
+                                .font(DesignTokens.Typography.secondarySemibold)
+                                .foregroundStyle(DesignTokens.Colors.iconRed)
+                                .padding(.horizontal, DesignTokens.Spacing.lg)
+                                .padding(.vertical, DesignTokens.Spacing.sm)
+                                .background(
+                                    Capsule()
+                                        .fill(DesignTokens.Colors.iconRed.opacity(0.15))
+                                )
+                                .transition(.opacity)
                         }
                         
                         // Answer options
@@ -205,6 +222,7 @@ struct ExamView: View {
                                     .font(DesignTokens.Typography.label)
                             }
                             .foregroundColor(DesignTokens.Colors.iconOrange)
+                            .opacity(viewModel.state == .active(.playing) ? 1 : 0.4)
                             .frame(maxWidth: .infinity)
                             .frame(height: 56)
                             .background(
@@ -229,6 +247,7 @@ struct ExamView: View {
                                     )
                             )
                         }
+                        .disabled(viewModel.state != .active(.playing))
                     }
                     
                     // Pause/Resume button
@@ -337,7 +356,7 @@ struct ExamHeaderView: View {
                 // Timer
                 if viewModel.configuration.showTimer {
                     HStack(spacing: DesignTokens.Spacing.sm) {
-                        Image(systemName: "timer")
+                        Image(systemName: viewModel.state == .active(.paused) ? "pause.fill" : "timer")
                             .font(.system(size: DesignTokens.Sizes.iconSmall))
                             .foregroundColor(timerColor)
 
@@ -361,26 +380,64 @@ struct ExamHeaderView: View {
     }
     
     private var timerColor: Color {
-        if viewModel.timeRemaining <= 10 {
+        switch viewModel.timerUrgency {
+        case .critical:
             return DesignTokens.Colors.iconRed
-        } else if viewModel.timeRemaining <= 20 {
+        case .warning:
             return DesignTokens.Colors.iconOrange
-        } else {
+        case .normal:
             return DesignTokens.Colors.iconBlue
         }
     }
     
     private var timerBackgroundColor: Color {
-        if viewModel.timeRemaining <= 10 {
-            return DesignTokens.Colors.iconRed.opacity(0.15)
-        } else if viewModel.timeRemaining <= 20 {
-            return DesignTokens.Colors.iconOrange.opacity(0.15)
-        } else {
-            return DesignTokens.Colors.iconBlue.opacity(0.15)
-        }
+        timerColor.opacity(0.15)
     }
 }
 
+
+// MARK: - Exam Paused View
+struct ExamPausedView: View {
+    let onResume: () -> Void
+    
+    var body: some View {
+        VStack(spacing: DesignTokens.Spacing.lg) {
+            Image(systemName: "pause.circle.fill")
+                .font(.system(size: 56))
+                .foregroundStyle(DesignTokens.Colors.iconBlue)
+                .accessibilityHidden(true)
+            
+            Text("exam.paused.title".localized)
+                .font(DesignTokens.Typography.h2)
+                .foregroundStyle(DesignTokens.Colors.textPrimary)
+                .multilineTextAlignment(.center)
+                .accessibilityAddTraits(.isHeader)
+            
+            Text("exam.paused.message".localized)
+                .font(DesignTokens.Typography.bodyRegular)
+                .foregroundStyle(DesignTokens.Colors.textSecondary)
+                .multilineTextAlignment(.center)
+            
+            Button(action: onResume) {
+                Label("exam.resume".localized, systemImage: "play.fill")
+                    .font(DesignTokens.Typography.secondarySemibold)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 56)
+            }
+            .foregroundStyle(DesignTokens.Colors.iconBlue)
+            .background(
+                RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
+                    .stroke(DesignTokens.Colors.iconPurpleLight.opacity(0.5), lineWidth: 1.5)
+            )
+        }
+        .padding(DesignTokens.Spacing.xxl)
+        .frame(maxWidth: .infinity)
+        .background(
+            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
+                .stroke(DesignTokens.Colors.iconPurpleLight.opacity(0.35), lineWidth: 1.5)
+        )
+    }
+}
 
 // MARK: - Exam Error View
 struct ExamErrorView: View {

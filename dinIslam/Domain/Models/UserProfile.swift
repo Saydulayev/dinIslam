@@ -383,6 +383,7 @@ struct ExamConfigurationSnapshot: Codable, Equatable {
     var totalQuestions: Int
     var timePerQuestion: TimeInterval
     var allowSkip: Bool
+    /// Настройка удалена из приложения; поле сохраняется, чтобы профиль читался старыми версиями
     var autoSubmit: Bool
     var passingThreshold: Double
 
@@ -390,7 +391,7 @@ struct ExamConfigurationSnapshot: Codable, Equatable {
         self.totalQuestions = configuration.totalQuestions
         self.timePerQuestion = configuration.timePerQuestion
         self.allowSkip = configuration.allowSkip
-        self.autoSubmit = configuration.autoSubmit
+        self.autoSubmit = true
         self.passingThreshold = passingThreshold
     }
 }
