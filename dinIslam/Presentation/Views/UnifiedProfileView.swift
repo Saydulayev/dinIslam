@@ -121,7 +121,7 @@ struct UnifiedProfileView: View {
             loadTotalQuestionsCount()
             // Инициализируем editingDisplayName текущим значением
             if !isEditingDisplayName {
-                let name = manager.profile.customDisplayName ?? manager.displayName
+                let name = manager.editableDisplayName
                 editingDisplayName = String(name.prefix(DesignTokens.Limits.maxDisplayNameLength))
             }
         }

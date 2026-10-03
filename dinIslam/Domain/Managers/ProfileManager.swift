@@ -28,18 +28,30 @@ final class ProfileManager {
     }
 
     var displayName: String {
-        // Сначала используем пользовательское имя, если оно задано
+        if !editableDisplayName.isEmpty {
+            return editableDisplayName
+        }
+
+        // Apple передаёт имя только при первом входе, поэтому вошедший пользователь может остаться без имени
+        if isSignedIn {
+            return NSLocalizedString("profile.noName", comment: "Signed-in user without a name")
+        }
+        return NSLocalizedString("profile.anonymous", comment: "Anonymous user placeholder")
+    }
+
+    /// Имя для поля редактирования: пользовательское, затем имя из Apple, иначе пустая строка
+    var editableDisplayName: String {
         if let customName = profile.customDisplayName, !customName.isEmpty {
             return customName
         }
-        
-        // Затем пытаемся использовать fullName
         if let fullName = profile.fullName, !fullName.isEmpty {
             return fullName
         }
+        return ""
+    }
 
-        // В последнюю очередь показываем анонимного пользователя
-        return NSLocalizedString("profile.anonymous", comment: "Anonymous user placeholder")
+    var needsDisplayName: Bool {
+        isSignedIn && editableDisplayName.isEmpty
     }
 
     var recommendations: [LearningRecommendation] {

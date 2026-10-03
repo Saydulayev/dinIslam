@@ -1,6 +1,8 @@
 "profile.title" = "Profile";
 "profile.done" = "Done";
 "profile.anonymous" = "Guest";
+"profile.noName" = "No Name";
+"profile.noName.hint" = "Tap the pencil to add your name";
 "profile.signout" = "Sign Out";
 "profile.signout.confirm.title" = "Sign Out?";
 "profile.signout.confirm.message" = "Your progress will stay on this device but will no longer sync with iCloud. Your profile photo will be removed from this device.";

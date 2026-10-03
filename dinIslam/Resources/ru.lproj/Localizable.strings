@@ -1,6 +1,8 @@
 "profile.title" = "Профиль";
 "profile.done" = "Готово";
 "profile.anonymous" = "Гость";
+"profile.noName" = "Без имени";
+"profile.noName.hint" = "Нажмите на карандаш, чтобы указать имя";
 "profile.signout" = "Выйти";
 "profile.signout.confirm.title" = "Выйти из аккаунта?";
 "profile.signout.confirm.message" = "Прогресс останется на этом устройстве, но перестанет синхронизироваться с iCloud. Фото профиля будет удалено с устройства.";

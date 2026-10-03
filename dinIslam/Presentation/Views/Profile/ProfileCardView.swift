@@ -98,41 +98,50 @@ struct ProfileCardView: View {
             }
             
             // User name with edit functionality
-            HStack(spacing: DesignTokens.Spacing.sm) {
-                if isEditingDisplayName {
-                    TextField("profile.displayName.placeholder".localized, text: displayNameBinding)
-                        .font(DesignTokens.Typography.h1)
-                        .foregroundStyle(DesignTokens.Colors.textPrimary)
-                        .textFieldStyle(.plain)
-                        .multilineTextAlignment(.center)
-                        .onSubmit {
-                            saveDisplayName()
+            VStack(spacing: DesignTokens.Spacing.xs) {
+                HStack(spacing: DesignTokens.Spacing.sm) {
+                    if isEditingDisplayName {
+                        TextField("profile.displayName.placeholder".localized, text: displayNameBinding)
+                            .font(DesignTokens.Typography.h1)
+                            .foregroundStyle(DesignTokens.Colors.textPrimary)
+                            .textFieldStyle(.plain)
+                            .multilineTextAlignment(.center)
+                            .onSubmit {
+                                saveDisplayName()
+                            }
+                    } else {
+                        Text(manager.displayName)
+                            .font(DesignTokens.Typography.h1)
+                            .foregroundStyle(DesignTokens.Colors.textPrimary)
+                    }
+                
+                    if manager.isSignedIn {
+                        Button(action: {
+                            if isEditingDisplayName {
+                                saveDisplayName()
+                            } else {
+                                let name = manager.editableDisplayName
+                                editingDisplayName = String(name.prefix(DesignTokens.Limits.maxDisplayNameLength))
+                                isEditingDisplayName = true
+                            }
+                        }) {
+                            Image(systemName: isEditingDisplayName ? "checkmark" : "pencil")
+                                .font(.system(size: DesignTokens.Sizes.iconSmall))
+                                .foregroundColor(DesignTokens.Colors.textSecondary)
+                                .frame(width: 44, height: 44)
+                                .contentShape(Rectangle())
                         }
-                } else {
-                    Text(manager.displayName)
-                        .font(DesignTokens.Typography.h1)
-                        .foregroundStyle(DesignTokens.Colors.textPrimary)
+                        .accessibilityLabel(
+                            (isEditingDisplayName ? "accessibility.displayName.save" : "accessibility.displayName.edit").localized
+                        )
+                    }
                 }
                 
-                if manager.isSignedIn {
-                    Button(action: {
-                        if isEditingDisplayName {
-                            saveDisplayName()
-                        } else {
-                            let name = manager.profile.customDisplayName ?? manager.displayName
-                            editingDisplayName = String(name.prefix(DesignTokens.Limits.maxDisplayNameLength))
-                            isEditingDisplayName = true
-                        }
-                    }) {
-                        Image(systemName: isEditingDisplayName ? "checkmark" : "pencil")
-                            .font(.system(size: DesignTokens.Sizes.iconSmall))
-                            .foregroundColor(DesignTokens.Colors.textSecondary)
-                            .frame(width: 44, height: 44)
-                            .contentShape(Rectangle())
-                    }
-                    .accessibilityLabel(
-                        (isEditingDisplayName ? "accessibility.displayName.save" : "accessibility.displayName.edit").localized
-                    )
+                if manager.needsDisplayName && !isEditingDisplayName {
+                    Text("profile.noName.hint".localized)
+                        .font(DesignTokens.Typography.secondaryRegular)
+                        .foregroundStyle(DesignTokens.Colors.textSecondary)
+                        .multilineTextAlignment(.center)
                 }
             }
             
