@@ -17,8 +17,9 @@ struct ResultView: View {
     var report: SessionReport? = nil
     var onRepeatMistakes: (([String]) -> Void)? = nil
     
-    @State private var showingAchievementNotification = false
-    @State private var currentAchievement: Achievement?
+    /// Новые достижения показываются по одному: первое в очереди — текущее
+    @State private var pendingAchievements: [Achievement] = []
+    @State private var achievementsTotal = 0
     @State private var achievementsCleared = false
     
     var body: some View {
@@ -233,29 +234,32 @@ struct ResultView: View {
         .overlay(
             // Achievement Notification Overlay
             Group {
-                if showingAchievementNotification, let achievement = currentAchievement {
+                if let achievement = pendingAchievements.first {
                     ZStack {
                         Color.black.opacity(0.4)
                             .ignoresSafeArea()
+                            .accessibilityHidden(true)
                         
                         AchievementNotificationView(
                             achievement: achievement,
-                            isPresented: $showingAchievementNotification
+                            position: achievementsTotal - pendingAchievements.count + 1,
+                            total: achievementsTotal,
+                            onClose: showNextAchievement
                         )
+                        .id(achievement.id)
+                        .transition(.scale(scale: 0.8).combined(with: .opacity))
+                        // Пока окно открыто, VoiceOver не уходит на экран результата под ним
+                        .accessibilityAddTraits(.isModal)
                     }
                 }
             }
+            .animation(.spring(response: 0.6, dampingFraction: 0.8), value: pendingAchievements.first?.id)
         )
         .onAppear {
             prepareAchievements()
             
             // Clear app badge when results are shown (iOS 17+ API)
             UNUserNotificationCenter.current().setBadgeCount(0, withCompletionHandler: { _ in })
-        }
-        .onChange(of: showingAchievementNotification) { _, newValue in
-            if !newValue {
-                clearAchievementsOnce()
-            }
         }
     }
     
@@ -354,10 +358,15 @@ struct ResultView: View {
     }
     
     private func prepareAchievements() {
-        guard !newAchievements.isEmpty else { return }
-        currentAchievement = newAchievements.first
-        showingAchievementNotification = true
+        guard !newAchievements.isEmpty, pendingAchievements.isEmpty else { return }
+        pendingAchievements = newAchievements
+        achievementsTotal = newAchievements.count
         clearAchievementsOnce()
+    }
+    
+    private func showNextAchievement() {
+        guard !pendingAchievements.isEmpty else { return }
+        pendingAchievements.removeFirst()
     }
     
     private func clearAchievementsOnce() {

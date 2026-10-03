@@ -176,6 +176,8 @@
 
 // Quiz Finish
 "quiz.finish" = "Завершить";
+"quiz.next" = "Далее";
+"quiz.showResult" = "Показать результат";
 "quiz.finish.confirm.title" = "Завершить викторину?";
 "quiz.finish.confirm.message" = "Отвеченные вопросы будут засчитаны, остальные попадутся в следующий раз.";
 "quiz.finish.confirm.ok" = "Завершить";
@@ -295,6 +297,8 @@
 "achievements.progress" = "Прогресс";
 "achievements.newAchievement" = "Новое достижение!";
 "achievements.congratulations" = "Поздравляем!";
+"achievements.notification.counter" = "%d из %d";
+"achievements.notification.next" = "Далее";
 "achievements.share" = "Поделиться";
 "achievements.share.text" = "Достижение разблокировано";
 "achievements.reset" = "Сбросить";

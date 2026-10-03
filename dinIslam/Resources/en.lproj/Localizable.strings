@@ -175,6 +175,8 @@
 
 // Quiz Finish
 "quiz.finish" = "Finish";
+"quiz.next" = "Next";
+"quiz.showResult" = "Show Result";
 "quiz.finish.confirm.title" = "Finish Quiz?";
 "quiz.finish.confirm.message" = "Answered questions will be counted; the rest will come up next time.";
 "quiz.finish.confirm.ok" = "Finish";
@@ -286,6 +288,8 @@
 "achievements.progress" = "Progress";
 "achievements.newAchievement" = "New Achievement!";
 "achievements.congratulations" = "Congratulations!";
+"achievements.notification.counter" = "%d of %d";
+"achievements.notification.next" = "Next";
 "achievements.share" = "Share";
 "achievements.share.text" = "Achievement unlocked";
 "achievements.reset" = "Reset";

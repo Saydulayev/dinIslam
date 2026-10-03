@@ -9,8 +9,15 @@ import SwiftUI
 
 struct AchievementNotificationView: View {
     let achievement: Achievement
-    @Binding var isPresented: Bool
+    /// Номер достижения в очереди и сколько их всего
+    var position: Int = 1
+    var total: Int = 1
+    let onClose: () -> Void
     @Environment(\.localizationProvider) private var localizationProvider
+    
+    private var isLast: Bool {
+        position >= total
+    }
     
     var body: some View {
         VStack(spacing: 16) {
@@ -27,6 +34,16 @@ struct AchievementNotificationView: View {
                 }
                 
                 VStack(spacing: 4) {
+                    if total > 1 {
+                        Text(String(
+                            format: localizationProvider.localizedString(for: "achievements.notification.counter"),
+                            position,
+                            total
+                        ))
+                        .font(.footnote)
+                        .foregroundColor(.secondary)
+                    }
+                    
                     Text(localizationProvider.localizedString(for: "achievements.congratulations"))
                         .font(.headline)
                         .foregroundColor(.secondary)
@@ -47,12 +64,8 @@ struct AchievementNotificationView: View {
                 .padding(.horizontal)
             
             // Close Button
-            Button(action: {
-                withAnimation(.easeInOut(duration: 0.3)) {
-                    isPresented = false
-                }
-            }) {
-                Text(localizationProvider.localizedString(for: "settings.done"))
+            Button(action: onClose) {
+                Text(localizationProvider.localizedString(for: isLast ? "settings.done" : "achievements.notification.next"))
                     .font(.headline)
                     .fontWeight(.semibold)
                     .foregroundColor(.white)
@@ -72,9 +85,6 @@ struct AchievementNotificationView: View {
                 )
         )
         .padding(.horizontal, 32)
-        .scaleEffect(isPresented ? 1.0 : 0.8)
-        .opacity(isPresented ? 1.0 : 0.0)
-        .animation(.spring(response: 0.6, dampingFraction: 0.8), value: isPresented)
     }
 }
 
@@ -95,7 +105,9 @@ struct AchievementNotificationView: View {
                 isUnlocked: true,
                 unlockedDate: Date()
             ),
-            isPresented: .constant(true)
+            position: 1,
+            total: 3,
+            onClose: {}
         )
     }
 }

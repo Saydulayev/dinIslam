@@ -79,6 +79,9 @@ class QuizViewModel {
         return currentQuestionIndex == questions.count - 1
     }
     
+    /// Переходить к следующему вопросу автоматически; экран выключает это при включённом VoiceOver
+    var advancesAutomatically = true
+    
     // MARK: - Initialization
     init(
         quizUseCase: QuizUseCaseProtocol,
@@ -218,9 +221,6 @@ class QuizViewModel {
         selectedAnswerIndex = index
         isAnswerSelected = true
         
-        // Provide haptic and sound feedback
-        feedbackProvider.selectionChanged()
-        
         // Check if answer is correct
         if let currentQuestion = currentQuestion {
             let isCorrect = index == currentQuestion.correctIndex
@@ -230,11 +230,15 @@ class QuizViewModel {
                 correctAnswers += 1
             }
             
+            // Один сигнал на ответ: звук и вибрация «верно/неверно»
             feedbackProvider.answerSelected(isCorrect: isCorrect)
         }
         
-        // Show result briefly before moving to next question
+        // С VoiceOver переход только по кнопке «Далее»: 1,5 с не хватает, чтобы дослушать результат
         nextQuestionTask?.cancel()
+        guard advancesAutomatically else { return }
+        
+        // Show result briefly before moving to next question
         nextQuestionTask = Task { @MainActor [weak self] in
             try? await Task.sleep(nanoseconds: 1_500_000_000) // 1.5 seconds
             // try? глушит CancellationError, поэтому отмену проверяем явно

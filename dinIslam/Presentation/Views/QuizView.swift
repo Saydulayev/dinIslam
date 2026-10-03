@@ -10,6 +10,7 @@ import UserNotifications
 
 struct QuizView: View {
     @Bindable var viewModel: QuizViewModel
+    @Environment(\.accessibilityVoiceOverEnabled) private var voiceOverEnabled
     @State private var showingStopConfirm: Bool = false
     @State private var showingFinishConfirm: Bool = false
     
@@ -154,6 +155,24 @@ struct QuizView: View {
                                         )
                                     }
                                 }
+                                
+                                // С VoiceOver вопрос не сменяется сам — переход по кнопке
+                                if viewModel.isAnswerSelected && !viewModel.advancesAutomatically {
+                                    Button(action: viewModel.nextQuestion) {
+                                        Label(
+                                            (viewModel.isLastQuestion ? "quiz.showResult" : "quiz.next").localized,
+                                            systemImage: "arrow.right"
+                                        )
+                                        .font(DesignTokens.Typography.secondarySemibold)
+                                        .frame(maxWidth: .infinity)
+                                        .frame(height: 56)
+                                    }
+                                    .foregroundStyle(DesignTokens.Colors.iconBlue)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
+                                            .stroke(DesignTokens.Colors.iconPurpleLight.opacity(0.5), lineWidth: 1.5)
+                                    )
+                                }
                             }
                         }
                         .padding(DesignTokens.Spacing.xxl)
@@ -246,7 +265,12 @@ struct QuizView: View {
         } message: {
             Text("quiz.stop.confirm.message".localized)
         }
+        .onChange(of: voiceOverEnabled) { _, isEnabled in
+            viewModel.advancesAutomatically = !isEnabled
+        }
         .onAppear {
+            viewModel.advancesAutomatically = !voiceOverEnabled
+            
             // Clear app badge when quiz starts
             if #available(iOS 17.0, *) {
                 UNUserNotificationCenter.current().setBadgeCount(0) { _ in }
