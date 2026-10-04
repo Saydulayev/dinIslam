@@ -57,24 +57,7 @@ struct ProgressCardView: View {
                 )
                 
                 // Рамка с градиентом и свечением
-                RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
-                    .stroke(
-                        LinearGradient(
-                            gradient: Gradient(colors: [
-                                DesignTokens.Colors.iconPurpleLight.opacity(0.5),
-                                DesignTokens.Colors.iconPurpleLight.opacity(0.2)
-                            ]),
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        ),
-                        lineWidth: 1.5
-                    )
-                    .shadow(
-                        color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
-                        radius: 12,
-                        x: 0,
-                        y: 0
-                    )
+                GlowBorder()
             }
         )
         .clipShape(RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium))

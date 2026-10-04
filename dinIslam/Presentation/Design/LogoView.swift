@@ -84,16 +84,7 @@ struct LogoView: View {
 // MARK: - Preview
 #Preview {
     ZStack {
-        // Темный фон для превью
-        LinearGradient(
-            gradient: Gradient(colors: [
-                Color(hex: "#0a0a1a"),
-                Color(hex: "#000000")
-            ]),
-            startPoint: .top,
-            endPoint: .bottom
-        )
-        .ignoresSafeArea()
+        AppBackground()
         
         LogoView(glowIntensity: 1.0)
     }

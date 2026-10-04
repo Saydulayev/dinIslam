@@ -23,16 +23,7 @@ struct ExamSettingsView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                // Background - очень темный градиент с оттенками индиго/фиолетового (как на главном экране)
-                LinearGradient(
-                    gradient: Gradient(colors: [
-                        Color(hex: "#0a0a1a"), // темно-индиго сверху
-                        Color(hex: "#000000") // черный снизу
-                    ]),
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-                .ignoresSafeArea()
+                AppBackground()
                 
                 VStack(spacing: 0) {
                     ScrollView {
@@ -71,27 +62,7 @@ struct ExamSettingsView: View {
                                     )
                                 }
                                 .padding(DesignTokens.Spacing.xxl)
-                                .background(
-                                    // Прозрачная рамка с фиолетовым свечением (как на главном экране)
-                                    RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xlarge)
-                                        .stroke(
-                                            LinearGradient(
-                                                gradient: Gradient(colors: [
-                                                    DesignTokens.Colors.iconPurpleLight.opacity(0.5),
-                                                    DesignTokens.Colors.iconPurpleLight.opacity(0.2)
-                                                ]),
-                                                startPoint: .topLeading,
-                                                endPoint: .bottomTrailing
-                                            ),
-                                            lineWidth: 1.5
-                                        )
-                                        .shadow(
-                                            color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
-                                            radius: 12,
-                                            x: 0,
-                                            y: 0
-                                        )
-                                )
+                                .glowBorder(cornerRadius: DesignTokens.CornerRadius.xlarge)
                                 .padding(.horizontal, DesignTokens.Spacing.xxl)
                                 
                                 Text("exam.settings.presets.footer".localized)
@@ -184,27 +155,7 @@ struct ExamSettingsView: View {
                                         }
                                     }
                                     .padding(DesignTokens.Spacing.xxl)
-                                    .background(
-                                        // Прозрачная рамка с фиолетовым свечением (как на главном экране)
-                                        RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xlarge)
-                                            .stroke(
-                                                LinearGradient(
-                                                    gradient: Gradient(colors: [
-                                                        DesignTokens.Colors.iconPurpleLight.opacity(0.5),
-                                                        DesignTokens.Colors.iconPurpleLight.opacity(0.2)
-                                                    ]),
-                                                    startPoint: .topLeading,
-                                                    endPoint: .bottomTrailing
-                                                ),
-                                                lineWidth: 1.5
-                                            )
-                                            .shadow(
-                                                color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
-                                                radius: 12,
-                                                x: 0,
-                                                y: 0
-                                            )
-                                    )
+                                    .glowBorder(cornerRadius: DesignTokens.CornerRadius.xlarge)
                                     .padding(.horizontal, DesignTokens.Spacing.xxl)
                                     
                                     Text("exam.settings.custom.footer".localized)
@@ -244,27 +195,7 @@ struct ExamSettingsView: View {
                             .foregroundColor(DesignTokens.Colors.iconBlue)
                             .frame(maxWidth: .infinity)
                             .frame(height: 56)
-                            .background(
-                                // Прозрачная рамка с фиолетовым свечением (как на главном экране)
-                                RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
-                                    .stroke(
-                                        LinearGradient(
-                                            gradient: Gradient(colors: [
-                                                DesignTokens.Colors.iconPurpleLight.opacity(0.5),
-                                                DesignTokens.Colors.iconPurpleLight.opacity(0.2)
-                                            ]),
-                                            startPoint: .topLeading,
-                                            endPoint: .bottomTrailing
-                                        ),
-                                        lineWidth: 1.5
-                                    )
-                                    .shadow(
-                                        color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
-                                        radius: 12,
-                                        x: 0,
-                                        y: 0
-                                    )
-                            )
+                            .glowBorder()
                         }
                         .padding(.horizontal, DesignTokens.Spacing.xxl)
                         .padding(.vertical, DesignTokens.Spacing.lg)
@@ -483,27 +414,7 @@ struct ExamPreviewCard: View {
             }
         }
         .padding(DesignTokens.Spacing.xxl)
-        .background(
-            // Прозрачная рамка с фиолетовым свечением (как на главном экране)
-            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.large)
-                .stroke(
-                    LinearGradient(
-                        gradient: Gradient(colors: [
-                            DesignTokens.Colors.iconPurpleLight.opacity(0.5),
-                            DesignTokens.Colors.iconPurpleLight.opacity(0.2)
-                        ]),
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    ),
-                    lineWidth: 1.5
-                )
-                .shadow(
-                    color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
-                    radius: 12,
-                    x: 0,
-                    y: 0
-                )
-        )
+        .glowBorder(cornerRadius: DesignTokens.CornerRadius.large)
     }
     
     private func formatTotalTime() -> String {

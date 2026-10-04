@@ -27,16 +27,7 @@ struct ExamView: View {
     
     var body: some View {
         ZStack {
-            // Background - очень темный градиент с оттенками индиго/фиолетового (как на главном экране)
-            LinearGradient(
-                gradient: Gradient(colors: [
-                    Color(hex: "#0a0a1a"), // темно-индиго сверху
-                    Color(hex: "#000000") // черный снизу
-                ]),
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea()
+            AppBackground()
             
             switch viewModel.state {
             case .idle, .active(.loading):
@@ -120,27 +111,7 @@ struct ExamView: View {
                                 .multilineTextAlignment(.center)
                                 .padding(DesignTokens.Spacing.xxl)
                                 .frame(maxWidth: .infinity)
-                                .background(
-                                    // Прозрачная рамка с фиолетовым свечением (как на главном экране)
-                                    RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
-                                        .stroke(
-                                            LinearGradient(
-                                                gradient: Gradient(colors: [
-                                                    DesignTokens.Colors.iconPurpleLight.opacity(0.5),
-                                                    DesignTokens.Colors.iconPurpleLight.opacity(0.2)
-                                                ]),
-                                                startPoint: .topLeading,
-                                                endPoint: .bottomTrailing
-                                            ),
-                                            lineWidth: 1.5
-                                        )
-                                        .shadow(
-                                            color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
-                                            radius: 12,
-                                            x: 0,
-                                            y: 0
-                                        )
-                                )
+                                .glowBorder()
                                 .accessibilityAddTraits(.isHeader)
                             
                             // Category
@@ -223,27 +194,7 @@ struct ExamView: View {
                             .opacity(viewModel.state == .active(.playing) ? 1 : 0.4)
                             .frame(maxWidth: .infinity)
                             .frame(height: 56)
-                            .background(
-                                // Прозрачная рамка с фиолетовым свечением (как на главном экране)
-                                RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
-                                    .stroke(
-                                        LinearGradient(
-                                            gradient: Gradient(colors: [
-                                                DesignTokens.Colors.iconPurpleLight.opacity(0.5),
-                                                DesignTokens.Colors.iconPurpleLight.opacity(0.2)
-                                            ]),
-                                            startPoint: .topLeading,
-                                            endPoint: .bottomTrailing
-                                        ),
-                                        lineWidth: 1.5
-                                    )
-                                    .shadow(
-                                        color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
-                                        radius: 12,
-                                        x: 0,
-                                        y: 0
-                                    )
-                            )
+                            .glowBorder()
                         }
                         .disabled(viewModel.state != .active(.playing))
                     }
@@ -265,27 +216,7 @@ struct ExamView: View {
                         .foregroundColor(DesignTokens.Colors.iconBlue)
                         .frame(maxWidth: .infinity)
                         .frame(height: 56)
-                        .background(
-                            // Прозрачная рамка с фиолетовым свечением (как на главном экране)
-                            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
-                                .stroke(
-                                    LinearGradient(
-                                        gradient: Gradient(colors: [
-                                            DesignTokens.Colors.iconPurpleLight.opacity(0.5),
-                                            DesignTokens.Colors.iconPurpleLight.opacity(0.2)
-                                        ]),
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    ),
-                                    lineWidth: 1.5
-                                )
-                                .shadow(
-                                    color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
-                                    radius: 12,
-                                    x: 0,
-                                    y: 0
-                                )
-                        )
+                        .glowBorder()
                     }
                     
                     // Finish button
@@ -301,27 +232,7 @@ struct ExamView: View {
                         .foregroundColor(DesignTokens.Colors.statusGreen)
                         .frame(maxWidth: .infinity)
                         .frame(height: 56)
-                        .background(
-                            // Прозрачная рамка с фиолетовым свечением (как на главном экране)
-                            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
-                                .stroke(
-                                    LinearGradient(
-                                        gradient: Gradient(colors: [
-                                            DesignTokens.Colors.iconPurpleLight.opacity(0.5),
-                                            DesignTokens.Colors.iconPurpleLight.opacity(0.2)
-                                        ]),
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    ),
-                                    lineWidth: 1.5
-                                )
-                                .shadow(
-                                    color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
-                                    radius: 12,
-                                    x: 0,
-                                    y: 0
-                                )
-                        )
+                        .glowBorder()
                     }
                 }
                 .padding(.horizontal, DesignTokens.Spacing.xxl)

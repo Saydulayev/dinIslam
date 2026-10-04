@@ -19,16 +19,7 @@ struct SettingsView: View {
     
     var body: some View {
         ZStack {
-            // Background - очень темный градиент с оттенками индиго/фиолетового (как на главном экране)
-            LinearGradient(
-                gradient: Gradient(colors: [
-                    Color(hex: "#0a0a1a"), // темно-индиго сверху
-                    Color(hex: "#000000") // черный снизу
-                ]),
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea()
+            AppBackground()
             
             ScrollView {
                 VStack(spacing: DesignTokens.Spacing.xxxl) {
@@ -110,27 +101,7 @@ struct SettingsView: View {
                         }
                     }
                     .padding(DesignTokens.Spacing.xxl)
-                    .background(
-                        // Прозрачная рамка с фиолетовым свечением (как на главном экране)
-                        RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xlarge)
-                            .stroke(
-                                LinearGradient(
-                                    gradient: Gradient(colors: [
-                                        DesignTokens.Colors.iconPurpleLight.opacity(0.5),
-                                        DesignTokens.Colors.iconPurpleLight.opacity(0.2)
-                                    ]),
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                ),
-                                lineWidth: 1.5
-                            )
-                            .shadow(
-                                color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
-                                radius: 12,
-                                x: 0,
-                                y: 0
-                            )
-                    )
+                    .glowBorder(cornerRadius: DesignTokens.CornerRadius.xlarge)
                     
                     // MARK: - Support Section
                     VStack(alignment: .leading, spacing: DesignTokens.Spacing.lg) {
@@ -196,27 +167,7 @@ struct SettingsView: View {
                         }
                     }
                     .padding(DesignTokens.Spacing.xxl)
-                    .background(
-                        // Прозрачная рамка с фиолетовым свечением (как на главном экране)
-                        RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xlarge)
-                            .stroke(
-                                LinearGradient(
-                                    gradient: Gradient(colors: [
-                                        DesignTokens.Colors.iconPurpleLight.opacity(0.5),
-                                        DesignTokens.Colors.iconPurpleLight.opacity(0.2)
-                                    ]),
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                ),
-                                lineWidth: 1.5
-                            )
-                            .shadow(
-                                color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
-                                radius: 12,
-                                x: 0,
-                                y: 0
-                            )
-                    )
+                    .glowBorder(cornerRadius: DesignTokens.CornerRadius.xlarge)
                     
                     // MARK: - About Section
                     VStack(alignment: .leading, spacing: DesignTokens.Spacing.lg) {
@@ -274,27 +225,7 @@ struct SettingsView: View {
                         }
                     }
                     .padding(DesignTokens.Spacing.xxl)
-                    .background(
-                        // Прозрачная рамка с фиолетовым свечением (как на главном экране)
-                        RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xlarge)
-                            .stroke(
-                                LinearGradient(
-                                    gradient: Gradient(colors: [
-                                        DesignTokens.Colors.iconPurpleLight.opacity(0.5),
-                                        DesignTokens.Colors.iconPurpleLight.opacity(0.2)
-                                    ]),
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                ),
-                                lineWidth: 1.5
-                            )
-                            .shadow(
-                                color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
-                                radius: 12,
-                                x: 0,
-                                y: 0
-                            )
-                    )
+                    .glowBorder(cornerRadius: DesignTokens.CornerRadius.xlarge)
                 }
                 .padding(.horizontal, DesignTokens.Spacing.xxl)
                 .padding(.top, DesignTokens.Spacing.lg)
@@ -409,16 +340,7 @@ struct SettingsView: View {
         
         var body: some View {
             ZStack {
-                // Background - очень темный градиент с оттенками индиго/фиолетового (как на главном экране)
-                LinearGradient(
-                    gradient: Gradient(colors: [
-                        Color(hex: "#0a0a1a"), // темно-индиго сверху
-                        Color(hex: "#000000") // черный снизу
-                    ]),
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-                .ignoresSafeArea()
+                AppBackground()
                 
                 ScrollView {
                     VStack(spacing: DesignTokens.Spacing.sm) {
@@ -453,27 +375,7 @@ struct SettingsView: View {
                         }
                     }
                     .padding(DesignTokens.Spacing.xxl)
-                    .background(
-                        // Прозрачная рамка с фиолетовым свечением (как на главном экране)
-                        RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xlarge)
-                            .stroke(
-                                LinearGradient(
-                                    gradient: Gradient(colors: [
-                                        DesignTokens.Colors.iconPurpleLight.opacity(0.5),
-                                        DesignTokens.Colors.iconPurpleLight.opacity(0.2)
-                                    ]),
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                ),
-                                lineWidth: 1.5
-                            )
-                            .shadow(
-                                color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
-                                radius: 12,
-                                x: 0,
-                                y: 0
-                            )
-                    )
+                    .glowBorder(cornerRadius: DesignTokens.CornerRadius.xlarge)
                     .padding(.horizontal, DesignTokens.Spacing.xxl)
                     .padding(.top, DesignTokens.Spacing.lg)
                 }

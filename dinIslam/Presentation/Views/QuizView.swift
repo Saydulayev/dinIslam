@@ -34,16 +34,7 @@ struct QuizView: View {
     
     var body: some View {
         ZStack {
-            // Background - очень темный градиент с оттенками индиго/фиолетового (как на главном экране)
-            LinearGradient(
-                gradient: Gradient(colors: [
-                    Color(hex: "#0a0a1a"), // темно-индиго сверху
-                    Color(hex: "#000000") // черный снизу
-                ]),
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea()
+            AppBackground()
             
             // Пока вопросы не загружены, показываем только загрузку — без «1 / 0» и кнопки «Завершить»
             if viewModel.isLoading || viewModel.questions.isEmpty {
@@ -99,27 +90,7 @@ struct QuizView: View {
                                         .multilineTextAlignment(.center)
                                         .padding(DesignTokens.Spacing.xxl)
                                         .frame(maxWidth: .infinity)
-                                        .background(
-                                            // Прозрачная рамка с фиолетовым свечением (как на главном экране)
-                                            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
-                                                .stroke(
-                                                    LinearGradient(
-                                                        gradient: Gradient(colors: [
-                                                            DesignTokens.Colors.iconPurpleLight.opacity(0.5),
-                                                            DesignTokens.Colors.iconPurpleLight.opacity(0.2)
-                                                        ]),
-                                                        startPoint: .topLeading,
-                                                        endPoint: .bottomTrailing
-                                                    ),
-                                                    lineWidth: 1.5
-                                                )
-                                                .shadow(
-                                                    color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
-                                                    radius: 12,
-                                                    x: 0,
-                                                    y: 0
-                                                )
-                                        )
+                                        .glowBorder()
                                         .accessibilityAddTraits(.isHeader)
                                 
                                     // Category
@@ -204,27 +175,7 @@ struct QuizView: View {
                             .foregroundColor(DesignTokens.Colors.statusGreen)
                             .frame(maxWidth: .infinity)
                             .frame(height: 56)
-                            .background(
-                                // Прозрачная рамка с фиолетовым свечением (как на главном экране)
-                                RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
-                                    .stroke(
-                                        LinearGradient(
-                                            gradient: Gradient(colors: [
-                                                DesignTokens.Colors.iconPurpleLight.opacity(0.5),
-                                                DesignTokens.Colors.iconPurpleLight.opacity(0.2)
-                                            ]),
-                                            startPoint: .topLeading,
-                                            endPoint: .bottomTrailing
-                                        ),
-                                        lineWidth: 1.5
-                                    )
-                                    .shadow(
-                                        color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
-                                        radius: 12,
-                                        x: 0,
-                                        y: 0
-                                    )
-                            )
+                            .glowBorder()
                             .padding(.horizontal, DesignTokens.Spacing.xxl)
                             .padding(.vertical, DesignTokens.Spacing.lg)
                         }
@@ -278,27 +229,7 @@ struct LoadingCardView: View {
                 .foregroundStyle(DesignTokens.Colors.textSecondary)
         }
         .padding(DesignTokens.Spacing.xxl)
-        .background(
-            // Прозрачная рамка с фиолетовым свечением (как на главном экране)
-            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
-                .stroke(
-                    LinearGradient(
-                        gradient: Gradient(colors: [
-                            DesignTokens.Colors.iconPurpleLight.opacity(0.5),
-                            DesignTokens.Colors.iconPurpleLight.opacity(0.2)
-                        ]),
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    ),
-                    lineWidth: 1.5
-                )
-                .shadow(
-                    color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
-                    radius: 12,
-                    x: 0,
-                    y: 0
-                )
-        )
+        .glowBorder()
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }

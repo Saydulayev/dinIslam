@@ -98,16 +98,7 @@ struct StartView: View {
         let model = bindingModel.wrappedValue
         return NavigationStack(path: bindingModel.navigationPath) {
             ZStack {
-                // Background - очень темный градиент с оттенками индиго/фиолетового
-                LinearGradient(
-                    gradient: Gradient(colors: [
-                        Color(hex: "#0a0a1a"), // темно-индиго сверху
-                        Color(hex: "#000000") // черный снизу
-                    ]),
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-                .ignoresSafeArea()
+                AppBackground()
                 
                 GeometryReader { proxy in
                     ScrollView {
@@ -281,27 +272,7 @@ struct StartView: View {
             actionsSection(model: model)
         }
         .padding(DesignTokens.Spacing.xxl)
-        .background(
-            // Прозрачная рамка с фиолетовым свечением
-            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xlarge)
-                .stroke(
-                    LinearGradient(
-                        gradient: Gradient(colors: [
-                            DesignTokens.Colors.iconPurpleLight.opacity(0.5),
-                            DesignTokens.Colors.iconPurpleLight.opacity(0.2)
-                        ]),
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    ),
-                    lineWidth: 1.5
-                )
-                .shadow(
-                    color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
-                    radius: 12,
-                    x: 0,
-                    y: 0
-                )
-        )
+        .glowBorder(cornerRadius: DesignTokens.CornerRadius.xlarge)
     }
     
     private func statsCard(model: StartViewModel) -> some View {

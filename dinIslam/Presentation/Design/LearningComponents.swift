@@ -9,29 +9,37 @@ import SwiftUI
 
 // MARK: - Glow Border
 
+/// Прозрачная рамка с фиолетовым свечением (как на главном экране).
+/// Отдельной View — для мест, где рамка стоит в overlay или внутри ZStack
+struct GlowBorder: View {
+    var cornerRadius: CGFloat = DesignTokens.CornerRadius.medium
+    
+    var body: some View {
+        RoundedRectangle(cornerRadius: cornerRadius)
+            .stroke(
+                LinearGradient(
+                    gradient: Gradient(colors: [
+                        DesignTokens.Colors.iconPurpleLight.opacity(0.5),
+                        DesignTokens.Colors.iconPurpleLight.opacity(0.2)
+                    ]),
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                ),
+                lineWidth: 1.5
+            )
+            .shadow(
+                color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
+                radius: 12,
+                x: 0,
+                y: 0
+            )
+    }
+}
+
 extension View {
-    /// Прозрачная рамка с фиолетовым свечением (как на главном экране)
+    /// Прозрачная рамка с фиолетовым свечением под содержимым
     func glowBorder(cornerRadius: CGFloat = DesignTokens.CornerRadius.medium) -> some View {
-        background(
-            RoundedRectangle(cornerRadius: cornerRadius)
-                .stroke(
-                    LinearGradient(
-                        gradient: Gradient(colors: [
-                            DesignTokens.Colors.iconPurpleLight.opacity(0.5),
-                            DesignTokens.Colors.iconPurpleLight.opacity(0.2)
-                        ]),
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    ),
-                    lineWidth: 1.5
-                )
-                .shadow(
-                    color: DesignTokens.Colors.iconPurpleLight.opacity(0.3),
-                    radius: 12,
-                    x: 0,
-                    y: 0
-                )
-        )
+        background(GlowBorder(cornerRadius: cornerRadius))
     }
 }
 
