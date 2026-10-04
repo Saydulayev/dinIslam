@@ -74,6 +74,7 @@ final class ProfileManager {
     @ObservationIgnored private let mergeService: ProfileMergeService
     @ObservationIgnored private let avatarService: ProfileAvatarHandling
     @ObservationIgnored private let progressService: ProfileProgressManaging
+    @ObservationIgnored private let questionPoolProgressManager: QuestionPoolProgressManaging
 
     init(
         localStore localStoreOverride: ProfileLocalStore? = nil,
@@ -84,7 +85,8 @@ final class ProfileManager {
         authService: ProfileAuthHandling? = nil,
         syncService: ProfileSyncing? = nil,
         avatarService: ProfileAvatarHandling? = nil,
-        progressService: ProfileProgressManaging? = nil
+        progressService: ProfileProgressManaging? = nil,
+        questionPoolProgressManager: QuestionPoolProgressManaging? = nil
     ) {
         let resolvedLocalStore: ProfileLocalStore
         if let override = localStoreOverride {
@@ -112,6 +114,7 @@ final class ProfileManager {
         self.adaptiveEngine = resolvedAdaptiveEngine
         self.statsManager = statsManager
         self.examStatisticsManager = examStatisticsManager
+        self.questionPoolProgressManager = questionPoolProgressManager ?? DefaultQuestionPoolProgressManager()
 
         // Initialize services with default implementations if not provided
         self.mergeService = ProfileMergeService(adaptiveEngine: resolvedAdaptiveEngine)
@@ -220,7 +223,6 @@ final class ProfileManager {
 
         statsManager.resetStats()
         examStatisticsManager.resetStatistics()
-        let questionPoolProgressManager = DefaultQuestionPoolProgressManager()
         questionPoolProgressManager.reset(version: 1)
         questionPoolProgressManager.setReviewMode(false, version: 1)
 
@@ -245,7 +247,6 @@ final class ProfileManager {
         localStore.saveProfile(profile)
         
         // Очищаем прогресс изучения вопросов (usedIds)
-        let questionPoolProgressManager = DefaultQuestionPoolProgressManager()
         questionPoolProgressManager.reset(version: 1)
         questionPoolProgressManager.setReviewMode(false, version: 1)
 

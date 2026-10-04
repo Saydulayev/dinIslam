@@ -22,6 +22,7 @@ final class StartViewModel {
     private let examUseCase: ExamUseCaseProtocol
     private let examStatisticsManager: ExamStatisticsManager
     @ObservationIgnored private let enhancedQuizUseCase: (any EnhancedQuizUseCaseProtocol)?
+    @ObservationIgnored private let questionPoolProgressManager: QuestionPoolProgressManaging
     
     // Services via protocols
     @ObservationIgnored private let navigationCoordinator: StartNavigationCoordinating
@@ -61,6 +62,7 @@ final class StartViewModel {
         examUseCase: ExamUseCaseProtocol,
         examStatisticsManager: ExamStatisticsManager,
         questionsPreloading: QuestionsPreloading,
+        questionPoolProgressManager: QuestionPoolProgressManaging,
         enhancedQuizUseCase: (any EnhancedQuizUseCaseProtocol)? = nil,
         navigationCoordinator: StartNavigationCoordinating? = nil,
         visualEffectsManager: StartVisualEffectsManaging? = nil,
@@ -74,6 +76,7 @@ final class StartViewModel {
         self.examUseCase = examUseCase
         self.examStatisticsManager = examStatisticsManager
         self.enhancedQuizUseCase = enhancedQuizUseCase
+        self.questionPoolProgressManager = questionPoolProgressManager
         
         // Initialize services with default implementations if not provided
         let resolvedNavigationCoordinator = navigationCoordinator ?? DefaultStartNavigationCoordinator()
@@ -215,9 +218,7 @@ final class StartViewModel {
     }
     
     private func isReviewMode() async -> Bool {
-        // Получаем доступ к questionPoolProgressManager через DefaultQuestionPoolProgressManager
-        let manager = DefaultQuestionPoolProgressManager()
-        return manager.isReviewMode(version: 1)
+        questionPoolProgressManager.isReviewMode(version: 1)
     }
 
     func resetQuiz() {
@@ -279,13 +280,11 @@ final class StartViewModel {
     
     // MARK: - Bank Completion Actions
     func resetQuestionPool() {
-        let manager = DefaultQuestionPoolProgressManager()
-        manager.reset(version: 1)
-        manager.setReviewMode(false, version: 1)
+        questionPoolProgressManager.reset(version: 1)
+        questionPoolProgressManager.setReviewMode(false, version: 1)
     }
     
     func enableReviewMode() {
-        let manager = DefaultQuestionPoolProgressManager()
-        manager.setReviewMode(true, version: 1)
+        questionPoolProgressManager.setReviewMode(true, version: 1)
     }
 }

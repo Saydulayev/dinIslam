@@ -50,11 +50,15 @@ struct AppDependencies: AppDependenciesProtocol {
             localizationProvider: localizationProvider
         )
         
+        // Initialize question pool progress manager with injected UserDefaults
+        self.questionPoolProgressManager = DefaultQuestionPoolProgressManager(userDefaults: userDefaults)
+        
         // Initialize profile manager
         self.profileManager = ProfileManager(
             adaptiveEngine: adaptiveLearningEngine,
             statsManager: statsManager,
-            examStatisticsManager: examStatisticsManager
+            examStatisticsManager: examStatisticsManager,
+            questionPoolProgressManager: questionPoolProgressManager
         )
         
         // Set up synchronization: ProfileManager implements ProfileProgressSyncing
@@ -72,9 +76,6 @@ struct AppDependencies: AppDependenciesProtocol {
             remoteService: remoteQuestionsService,
             networkManager: networkManager
         )
-        
-        // Initialize question pool progress manager with injected UserDefaults
-        self.questionPoolProgressManager = DefaultQuestionPoolProgressManager(userDefaults: userDefaults)
         
         // Initialize question selection strategies
         let adaptiveStrategy = AdaptiveQuestionSelectionStrategy(adaptiveEngine: adaptiveLearningEngine)

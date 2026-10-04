@@ -62,7 +62,8 @@ struct StartView: View {
         examUseCase: ExamUseCaseProtocol,
         examStatisticsManager: ExamStatisticsManager,
         enhancedQuizUseCase: EnhancedQuizUseCaseProtocol,
-        achievementManager: AchievementManager
+        achievementManager: AchievementManager,
+        questionPoolProgressManager: QuestionPoolProgressManaging
     ) {
         let quizViewModel = QuizViewModel(
             quizUseCase: quizUseCase,
@@ -82,6 +83,7 @@ struct StartView: View {
                 examUseCase: examUseCase,
                 examStatisticsManager: examStatisticsManager,
                 questionsPreloading: questionsPreloading,
+                questionPoolProgressManager: questionPoolProgressManager,
                 enhancedQuizUseCase: enhancedQuizUseCase
             )
         )
@@ -472,7 +474,8 @@ struct StartView: View {
         examUseCase: examUseCase,
         examStatisticsManager: examStatsManager,
         enhancedQuizUseCase: enhancedDependencies.enhancedQuizUseCase,
-        achievementManager: achievementManager
+        achievementManager: achievementManager,
+        questionPoolProgressManager: questionPoolProgressManager
     )
     .environment(\.settingsManager, settingsManager)
     .environment(\.statsManager, statsManager)

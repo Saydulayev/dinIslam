@@ -158,7 +158,8 @@ struct dinIslamApp: App {
                 examUseCase: dependencies.examUseCase,
                 examStatisticsManager: dependencies.examStatisticsManager,
                 enhancedQuizUseCase: enhancedDependencies.enhancedQuizUseCase,
-                achievementManager: dependencies.achievementManager
+                achievementManager: dependencies.achievementManager,
+                questionPoolProgressManager: dependencies.questionPoolProgressManager
             )
             // Set achievementManager first to ensure it's available before any views access it
             .environment(\.achievementManager, dependencies.achievementManager)
