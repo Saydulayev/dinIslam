@@ -95,7 +95,6 @@ struct AchievementsView: View {
         }
         .navigationTitle("achievements.title".localized)
         .navigationBarTitleDisplayMode(.inline)
-        .toolbarBackground(.clear, for: .navigationBar) // прозрачный toolbar для градиента
         .toolbarColorScheme(.dark, for: .navigationBar)
         .alert(
             "achievements.reset.confirm.title".localized,
@@ -249,7 +248,8 @@ struct AchievementCard: View {
                     y: 0
                 )
         )
-        .opacity(isUnlocked ? 1.0 : 0.6)
+        // Без общей прозрачности: серый текст на 0.6 не проходит по контрасту (≈3.4:1),
+        // а заблокированность и так видна по серой иконке, заголовку и прогрессу
         .animation(.easeInOut(duration: 0.3), value: isUnlocked)
         .contentShape(Rectangle())
     }
@@ -381,7 +381,8 @@ struct ExpandedAchievementCard: View {
         
         // Используем ImageRenderer для конвертации View в UIImage
         let renderer = ImageRenderer(content: shareableCard)
-        renderer.scale = UIScreen.main.scale
+        // Карточка уже 1080×1920 точек: масштаб экрана (×3) дал бы 3240×5760 пикселей (~75 МБ в памяти)
+        renderer.scale = 1
         
         // Устанавливаем размер изображения (Instagram story size: 1080x1920)
         let targetSize = CGSize(width: 1080, height: 1920)

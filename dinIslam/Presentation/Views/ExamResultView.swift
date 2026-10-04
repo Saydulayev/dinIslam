@@ -58,8 +58,6 @@ struct ExamResultView: View {
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
         .interactiveDismissDisabled(true)
-        .toolbarBackground(.clear, for: .navigationBar) // прозрачный toolbar для градиента
-        .toolbarBackground(.visible, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
     }
 }

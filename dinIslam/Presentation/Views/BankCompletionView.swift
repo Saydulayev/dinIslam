@@ -234,7 +234,6 @@ struct BankCompletionView: View {
             }
         }
         .navigationBarTitleDisplayMode(.inline)
-        .toolbarBackground(.clear, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
         .alert(
             "bank.completion.startOver.confirm.title".localized,

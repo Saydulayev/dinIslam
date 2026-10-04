@@ -185,8 +185,6 @@ struct StartView: View {
                 .environment(\.settingsManager, model.settingsManager)
             }
             .navigationBarTitleDisplayMode(.inline)
-            .toolbarBackground(.clear, for: .navigationBar) // прозрачный toolbar для градиента
-            .toolbarBackground(.visible, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {

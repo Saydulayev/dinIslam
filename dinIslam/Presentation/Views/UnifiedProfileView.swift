@@ -106,7 +106,6 @@ struct UnifiedProfileView: View {
         }
         .navigationTitle("profile.title".localized)
         .navigationBarTitleDisplayMode(.inline)
-        .toolbarBackground(.clear, for: .navigationBar) // прозрачный toolbar для градиента
         .toolbarColorScheme(.dark, for: .navigationBar)
         .onAppear {
             manager.validateAvatar()

@@ -236,8 +236,6 @@ struct QuizView: View {
         }
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
-        .toolbarBackground(.clear, for: .navigationBar) // прозрачный toolbar для градиента
-        .toolbarBackground(.visible, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
         .alert(
             "quiz.finish.confirm.title".localized,

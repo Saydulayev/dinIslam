@@ -54,8 +54,6 @@ struct ExamView: View {
         .navigationTitle("exam.title".localized)
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
-        .toolbarBackground(.clear, for: .navigationBar) // прозрачный toolbar для градиента
-        .toolbarBackground(.visible, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
         .navigationDestination(isPresented: $showingResult) {
             if let result = viewModel.examResult {

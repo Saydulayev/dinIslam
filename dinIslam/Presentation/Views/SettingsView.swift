@@ -304,7 +304,6 @@ struct SettingsView: View {
         .id(viewModel.refreshTrigger)
         .navigationTitle("settings.title".localized)
         .navigationBarTitleDisplayMode(.inline)
-        .toolbarBackground(.clear, for: .navigationBar) // прозрачный toolbar для градиента
         .toolbarColorScheme(.dark, for: .navigationBar)
         .navigationBarBackButtonHidden(false)
         .sheet(isPresented: $viewModel.showingLanguagePicker) {
@@ -490,7 +489,6 @@ struct SettingsView: View {
                     .foregroundColor(DesignTokens.Colors.textPrimary)
                 }
             }
-            .toolbarBackground(.clear, for: .navigationBar) // прозрачный toolbar для градиента
             .toolbarColorScheme(.dark, for: .navigationBar)
         }
     }

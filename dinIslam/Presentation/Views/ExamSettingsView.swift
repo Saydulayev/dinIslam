@@ -274,8 +274,6 @@ struct ExamSettingsView: View {
             }
             .navigationTitle("exam.settings.title".localized)
             .navigationBarTitleDisplayMode(.inline)
-            .toolbarBackground(.clear, for: .navigationBar) // прозрачный toolbar для градиента
-            .toolbarBackground(.visible, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
