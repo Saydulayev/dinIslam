@@ -126,6 +126,7 @@
 "settings.language.system" = "Системный";
 "settings.language.russian" = "Русский";
 "settings.language.english" = "English";
+"settings.language.restartHint" = "Кнопка входа через Apple и некоторые системные элементы сменят язык после перезапуска приложения.";
 "settings.theme.title" = "Тема";
 "settings.theme.system" = "Системная";
 "settings.theme.light" = "Светлая";

@@ -150,13 +150,13 @@ enum ExamGrade: String, CaseIterable, Codable {
     var localizedName: String {
         switch self {
         case .excellent:
-            return NSLocalizedString("exam.grade.excellent", comment: "Excellent grade")
+            return "exam.grade.excellent".localized
         case .good:
-            return NSLocalizedString("exam.grade.good", comment: "Good grade")
+            return "exam.grade.good".localized
         case .satisfactory:
-            return NSLocalizedString("exam.grade.satisfactory", comment: "Satisfactory grade")
+            return "exam.grade.satisfactory".localized
         case .unsatisfactory:
-            return NSLocalizedString("exam.grade.unsatisfactory", comment: "Unsatisfactory grade")
+            return "exam.grade.unsatisfactory".localized
         }
     }
     

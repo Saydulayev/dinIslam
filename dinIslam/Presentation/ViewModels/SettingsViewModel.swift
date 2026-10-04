@@ -135,7 +135,7 @@ class SettingsViewModel {
         
         let activityViewController = UIActivityViewController(
             activityItems: [
-                NSLocalizedString("settings.share.text", comment: "Share text"),
+                "settings.share.text".localized,
                 shareURL
             ],
             applicationActivities: nil

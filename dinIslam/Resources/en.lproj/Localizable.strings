@@ -125,6 +125,7 @@
 "settings.language.system" = "System";
 "settings.language.russian" = "Русский";
 "settings.language.english" = "English";
+"settings.language.restartHint" = "The Sign in with Apple button and some system elements will switch language after the app is restarted.";
 "settings.theme.title" = "Theme";
 "settings.theme.system" = "System";
 "settings.theme.light" = "Light";

@@ -2,7 +2,7 @@
 //  ProfileWrongQuestionsSectionView.swift
 //  dinIslam
 //
-//  Created by Assistant on 13.11.25.
+//  Created by Saydulayev on 13.11.25.
 //
 
 import SwiftUI
@@ -21,35 +21,35 @@ struct ProfileWrongQuestionsSectionView: View {
                 HStack {
                     Text("stats.wrongQuestionsCount.title".localized)
                         .font(DesignTokens.Typography.secondaryRegular)
-                        .foregroundColor(DesignTokens.Colors.textSecondary)
+                        .foregroundStyle(DesignTokens.Colors.textSecondary)
                     Spacer()
                     Text("\(statsManager.stats.wrongQuestionsCount)")
                         .font(DesignTokens.Typography.bodyRegular)
                         .fontWeight(.semibold)
-                        .foregroundColor(DesignTokens.Colors.iconRed)
+                        .foregroundStyle(DesignTokens.Colors.iconRed)
                 }
                 
                 HStack {
                     Text("stats.reviewDueToday.title".localized)
                         .font(DesignTokens.Typography.secondaryRegular)
-                        .foregroundColor(DesignTokens.Colors.textSecondary)
+                        .foregroundStyle(DesignTokens.Colors.textSecondary)
                     Spacer()
                     Text("\(statsManager.dueReviewCount)")
                         .font(DesignTokens.Typography.bodyRegular)
                         .fontWeight(.semibold)
-                        .foregroundColor(DesignTokens.Colors.iconOrange)
+                        .foregroundStyle(DesignTokens.Colors.iconOrange)
                 }
                 
                 if statsManager.dueReviewCount == 0, let next = ReviewDateText.nextReview(statsManager.nextReviewDate) {
                     Text(next)
                         .font(DesignTokens.Typography.label)
-                        .foregroundColor(DesignTokens.Colors.textTertiary)
+                        .foregroundStyle(DesignTokens.Colors.textTertiary)
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
                 
                 Text("review.summary.howItWorks".localized)
                     .font(DesignTokens.Typography.label)
-                    .foregroundColor(DesignTokens.Colors.textTertiary)
+                    .foregroundStyle(DesignTokens.Colors.textTertiary)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .fixedSize(horizontal: false, vertical: true)
                 

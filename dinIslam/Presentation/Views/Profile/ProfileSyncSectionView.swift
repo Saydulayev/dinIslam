@@ -2,7 +2,7 @@
 //  ProfileSyncSectionView.swift
 //  dinIslam
 //
-//  Created by Assistant on 13.11.25.
+//  Created by Saydulayev on 13.11.25.
 //
 
 import SwiftUI
@@ -41,7 +41,7 @@ struct ProfileSyncSectionView: View {
                 HStack(spacing: DesignTokens.Spacing.md) {
                     Image(systemName: ProfileViewHelpers.syncIcon(for: manager.syncState))
                         .font(.system(size: DesignTokens.Sizes.iconSmall))
-                        .foregroundColor(ProfileViewHelpers.syncColor(for: manager.syncState))
+                        .foregroundStyle(ProfileViewHelpers.syncColor(for: manager.syncState))
                     
                     Text(ProfileViewHelpers.syncMessage(for: manager, settingsManager: settingsManager))
                         .font(DesignTokens.Typography.secondaryRegular)
@@ -54,7 +54,7 @@ struct ProfileSyncSectionView: View {
                         HStack(spacing: DesignTokens.Spacing.sm) {
                             Image(systemName: "exclamationmark.triangle.fill")
                                 .font(.system(size: DesignTokens.Sizes.iconSmall))
-                                .foregroundColor(DesignTokens.Colors.warning)
+                                .foregroundStyle(DesignTokens.Colors.warning)
                             
                             Text(message)
                                 .font(DesignTokens.Typography.secondaryRegular)
@@ -92,14 +92,14 @@ struct ProfileSyncSectionView: View {
             
             // Divider
             Divider()
-                .background(Color.white.opacity(0.1))
+                .overlay(Color.white.opacity(0.1))
             
             // Questions Sync Section
             VStack(alignment: .leading, spacing: DesignTokens.Spacing.md) {
                 HStack {
                     Text("stats.sync.questions.status".localized)
                         .font(DesignTokens.Typography.secondaryRegular)
-                        .foregroundColor(DesignTokens.Colors.textSecondary)
+                        .foregroundStyle(DesignTokens.Colors.textSecondary)
                     Spacer()
                     if remoteService.isLoading {
                         ProgressView()
@@ -110,19 +110,19 @@ struct ProfileSyncSectionView: View {
                             Text("stats.sync.available".localized)
                                 .font(DesignTokens.Typography.secondaryRegular)
                                 .fontWeight(.semibold)
-                                .foregroundColor(DesignTokens.Colors.iconGreen)
+                                .foregroundStyle(DesignTokens.Colors.iconGreen)
                             if newQuestionsCount > 0 {
                                 Text("+\(newQuestionsCount)")
                                     .font(DesignTokens.Typography.label)
                                     .fontWeight(.semibold)
-                                    .foregroundColor(DesignTokens.Colors.iconGreen)
+                                    .foregroundStyle(DesignTokens.Colors.iconGreen)
                             }
                         }
                     } else {
                         Text("stats.sync.upToDate".localized)
                             .font(DesignTokens.Typography.secondaryRegular)
                             .fontWeight(.semibold)
-                            .foregroundColor(DesignTokens.Colors.iconBlue)
+                            .foregroundStyle(DesignTokens.Colors.iconBlue)
                     }
                 }
                 
@@ -176,7 +176,7 @@ struct ProfileSyncSectionView: View {
                 HStack {
                     Text("stats.sync.questions.status".localized)
                         .font(DesignTokens.Typography.secondaryRegular)
-                        .foregroundColor(DesignTokens.Colors.textSecondary)
+                        .foregroundStyle(DesignTokens.Colors.textSecondary)
                     Spacer()
                     if remoteService.isLoading {
                         ProgressView()
@@ -186,12 +186,12 @@ struct ProfileSyncSectionView: View {
                         Text("stats.sync.available".localized)
                             .font(DesignTokens.Typography.secondaryRegular)
                             .fontWeight(.semibold)
-                            .foregroundColor(DesignTokens.Colors.iconGreen)
+                            .foregroundStyle(DesignTokens.Colors.iconGreen)
                     } else {
                         Text("stats.sync.upToDate".localized)
                             .font(DesignTokens.Typography.secondaryRegular)
                             .fontWeight(.semibold)
-                            .foregroundColor(DesignTokens.Colors.iconBlue)
+                            .foregroundStyle(DesignTokens.Colors.iconBlue)
                     }
                 }
                 
@@ -199,12 +199,12 @@ struct ProfileSyncSectionView: View {
                     HStack {
                         Text("stats.sync.newQuestions.title".localized)
                             .font(DesignTokens.Typography.label)
-                            .foregroundColor(DesignTokens.Colors.textSecondary)
+                            .foregroundStyle(DesignTokens.Colors.textSecondary)
                         Spacer()
                         Text("+\(newQuestionsCount)")
                             .font(DesignTokens.Typography.label)
                             .fontWeight(.semibold)
-                            .foregroundColor(DesignTokens.Colors.iconGreen)
+                            .foregroundStyle(DesignTokens.Colors.iconGreen)
                     }
                 }
                 

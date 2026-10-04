@@ -144,7 +144,7 @@ struct AchievementCard: View {
             } label: {
                 cardContent
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.pressable)
         } else {
             cardContent
                 .accessibilityElement(children: .combine)
@@ -161,7 +161,7 @@ struct AchievementCard: View {
                 
                 Image(systemName: achievement.icon)
                     .font(.system(size: DesignTokens.Sizes.iconLarge, weight: .semibold))
-                    .foregroundColor(iconColor)
+                    .foregroundStyle(iconColor)
             }
             
             // Content
@@ -170,27 +170,27 @@ struct AchievementCard: View {
                     Text(achievement.title)
                         .font(DesignTokens.Typography.bodyRegular)
                         .fontWeight(.semibold)
-                        .foregroundColor(isUnlocked ? DesignTokens.Colors.textPrimary : DesignTokens.Colors.textSecondary)
+                        .foregroundStyle(isUnlocked ? DesignTokens.Colors.textPrimary : DesignTokens.Colors.textSecondary)
                     
                     Spacer()
                     
                     if isUnlocked {
                         Image(systemName: "checkmark.circle.fill")
-                            .foregroundColor(DesignTokens.Colors.iconGreen)
+                            .foregroundStyle(DesignTokens.Colors.iconGreen)
                             .font(.system(size: DesignTokens.Sizes.iconMedium))
                     }
                 }
                 
                 Text(achievement.displayDescription(using: localizationProvider))
                     .font(DesignTokens.Typography.label)
-                    .foregroundColor(DesignTokens.Colors.textSecondary)
+                    .foregroundStyle(DesignTokens.Colors.textSecondary)
                     .multilineTextAlignment(.leading)
                 
                 if isUnlocked, let unlockedDate = achievement.unlockedDate {
                     Text(localizationProvider.localizedString(for: "achievements.unlocked") + " " + 
                          unlockedDate.formatted(date: .abbreviated, time: .omitted))
                     .font(DesignTokens.Typography.label)
-                    .foregroundColor(DesignTokens.Colors.iconGreen)
+                    .foregroundStyle(DesignTokens.Colors.iconGreen)
                     .fontWeight(.medium)
                     .padding(.top, DesignTokens.Spacing.xs)
                 } else {
@@ -205,7 +205,7 @@ struct AchievementCard: View {
                             Text("\(progress.currentProgress)/\(progress.requirement)")
                                 .font(DesignTokens.Typography.label)
                                 .fontWeight(.semibold)
-                                .foregroundColor(achievement.color)
+                                .foregroundStyle(achievement.color)
                             
                             Spacer()
                         }
@@ -260,25 +260,25 @@ struct ExpandedAchievementCard: View {
                     
                     Image(systemName: achievement.icon)
                         .font(.system(size: DesignTokens.Sizes.iconXXLarge, weight: .semibold))
-                        .foregroundColor(achievement.color)
+                        .foregroundStyle(achievement.color)
                 }
                 
                 VStack(spacing: DesignTokens.Spacing.sm) {
                     Text(achievement.title)
                         .font(DesignTokens.Typography.displayTitle)
-                        .foregroundColor(DesignTokens.Colors.textPrimary)
+                        .foregroundStyle(DesignTokens.Colors.textPrimary)
                         .multilineTextAlignment(.center)
                     
                     Text(achievement.displayDescription(using: localizationProvider))
                         .font(DesignTokens.Typography.secondaryRegular)
-                        .foregroundColor(DesignTokens.Colors.textSecondary)
+                        .foregroundStyle(DesignTokens.Colors.textSecondary)
                         .multilineTextAlignment(.center)
                     
                     if let unlockedDate = achievement.unlockedDate {
                         Text(localizationProvider.localizedString(for: "achievements.unlocked") + " " + 
                              unlockedDate.formatted(date: .abbreviated, time: .omitted))
                         .font(DesignTokens.Typography.label)
-                        .foregroundColor(DesignTokens.Colors.iconGreen)
+                        .foregroundStyle(DesignTokens.Colors.iconGreen)
                         .fontWeight(.medium)
                         .padding(.top, DesignTokens.Spacing.xs)
                     }
@@ -418,7 +418,7 @@ struct ShareableAchievementCardView: View {
                     
                     Text(localizationProvider.localizedString(for: "app.name"))
                         .font(.system(size: 48, weight: .bold))
-                        .foregroundColor(.white)
+                        .foregroundStyle(.white)
                 }
                 .padding(.top, 80)
                 
@@ -434,20 +434,20 @@ struct ShareableAchievementCardView: View {
                         
                         Image(systemName: achievement.icon)
                             .font(.system(size: 140, weight: .semibold))
-                            .foregroundColor(achievement.color)
+                            .foregroundStyle(achievement.color)
                     }
                     
                     // Title and Description - УВЕЛИЧЕНЫ ШРИФТЫ
                     VStack(spacing: 24) {
                         Text(achievement.title)
                             .font(.system(size: 60, weight: .bold))
-                            .foregroundColor(.white)
+                            .foregroundStyle(.white)
                             .multilineTextAlignment(.center)
                             .lineLimit(3)
                         
                         Text(achievement.displayDescription(using: localizationProvider))
                             .font(.system(size: 36))
-                            .foregroundColor(Color.white.opacity(0.75))
+                            .foregroundStyle(Color.white.opacity(0.75))
                             .multilineTextAlignment(.center)
                             .lineLimit(4)
                             .padding(.horizontal, 40)
@@ -456,12 +456,12 @@ struct ShareableAchievementCardView: View {
                             HStack(spacing: 12) {
                                 Image(systemName: "checkmark.circle.fill")
                                     .font(.system(size: 32))
-                                    .foregroundColor(DesignTokens.Colors.iconGreen)
+                                    .foregroundStyle(DesignTokens.Colors.iconGreen)
                                 
                                 Text(localizationProvider.localizedString(for: "achievements.unlocked") + " " + 
                                      unlockedDate.formatted(date: .abbreviated, time: .omitted))
                                 .font(.system(size: 32, weight: .medium))
-                                .foregroundColor(DesignTokens.Colors.iconGreen)
+                                .foregroundStyle(DesignTokens.Colors.iconGreen)
                             }
                             .padding(.top, 16)
                         }
@@ -502,11 +502,11 @@ struct ShareableAchievementCardView: View {
                 HStack(spacing: 16) {
                     Image(systemName: "trophy.fill")
                         .font(.system(size: 40))
-                        .foregroundColor(achievement.color)
+                        .foregroundStyle(achievement.color)
                     
                     Text("achievements.singular".localized)
                         .font(.system(size: 40, weight: .semibold))
-                        .foregroundColor(.white.opacity(0.8))
+                        .foregroundStyle(.white.opacity(0.8))
                 }
                 .padding(.bottom, 80)
             }

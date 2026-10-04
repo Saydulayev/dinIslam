@@ -42,7 +42,7 @@ struct SettingsView: View {
                             }
                             
                             Divider()
-                                .background(Color.white.opacity(0.1))
+                                .overlay(Color.white.opacity(0.1))
                             
                             // Sound Setting
                             Toggle(isOn: Binding(
@@ -51,20 +51,20 @@ struct SettingsView: View {
                             )) {
                                 HStack(spacing: DesignTokens.Spacing.md) {
                                     Image(systemName: "speaker.wave.2")
-                                        .foregroundColor(DesignTokens.Colors.iconGreen)
+                                        .foregroundStyle(DesignTokens.Colors.iconGreen)
                                         .frame(width: DesignTokens.Sizes.iconLarge)
                                         .accessibilityHidden(true)
                                     
                                     Text("settings.sound.title".localized)
                                         .font(DesignTokens.Typography.bodyRegular)
-                                        .foregroundColor(DesignTokens.Colors.textPrimary)
+                                        .foregroundStyle(DesignTokens.Colors.textPrimary)
                                 }
                             }
                             .tint(DesignTokens.Colors.iconGreen)
                             .padding(.vertical, DesignTokens.Spacing.xs)
                             
                             Divider()
-                                .background(Color.white.opacity(0.1))
+                                .overlay(Color.white.opacity(0.1))
                             
                             // Haptic Feedback Setting
                             Toggle(isOn: Binding(
@@ -73,20 +73,20 @@ struct SettingsView: View {
                             )) {
                                 HStack(spacing: DesignTokens.Spacing.md) {
                                     Image(systemName: "iphone.radiowaves.left.and.right")
-                                        .foregroundColor(DesignTokens.Colors.iconOrange)
+                                        .foregroundStyle(DesignTokens.Colors.iconOrange)
                                         .frame(width: DesignTokens.Sizes.iconLarge)
                                         .accessibilityHidden(true)
                                     
                                     Text("settings.haptic.title".localized)
                                         .font(DesignTokens.Typography.bodyRegular)
-                                        .foregroundColor(DesignTokens.Colors.textPrimary)
+                                        .foregroundStyle(DesignTokens.Colors.textPrimary)
                                 }
                             }
                             .tint(DesignTokens.Colors.iconOrange)
                             .padding(.vertical, DesignTokens.Spacing.xs)
                             
                             Divider()
-                                .background(Color.white.opacity(0.1))
+                                .overlay(Color.white.opacity(0.1))
                             
                             // Notifications Setting
                             SettingRow(
@@ -122,7 +122,7 @@ struct SettingsView: View {
                             }
                             
                             Divider()
-                                .background(Color.white.opacity(0.1))
+                                .overlay(Color.white.opacity(0.1))
                             
                             // Religious questions
                             SettingRow(
@@ -136,7 +136,7 @@ struct SettingsView: View {
                             }
                             
                             Divider()
-                                .background(Color.white.opacity(0.1))
+                                .overlay(Color.white.opacity(0.1))
                             
                             // Rate App
                             SettingRow(
@@ -152,7 +152,7 @@ struct SettingsView: View {
                             }
                             
                             Divider()
-                                .background(Color.white.opacity(0.1))
+                                .overlay(Color.white.opacity(0.1))
                             
                             // Share App
                             SettingRow(
@@ -179,16 +179,16 @@ struct SettingsView: View {
                             // App Version
                             HStack(spacing: DesignTokens.Spacing.md) {
                                 Image(systemName: "info.circle")
-                                    .foregroundColor(DesignTokens.Colors.iconBlue)
+                                    .foregroundStyle(DesignTokens.Colors.iconBlue)
                                     .frame(width: DesignTokens.Sizes.iconLarge)
                                 
                                 VStack(alignment: .leading, spacing: DesignTokens.Spacing.xs) {
                                     Text("settings.version.title".localized)
                                         .font(DesignTokens.Typography.bodyRegular)
-                                        .foregroundColor(DesignTokens.Colors.textPrimary)
+                                        .foregroundStyle(DesignTokens.Colors.textPrimary)
                                     Text(appVersion)
                                         .font(DesignTokens.Typography.label)
-                                        .foregroundColor(DesignTokens.Colors.textSecondary)
+                                        .foregroundStyle(DesignTokens.Colors.textSecondary)
                                 }
                                 
                                 Spacer()
@@ -196,7 +196,7 @@ struct SettingsView: View {
                             .padding(.vertical, DesignTokens.Spacing.xs)
                             
                             Divider()
-                                .background(Color.white.opacity(0.1))
+                                .overlay(Color.white.opacity(0.1))
                             
                             // Privacy Policy
                             SettingRow(
@@ -210,7 +210,7 @@ struct SettingsView: View {
                             }
                             
                             Divider()
-                                .background(Color.white.opacity(0.1))
+                                .overlay(Color.white.opacity(0.1))
                             
                             // Terms of Service
                             SettingRow(
@@ -306,19 +306,19 @@ struct SettingsView: View {
             Button(action: action) {
                 HStack(spacing: DesignTokens.Spacing.md) {
                     Image(systemName: icon)
-                        .foregroundColor(iconColor)
+                        .foregroundStyle(iconColor)
                         .frame(width: DesignTokens.Sizes.iconLarge)
                         .accessibilityHidden(true)
                     
                     VStack(alignment: .leading, spacing: DesignTokens.Spacing.xs) {
                         Text(title)
                             .font(DesignTokens.Typography.bodyRegular)
-                            .foregroundColor(DesignTokens.Colors.textPrimary)
+                            .foregroundStyle(DesignTokens.Colors.textPrimary)
                         
                         if let subtitle = subtitle {
                             Text(subtitle)
                                 .font(DesignTokens.Typography.label)
-                                .foregroundColor(DesignTokens.Colors.textSecondary)
+                                .foregroundStyle(DesignTokens.Colors.textSecondary)
                         }
                     }
                     
@@ -327,14 +327,14 @@ struct SettingsView: View {
                     if showChevron {
                         Image(systemName: "chevron.right")
                             .font(.system(size: DesignTokens.Sizes.iconSmall))
-                            .foregroundColor(DesignTokens.Colors.textSecondary)
+                            .foregroundStyle(DesignTokens.Colors.textSecondary)
                             .accessibilityHidden(true)
                     }
                 }
                 .padding(.vertical, DesignTokens.Spacing.xs)
                 .contentShape(Rectangle())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.pressable)
         }
     }
     
@@ -360,25 +360,25 @@ struct SettingsView: View {
                                 HStack {
                                     Text(language.displayName)
                                         .font(DesignTokens.Typography.bodyRegular)
-                                        .foregroundColor(DesignTokens.Colors.textPrimary)
+                                        .foregroundStyle(DesignTokens.Colors.textPrimary)
                                     
                                     Spacer()
                                     
                                     if viewModel.settings.language == language {
                                         Image(systemName: "checkmark")
-                                            .foregroundColor(DesignTokens.Colors.iconBlue)
+                                            .foregroundStyle(DesignTokens.Colors.iconBlue)
                                             .accessibilityHidden(true)
                                     }
                                 }
                                 .padding(DesignTokens.Spacing.lg)
                                 .contentShape(Rectangle())
                             }
-                            .buttonStyle(.plain)
+                            .buttonStyle(.pressable)
                             .accessibilityAddTraits(viewModel.settings.language == language ? .isSelected : [])
                             
                             if language != AppLanguage.allCases.last {
                                 Divider()
-                                    .background(Color.white.opacity(0.1))
+                                    .overlay(Color.white.opacity(0.1))
                             }
                         }
                     }
@@ -386,17 +386,25 @@ struct SettingsView: View {
                     .glowBorder(cornerRadius: DesignTokens.CornerRadius.xlarge)
                     .padding(.horizontal, DesignTokens.Spacing.xxl)
                     .padding(.top, DesignTokens.Spacing.lg)
+                    
+                    // Системные элементы берут язык при запуске приложения (см. SettingsManager)
+                    Text("settings.language.restartHint".localized)
+                        .font(DesignTokens.Typography.label)
+                        .foregroundStyle(DesignTokens.Colors.textSecondary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal, DesignTokens.Spacing.xxl + DesignTokens.Spacing.lg)
+                        .padding(.top, DesignTokens.Spacing.sm)
                 }
             }
             .navigationTitle("settings.language.title".localized)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
+                ToolbarItem(placement: .topBarTrailing) {
                     Button("settings.done".localized) {
                         dismiss()
                     }
                     .font(DesignTokens.Typography.secondarySemibold)
-                    .foregroundColor(DesignTokens.Colors.textPrimary)
+                    .foregroundStyle(DesignTokens.Colors.textPrimary)
                 }
             }
             .toolbarColorScheme(.dark, for: .navigationBar)

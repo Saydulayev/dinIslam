@@ -2,7 +2,7 @@
 //  ProfileCardView.swift
 //  dinIslam
 //
-//  Created by Assistant on 13.11.25.
+//  Created by Saydulayev on 13.11.25.
 //
 
 import AuthenticationServices
@@ -133,7 +133,7 @@ struct ProfileCardView: View {
                         }) {
                             Image(systemName: isEditingDisplayName ? "checkmark" : "pencil")
                                 .font(.system(size: DesignTokens.Sizes.iconSmall))
-                                .foregroundColor(DesignTokens.Colors.textSecondary)
+                                .foregroundStyle(DesignTokens.Colors.textSecondary)
                                 .frame(width: 44, height: 44)
                                 .contentShape(Rectangle())
                         }

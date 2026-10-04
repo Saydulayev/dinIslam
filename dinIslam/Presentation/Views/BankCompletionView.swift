@@ -2,7 +2,7 @@
 //  BankCompletionView.swift
 //  dinIslam
 //
-//  Created by Assistant on 13.11.25.
+//  Created by Saydulayev on 13.11.25.
 //
 
 import SwiftUI
@@ -100,7 +100,7 @@ struct BankCompletionView: View {
                             HStack(spacing: DesignTokens.Spacing.md) {
                                 Image(systemName: "arrow.counterclockwise")
                                     .font(.system(size: DesignTokens.Sizes.iconMedium))
-                                    .foregroundColor(.white)
+                                    .foregroundStyle(.white)
                                 
                                 Text("bank.completion.startOver".localized)
                                     .font(DesignTokens.Typography.secondarySemibold)
@@ -110,7 +110,7 @@ struct BankCompletionView: View {
                                 
                                 Image(systemName: "chevron.right")
                                     .font(.system(size: DesignTokens.Sizes.iconSmall))
-                                    .foregroundColor(.white)
+                                    .foregroundStyle(.white)
                             }
                             .padding(DesignTokens.Spacing.lg)
                             .frame(maxWidth: .infinity)
@@ -137,14 +137,14 @@ struct BankCompletionView: View {
                                 y: 6
                             )
                         }
-                        .buttonStyle(.plain)
+                        .buttonStyle(.pressable)
                         
                         // Кнопка "Повторение"
                         Button(action: onStartReview) {
                             HStack(spacing: DesignTokens.Spacing.md) {
                                 Image(systemName: "repeat")
                                     .font(.system(size: DesignTokens.Sizes.iconMedium))
-                                    .foregroundColor(.white)
+                                    .foregroundStyle(.white)
                                 
                                 Text("bank.completion.review".localized)
                                     .font(DesignTokens.Typography.secondarySemibold)
@@ -154,7 +154,7 @@ struct BankCompletionView: View {
                                 
                                 Image(systemName: "chevron.right")
                                     .font(.system(size: DesignTokens.Sizes.iconSmall))
-                                    .foregroundColor(.white)
+                                    .foregroundStyle(.white)
                             }
                             .padding(DesignTokens.Spacing.lg)
                             .frame(maxWidth: .infinity)
@@ -181,7 +181,7 @@ struct BankCompletionView: View {
                                 y: 6
                             )
                         }
-                        .buttonStyle(.plain)
+                        .buttonStyle(.pressable)
                     }
                     .padding(.horizontal, DesignTokens.Spacing.xxl)
                     

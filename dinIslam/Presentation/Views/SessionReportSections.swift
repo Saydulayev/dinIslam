@@ -160,7 +160,7 @@ struct ReviewSummaryCard: View {
                     title: "review.summary.notDue".localized, value: summary.notDue)
             }
 
-            Divider().background(DesignTokens.Colors.borderSubtle)
+            Divider().overlay(DesignTokens.Colors.borderSubtle)
 
             if summary.remaining == 0 {
                 Text("review.summary.allLearned".localized)

@@ -28,21 +28,21 @@ struct NotificationSettingsView: View {
                         VStack(alignment: .leading, spacing: DesignTokens.Spacing.lg) {
                             HStack(spacing: DesignTokens.Spacing.md) {
                                 Image(systemName: "bell.badge")
-                                    .foregroundColor(DesignTokens.Colors.iconBlue)
+                                    .foregroundStyle(DesignTokens.Colors.iconBlue)
                                     .font(.system(size: DesignTokens.Sizes.iconLarge))
                                     .frame(width: DesignTokens.Sizes.iconLarge)
                                 
                                 VStack(alignment: .leading, spacing: DesignTokens.Spacing.xs) {
                                     Text("notification.permission.title".localized)
                                         .font(DesignTokens.Typography.bodyRegular)
-                                        .foregroundColor(DesignTokens.Colors.textPrimary)
+                                        .foregroundStyle(DesignTokens.Colors.textPrimary)
                                     
                                     // После отказа системный запрос не появится — объясняем, где включить
                                     Text((notificationManager.isPermissionDenied ?
                                           "notification.permission.denied.message" :
                                           "notification.permission.message").localized)
                                         .font(DesignTokens.Typography.label)
-                                        .foregroundColor(DesignTokens.Colors.textSecondary)
+                                        .foregroundStyle(DesignTokens.Colors.textSecondary)
                                 }
                                 
                                 Spacer()
@@ -64,7 +64,7 @@ struct NotificationSettingsView: View {
                                       "notification.permission.openSettings" :
                                       "notification.permission.request").localized)
                                     .font(DesignTokens.Typography.secondarySemibold)
-                                    .foregroundColor(.white)
+                                    .foregroundStyle(.white)
                                     .frame(maxWidth: .infinity)
                                     .frame(height: 56)
                                     .background(
@@ -78,7 +78,7 @@ struct NotificationSettingsView: View {
                                         )
                                     )
                                     .overlay(GlowBorder())
-                                    .cornerRadius(DesignTokens.CornerRadius.medium)
+                                    .clipShape(RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium))
                             }
                         }
                         .padding(DesignTokens.Spacing.xxl)
@@ -97,7 +97,7 @@ struct NotificationSettingsView: View {
                                 Toggle(isOn: $isNotificationEnabled) {
                                     HStack(spacing: DesignTokens.Spacing.md) {
                                         Image(systemName: "bell")
-                                            .foregroundColor(DesignTokens.Colors.iconPurple)
+                                            .foregroundStyle(DesignTokens.Colors.iconPurple)
                                             .font(.system(size: DesignTokens.Sizes.iconMedium))
                                             .frame(width: DesignTokens.Sizes.iconLarge)
                                             .accessibilityHidden(true)
@@ -105,14 +105,14 @@ struct NotificationSettingsView: View {
                                         VStack(alignment: .leading, spacing: DesignTokens.Spacing.xs) {
                                             Text("notification.settings.enabled".localized)
                                                 .font(DesignTokens.Typography.bodyRegular)
-                                                .foregroundColor(DesignTokens.Colors.textPrimary)
+                                                .foregroundStyle(DesignTokens.Colors.textPrimary)
                                             
                                             // Состояние и так озвучивает переключатель
                                             Text(isNotificationEnabled ?
                                                  "settings.on".localized :
                                                  "settings.off".localized)
                                                 .font(DesignTokens.Typography.label)
-                                                .foregroundColor(DesignTokens.Colors.textSecondary)
+                                                .foregroundStyle(DesignTokens.Colors.textSecondary)
                                                 .accessibilityHidden(true)
                                         }
                                     }
@@ -126,18 +126,18 @@ struct NotificationSettingsView: View {
                                 // Reminder Time
                                 if isNotificationEnabled {
                                     Divider()
-                                        .background(Color.white.opacity(0.1))
+                                        .overlay(Color.white.opacity(0.1))
                                     
                                     HStack(spacing: DesignTokens.Spacing.md) {
                                         Image(systemName: "clock")
-                                            .foregroundColor(DesignTokens.Colors.iconBlue)
+                                            .foregroundStyle(DesignTokens.Colors.iconBlue)
                                             .font(.system(size: DesignTokens.Sizes.iconMedium))
                                             .frame(width: DesignTokens.Sizes.iconLarge)
                                         
                                         // Время показывает сам DatePicker, второй раз подписью не дублируем
                                         Text("notification.settings.time".localized)
                                             .font(DesignTokens.Typography.bodyRegular)
-                                            .foregroundColor(DesignTokens.Colors.textPrimary)
+                                            .foregroundStyle(DesignTokens.Colors.textPrimary)
                                             .accessibilityHidden(true)
                                         
                                         Spacer()
@@ -154,7 +154,7 @@ struct NotificationSettingsView: View {
                                     if isNotificationEnabled {
                                         Text("notification.settings.footer".localized)
                                             .font(DesignTokens.Typography.label)
-                                            .foregroundColor(DesignTokens.Colors.textSecondary)
+                                            .foregroundStyle(DesignTokens.Colors.textSecondary)
                                             .padding(.top, DesignTokens.Spacing.sm)
                                     }
                                 }
@@ -189,11 +189,11 @@ struct NotificationSettingsView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbarColorScheme(.dark, for: .navigationBar)
         .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
+            ToolbarItem(placement: .topBarTrailing) {
                 Button("settings.done".localized) {
                     dismiss()
                 }
-                .foregroundColor(DesignTokens.Colors.textPrimary)
+                .foregroundStyle(DesignTokens.Colors.textPrimary)
             }
         }
         .alert("notification.permission.title".localized,

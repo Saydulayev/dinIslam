@@ -66,7 +66,7 @@ struct ExamResultHeaderView: View {
             // Title
             Text(result.isPassed ? "exam.result.passed".localized : "exam.result.failed".localized)
                 .font(DesignTokens.Typography.h1)
-                .foregroundColor(DesignTokens.Colors.textPrimary)
+                .foregroundStyle(DesignTokens.Colors.textPrimary)
             
             // Score
             Text(result.percentage.displayScore)
@@ -85,11 +85,11 @@ struct ExamGradeView: View {
         VStack(spacing: DesignTokens.Spacing.md) {
             Text("exam.result.grade".localized)
                 .font(DesignTokens.Typography.bodyRegular)
-                .foregroundColor(DesignTokens.Colors.textSecondary)
+                .foregroundStyle(DesignTokens.Colors.textSecondary)
             
             Text(result.grade.localizedName)
                 .font(DesignTokens.Typography.h1)
-                .foregroundColor(gradeColor)
+                .foregroundStyle(gradeColor)
                 .padding(.horizontal, DesignTokens.Spacing.xl)
                 .padding(.vertical, DesignTokens.Spacing.md)
                 .glowBorder()
@@ -163,15 +163,15 @@ struct ExamStatCard: View {
         VStack(spacing: DesignTokens.Spacing.md) {
             Image(systemName: icon)
                 .font(.system(size: DesignTokens.Sizes.iconMedium))
-                .foregroundColor(color)
+                .foregroundStyle(color)
             
             Text(value)
                 .font(DesignTokens.Typography.h1)
-                .foregroundColor(DesignTokens.Colors.textPrimary)
+                .foregroundStyle(DesignTokens.Colors.textPrimary)
             
             Text(title)
                 .font(DesignTokens.Typography.label)
-                .foregroundColor(DesignTokens.Colors.textSecondary)
+                .foregroundStyle(DesignTokens.Colors.textSecondary)
                 .multilineTextAlignment(.center)
         }
         .frame(maxWidth: .infinity)
@@ -188,7 +188,7 @@ struct ExamBreakdownView: View {
         VStack(alignment: .leading, spacing: DesignTokens.Spacing.lg) {
             Text("exam.result.breakdown".localized)
                 .font(DesignTokens.Typography.h2)
-                .foregroundColor(DesignTokens.Colors.textPrimary)
+                .foregroundStyle(DesignTokens.Colors.textPrimary)
             
             VStack(spacing: DesignTokens.Spacing.md) {
                 ExamBreakdownRow(
@@ -237,13 +237,13 @@ struct ExamBreakdownRow: View {
         HStack {
             Text(title)
                 .font(DesignTokens.Typography.secondaryRegular)
-                .foregroundColor(DesignTokens.Colors.textSecondary)
+                .foregroundStyle(DesignTokens.Colors.textSecondary)
             
             Spacer()
             
             Text(value)
                 .font(DesignTokens.Typography.secondarySemibold)
-                .foregroundColor(color)
+                .foregroundStyle(color)
         }
     }
 }

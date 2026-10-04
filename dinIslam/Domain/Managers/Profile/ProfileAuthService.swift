@@ -2,7 +2,7 @@
 //  ProfileAuthService.swift
 //  dinIslam
 //
-//  Created by Assistant on 13.11.25.
+//  Created by Saydulayev on 13.11.25.
 //
 
 import AuthenticationServices
@@ -27,7 +27,7 @@ final class ProfileAuthService {
         switch result {
         case .success(let authorization):
             guard let credential = authorization.credential as? ASAuthorizationAppleIDCredential else {
-                onFailure(NSLocalizedString("profile.signin.invalidCredential", comment: "Invalid credential"))
+                onFailure("profile.signin.invalidCredential".localized)
                 return
             }
             Task {
@@ -73,14 +73,14 @@ final class ProfileAuthService {
         let errorDescription = error.localizedDescription.lowercased()
         
         if errorDescription.contains("cancel") {
-            return NSLocalizedString("profile.signin.cancelled", comment: "Sign in cancelled")
+            return "profile.signin.cancelled".localized
         }
         
         if errorDescription.contains("network") || errorDescription.contains("internet") {
-            return NSLocalizedString("profile.signin.network", comment: "Network error")
+            return "profile.signin.network".localized
         }
         
-        return NSLocalizedString("profile.signin.error", comment: "Sign in error")
+        return "profile.signin.error".localized
     }
 }
 

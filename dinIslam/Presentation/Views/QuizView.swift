@@ -155,7 +155,7 @@ struct QuizView: View {
                     // Finish button at the bottom
                     VStack(spacing: 0) {
                         Divider()
-                            .background(DesignTokens.Colors.borderSubtle)
+                            .overlay(DesignTokens.Colors.borderSubtle)
                     
                         Button(action: {
                             showingFinishConfirm = true
@@ -198,11 +198,7 @@ struct QuizView: View {
             viewModel.advancesAutomatically = !voiceOverEnabled
             
             // Clear app badge when quiz starts
-            if #available(iOS 17.0, *) {
-                UNUserNotificationCenter.current().setBadgeCount(0) { _ in }
-            } else {
-                UIApplication.shared.applicationIconBadgeNumber = 0
-            }
+            UNUserNotificationCenter.current().setBadgeCount(0) { _ in }
         }
     }
 }
@@ -290,12 +286,12 @@ struct AnswerButton: View {
                 if isAnswerSelected && isCorrect {
                     Image(systemName: "checkmark.circle.fill")
                         .font(.system(size: DesignTokens.Sizes.iconMedium))
-                        .foregroundColor(DesignTokens.Colors.success)
+                        .foregroundStyle(DesignTokens.Colors.success)
                         .accessibilityHidden(true)
                 } else if isAnswerSelected && isSelected {
                     Image(systemName: "xmark.circle.fill")
                         .font(.system(size: DesignTokens.Sizes.iconMedium))
-                        .foregroundColor(DesignTokens.Colors.error)
+                        .foregroundStyle(DesignTokens.Colors.error)
                         .accessibilityHidden(true)
                 }
             }

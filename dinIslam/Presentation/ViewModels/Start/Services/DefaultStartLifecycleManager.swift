@@ -2,7 +2,7 @@
 //  DefaultStartLifecycleManager.swift
 //  dinIslam
 //
-//  Created by Assistant on 13.11.25.
+//  Created by Saydulayev on 13.11.25.
 //
 
 import Foundation
@@ -56,11 +56,7 @@ final class DefaultStartLifecycleManager: StartLifecycleManaging {
     
     // MARK: - Private Helpers
     private func clearBadge() {
-        if #available(iOS 17.0, *) {
-            UNUserNotificationCenter.current().setBadgeCount(0, withCompletionHandler: { _ in })
-        } else {
-            UIApplication.shared.applicationIconBadgeNumber = 0
-        }
+        UNUserNotificationCenter.current().setBadgeCount(0, withCompletionHandler: { _ in })
     }
 }
 

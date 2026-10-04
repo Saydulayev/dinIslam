@@ -205,7 +205,7 @@ struct StartView: View {
                         }
                     } label: {
                         Image(systemName: "ellipsis")
-                            .foregroundColor(DesignTokens.Colors.textPrimary)
+                            .foregroundStyle(DesignTokens.Colors.textPrimary)
                     }
                     .accessibilityLabel("accessibility.menu".localized)
                 }
@@ -267,7 +267,7 @@ struct StartView: View {
             statsCard(model: model)
             
             Divider()
-                .background(Color.white.opacity(0.1))
+                .overlay(Color.white.opacity(0.1))
             
             actionsSection(model: model)
         }

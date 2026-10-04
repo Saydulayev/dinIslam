@@ -288,12 +288,12 @@ final class AdaptiveLearningEngine {
         if let weakestTopic = progress.topicProgress.min(by: { topicAccuracy($0) < topicAccuracy($1) }),
            topicAccuracy(weakestTopic) < 70 {
             let message = String(
-                format: NSLocalizedString("profile.recommendation.focusTopic", comment: "Focus topic recommendation"),
+                format: "profile.recommendation.focusTopic".localized,
                 weakestTopic.displayName ?? weakestTopic.topicId
             )
             let recommendation = LearningRecommendation(
                 type: .focusTopic,
-                title: NSLocalizedString("profile.recommendation.focusTopic.title", comment: ""),
+                title: "profile.recommendation.focusTopic.title".localized,
                 message: message,
                 topicId: weakestTopic.topicId,
                 targetDifficulty: weakestTopic.recommendedDifficulty
@@ -303,12 +303,12 @@ final class AdaptiveLearningEngine {
 
         if let highScore = progress.difficultyStats.first(where: { $0.masteryLevel == .expert || $0.adaptiveScore > 90 }) {
             let message = String(
-                format: NSLocalizedString("profile.recommendation.challenge", comment: "Challenge recommendation"),
+                format: "profile.recommendation.challenge".localized,
                 highScore.difficulty.localizedName
             )
             let recommendation = LearningRecommendation(
                 type: .increaseDifficulty,
-                title: NSLocalizedString("profile.recommendation.challenge.title", comment: ""),
+                title: "profile.recommendation.challenge.title".localized,
                 message: message,
                 targetDifficulty: .hard
             )
@@ -316,10 +316,10 @@ final class AdaptiveLearningEngine {
         }
 
         if progress.currentStreak >= 3 {
-            let message = NSLocalizedString("profile.recommendation.maintainStreak", comment: "Maintain streak recommendation")
+            let message = "profile.recommendation.maintainStreak".localized
             let recommendation = LearningRecommendation(
                 type: .maintainStreak,
-                title: NSLocalizedString("profile.recommendation.maintainStreak.title", comment: ""),
+                title: "profile.recommendation.maintainStreak.title".localized,
                 message: message
             )
             recommendations.append(recommendation)

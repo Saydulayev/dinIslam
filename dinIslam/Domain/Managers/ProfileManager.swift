@@ -34,9 +34,9 @@ final class ProfileManager {
 
         // Apple передаёт имя только при первом входе, поэтому вошедший пользователь может остаться без имени
         if isSignedIn {
-            return NSLocalizedString("profile.noName", comment: "Signed-in user without a name")
+            return "profile.noName".localized
         }
-        return NSLocalizedString("profile.anonymous", comment: "Anonymous user placeholder")
+        return "profile.anonymous".localized
     }
 
     /// Имя для поля редактирования: пользовательское, затем имя из Apple, иначе пустая строка

@@ -32,17 +32,17 @@ struct ProgressCardView: View {
         VStack(alignment: .leading, spacing: DesignTokens.Spacing.md) {
             Image(systemName: icon)
                 .font(.system(size: DesignTokens.Sizes.iconMedium))
-                .foregroundColor(.white) // Белая иконка для лучшей видимости на градиенте
+                .foregroundStyle(.white) // Белая иконка для лучшей видимости на градиенте
             
             Text(value)
                 .font(DesignTokens.Typography.statsValue)
-                .foregroundColor(.white) // Белый текст для лучшей читаемости
+                .foregroundStyle(.white) // Белый текст для лучшей читаемости
             
             Spacer(minLength: 0)
             
             Text(label)
                 .font(DesignTokens.Typography.label)
-                .foregroundColor(.white.opacity(0.9)) // Белый текст с небольшой прозрачностью
+                .foregroundStyle(.white.opacity(0.9)) // Белый текст с небольшой прозрачностью
                 .fixedSize(horizontal: false, vertical: true)
         }
         .frame(maxWidth: .infinity, minHeight: 110, maxHeight: .infinity, alignment: .leading)

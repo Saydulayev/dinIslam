@@ -57,7 +57,7 @@ struct ResultView: View {
                         }
                         
                         Divider()
-                            .background(DesignTokens.Colors.borderSubtle)
+                            .overlay(DesignTokens.Colors.borderSubtle)
                         
                         // Detailed stats
                         VStack(spacing: DesignTokens.Spacing.md) {
@@ -85,10 +85,10 @@ struct ResultView: View {
                     HStack(spacing: DesignTokens.Spacing.md) {
                         Image(systemName: feedbackIcon)
                             .font(.system(size: DesignTokens.Sizes.iconMedium))
-                            .foregroundColor(feedbackColor)
+                            .foregroundStyle(feedbackColor)
                         LocalizedText(resultFeedbackMessage)
                             .font(DesignTokens.Typography.secondarySemibold)
-                            .foregroundColor(feedbackColor)
+                            .foregroundStyle(feedbackColor)
                     }
                     .padding(DesignTokens.Spacing.lg)
                     .frame(maxWidth: .infinity)

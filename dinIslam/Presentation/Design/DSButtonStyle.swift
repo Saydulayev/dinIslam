@@ -117,3 +117,15 @@ struct DSButtonStyle: ButtonStyle {
             )
     }
 }
+
+/// Кнопка без оформления, но с откликом на нажатие — для строк и карточек вместо `.plain`
+struct PressableButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .opacity(configuration.isPressed ? 0.7 : 1)
+    }
+}
+
+extension ButtonStyle where Self == PressableButtonStyle {
+    static var pressable: PressableButtonStyle { PressableButtonStyle() }
+}

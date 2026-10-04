@@ -64,7 +64,7 @@ struct GradientActionButton: View {
                 } else {
                     Image(systemName: icon)
                         .font(.system(size: DesignTokens.Sizes.iconMedium))
-                        .foregroundColor(.white)
+                        .foregroundStyle(.white)
                 }
 
                 VStack(alignment: .leading, spacing: 2) {
@@ -91,7 +91,7 @@ struct GradientActionButton: View {
 
                 Image(systemName: "chevron.right")
                     .font(.system(size: DesignTokens.Sizes.iconSmall))
-                    .foregroundColor(.white)
+                    .foregroundStyle(.white)
             }
             .padding(DesignTokens.Spacing.lg)
             .frame(maxWidth: .infinity)
@@ -106,7 +106,7 @@ struct GradientActionButton: View {
             .clipShape(RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium))
             .shadow(color: (gradient.first ?? .clear).opacity(0.5), radius: 12, y: 6)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.pressable)
         .disabled(isLoading)
     }
 }

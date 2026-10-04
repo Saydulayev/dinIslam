@@ -89,7 +89,7 @@ struct ExamSettingsView: View {
                                                 Spacer()
                                                 Text("time.seconds.short".localized(arguments: Int(customTimePerQuestion)))
                                                     .font(DesignTokens.Typography.secondarySemibold)
-                                                    .foregroundColor(DesignTokens.Colors.iconBlue)
+                                                    .foregroundStyle(DesignTokens.Colors.iconBlue)
                                             }
                                             
                                             Slider(value: $customTimePerQuestion, in: 10...120, step: 5)
@@ -97,7 +97,7 @@ struct ExamSettingsView: View {
                                         }
                                         
                                         Divider()
-                                            .background(DesignTokens.Colors.borderSubtle)
+                                            .overlay(DesignTokens.Colors.borderSubtle)
                                         
                                         // Total questions
                                         VStack(alignment: .leading, spacing: DesignTokens.Spacing.sm) {
@@ -108,7 +108,7 @@ struct ExamSettingsView: View {
                                                 Spacer()
                                                 Text("\(customTotalQuestions)")
                                                     .font(DesignTokens.Typography.secondarySemibold)
-                                                    .foregroundColor(DesignTokens.Colors.iconBlue)
+                                                    .foregroundStyle(DesignTokens.Colors.iconBlue)
                                             }
                                             
                                             Slider(value: Binding(
@@ -119,7 +119,7 @@ struct ExamSettingsView: View {
                                         }
                                         
                                         Divider()
-                                            .background(DesignTokens.Colors.borderSubtle)
+                                            .overlay(DesignTokens.Colors.borderSubtle)
                                         
                                         // Additional options
                                         VStack(spacing: DesignTokens.Spacing.md) {
@@ -127,7 +127,7 @@ struct ExamSettingsView: View {
                                                 HStack {
                                                     Image(systemName: "forward.fill")
                                                         .font(.system(size: DesignTokens.Sizes.iconMedium))
-                                                        .foregroundColor(DesignTokens.Colors.iconOrange)
+                                                        .foregroundStyle(DesignTokens.Colors.iconOrange)
                                                         .frame(width: DesignTokens.Sizes.iconLarge)
                                                         .accessibilityHidden(true)
                                                     
@@ -142,7 +142,7 @@ struct ExamSettingsView: View {
                                                 HStack {
                                                     Image(systemName: "timer")
                                                         .font(.system(size: DesignTokens.Sizes.iconMedium))
-                                                        .foregroundColor(DesignTokens.Colors.iconBlue)
+                                                        .foregroundStyle(DesignTokens.Colors.iconBlue)
                                                         .frame(width: DesignTokens.Sizes.iconLarge)
                                                         .accessibilityHidden(true)
                                                     
@@ -183,7 +183,7 @@ struct ExamSettingsView: View {
                     // Start Exam Button
                     VStack(spacing: 0) {
                         Divider()
-                            .background(DesignTokens.Colors.borderSubtle)
+                            .overlay(DesignTokens.Colors.borderSubtle)
                         
                         Button(action: startExam) {
                             HStack(spacing: DesignTokens.Spacing.md) {
@@ -204,11 +204,11 @@ struct ExamSettingsView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
+                ToolbarItem(placement: .topBarLeading) {
                     Button("exam.settings.cancel".localized) {
                         dismiss()
                     }
-                    .foregroundColor(DesignTokens.Colors.textPrimary)
+                    .foregroundStyle(DesignTokens.Colors.textPrimary)
                 }
             }
         }
@@ -328,18 +328,18 @@ struct ExamPresetRow: View {
                 // Icon
                 Image(systemName: preset.icon)
                     .font(.system(size: DesignTokens.Sizes.iconMedium))
-                    .foregroundColor(preset.color)
+                    .foregroundStyle(preset.color)
                     .frame(width: DesignTokens.Sizes.iconLarge)
                 
                 // Content
                 VStack(alignment: .leading, spacing: DesignTokens.Spacing.xs) {
                     Text(preset.title)
                         .font(DesignTokens.Typography.bodyRegular)
-                        .foregroundColor(DesignTokens.Colors.textPrimary)
+                        .foregroundStyle(DesignTokens.Colors.textPrimary)
                     
                     Text(preset.description)
                         .font(DesignTokens.Typography.label)
-                        .foregroundColor(DesignTokens.Colors.textSecondary)
+                        .foregroundStyle(DesignTokens.Colors.textSecondary)
                         .multilineTextAlignment(.leading)
                 }
                 
@@ -348,13 +348,13 @@ struct ExamPresetRow: View {
                 // Selection indicator
                 if isSelected {
                     Image(systemName: "checkmark.circle.fill")
-                        .foregroundColor(DesignTokens.Colors.iconBlue)
+                        .foregroundStyle(DesignTokens.Colors.iconBlue)
                         .font(.system(size: DesignTokens.Sizes.iconMedium))
                 }
             }
             .padding(.vertical, DesignTokens.Spacing.sm)
         }
-        .buttonStyle(PlainButtonStyle())
+        .buttonStyle(.pressable)
     }
 }
 
@@ -366,47 +366,47 @@ struct ExamPreviewCard: View {
         VStack(alignment: .leading, spacing: DesignTokens.Spacing.lg) {
             Text("exam.settings.preview.title".localized)
                 .font(DesignTokens.Typography.secondarySemibold)
-                .foregroundColor(DesignTokens.Colors.textPrimary)
+                .foregroundStyle(DesignTokens.Colors.textPrimary)
             
             VStack(spacing: DesignTokens.Spacing.md) {
                 HStack {
                     Text("exam.settings.preview.questions".localized)
                         .font(DesignTokens.Typography.secondaryRegular)
-                        .foregroundColor(DesignTokens.Colors.textSecondary)
+                        .foregroundStyle(DesignTokens.Colors.textSecondary)
                     Spacer()
                     Text("\(configuration.totalQuestions)")
                         .font(DesignTokens.Typography.secondarySemibold)
-                        .foregroundColor(DesignTokens.Colors.textPrimary)
+                        .foregroundStyle(DesignTokens.Colors.textPrimary)
                 }
                 
                 HStack {
                     Text("exam.settings.preview.timePerQuestion".localized)
                         .font(DesignTokens.Typography.secondaryRegular)
-                        .foregroundColor(DesignTokens.Colors.textSecondary)
+                        .foregroundStyle(DesignTokens.Colors.textSecondary)
                     Spacer()
                     Text("time.seconds.short".localized(arguments: Int(configuration.timePerQuestion)))
                         .font(DesignTokens.Typography.secondarySemibold)
-                        .foregroundColor(DesignTokens.Colors.textPrimary)
+                        .foregroundStyle(DesignTokens.Colors.textPrimary)
                 }
                 
                 HStack {
                     Text("exam.settings.preview.totalTime".localized)
                         .font(DesignTokens.Typography.secondaryRegular)
-                        .foregroundColor(DesignTokens.Colors.textSecondary)
+                        .foregroundStyle(DesignTokens.Colors.textSecondary)
                     Spacer()
                     Text(formatTotalTime())
                         .font(DesignTokens.Typography.secondarySemibold)
-                        .foregroundColor(DesignTokens.Colors.textPrimary)
+                        .foregroundStyle(DesignTokens.Colors.textPrimary)
                 }
                 
                 HStack {
                     Text("exam.settings.preview.options".localized)
                         .font(DesignTokens.Typography.secondaryRegular)
-                        .foregroundColor(DesignTokens.Colors.textSecondary)
+                        .foregroundStyle(DesignTokens.Colors.textSecondary)
                     Spacer()
                     Text(optionsText())
                         .font(DesignTokens.Typography.secondarySemibold)
-                        .foregroundColor(DesignTokens.Colors.iconBlue)
+                        .foregroundStyle(DesignTokens.Colors.iconBlue)
                 }
             }
         }

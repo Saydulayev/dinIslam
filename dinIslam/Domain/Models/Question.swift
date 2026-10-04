@@ -41,11 +41,11 @@ enum Difficulty: String, Codable, CaseIterable {
     var localizedName: String {
         switch self {
         case .easy:
-            return NSLocalizedString("difficulty.easy", comment: "Easy difficulty")
+            return "difficulty.easy".localized
         case .medium:
-            return NSLocalizedString("difficulty.medium", comment: "Medium difficulty")
+            return "difficulty.medium".localized
         case .hard:
-            return NSLocalizedString("difficulty.hard", comment: "Hard difficulty")
+            return "difficulty.hard".localized
         }
     }
 }

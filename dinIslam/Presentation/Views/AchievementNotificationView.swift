@@ -30,7 +30,7 @@ struct AchievementNotificationView: View {
                     
                     Image(systemName: achievement.icon)
                         .font(.system(size: DesignTokens.Sizes.iconXLarge, weight: .medium))
-                        .foregroundColor(achievement.color)
+                        .foregroundStyle(achievement.color)
                 }
                 
                 VStack(spacing: 4) {
@@ -41,17 +41,17 @@ struct AchievementNotificationView: View {
                             total
                         ))
                         .font(.footnote)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                     }
                     
                     Text(localizationProvider.localizedString(for: "achievements.congratulations"))
                         .font(.headline)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                     
                     Text(achievement.title)
                         .font(.title2)
                         .fontWeight(.bold)
-                        .foregroundColor(.primary)
+                        .foregroundStyle(.primary)
                         .multilineTextAlignment(.center)
                 }
             }
@@ -59,7 +59,7 @@ struct AchievementNotificationView: View {
             // Description
             Text(achievement.type.notification(using: localizationProvider))
                 .font(.subheadline)
-                .foregroundColor(.secondary)
+                .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal)
             
@@ -68,7 +68,7 @@ struct AchievementNotificationView: View {
                 Text(localizationProvider.localizedString(for: isLast ? "settings.done" : "achievements.notification.next"))
                     .font(.headline)
                     .fontWeight(.semibold)
-                    .foregroundColor(.white)
+                    .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
                     .frame(height: 50)
                     .background(achievement.color, in: RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium))

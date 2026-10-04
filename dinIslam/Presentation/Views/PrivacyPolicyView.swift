@@ -20,11 +20,11 @@ struct PrivacyPolicyView: View {
                     VStack(alignment: .leading, spacing: DesignTokens.Spacing.sm) {
                         Text("privacy.title".localized)
                             .font(DesignTokens.Typography.h1)
-                            .foregroundColor(DesignTokens.Colors.textPrimary)
+                            .foregroundStyle(DesignTokens.Colors.textPrimary)
                         
                         Text("privacy.lastUpdated".localized)
                             .font(DesignTokens.Typography.label)
-                            .foregroundColor(DesignTokens.Colors.textSecondary)
+                            .foregroundStyle(DesignTokens.Colors.textSecondary)
                     }
                     .padding(.bottom, DesignTokens.Spacing.md)
                     
@@ -83,11 +83,11 @@ struct PrivacyPolicyView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbarColorScheme(.dark, for: .navigationBar)
         .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
+            ToolbarItem(placement: .topBarTrailing) {
                 Button("privacy.done".localized) {
                     dismiss()
                 }
-                .foregroundColor(DesignTokens.Colors.textPrimary)
+                .foregroundStyle(DesignTokens.Colors.textPrimary)
                 .fontWeight(.semibold)
             }
         }
@@ -102,11 +102,11 @@ struct SectionView: View {
         VStack(alignment: .leading, spacing: DesignTokens.Spacing.md) {
             Text(title)
                 .font(DesignTokens.Typography.h2)
-                .foregroundColor(DesignTokens.Colors.textPrimary)
+                .foregroundStyle(DesignTokens.Colors.textPrimary)
             
             Text(content)
                 .font(DesignTokens.Typography.bodyRegular)
-                .foregroundColor(DesignTokens.Colors.textSecondary)
+                .foregroundStyle(DesignTokens.Colors.textSecondary)
                 .lineSpacing(4)
         }
         .frame(maxWidth: .infinity, alignment: .leading)

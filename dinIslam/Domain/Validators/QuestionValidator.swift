@@ -2,7 +2,7 @@
 //  QuestionValidator.swift
 //  dinIslam
 //
-//  Created by Assistant on 19.01.26.
+//  Created by Saydulayev on 19.01.26.
 //
 
 import Foundation

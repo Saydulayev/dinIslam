@@ -176,7 +176,7 @@ struct ExamView: View {
             // Fixed action buttons at the bottom
             VStack(spacing: 0) {
                 Divider()
-                    .background(DesignTokens.Colors.borderSubtle)
+                    .overlay(DesignTokens.Colors.borderSubtle)
                 
                 HStack(spacing: DesignTokens.Spacing.md) {
                     // Skip button
@@ -257,11 +257,11 @@ struct ExamHeaderView: View {
                     HStack(spacing: DesignTokens.Spacing.sm) {
                         Image(systemName: viewModel.state == .active(.paused) ? "pause.fill" : "timer")
                             .font(.system(size: DesignTokens.Sizes.iconSmall))
-                            .foregroundColor(timerColor)
+                            .foregroundStyle(timerColor)
 
                         Text(viewModel.timeRemainingFormatted)
                             .font(DesignTokens.Typography.secondarySemibold)
-                            .foregroundColor(timerColor)
+                            .foregroundStyle(timerColor)
                             .monospacedDigit()
                     }
                     .padding(.horizontal, DesignTokens.Spacing.md)

@@ -2,7 +2,7 @@
 //  ProfileErrorHandler.swift
 //  dinIslam
 //
-//  Created by Assistant on 13.11.25.
+//  Created by Saydulayev on 13.11.25.
 //
 
 import CloudKit
@@ -19,22 +19,22 @@ final class ProfileErrorHandler {
         // Check for "oplock" errors first (most common conflict error)
         if errorDescription.contains("oplock") {
             AppLogger.info("Detected oplock error, returning conflict message", category: AppLogger.data)
-            return NSLocalizedString("profile.sync.error.conflict", comment: "Sync conflict error")
+            return "profile.sync.error.conflict".localized
         }
         
         // Check for CKError first
         if let ckError = error as? CKError {
             switch ckError.code {
             case .serverRecordChanged, .requestRateLimited:
-                return NSLocalizedString("profile.sync.error.conflict", comment: "Sync conflict error")
+                return "profile.sync.error.conflict".localized
             case .networkUnavailable, .networkFailure:
-                return NSLocalizedString("profile.sync.error.network", comment: "Network error")
+                return "profile.sync.error.network".localized
             case .quotaExceeded:
-                return NSLocalizedString("profile.sync.error.quota", comment: "Quota exceeded error")
+                return "profile.sync.error.quota".localized
             case .notAuthenticated:
-                return NSLocalizedString("profile.sync.error.auth", comment: "Authentication error")
+                return "profile.sync.error.auth".localized
             case .permissionFailure:
-                return NSLocalizedString("profile.sync.error.permission", comment: "Permission error")
+                return "profile.sync.error.permission".localized
             default:
                 break
             }
@@ -45,27 +45,27 @@ final class ProfileErrorHandler {
             if nsError.domain == "CKErrorDomain" || nsError.domain.contains("CloudKit") {
                 // This is a CloudKit error
                 if errorDescription.contains("oplock") {
-                    return NSLocalizedString("profile.sync.error.conflict", comment: "Sync conflict error")
+                    return "profile.sync.error.conflict".localized
                 }
             }
         }
         
         // Check error description for other patterns
         if errorDescription.contains("network") || errorDescription.contains("internet") {
-            return NSLocalizedString("profile.sync.error.network", comment: "Network error")
+            return "profile.sync.error.network".localized
         }
         if errorDescription.contains("quota") || errorDescription.contains("limit") {
-            return NSLocalizedString("profile.sync.error.quota", comment: "Quota exceeded error")
+            return "profile.sync.error.quota".localized
         }
         if errorDescription.contains("permission") || errorDescription.contains("unauthorized") {
-            return NSLocalizedString("profile.sync.error.permission", comment: "Permission error")
+            return "profile.sync.error.permission".localized
         }
         if errorDescription.contains("not authenticated") || errorDescription.contains("authentication") {
-            return NSLocalizedString("profile.sync.error.auth", comment: "Authentication error")
+            return "profile.sync.error.auth".localized
         }
         
         // Generic error message
-        return NSLocalizedString("profile.sync.error.generic", comment: "Generic sync error")
+        return "profile.sync.error.generic".localized
     }
 }
 

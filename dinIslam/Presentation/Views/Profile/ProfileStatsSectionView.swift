@@ -2,7 +2,7 @@
 //  ProfileStatsSectionView.swift
 //  dinIslam
 //
-//  Created by Assistant on 13.11.25.
+//  Created by Saydulayev on 13.11.25.
 //
 
 import SwiftUI
@@ -116,17 +116,17 @@ struct ProfileStatsSectionView: View {
             HStack(spacing: DesignTokens.Spacing.lg) {
                 Image(systemName: "book.closed")
                     .font(.system(size: DesignTokens.Sizes.iconMedium))
-                    .foregroundColor(.white) // Белая иконка для лучшей видимости на градиенте
+                    .foregroundStyle(.white) // Белая иконка для лучшей видимости на градиенте
                     .frame(width: 40, height: 40)
                 
                 VStack(alignment: .leading, spacing: DesignTokens.Spacing.xs) {
                     Text("stats.totalQuestions.title".localized)
                         .font(DesignTokens.Typography.label)
-                        .foregroundColor(.white.opacity(0.9)) // Белый текст с небольшой прозрачностью
+                        .foregroundStyle(.white.opacity(0.9)) // Белый текст с небольшой прозрачностью
                     
                     Text(totalQuestionsCount.map(String.init) ?? "—")
                         .font(DesignTokens.Typography.statsValue)
-                        .foregroundColor(.white) // Белый текст для лучшей читаемости
+                        .foregroundStyle(.white) // Белый текст для лучшей читаемости
                 }
                 
                 Spacer()
