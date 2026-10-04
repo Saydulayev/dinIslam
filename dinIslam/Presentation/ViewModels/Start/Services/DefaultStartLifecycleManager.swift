@@ -29,7 +29,7 @@ final class DefaultStartLifecycleManager: StartLifecycleManaging {
         onProfileSync: @escaping () async -> Void
     ) {
         clearBadge()
-        let newLanguageCode = languageCode(from: settingsManager)
+        let newLanguageCode = settingsManager.settings.language.languageCode
         onLanguageCodeUpdate(newLanguageCode)
         
         Task {
@@ -50,7 +50,7 @@ final class DefaultStartLifecycleManager: StartLifecycleManaging {
     func onLanguageChange(
         onLanguageCodeUpdate: (String) -> Void
     ) {
-        let newLanguageCode = languageCode(from: settingsManager)
+        let newLanguageCode = settingsManager.settings.language.languageCode
         onLanguageCodeUpdate(newLanguageCode)
     }
     
@@ -61,10 +61,6 @@ final class DefaultStartLifecycleManager: StartLifecycleManaging {
         } else {
             UIApplication.shared.applicationIconBadgeNumber = 0
         }
-    }
-    
-    private func languageCode(from settingsManager: SettingsManager) -> String {
-        settingsManager.settings.language.locale?.language.languageCode?.identifier ?? "ru"
     }
 }
 

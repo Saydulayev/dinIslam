@@ -36,6 +36,10 @@ private struct NotificationManagerKey: EnvironmentKey {
     static let defaultValue: NotificationManager? = nil
 }
 
+private struct QuestionPoolProgressManagerKey: EnvironmentKey {
+    static let defaultValue: QuestionPoolProgressManaging? = nil
+}
+
 extension EnvironmentValues {
     var localizationProvider: LocalizationProviding {
         get { 
@@ -117,6 +121,15 @@ extension EnvironmentValues {
             self[NotificationManagerKey.self] = newValue
         }
     }
+    
+    var questionPoolProgressManager: QuestionPoolProgressManaging {
+        get {
+            self[QuestionPoolProgressManagerKey.self] ?? DefaultQuestionPoolProgressManager()
+        }
+        set {
+            self[QuestionPoolProgressManagerKey.self] = newValue
+        }
+    }
 }
 
 @main
@@ -155,6 +168,7 @@ struct dinIslamApp: App {
             .environment(\.statsManager, dependencies.statsManager)
             .environment(\.profileManager, dependencies.profileManager)
             .environment(\.remoteQuestionsService, dependencies.remoteQuestionsService)
+            .environment(\.questionPoolProgressManager, dependencies.questionPoolProgressManager)
             .preferredColorScheme(.dark)
         }
     }

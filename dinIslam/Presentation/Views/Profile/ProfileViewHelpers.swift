@@ -42,11 +42,8 @@ enum ProfileViewHelpers {
         case .idle:
             if let date = manager.profile.metadata.lastSyncedAt {
                 let formatter = RelativeDateTimeFormatter()
-                // Устанавливаем локаль в зависимости от текущего языка приложения
-                let currentLanguage = settingsManager.settings.language == .system ? 
-                    (Locale.current.language.languageCode?.identifier ?? "ru") :
-                    settingsManager.settings.language.rawValue
-                formatter.locale = Locale(identifier: currentLanguage == "en" ? "en_US" : "ru_RU")
+                // Локаль по языку приложения, а не системы
+                formatter.locale = Locale(identifier: settingsManager.settings.language.resolved == .english ? "en_US" : "ru_RU")
                 
                 let relativeTime = formatter.localizedString(for: date, relativeTo: Date())
                 let formatString = "profile.sync.lastSync".localized

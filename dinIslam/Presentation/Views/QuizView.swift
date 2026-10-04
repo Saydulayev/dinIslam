@@ -11,7 +11,6 @@ import UserNotifications
 struct QuizView: View {
     @Bindable var viewModel: QuizViewModel
     @Environment(\.accessibilityVoiceOverEnabled) private var voiceOverEnabled
-    @State private var showingStopConfirm: Bool = false
     @State private var showingFinishConfirm: Bool = false
     
     init(viewModel: QuizViewModel) {
@@ -249,19 +248,6 @@ struct QuizView: View {
             }
         } message: {
             Text("quiz.finish.confirm.message".localized)
-        }
-        .alert(
-            "quiz.stop.confirm.title".localized,
-            isPresented: $showingStopConfirm
-        ) {
-            Button("quiz.stop.confirm.cancel".localized, role: .cancel) {
-                showingStopConfirm = false
-            }
-            Button("quiz.stop.confirm.ok".localized, role: .destructive) {
-                viewModel.restartQuiz()
-            }
-        } message: {
-            Text("quiz.stop.confirm.message".localized)
         }
         .onChange(of: voiceOverEnabled) { _, isEnabled in
             viewModel.advancesAutomatically = !isEnabled

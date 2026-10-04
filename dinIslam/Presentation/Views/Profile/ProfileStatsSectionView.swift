@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct ProfileStatsSectionView: View {
+    @Environment(\.questionPoolProgressManager) private var questionPoolProgressManager
     @Bindable var manager: ProfileManager
     @Bindable var statsManager: StatsManager
     /// nil, пока количество вопросов загружается — вместо «0 / 0» показываем прочерк
@@ -213,8 +214,7 @@ struct ProfileStatsSectionView: View {
     
     private func loadProgressStats() {
         guard let totalQuestionsCount else { return }
-        let manager = DefaultQuestionPoolProgressManager()
-        let stats = manager.getProgressStats(total: totalQuestionsCount, version: 1)
+        let stats = questionPoolProgressManager.getProgressStats(total: totalQuestionsCount, version: 1)
         studiedCount = stats.used
     }
 }

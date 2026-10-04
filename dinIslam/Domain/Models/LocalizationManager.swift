@@ -31,9 +31,7 @@ class LocalizationManager: ObservableObject, LocalizationProviding {
         if let savedLanguage = userDefaults.string(forKey: "SelectedLanguage") {
             currentLanguage = savedLanguage
         } else {
-            // Use system language if available
-            let systemLanguage = Locale.current.language.languageCode?.identifier ?? "ru"
-            currentLanguage = ["ru", "en"].contains(systemLanguage) ? systemLanguage : "ru"
+            currentLanguage = AppLanguage.system.languageCode
         }
     }
     
@@ -94,15 +92,13 @@ extension String {
     }
     
     func localized(count: Int) -> String {
-        // EnhancedLocalizationManager is not available through DIContainer, so we use .shared
-        // This is acceptable as EnhancedLocalizationManager is a separate utility
-        return EnhancedLocalizationManager.shared.localizedString(for: self, count: count)
+        let localizationProvider = GlobalLocalizationProvider.instance
+        let pluralKey = PluralRules.key(for: self, count: count, language: localizationProvider.currentLanguage)
+        return localizationProvider.localizedString(for: pluralKey)
     }
     
     func localized(count: Int, arguments: CVarArg...) -> String {
-        // EnhancedLocalizationManager is not available through DIContainer, so we use .shared
-        // This is acceptable as EnhancedLocalizationManager is a separate utility
-        return EnhancedLocalizationManager.shared.localizedString(for: self, count: count, arguments: arguments)
+        String(format: localized(count: count), arguments: arguments)
     }
 }
 

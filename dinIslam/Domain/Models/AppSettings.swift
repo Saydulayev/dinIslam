@@ -53,6 +53,23 @@ enum AppLanguage: String, CaseIterable, Codable {
             return Locale(identifier: "en")
         }
     }
+    
+    /// Язык, на котором реально идут интерфейс и вопросы: «Системный» сводится
+    /// к русскому или английскому по языкам, выбранным в настройках iPhone
+    var resolved: AppLanguage {
+        switch self {
+        case .russian, .english:
+            return self
+        case .system:
+            let preferred = Bundle.preferredLocalizations(from: [AppLanguage.russian.rawValue, AppLanguage.english.rawValue]).first
+            return preferred == AppLanguage.english.rawValue ? .english : .russian
+        }
+    }
+    
+    /// Код языка ("ru" / "en") для локализации и загрузки вопросов
+    var languageCode: String {
+        resolved.rawValue
+    }
 }
 
 // MARK: - Settings Manager
@@ -112,19 +129,6 @@ final class SettingsManager {
     }
     
     private func applyLanguageSettings() {
-        // Apply language settings to the app
-        let languageCode: String
-        
-        switch settings.language {
-        case .system:
-            languageCode = Locale.current.language.languageCode?.identifier ?? "ru"
-        case .russian:
-            languageCode = "ru"
-        case .english:
-            languageCode = "en"
-        }
-        
-        // Update localization provider
-        localizationProvider.setLanguage(languageCode)
+        localizationProvider.setLanguage(settings.language.languageCode)
     }
 }

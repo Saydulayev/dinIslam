@@ -71,22 +71,7 @@ class SettingsViewModel {
     // MARK: - Language Settings
     func updateLanguage(_ language: AppLanguage) {
         settingsManager.updateLanguage(language)
-        
-        // Update localization helper
-        let languageCode: String
-        switch language {
-        case .system:
-            // Normalize preferred localization to base language code (e.g., "en-GB" -> "en")
-            let preferred = Bundle.main.preferredLocalizations.first
-            let normalized = preferred.flatMap { Locale(identifier: $0).language.languageCode?.identifier }
-            languageCode = normalized ?? "en"
-        case .russian:
-            languageCode = "ru"
-        case .english:
-            languageCode = "en"
-        }
-        
-        localizationProvider.setLanguage(languageCode)
+        localizationProvider.setLanguage(language.languageCode)
         refreshTrigger = UUID()
         hapticManager.selectionChanged()
         achievementManager.refreshLocalization()

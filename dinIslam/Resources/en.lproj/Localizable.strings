@@ -41,7 +41,6 @@
 "profile.avatar.select" = "Choose Photo";
 "profile.avatar.change" = "Change Photo";
 "profile.avatar.delete" = "Delete Photo";
-"profile.sync.reset" = "Reset Data";
 "profile.sync.reset.title" = "Reset statistics?";
 "profile.sync.reset.message" = "Statistics, the mistakes list, exam results, and question progress will be reset on this device and in iCloud. Your name, photo, and achievements will not change. This action cannot be undone.";
 "profile.sync.reset.message.guest" = "Statistics, the mistakes list, exam results, and question progress will be reset. Achievements will not change. This action cannot be undone.";
@@ -172,10 +171,6 @@
 
 // Quiz Stop
 "quiz.stop" = "Stop";
-"quiz.stop.confirm.title" = "Quit Quiz?";
-"quiz.stop.confirm.message" = "Progress will be lost.";
-"quiz.stop.confirm.ok" = "Quit";
-"quiz.stop.confirm.cancel" = "Cancel";
 
 // Quiz Finish
 "quiz.finish" = "Finish";

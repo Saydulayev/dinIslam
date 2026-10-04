@@ -41,7 +41,6 @@
 "profile.avatar.select" = "Выбрать фото";
 "profile.avatar.change" = "Сменить фото";
 "profile.avatar.delete" = "Удалить фото";
-"profile.sync.reset" = "Сбросить данные";
 "profile.sync.reset.title" = "Сбросить статистику?";
 "profile.sync.reset.message" = "Будут сброшены статистика, список ошибок, результаты экзаменов и прогресс изучения вопросов — на этом устройстве и в iCloud. Имя, фото и достижения не изменятся. Это действие нельзя отменить.";
 "profile.sync.reset.message.guest" = "Будут сброшены статистика, список ошибок, результаты экзаменов и прогресс изучения вопросов. Достижения не изменятся. Это действие нельзя отменить.";
@@ -173,10 +172,6 @@
 
 // Quiz Stop
 "quiz.stop" = "Стоп";
-"quiz.stop.confirm.title" = "Выйти из викторины?";
-"quiz.stop.confirm.message" = "Прогресс будет потерян.";
-"quiz.stop.confirm.ok" = "Выйти";
-"quiz.stop.confirm.cancel" = "Отмена";
 
 // Quiz Finish
 "quiz.finish" = "Завершить";

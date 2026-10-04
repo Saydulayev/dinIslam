@@ -152,26 +152,17 @@ struct UnifiedProfileView: View {
         loadQuestionsTask?.cancel()
         loadQuestionsTask = Task { @MainActor [settingsManager, remoteService] in
             // Same service as the quiz: fresh cache is used without a network request
-            let language: AppLanguage = settingsManager.settings.language == .english ? .english : .russian
-            let questions = await remoteService.fetchQuestions(for: language, manageLoadingState: false)
+            let questions = await remoteService.fetchQuestions(for: settingsManager.settings.language.resolved, manageLoadingState: false)
             totalQuestionsCount = questions.count
         }
     }
     
     private func checkForUpdates() async {
-        let currentLanguage: AppLanguage = settingsManager.settings.language == .system ? 
-            (Locale.current.language.languageCode?.identifier == "en" ? .english : .russian) :
-            settingsManager.settings.language
-        
-        await remoteService.checkForUpdates(for: currentLanguage)
+        await remoteService.checkForUpdates(for: settingsManager.settings.language.resolved)
     }
     
     private func syncQuestions() async {
-        let currentLanguage: AppLanguage = settingsManager.settings.language == .system ? 
-            (Locale.current.language.languageCode?.identifier == "en" ? .english : .russian) :
-            settingsManager.settings.language
-        
-        let questions = await remoteService.forceSync(for: currentLanguage)
+        let questions = await remoteService.forceSync(for: settingsManager.settings.language.resolved)
         
         await MainActor.run {
             totalQuestionsCount = questions.count

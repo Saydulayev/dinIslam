@@ -13,18 +13,6 @@ import UIKit
 @MainActor
 @Observable
 final class StartViewModel {
-    // MARK: - Nested Types
-    struct Particle: Identifiable {
-        let id = UUID()
-        var x: Double
-        var y: Double
-        var opacity: Double
-        var size: Double
-        var velocityX: Double
-        var velocityY: Double
-        var life: Double
-    }
-
     // MARK: - Dependencies
     let quizViewModel: QuizViewModel
     let statsManager: StatsManager
@@ -54,10 +42,6 @@ final class StartViewModel {
     var logoGlowIntensity: Double {
         get { visualEffectsManager.logoGlowIntensity }
         set { visualEffectsManager.logoGlowIntensity = newValue }
-    }
-    var particles: [Particle] {
-        get { visualEffectsManager.particles }
-        set { visualEffectsManager.particles = newValue }
     }
     var isGlowAnimationStarted: Bool {
         get { visualEffectsManager.isGlowAnimationStarted }
@@ -107,7 +91,7 @@ final class StartViewModel {
         
         self.examViewModelFactory = examViewModelFactory ?? DefaultExamViewModelFactory()
         
-        self.cachedLanguageCode = StartViewModel.languageCode(from: settingsManager)
+        self.cachedLanguageCode = settingsManager.settings.language.languageCode
     }
 
 
@@ -122,7 +106,6 @@ final class StartViewModel {
             }
         )
         visualEffectsManager.startGlowAnimationIfNeeded()
-        visualEffectsManager.createParticlesIfNeeded()
         
         // Keep question bank up to date with a lightweight ETag revalidation.
         Task { [weak self] in
@@ -304,19 +287,5 @@ final class StartViewModel {
     func enableReviewMode() {
         let manager = DefaultQuestionPoolProgressManager()
         manager.setReviewMode(true, version: 1)
-    }
-
-    // MARK: - Particles & Animations
-    func updateParticles(at date: Date) {
-        visualEffectsManager.updateParticles(at: date)
-    }
-
-    func particlesSnapshot(for date: Date) -> [Particle] {
-        return visualEffectsManager.particlesSnapshot(for: date)
-    }
-
-    // MARK: - Helpers
-    private static func languageCode(from settingsManager: SettingsManager) -> String {
-        settingsManager.settings.language.locale?.language.languageCode?.identifier ?? "ru"
     }
 }
