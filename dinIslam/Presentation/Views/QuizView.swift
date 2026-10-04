@@ -134,14 +134,8 @@ struct QuizView: View {
                                             systemImage: "arrow.right"
                                         )
                                         .font(DesignTokens.Typography.secondarySemibold)
-                                        .frame(maxWidth: .infinity)
-                                        .frame(height: 56)
                                     }
-                                    .foregroundStyle(DesignTokens.Colors.iconBlue)
-                                    .background(
-                                        RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
-                                            .stroke(DesignTokens.Colors.iconPurpleLight.opacity(0.5), lineWidth: 1.5)
-                                    )
+                                    .buttonStyle(DSButtonStyle())
                                 }
                             }
                         }
@@ -172,13 +166,10 @@ struct QuizView: View {
                                 Text("quiz.finish".localized)
                                     .font(DesignTokens.Typography.secondarySemibold)
                             }
-                            .foregroundColor(DesignTokens.Colors.statusGreen)
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 56)
-                            .glowBorder()
-                            .padding(.horizontal, DesignTokens.Spacing.xxl)
-                            .padding(.vertical, DesignTokens.Spacing.lg)
                         }
+                        .buttonStyle(DSButtonStyle(role: .success))
+                        .padding(.horizontal, DesignTokens.Spacing.xxl)
+                        .padding(.vertical, DesignTokens.Spacing.lg)
                         // Убираем фон, чтобы был виден градиент как на главном экране
                     }
                 }

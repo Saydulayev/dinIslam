@@ -64,7 +64,7 @@ struct ProfileSyncSectionView: View {
                         MinimalButton(
                             icon: "arrow.clockwise",
                             title: "profile.sync.retry".localized,
-                            foregroundColor: DesignTokens.Colors.warning
+                            role: .warning
                         ) {
                             Task { @MainActor [manager] in
                                 await manager.refreshFromCloud(mergeStrategy: .newest)
@@ -76,8 +76,7 @@ struct ProfileSyncSectionView: View {
                 } else {
                     MinimalButton(
                         icon: "icloud.fill",
-                        title: "profile.sync.refresh".localized,
-                        foregroundColor: DesignTokens.Colors.iconBlue
+                        title: "profile.sync.refresh".localized
                     ) {
                         Task { @MainActor [manager] in
                             await manager.refreshFromCloud(mergeStrategy: .newest)
@@ -128,7 +127,7 @@ struct ProfileSyncSectionView: View {
                     MinimalButton(
                         icon: "arrow.down.circle",
                         title: "stats.sync.sync".localized,
-                        foregroundColor: DesignTokens.Colors.iconGreen
+                        role: .success
                     ) {
                         Task { @MainActor in
                             await onSyncQuestions()
@@ -139,8 +138,7 @@ struct ProfileSyncSectionView: View {
                 } else {
                     MinimalButton(
                         icon: "tray.and.arrow.down.fill",
-                        title: "stats.sync.check".localized,
-                        foregroundColor: DesignTokens.Colors.iconBlue
+                        title: "stats.sync.check".localized
                     ) {
                         Task { @MainActor in
                             await onCheckForUpdates()
@@ -213,7 +211,7 @@ struct ProfileSyncSectionView: View {
                     MinimalButton(
                         icon: "arrow.down.circle",
                         title: "stats.sync.sync".localized,
-                        foregroundColor: DesignTokens.Colors.iconGreen
+                        role: .success
                     ) {
                         Task { @MainActor in
                             await onSyncQuestions()
@@ -224,8 +222,7 @@ struct ProfileSyncSectionView: View {
                 } else {
                     MinimalButton(
                         icon: "tray.and.arrow.down.fill",
-                        title: "stats.sync.check".localized,
-                        foregroundColor: DesignTokens.Colors.iconBlue
+                        title: "stats.sync.check".localized
                     ) {
                         Task { @MainActor in
                             await onCheckForUpdates()

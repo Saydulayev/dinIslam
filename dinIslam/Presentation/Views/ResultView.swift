@@ -111,11 +111,8 @@ struct ResultView: View {
                                 LocalizedText("result.playAgain")
                                     .font(DesignTokens.Typography.secondarySemibold)
                             }
-                            .foregroundColor(DesignTokens.Colors.iconBlue)
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 56)
-                            .glowBorder()
                         }
+                        .buttonStyle(DSButtonStyle())
                         
                         Button(action: onBackToStart) {
                             HStack(spacing: DesignTokens.Spacing.md) {
@@ -124,11 +121,8 @@ struct ResultView: View {
                                 LocalizedText("result.backToStart")
                                     .font(DesignTokens.Typography.secondarySemibold)
                             }
-                            .foregroundColor(DesignTokens.Colors.iconBlue)
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 56)
-                            .glowBorder()
                         }
+                        .buttonStyle(DSButtonStyle())
                     }
                     .padding(.horizontal, DesignTokens.Spacing.xxl)
                     

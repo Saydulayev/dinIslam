@@ -265,11 +265,8 @@ struct ExamResultActionsView: View {
                     Text("exam.result.retake".localized)
                         .font(DesignTokens.Typography.secondarySemibold)
                 }
-                .foregroundColor(DesignTokens.Colors.iconBlue)
-                .frame(maxWidth: .infinity)
-                .frame(height: 56)
-                .glowBorder()
             }
+            .buttonStyle(DSButtonStyle())
             
             Button(action: onBackToMenu) {
                 HStack(spacing: DesignTokens.Spacing.md) {
@@ -278,11 +275,8 @@ struct ExamResultActionsView: View {
                     LocalizedText("result.backToStart")
                         .font(DesignTokens.Typography.secondarySemibold)
                 }
-                .foregroundColor(DesignTokens.Colors.iconBlue)
-                .frame(maxWidth: .infinity)
-                .frame(height: 56)
-                .glowBorder()
             }
+            .buttonStyle(DSButtonStyle())
         }
     }
 }

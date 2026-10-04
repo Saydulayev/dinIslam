@@ -56,7 +56,7 @@ struct ProfileWrongQuestionsSectionView: View {
                 MinimalButton(
                     icon: "exclamationmark.triangle",
                     title: "stats.repeatMistakes".localized,
-                    foregroundColor: DesignTokens.Colors.iconRed
+                    role: .destructive
                 ) {
                     onStartMistakesReview()
                 }

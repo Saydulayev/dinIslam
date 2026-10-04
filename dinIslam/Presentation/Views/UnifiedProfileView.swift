@@ -84,7 +84,7 @@ struct UnifiedProfileView: View {
                     MinimalButton(
                         icon: "arrow.counterclockwise",
                         title: "stats.reset".localized,
-                        foregroundColor: DesignTokens.Colors.destructive
+                        role: .destructive
                     ) {
                         showResetConfirmation = true
                     }

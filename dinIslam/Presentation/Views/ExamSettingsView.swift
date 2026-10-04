@@ -192,11 +192,8 @@ struct ExamSettingsView: View {
                                 LocalizedText("exam.settings.start")
                                     .font(DesignTokens.Typography.secondarySemibold)
                             }
-                            .foregroundColor(DesignTokens.Colors.iconBlue)
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 56)
-                            .glowBorder()
                         }
+                        .buttonStyle(DSButtonStyle())
                         .padding(.horizontal, DesignTokens.Spacing.xxl)
                         .padding(.vertical, DesignTokens.Spacing.lg)
                         // Убираем фон, чтобы был виден градиент как на главном экране

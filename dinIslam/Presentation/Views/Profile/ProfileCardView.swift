@@ -158,7 +158,7 @@ struct ProfileCardView: View {
                         MinimalButton(
                             icon: "trash",
                             title: "profile.avatar.delete".localized,
-                            foregroundColor: DesignTokens.Colors.textSecondary
+                            role: .secondary
                         ) {
                             Task { @MainActor [manager] in
                                 await manager.deleteAvatar()
@@ -169,7 +169,7 @@ struct ProfileCardView: View {
                     MinimalButton(
                         icon: "rectangle.portrait.and.arrow.right",
                         title: "profile.signout".localized,
-                        foregroundColor: DesignTokens.Colors.destructive
+                        role: .destructive
                     ) {
                         showingSignOutConfirmation = true
                     }
@@ -178,7 +178,7 @@ struct ProfileCardView: View {
                     MinimalButton(
                         icon: "person.crop.circle.badge.xmark",
                         title: "profile.deleteAccount".localized,
-                        foregroundColor: DesignTokens.Colors.destructive
+                        role: .destructive
                     ) {
                         showingDeleteAccountConfirmation = true
                     }

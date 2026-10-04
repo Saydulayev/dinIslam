@@ -38,7 +38,7 @@ struct AchievementsView: View {
                 MinimalButton(
                     icon: "arrow.counterclockwise",
                     title: "achievements.reset".localized,
-                    foregroundColor: DesignTokens.Colors.destructive
+                    role: .destructive
                 ) {
                     showingResetAlert = true
                 }
@@ -288,8 +288,7 @@ struct ExpandedAchievementCard: View {
                 // Share Button - в стиле MinimalButton
                 MinimalButton(
                     icon: "square.and.arrow.up",
-                    title: "achievements.share".localized,
-                    foregroundColor: achievement.color
+                    title: "achievements.share".localized
                 ) {
                     shareAchievement()
                 }
@@ -298,7 +297,7 @@ struct ExpandedAchievementCard: View {
                 MinimalButton(
                     icon: "checkmark.square",
                     title: localizationProvider.localizedString(for: "settings.done"),
-                    foregroundColor: DesignTokens.Colors.textSecondary
+                    role: .secondary
                 ) {
                     withAnimation(.easeInOut(duration: 0.3)) {
                         isPresented = false

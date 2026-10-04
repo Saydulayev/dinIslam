@@ -190,12 +190,8 @@ struct ExamView: View {
                                 Text("exam.skip".localized)
                                     .font(DesignTokens.Typography.label)
                             }
-                            .foregroundColor(DesignTokens.Colors.iconOrange)
-                            .opacity(viewModel.state == .active(.playing) ? 1 : 0.4)
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 56)
-                            .glowBorder()
                         }
+                        .buttonStyle(DSButtonStyle(role: .warning))
                         .disabled(viewModel.state != .active(.playing))
                     }
                     
@@ -213,11 +209,8 @@ struct ExamView: View {
                             Text(viewModel.state == .active(.paused) ? "exam.resume".localized : "exam.pause".localized)
                                 .font(DesignTokens.Typography.label)
                         }
-                        .foregroundColor(DesignTokens.Colors.iconBlue)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 56)
-                        .glowBorder()
                     }
+                    .buttonStyle(DSButtonStyle())
                     
                     // Finish button
                     Button(action: {
@@ -229,11 +222,8 @@ struct ExamView: View {
                             Text("quiz.finish".localized)
                                 .font(DesignTokens.Typography.label)
                         }
-                        .foregroundColor(DesignTokens.Colors.statusGreen)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 56)
-                        .glowBorder()
                     }
+                    .buttonStyle(DSButtonStyle(role: .success))
                 }
                 .padding(.horizontal, DesignTokens.Spacing.xxl)
                 .padding(.vertical, DesignTokens.Spacing.lg)
@@ -330,14 +320,8 @@ struct ExamPausedView: View {
             Button(action: onResume) {
                 Label("exam.resume".localized, systemImage: "play.fill")
                     .font(DesignTokens.Typography.secondarySemibold)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 56)
             }
-            .foregroundStyle(DesignTokens.Colors.iconBlue)
-            .background(
-                RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
-                    .stroke(DesignTokens.Colors.iconPurpleLight.opacity(0.5), lineWidth: 1.5)
-            )
+            .buttonStyle(DSButtonStyle())
         }
         .padding(DesignTokens.Spacing.xxl)
         .frame(maxWidth: .infinity)
@@ -380,14 +364,8 @@ struct ExamErrorView: View {
                 Button(action: onRetry) {
                     Label("exam.error.retry".localized, systemImage: "arrow.clockwise")
                         .font(DesignTokens.Typography.secondarySemibold)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 56)
                 }
-                .foregroundStyle(DesignTokens.Colors.iconBlue)
-                .background(
-                    RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
-                        .stroke(DesignTokens.Colors.iconPurpleLight.opacity(0.5), lineWidth: 1.5)
-                )
+                .buttonStyle(DSButtonStyle())
                 
                 Button(action: onExit) {
                     Label("result.backToStart".localized, systemImage: "house.fill")
