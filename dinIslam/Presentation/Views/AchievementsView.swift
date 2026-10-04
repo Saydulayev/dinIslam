@@ -108,6 +108,7 @@ struct AchievementCard: View {
     @Environment(\.settingsManager) private var settingsManager
     @Environment(\.achievementManager) private var achievementManager: AchievementManager
     @Environment(\.statsManager) private var statsManager: StatsManager
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     
     private var isUnlocked: Bool {
         achievement.isUnlocked
@@ -137,7 +138,7 @@ struct AchievementCard: View {
         // Открыть подробности можно только у полученного достижения
         if isUnlocked {
             Button {
-                withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
+                withAnimation(.dsSpring(reduceMotion: reduceMotion)) {
                     onTap()
                 }
             } label: {
@@ -246,6 +247,7 @@ struct ExpandedAchievementCard: View {
     let achievement: Achievement
     @Binding var isPresented: Bool
     @Environment(\.localizationProvider) private var localizationProvider
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     
     var body: some View {
         VStack(spacing: DesignTokens.Spacing.xxl) {
@@ -328,9 +330,9 @@ struct ExpandedAchievementCard: View {
             y: 12
         )
         .padding(.horizontal, DesignTokens.Spacing.xxxl)
-        .scaleEffect(isPresented ? 1.0 : 0.8)
+        .scaleEffect(isPresented || reduceMotion ? 1.0 : 0.8)
         .opacity(isPresented ? 1.0 : 0.0)
-        .animation(.spring(response: 0.6, dampingFraction: 0.8), value: isPresented)
+        .animation(.dsSpring(reduceMotion: reduceMotion), value: isPresented)
     }
     
     // MARK: - Helper

@@ -48,7 +48,6 @@ struct ExamResultView: View {
         .navigationTitle("exam.result.title".localized)
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
-        .interactiveDismissDisabled(true)
         .toolbarColorScheme(.dark, for: .navigationBar)
     }
 }
@@ -125,7 +124,7 @@ struct ExamStatsCardsView: View {
             ExamStatCard(
                 title: "exam.result.answered".localized,
                 value: "\(result.answeredQuestions)",
-                icon: "checkmark.circle.fill",
+                icon: "pencil.circle.fill",
                 color: DesignTokens.Colors.iconBlue
             )
             

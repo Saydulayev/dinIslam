@@ -15,6 +15,12 @@ final class DefaultStartVisualEffectsManager: StartVisualEffectsManaging {
     
     func startGlowAnimationIfNeeded() {
         guard !isGlowAnimationStarted else { return }
+        // «Уменьшение движения»: логотип светится ровно, без пульсации
+        if UIAccessibility.isReduceMotionEnabled {
+            logoGlowIntensity = 1.0
+            isGlowAnimationStarted = true
+            return
+        }
         withAnimation(.easeInOut(duration: 2.0).repeatForever(autoreverses: true)) {
             logoGlowIntensity = 1.0
         }

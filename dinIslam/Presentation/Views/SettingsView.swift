@@ -36,7 +36,7 @@ struct SettingsView: View {
                                 iconColor: DesignTokens.Colors.iconBlue,
                                 title: "settings.language.title".localized,
                                 subtitle: viewModel.settings.language.displayName,
-                                showChevron: false
+                                showChevron: true
                             ) {
                                 viewModel.showingLanguagePicker = true
                             }
@@ -94,7 +94,7 @@ struct SettingsView: View {
                                 iconColor: DesignTokens.Colors.iconPurple,
                                 title: "settings.notifications.title".localized,
                                 subtitle: nil,
-                                showChevron: false
+                                showChevron: true
                             ) {
                                 showingNotificationSettings = true
                             }
@@ -186,7 +186,7 @@ struct SettingsView: View {
                                     Text("settings.version.title".localized)
                                         .font(DesignTokens.Typography.bodyRegular)
                                         .foregroundColor(DesignTokens.Colors.textPrimary)
-                                    Text(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0")
+                                    Text(appVersion)
                                         .font(DesignTokens.Typography.label)
                                         .foregroundColor(DesignTokens.Colors.textSecondary)
                                 }
@@ -204,7 +204,7 @@ struct SettingsView: View {
                                 iconColor: DesignTokens.Colors.iconRed,
                                 title: "settings.privacy.title".localized,
                                 subtitle: nil,
-                                showChevron: false
+                                showChevron: true
                             ) {
                                 viewModel.openPrivacyPolicy()
                             }
@@ -218,7 +218,7 @@ struct SettingsView: View {
                                 iconColor: DesignTokens.Colors.textSecondary,
                                 title: "settings.terms.title".localized,
                                 subtitle: nil,
-                                showChevron: false
+                                showChevron: true
                             ) {
                                 viewModel.openTermsOfService()
                             }
@@ -273,6 +273,14 @@ struct SettingsView: View {
         } message: { recipient in
             Text(String(format: "settings.feedback.mailUnavailable.message".localized, recipient.address))
         }
+    }
+    
+    /// Версия с номером сборки — например «1.2 (34)», чтобы в обращениях было видно точную сборку
+    private var appVersion: String {
+        let info = Bundle.main.infoDictionary
+        let version = info?["CFBundleShortVersionString"] as? String ?? "1.0"
+        guard let build = info?["CFBundleVersion"] as? String else { return version }
+        return "\(version) (\(build))"
     }
     
     /// Без настроенной почты mailto: не открывается — тогда показываем адрес,

@@ -134,19 +134,15 @@ struct NotificationSettingsView: View {
                                             .font(.system(size: DesignTokens.Sizes.iconMedium))
                                             .frame(width: DesignTokens.Sizes.iconLarge)
                                         
-                                        VStack(alignment: .leading, spacing: DesignTokens.Spacing.xs) {
-                                            Text("notification.settings.time".localized)
-                                                .font(DesignTokens.Typography.bodyRegular)
-                                                .foregroundColor(DesignTokens.Colors.textPrimary)
-                                            
-                                            Text(reminderTime.formatted(date: .omitted, time: .shortened))
-                                                .font(DesignTokens.Typography.label)
-                                                .foregroundColor(DesignTokens.Colors.textSecondary)
-                                        }
+                                        // Время показывает сам DatePicker, второй раз подписью не дублируем
+                                        Text("notification.settings.time".localized)
+                                            .font(DesignTokens.Typography.bodyRegular)
+                                            .foregroundColor(DesignTokens.Colors.textPrimary)
+                                            .accessibilityHidden(true)
                                         
                                         Spacer()
                                         
-                                        DatePicker("", selection: $reminderTime, displayedComponents: .hourAndMinute)
+                                        DatePicker("notification.settings.time".localized, selection: $reminderTime, displayedComponents: .hourAndMinute)
                                             .labelsHidden()
                                             .tint(DesignTokens.Colors.iconBlue)
                                             .onChange(of: reminderTime) { _, newValue in

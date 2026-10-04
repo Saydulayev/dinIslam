@@ -21,6 +21,7 @@ struct ResultView: View {
     @State private var pendingAchievements: [Achievement] = []
     @State private var achievementsTotal = 0
     @State private var achievementsCleared = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     
     var body: some View {
         ZStack {
@@ -150,13 +151,13 @@ struct ResultView: View {
                             onClose: showNextAchievement
                         )
                         .id(achievement.id)
-                        .transition(.scale(scale: 0.8).combined(with: .opacity))
+                        .transition(reduceMotion ? .opacity : .scale(scale: 0.8).combined(with: .opacity))
                         // Пока окно открыто, VoiceOver не уходит на экран результата под ним
                         .accessibilityAddTraits(.isModal)
                     }
                 }
             }
-            .animation(.spring(response: 0.6, dampingFraction: 0.8), value: pendingAchievements.first?.id)
+            .animation(.dsSpring(reduceMotion: reduceMotion), value: pendingAchievements.first?.id)
         )
         .onAppear {
             prepareAchievements()

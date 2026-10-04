@@ -16,6 +16,11 @@ struct ProfileSyncSectionView: View {
     let onSyncQuestions: () async -> Void
     let onCheckForUpdates: () async -> Void
     
+    /// Прирост вопросов в обновлении; если вопросы удалили, разница отрицательная — «+N» не показываем
+    private var newQuestionsCount: Int {
+        remoteService.remoteQuestionsCount - remoteService.cachedQuestionsCount
+    }
+    
     var body: some View {
         if manager.isSignedIn {
             unifiedSyncSection
@@ -71,7 +76,6 @@ struct ProfileSyncSectionView: View {
                             }
                         }
                         .disabled(isResettingProfile || manager.isLoading)
-                        .opacity((isResettingProfile || manager.isLoading) ? 0.6 : 1.0)
                     }
                 } else {
                     MinimalButton(
@@ -83,7 +87,6 @@ struct ProfileSyncSectionView: View {
                         }
                     }
                     .disabled(isResettingProfile || manager.isLoading)
-                    .opacity((isResettingProfile || manager.isLoading) ? 0.6 : 1.0)
                 }
             }
             
@@ -108,8 +111,8 @@ struct ProfileSyncSectionView: View {
                                 .font(DesignTokens.Typography.secondaryRegular)
                                 .fontWeight(.semibold)
                                 .foregroundColor(DesignTokens.Colors.iconGreen)
-                            if remoteService.remoteQuestionsCount > remoteService.cachedQuestionsCount {
-                                Text("+\(remoteService.remoteQuestionsCount - remoteService.cachedQuestionsCount)")
+                            if newQuestionsCount > 0 {
+                                Text("+\(newQuestionsCount)")
                                     .font(DesignTokens.Typography.label)
                                     .fontWeight(.semibold)
                                     .foregroundColor(DesignTokens.Colors.iconGreen)
@@ -134,7 +137,6 @@ struct ProfileSyncSectionView: View {
                         }
                     }
                     .disabled(remoteService.isLoading)
-                    .opacity(remoteService.isLoading ? 0.6 : 1.0)
                 } else {
                     MinimalButton(
                         icon: "tray.and.arrow.down.fill",
@@ -145,7 +147,6 @@ struct ProfileSyncSectionView: View {
                         }
                     }
                     .disabled(remoteService.isLoading)
-                    .opacity(remoteService.isLoading ? 0.6 : 1.0)
                 }
             }
             
@@ -194,13 +195,13 @@ struct ProfileSyncSectionView: View {
                     }
                 }
                 
-                if remoteService.hasUpdates {
+                if remoteService.hasUpdates && newQuestionsCount > 0 {
                     HStack {
                         Text("stats.sync.newQuestions.title".localized)
                             .font(DesignTokens.Typography.label)
                             .foregroundColor(DesignTokens.Colors.textSecondary)
                         Spacer()
-                        Text("+\(remoteService.remoteQuestionsCount - remoteService.cachedQuestionsCount)")
+                        Text("+\(newQuestionsCount)")
                             .font(DesignTokens.Typography.label)
                             .fontWeight(.semibold)
                             .foregroundColor(DesignTokens.Colors.iconGreen)
@@ -218,7 +219,6 @@ struct ProfileSyncSectionView: View {
                         }
                     }
                     .disabled(remoteService.isLoading)
-                    .opacity(remoteService.isLoading ? 0.6 : 1.0)
                 } else {
                     MinimalButton(
                         icon: "tray.and.arrow.down.fill",
@@ -229,7 +229,6 @@ struct ProfileSyncSectionView: View {
                         }
                     }
                     .disabled(remoteService.isLoading)
-                    .opacity(remoteService.isLoading ? 0.6 : 1.0)
                 }
             }
         }

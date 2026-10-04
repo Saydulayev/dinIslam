@@ -48,6 +48,14 @@ extension Double {
     }
 }
 
+// MARK: - Motion
+extension Animation {
+    /// Пружина интерфейса; при «Уменьшении движения» — короткое плавное появление без отскока
+    static func dsSpring(reduceMotion: Bool) -> Animation {
+        reduceMotion ? .easeInOut(duration: 0.2) : .spring(response: 0.6, dampingFraction: 0.8)
+    }
+}
+
 // MARK: - Design Tokens
 struct DesignTokens {
     
