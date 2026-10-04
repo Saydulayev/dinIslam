@@ -64,7 +64,7 @@ struct QuizView: View {
                         
                             Text("\(viewModel.correctAnswers)")
                                 .font(DesignTokens.Typography.secondarySemibold)
-                                .foregroundStyle(DesignTokens.Colors.statusGreen)
+                                .foregroundStyle(DesignTokens.Colors.success)
                         }
                     
                         // Progress bar
@@ -246,9 +246,9 @@ struct AnswerButton: View {
         if !isAnswerSelected {
             return DesignTokens.Colors.iconBlue
         } else if isSelected {
-            return isCorrect ? DesignTokens.Colors.statusGreen : DesignTokens.Colors.iconRed
+            return isCorrect ? DesignTokens.Colors.success : DesignTokens.Colors.error
         } else if isCorrect {
-            return DesignTokens.Colors.statusGreen
+            return DesignTokens.Colors.success
         } else {
             return DesignTokens.Colors.textTertiary
         }
@@ -258,9 +258,9 @@ struct AnswerButton: View {
         if !isAnswerSelected {
             return DesignTokens.Colors.iconBlue.opacity(0.15)
         } else if isSelected {
-            return isCorrect ? DesignTokens.Colors.statusGreen.opacity(0.2) : DesignTokens.Colors.iconRed.opacity(0.2)
+            return isCorrect ? DesignTokens.Colors.success.opacity(0.2) : DesignTokens.Colors.error.opacity(0.2)
         } else if isCorrect {
-            return DesignTokens.Colors.statusGreen.opacity(0.2)
+            return DesignTokens.Colors.success.opacity(0.2)
         } else {
             return DesignTokens.Colors.cardBackground
         }
@@ -299,12 +299,12 @@ struct AnswerButton: View {
                 if isAnswerSelected && isCorrect {
                     Image(systemName: "checkmark.circle.fill")
                         .font(.system(size: DesignTokens.Sizes.iconMedium))
-                        .foregroundColor(DesignTokens.Colors.statusGreen)
+                        .foregroundColor(DesignTokens.Colors.success)
                         .accessibilityHidden(true)
                 } else if isAnswerSelected && isSelected {
                     Image(systemName: "xmark.circle.fill")
                         .font(.system(size: DesignTokens.Sizes.iconMedium))
-                        .foregroundColor(DesignTokens.Colors.iconRed)
+                        .foregroundColor(DesignTokens.Colors.error)
                         .accessibilityHidden(true)
                 }
             }

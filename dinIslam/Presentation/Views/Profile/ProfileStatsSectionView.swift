@@ -73,7 +73,7 @@ struct ProfileStatsSectionView: View {
                     if manager.isSignedIn {
                         ProgressCardView(
                             icon: "chart.bar",
-                            value: "\(Int(manager.progress.averageQuizScore))%",
+                            value: manager.progress.averageQuizScore.displayScore,
                             label: "profile.progress.accuracy".localized,
                             iconColor: DesignTokens.Colors.iconPurple,
                             backgroundColor: DesignTokens.Colors.iconPurple.opacity(0.2)
@@ -81,10 +81,10 @@ struct ProfileStatsSectionView: View {
                     } else {
                         // Для неавторизованных показываем точность из statsManager
                         let accuracy = statsManager.stats.totalQuestionsStudied > 0 ?
-                            Int((Double(statsManager.stats.correctAnswers) / Double(statsManager.stats.totalQuestionsStudied)) * 100) : 0
+                            Double(statsManager.stats.correctAnswers) / Double(statsManager.stats.totalQuestionsStudied) * 100 : 0
                         ProgressCardView(
                             icon: "chart.bar",
-                            value: "\(accuracy)%",
+                            value: accuracy.displayScore,
                             label: "profile.progress.accuracy".localized,
                             iconColor: DesignTokens.Colors.iconPurple,
                             backgroundColor: DesignTokens.Colors.iconPurple.opacity(0.2)

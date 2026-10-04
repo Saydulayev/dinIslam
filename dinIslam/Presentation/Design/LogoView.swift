@@ -31,7 +31,7 @@ struct LogoView: View {
     
     // MARK: - Container Frame
     private var containerFrame: some View {
-        RoundedRectangle(cornerRadius: 24)
+        RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xlarge)
             .stroke(
                 LinearGradient(
                     gradient: Gradient(colors: [

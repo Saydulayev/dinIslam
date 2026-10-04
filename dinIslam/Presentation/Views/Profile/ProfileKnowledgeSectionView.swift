@@ -39,7 +39,7 @@ struct ProfileKnowledgeSectionView: View {
                         TopicProgressRow(
                             categoryId: topic.category.rawValue,
                             accuracy: topic.stat.accuracy / 100,
-                            detail: "\(Int(topic.stat.accuracy.rounded()))%"
+                            detail: topic.stat.accuracy.displayScore
                         )
                     }
                 }

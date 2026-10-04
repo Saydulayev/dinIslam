@@ -144,7 +144,7 @@ struct ReviewSummaryCard: View {
                 .foregroundStyle(DesignTokens.Colors.textPrimary)
 
             if summary.graduated > 0 {
-                row(icon: "checkmark.seal.fill", color: DesignTokens.Colors.statusGreen,
+                row(icon: "checkmark.seal.fill", color: DesignTokens.Colors.success,
                     title: "review.summary.graduated".localized, value: summary.graduated)
             }
             if summary.advanced > 0 {
@@ -165,7 +165,7 @@ struct ReviewSummaryCard: View {
             if summary.remaining == 0 {
                 Text("review.summary.allLearned".localized)
                     .font(DesignTokens.Typography.secondarySemibold)
-                    .foregroundStyle(DesignTokens.Colors.statusGreen)
+                    .foregroundStyle(DesignTokens.Colors.success)
             } else if let next = ReviewDateText.nextReview(summary.nextDueDate) {
                 Text(next)
                     .font(DesignTokens.Typography.secondaryRegular)

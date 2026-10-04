@@ -321,7 +321,7 @@ struct StartView: View {
     private func averageScoreTile(model: StartViewModel) -> some View {
         let hasGames = model.statsManager.hasRecentGames()
         return VStack(spacing: DesignTokens.Spacing.xs) {
-            Text(hasGames ? "\(Int(model.statsManager.getAverageRecentScore()))%" : "—")
+            Text(hasGames ? model.statsManager.getAverageRecentScore().displayScore : "—")
                 .font(DesignTokens.Typography.h1)
                 .foregroundStyle(hasGames ? DesignTokens.Colors.iconBlueLight : DesignTokens.Colors.textTertiary)
             LocalizedText(hasGames ? "start.averageScore" : "start.noGamesYet")

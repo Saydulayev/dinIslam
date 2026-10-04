@@ -34,7 +34,7 @@ struct ResultView: View {
                     // Result icon
                     VStack(spacing: DesignTokens.Spacing.lg) {
                         Image(systemName: resultIcon)
-                            .font(.system(size: 80))
+                            .font(.system(size: DesignTokens.Sizes.iconHero))
                             .foregroundStyle(resultColor)
                         
                         LocalizedText("result.title")
@@ -46,8 +46,8 @@ struct ResultView: View {
                     VStack(spacing: DesignTokens.Spacing.xl) {
                         // Main score
                         VStack(spacing: DesignTokens.Spacing.sm) {
-                            Text("\(Int(result.percentage))%")
-                                .font(.system(size: 60, weight: .bold, design: .rounded))
+                            Text(result.percentage.displayScore)
+                                .font(DesignTokens.Typography.scoreLarge)
                                 .foregroundStyle(resultColor)
                             
                             LocalizedText("result.correctAnswers")

@@ -45,7 +45,7 @@ struct BankCompletionView: View {
                             )
                         
                         Image(systemName: "checkmark.circle.fill")
-                            .font(.system(size: 80))
+                            .font(.system(size: DesignTokens.Sizes.iconHero))
                             .foregroundStyle(DesignTokens.Colors.iconGreen)
                     }
                     .padding(.bottom, DesignTokens.Spacing.lg)

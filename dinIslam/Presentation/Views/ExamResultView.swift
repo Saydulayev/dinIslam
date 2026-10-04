@@ -61,8 +61,8 @@ struct ExamResultHeaderView: View {
         VStack(spacing: DesignTokens.Spacing.lg) {
             // Icon
             Image(systemName: result.isPassed ? "checkmark.circle.fill" : "xmark.circle.fill")
-                .font(.system(size: 80))
-                .foregroundStyle(result.isPassed ? DesignTokens.Colors.statusGreen : DesignTokens.Colors.iconRed)
+                .font(.system(size: DesignTokens.Sizes.iconHero))
+                .foregroundStyle(result.isPassed ? DesignTokens.Colors.success : DesignTokens.Colors.error)
             
             // Title
             Text(result.isPassed ? "exam.result.passed".localized : "exam.result.failed".localized)
@@ -70,9 +70,9 @@ struct ExamResultHeaderView: View {
                 .foregroundColor(DesignTokens.Colors.textPrimary)
             
             // Score
-            Text("\(Int(result.percentage))%")
-                .font(.system(size: 48, weight: .bold, design: .rounded))
-                .foregroundStyle(result.isPassed ? DesignTokens.Colors.statusGreen : DesignTokens.Colors.iconRed)
+            Text(result.percentage.displayScore)
+                .font(DesignTokens.Typography.scoreMedium)
+                .foregroundStyle(result.isPassed ? DesignTokens.Colors.success : DesignTokens.Colors.error)
         }
         .padding(.vertical, DesignTokens.Spacing.xl)
     }
@@ -100,13 +100,13 @@ struct ExamGradeView: View {
     private var gradeColor: Color {
         switch result.grade {
         case .excellent:
-            return DesignTokens.Colors.statusGreen
+            return DesignTokens.Colors.success
         case .good:
             return DesignTokens.Colors.iconBlue
         case .satisfactory:
-            return DesignTokens.Colors.iconOrange
+            return DesignTokens.Colors.warning
         case .unsatisfactory:
-            return DesignTokens.Colors.iconRed
+            return DesignTokens.Colors.error
         }
     }
 }
@@ -133,14 +133,14 @@ struct ExamStatsCardsView: View {
                 title: "exam.result.correct".localized,
                 value: "\(result.correctAnswers)",
                 icon: "checkmark.circle.fill",
-                color: DesignTokens.Colors.statusGreen
+                color: DesignTokens.Colors.success
             )
             
             ExamStatCard(
                 title: "exam.result.incorrect".localized,
                 value: "\(result.incorrectAnswers)",
                 icon: "xmark.circle.fill",
-                color: DesignTokens.Colors.iconRed
+                color: DesignTokens.Colors.error
             )
             
             ExamStatCard(
@@ -207,13 +207,13 @@ struct ExamBreakdownView: View {
                 ExamBreakdownRow(
                     title: "exam.result.averageTime".localized,
                     value: formatTime(result.averageTimePerQuestion),
-                    color: DesignTokens.Colors.statusGreen
+                    color: DesignTokens.Colors.success
                 )
                 
                 ExamBreakdownRow(
                     title: "exam.result.timeExpired".localized,
                     value: "\(result.timeExpiredQuestions)",
-                    color: DesignTokens.Colors.iconRed
+                    color: DesignTokens.Colors.error
                 )
             }
         }

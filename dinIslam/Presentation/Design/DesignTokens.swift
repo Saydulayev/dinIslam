@@ -35,6 +35,19 @@ extension Color {
     }
 }
 
+// MARK: - Score Formatting
+extension Double {
+    /// Процент (0…100) для показа: округление до целого, но неполный результат
+    /// не превращается в «100%», а ненулевой — в «0%»
+    var displayScore: String {
+        var value = Int(rounded())
+        if self > 0 && self < 100 {
+            value = Swift.min(Swift.max(value, 1), 99)
+        }
+        return "\(value)%"
+    }
+}
+
 // MARK: - Design Tokens
 struct DesignTokens {
     
@@ -70,6 +83,12 @@ struct DesignTokens {
         
         // Status colors
         static let statusGreen = Color(hex: "#10B981")
+        
+        // Semantic colors - по смыслу, а не по оттенку
+        static let success = statusGreen  // верный ответ, экзамен сдан, синхронизировано
+        static let error = iconRed        // неверный ответ, экзамен не сдан, время вышло
+        static let warning = iconOrange   // требует внимания: таймер, ошибка синхронизации
+        static let destructive = iconRed  // разрушительные действия: сброс, выход, удаление
         
         // Borders - нейтральные цвета
         static let borderSubtle = Color(hex: "#171717").opacity(0.3) // neutral-900 с прозрачностью
@@ -124,6 +143,7 @@ struct DesignTokens {
         static let small: CGFloat = 8
         static let medium: CGFloat = 12
         static let large: CGFloat = 16
+        static let overlayCard: CGFloat = 20 // всплывающая карточка нового достижения
         static let xlarge: CGFloat = 24
     }
     
@@ -157,6 +177,11 @@ struct DesignTokens {
         
         // Stats value
         static let statsValue = Font.system(.callout)               // 16
+        
+        // Крупные цифры и заголовки экранов результата — фиксированный размер
+        static let scoreLarge = Font.system(size: 60, weight: .bold, design: .rounded)
+        static let scoreMedium = Font.system(size: 48, weight: .bold, design: .rounded)
+        static let displayTitle = Font.system(size: 24, weight: .bold)
     }
     
     // MARK: - Sizes
@@ -170,9 +195,14 @@ struct DesignTokens {
         static let editIconSize: CGFloat = 16
         
         // Icons
+        static let iconXSmall: CGFloat = 12     // шевроны
         static let iconSmall: CGFloat = 16
         static let iconMedium: CGFloat = 20
         static let iconLarge: CGFloat = 24
+        static let iconXLarge: CGFloat = 32     // иконка во всплывающем достижении
+        static let iconXXLarge: CGFloat = 50    // иконка в раскрытой карточке достижения
+        static let iconDisplay: CGFloat = 56    // заглушка аватара, пауза экзамена
+        static let iconHero: CGFloat = 80       // главная иконка экранов результата
         
         // Buttons
         static let buttonHeight: CGFloat = 40

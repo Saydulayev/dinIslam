@@ -26,11 +26,11 @@ enum ProfileViewHelpers {
     static func syncColor(for state: ProfileManager.SyncState) -> Color {
         switch state {
         case .idle:
-            return DesignTokens.Colors.statusGreen
+            return DesignTokens.Colors.success
         case .syncing:
             return DesignTokens.Colors.iconBlue
         case .failed:
-            return DesignTokens.Colors.iconOrange
+            return DesignTokens.Colors.warning
         }
     }
 

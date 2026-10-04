@@ -49,22 +49,22 @@ struct ProfileSyncSectionView: View {
                         HStack(spacing: DesignTokens.Spacing.sm) {
                             Image(systemName: "exclamationmark.triangle.fill")
                                 .font(.system(size: DesignTokens.Sizes.iconSmall))
-                                .foregroundColor(DesignTokens.Colors.iconOrange)
+                                .foregroundColor(DesignTokens.Colors.warning)
                             
                             Text(message)
                                 .font(DesignTokens.Typography.secondaryRegular)
-                                .foregroundStyle(DesignTokens.Colors.iconOrange)
+                                .foregroundStyle(DesignTokens.Colors.warning)
                         }
                         .padding(DesignTokens.Spacing.md)
                         .background(
                             RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
-                                .fill(DesignTokens.Colors.iconOrange.opacity(0.1))
+                                .fill(DesignTokens.Colors.warning.opacity(0.1))
                         )
                         
                         MinimalButton(
                             icon: "arrow.clockwise",
                             title: "profile.sync.retry".localized,
-                            foregroundColor: DesignTokens.Colors.iconOrange
+                            foregroundColor: DesignTokens.Colors.warning
                         ) {
                             Task { @MainActor [manager] in
                                 await manager.refreshFromCloud(mergeStrategy: .newest)

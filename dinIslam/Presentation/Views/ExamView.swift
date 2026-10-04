@@ -133,12 +133,12 @@ struct ExamView: View {
                         if viewModel.state == .active(.timeUp) {
                             Label("exam.timeUp".localized, systemImage: "timer")
                                 .font(DesignTokens.Typography.secondarySemibold)
-                                .foregroundStyle(DesignTokens.Colors.iconRed)
+                                .foregroundStyle(DesignTokens.Colors.error)
                                 .padding(.horizontal, DesignTokens.Spacing.lg)
                                 .padding(.vertical, DesignTokens.Spacing.sm)
                                 .background(
                                     Capsule()
-                                        .fill(DesignTokens.Colors.iconRed.opacity(0.15))
+                                        .fill(DesignTokens.Colors.error.opacity(0.15))
                                 )
                                 .transition(.opacity)
                         }
@@ -291,9 +291,9 @@ struct ExamHeaderView: View {
     private var timerColor: Color {
         switch viewModel.timerUrgency {
         case .critical:
-            return DesignTokens.Colors.iconRed
+            return DesignTokens.Colors.error
         case .warning:
-            return DesignTokens.Colors.iconOrange
+            return DesignTokens.Colors.warning
         case .normal:
             return DesignTokens.Colors.iconBlue
         }
@@ -312,7 +312,7 @@ struct ExamPausedView: View {
     var body: some View {
         VStack(spacing: DesignTokens.Spacing.lg) {
             Image(systemName: "pause.circle.fill")
-                .font(.system(size: 56))
+                .font(.system(size: DesignTokens.Sizes.iconDisplay))
                 .foregroundStyle(DesignTokens.Colors.iconBlue)
                 .accessibilityHidden(true)
             
@@ -358,7 +358,7 @@ struct ExamErrorView: View {
         VStack(spacing: DesignTokens.Spacing.xl) {
             Image(systemName: "exclamationmark.triangle.fill")
                 .font(.largeTitle)
-                .foregroundStyle(DesignTokens.Colors.iconOrange)
+                .foregroundStyle(DesignTokens.Colors.warning)
                 .accessibilityHidden(true)
             
             VStack(spacing: DesignTokens.Spacing.sm) {

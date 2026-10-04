@@ -27,7 +27,7 @@ struct MinimalButton: View {
                 Spacer()
                 
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 12))
+                    .font(.system(size: DesignTokens.Sizes.iconXSmall))
                     .foregroundColor(.white.opacity(0.7))
             }
             .padding(.horizontal, DesignTokens.Spacing.md)
@@ -84,9 +84,9 @@ struct MinimalButton: View {
         } else if color == DesignTokens.Colors.iconOrange {
             return DesignTokens.Colors.examButtonGradientStart
         } else if color == DesignTokens.Colors.iconRed {
-            return Color(hex: "#7f1d1d") // dark red
+            return DesignTokens.Colors.redGradientStart
         } else if color == DesignTokens.Colors.iconGreen {
-            return Color(hex: "#14532d") // dark green
+            return DesignTokens.Colors.greenGradientStart
         } else {
             // По умолчанию синий градиент
             return DesignTokens.Colors.quizButtonGradientStart
@@ -99,9 +99,9 @@ struct MinimalButton: View {
         } else if color == DesignTokens.Colors.iconOrange {
             return DesignTokens.Colors.examButtonGradientEnd
         } else if color == DesignTokens.Colors.iconRed {
-            return Color(hex: "#991b1b") // red-800
+            return DesignTokens.Colors.redGradientEnd
         } else if color == DesignTokens.Colors.iconGreen {
-            return Color(hex: "#166534") // green-800
+            return DesignTokens.Colors.greenGradientEnd
         } else {
             return DesignTokens.Colors.quizButtonGradientEnd
         }

@@ -38,7 +38,7 @@ struct AchievementsView: View {
                 MinimalButton(
                     icon: "arrow.counterclockwise",
                     title: "achievements.reset".localized,
-                    foregroundColor: DesignTokens.Colors.iconRed
+                    foregroundColor: DesignTokens.Colors.destructive
                 ) {
                     showingResetAlert = true
                 }
@@ -159,7 +159,7 @@ struct AchievementCard: View {
                     .frame(width: 60, height: 60)
                 
                 Image(systemName: achievement.icon)
-                    .font(.system(size: 24, weight: .semibold))
+                    .font(.system(size: DesignTokens.Sizes.iconLarge, weight: .semibold))
                     .foregroundColor(iconColor)
             }
             
@@ -257,13 +257,13 @@ struct ExpandedAchievementCard: View {
                         .frame(width: 100, height: 100)
                     
                     Image(systemName: achievement.icon)
-                        .font(.system(size: 50, weight: .semibold))
+                        .font(.system(size: DesignTokens.Sizes.iconXXLarge, weight: .semibold))
                         .foregroundColor(achievement.color)
                 }
                 
                 VStack(spacing: DesignTokens.Spacing.sm) {
                     Text(achievement.title)
-                        .font(.system(size: 24, weight: .bold))
+                        .font(DesignTokens.Typography.displayTitle)
                         .foregroundColor(DesignTokens.Colors.textPrimary)
                         .multilineTextAlignment(.center)
                     
@@ -397,6 +397,8 @@ struct ExpandedAchievementCard: View {
     }
 }
 
+/// Картинка для шаринга: холст 1080×1920 пикселей, поэтому размеры заданы
+/// числами под этот холст, а не токенами интерфейса
 struct ShareableAchievementCardView: View {
     let achievement: Achievement
     @Environment(\.localizationProvider) private var localizationProvider
@@ -509,7 +511,6 @@ struct ShareableAchievementCardView: View {
             }
         }
         .frame(width: 1080, height: 1920) // Instagram story size
-        .clipShape(RoundedRectangle(cornerRadius: 0))
     }
 }
 

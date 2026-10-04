@@ -29,7 +29,7 @@ struct AchievementNotificationView: View {
                         .frame(width: 80, height: 80)
                     
                     Image(systemName: achievement.icon)
-                        .font(.system(size: 32, weight: .medium))
+                        .font(.system(size: DesignTokens.Sizes.iconXLarge, weight: .medium))
                         .foregroundColor(achievement.color)
                 }
                 
@@ -71,16 +71,16 @@ struct AchievementNotificationView: View {
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
                     .frame(height: 50)
-                    .background(achievement.color, in: RoundedRectangle(cornerRadius: 12))
+                    .background(achievement.color, in: RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium))
             }
             .padding(.horizontal)
         }
         .padding(24)
         .background(
-            RoundedRectangle(cornerRadius: 20)
+            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.overlayCard)
                 .fill(.ultraThinMaterial)
                 .overlay(
-                    RoundedRectangle(cornerRadius: 20)
+                    RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.overlayCard)
                         .stroke(achievement.color.opacity(0.3), lineWidth: 2)
                 )
         )

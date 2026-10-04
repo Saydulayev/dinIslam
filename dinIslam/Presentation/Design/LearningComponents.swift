@@ -121,9 +121,9 @@ struct TopicProgressRow: View {
 
     private var color: Color {
         switch accuracy {
-        case 0.8...: return DesignTokens.Colors.statusGreen
-        case 0.5..<0.8: return DesignTokens.Colors.iconOrange
-        default: return DesignTokens.Colors.iconRed
+        case 0.8...: return DesignTokens.Colors.success
+        case 0.5..<0.8: return DesignTokens.Colors.warning
+        default: return DesignTokens.Colors.error
         }
     }
 

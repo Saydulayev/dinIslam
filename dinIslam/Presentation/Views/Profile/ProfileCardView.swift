@@ -53,7 +53,7 @@ struct ProfileCardView: View {
                         )
                         .overlay(
                             Image(systemName: manager.isSignedIn ? "person.crop.circle.fill" : "person.circle.fill")
-                                .font(.system(size: 56))
+                                .font(.system(size: DesignTokens.Sizes.iconDisplay))
                                 .foregroundStyle(DesignTokens.Colors.textSecondary)
                         )
                         .shadow(
@@ -169,7 +169,7 @@ struct ProfileCardView: View {
                     MinimalButton(
                         icon: "rectangle.portrait.and.arrow.right",
                         title: "profile.signout".localized,
-                        foregroundColor: DesignTokens.Colors.iconRed
+                        foregroundColor: DesignTokens.Colors.destructive
                     ) {
                         showingSignOutConfirmation = true
                     }
@@ -178,7 +178,7 @@ struct ProfileCardView: View {
                     MinimalButton(
                         icon: "person.crop.circle.badge.xmark",
                         title: "profile.deleteAccount".localized,
-                        foregroundColor: DesignTokens.Colors.iconRed
+                        foregroundColor: DesignTokens.Colors.destructive
                     ) {
                         showingDeleteAccountConfirmation = true
                     }
