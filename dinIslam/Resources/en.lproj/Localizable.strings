@@ -42,8 +42,9 @@
 "profile.avatar.change" = "Change Photo";
 "profile.avatar.delete" = "Delete Photo";
 "profile.sync.reset" = "Reset Data";
-"profile.sync.reset.title" = "Reset progress and name?";
-"profile.sync.reset.message" = "Statistics, progress, and display name will be reset locally and in iCloud. Your profile photo will not be changed.";
+"profile.sync.reset.title" = "Reset statistics?";
+"profile.sync.reset.message" = "Statistics, the mistakes list, exam results, and question progress will be reset on this device and in iCloud. Your name, photo, and achievements will not change. This action cannot be undone.";
+"profile.sync.reset.message.guest" = "Statistics, the mistakes list, exam results, and question progress will be reset. Achievements will not change. This action cannot be undone.";
 "profile.sync.reset.confirm" = "Reset";
 "profile.sync.reset.cancel" = "Cancel";
 "profile.sync.reset.inProgress" = "Resetting data…";
@@ -143,6 +144,9 @@
 "settings.feedback.religious.title" = "Religious Questions";
 "settings.feedback.religious.subtitle" = "Questions about Islam and content";
 "settings.feedback.religious.subject" = "Tabiin Academy — Religious Question";
+"settings.feedback.mailUnavailable.title" = "Mail Is Not Set Up";
+"settings.feedback.mailUnavailable.message" = "Couldn't open the Mail app. Please write to us at %@.";
+"settings.feedback.mailUnavailable.copy" = "Copy Address";
 "settings.feedback.message" = "Choose how to send your feedback";
 "settings.feedback.email" = "Send Email";
 "settings.feedback.appStore" = "Rate in App Store";
@@ -201,11 +205,7 @@
 // Stats View - Pluralization Support
 "stats.title" = "Statistics";
 "stats.done" = "Done";
-"stats.reset" = "Reset";
-"stats.reset.confirm.title" = "Reset Statistics?";
-"stats.reset.confirm.message" = "This will reset all statistics, including the average score. This action cannot be undone.";
-"stats.reset.confirm.ok" = "Reset";
-"stats.reset.confirm.cancel" = "Cancel";
+"stats.reset" = "Reset Statistics";
 
 // Stat titles (without pluralization)
 "stats.questionsStudied.title" = "Questions Studied";
@@ -292,9 +292,9 @@
 "achievements.notification.next" = "Next";
 "achievements.share" = "Share";
 "achievements.share.text" = "Achievement unlocked";
-"achievements.reset" = "Reset";
+"achievements.reset" = "Reset Achievements";
 "achievements.reset.confirm.title" = "Reset Achievements?";
-"achievements.reset.confirm.message" = "All achievements will be locked. This action cannot be undone.";
+"achievements.reset.confirm.message" = "All achievements will be locked, and the counters they are based on will be reset: questions studied, quizzes completed, day streak, and perfect scores. Correct and incorrect answers, the mistakes list, and question progress will be kept. This action cannot be undone.";
 "achievements.reset.confirm.ok" = "Reset";
 "achievements.reset.confirm.cancel" = "Cancel";
 
@@ -368,6 +368,7 @@
 "notification.permission.title" = "Allow Notifications";
 "notification.permission.message" = "Get reminders for daily study";
 "notification.permission.request" = "Allow";
+"notification.permission.openSettings" = "Open Settings";
 "notification.settings.title" = "Configure";
 "notification.settings.enabled" = "Enable Reminders";
 "notification.settings.time" = "Reminder Time";
@@ -392,7 +393,7 @@
 "notification.settings.features.achievements" = "New achievement notifications";
 "notification.settings.features.streak" = "Streak maintenance reminders";
 "notification.settings.footer" = "Reminders will be sent daily at the selected time.";
-"notification.permission.denied.message" = "To receive reminders, you need to allow notifications in app settings.";
+"notification.permission.denied.message" = "Notifications are turned off in iPhone Settings. Tap “Open Settings” and turn on “Allow Notifications”.";
 "notification.test.sent.title" = "Test Notification";
 "notification.test.sent.message" = "Test notification sent!";
 

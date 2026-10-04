@@ -42,8 +42,9 @@
 "profile.avatar.change" = "Сменить фото";
 "profile.avatar.delete" = "Удалить фото";
 "profile.sync.reset" = "Сбросить данные";
-"profile.sync.reset.title" = "Сбросить прогресс и имя?";
-"profile.sync.reset.message" = "Будут сброшены статистика, прогресс и отображаемое имя (локально и в iCloud). Фото профиля не изменится.";
+"profile.sync.reset.title" = "Сбросить статистику?";
+"profile.sync.reset.message" = "Будут сброшены статистика, список ошибок, результаты экзаменов и прогресс изучения вопросов — на этом устройстве и в iCloud. Имя, фото и достижения не изменятся. Это действие нельзя отменить.";
+"profile.sync.reset.message.guest" = "Будут сброшены статистика, список ошибок, результаты экзаменов и прогресс изучения вопросов. Достижения не изменятся. Это действие нельзя отменить.";
 "profile.sync.reset.confirm" = "Сбросить";
 "profile.sync.reset.cancel" = "Отмена";
 "profile.sync.reset.inProgress" = "Сбрасываем данные…";
@@ -144,6 +145,9 @@
 "settings.feedback.religious.title" = "Религиозные вопросы";
 "settings.feedback.religious.subtitle" = "Вопросы по исламу и содержанию";
 "settings.feedback.religious.subject" = "Tabiin Academy — Религиозный вопрос";
+"settings.feedback.mailUnavailable.title" = "Почта не настроена";
+"settings.feedback.mailUnavailable.message" = "Не удалось открыть приложение «Почта». Напишите нам на адрес %@.";
+"settings.feedback.mailUnavailable.copy" = "Скопировать адрес";
 "settings.feedback.message" = "Выберите способ отправки отзыва";
 "settings.feedback.email" = "Отправить email";
 "settings.feedback.appStore" = "Оценить в App Store";
@@ -202,11 +206,7 @@
 // Stats View - Pluralization Support
 "stats.title" = "Статистика";
 "stats.done" = "Готово";
-"stats.reset" = "Сбросить";
-"stats.reset.confirm.title" = "Сбросить статистику?";
-"stats.reset.confirm.message" = "Это действие сбросит всю статистику, включая средний результат. Это действие нельзя отменить.";
-"stats.reset.confirm.ok" = "Сбросить";
-"stats.reset.confirm.cancel" = "Отмена";
+"stats.reset" = "Сбросить статистику";
 
 // Stat titles (without pluralization)
 "stats.questionsStudied.title" = "Изучено вопросов";
@@ -301,9 +301,9 @@
 "achievements.notification.next" = "Далее";
 "achievements.share" = "Поделиться";
 "achievements.share.text" = "Достижение разблокировано";
-"achievements.reset" = "Сбросить";
+"achievements.reset" = "Сбросить достижения";
 "achievements.reset.confirm.title" = "Сбросить достижения?";
-"achievements.reset.confirm.message" = "Все достижения будут заблокированы. Это действие нельзя отменить.";
+"achievements.reset.confirm.message" = "Все достижения будут заблокированы, а счётчики, по которым они выдаются, обнулятся: изученные вопросы, пройденные викторины, серия дней и идеальные результаты. Правильные и неправильные ответы, список ошибок и прогресс изучения вопросов сохранятся. Это действие нельзя отменить.";
 "achievements.reset.confirm.ok" = "Сбросить";
 "achievements.reset.confirm.cancel" = "Отмена";
 
@@ -384,6 +384,7 @@
 "notification.permission.title" = "Разрешить уведомления";
 "notification.permission.message" = "Получайте напоминания о ежедневном изучении";
 "notification.permission.request" = "Разрешить";
+"notification.permission.openSettings" = "Открыть настройки";
 "notification.settings.title" = "Настроить";
 "notification.settings.enabled" = "Включить напоминания";
 "notification.settings.time" = "Время напоминания";
@@ -408,7 +409,7 @@
 "notification.settings.features.achievements" = "Уведомления о новых достижениях";
 "notification.settings.features.streak" = "Напоминания о поддержании серии";
 "notification.settings.footer" = "Напоминания будут приходить ежедневно в выбранное время.";
-"notification.permission.denied.message" = "Для получения напоминаний необходимо разрешить уведомления в настройках приложения.";
+"notification.permission.denied.message" = "Уведомления выключены в настройках iPhone. Нажмите «Открыть настройки» и включите «Допуск уведомлений».";
 "notification.test.sent.title" = "Тестовое уведомление";
 "notification.test.sent.message" = "Тестовое уведомление отправлено!";
 

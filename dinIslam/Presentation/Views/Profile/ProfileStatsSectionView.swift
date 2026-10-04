@@ -10,7 +10,8 @@ import SwiftUI
 struct ProfileStatsSectionView: View {
     @Bindable var manager: ProfileManager
     @Bindable var statsManager: StatsManager
-    let totalQuestionsCount: Int
+    /// nil, пока количество вопросов загружается — вместо «0 / 0» показываем прочерк
+    let totalQuestionsCount: Int?
     let isResettingProfile: Bool
     let statsRefreshTrigger: Int
     @State private var studiedCount: Int = 0
@@ -30,7 +31,7 @@ struct ProfileStatsSectionView: View {
                     // Questions Studied
                     ProgressCardView(
                         icon: "questionmark.circle",
-                        value: "\(studiedCount) / \(totalQuestionsCount)",
+                        value: totalQuestionsCount.map { "\(studiedCount) / \($0)" } ?? "—",
                         label: manager.isSignedIn ? "profile.progress.questions".localized : "stats.questionsStudied.title".localized,
                         iconColor: DesignTokens.Colors.iconBlue,
                         backgroundColor: DesignTokens.Colors.iconBlue.opacity(0.2)
@@ -122,7 +123,7 @@ struct ProfileStatsSectionView: View {
                         .font(DesignTokens.Typography.label)
                         .foregroundColor(.white.opacity(0.9)) // Белый текст с небольшой прозрачностью
                     
-                    Text("\(totalQuestionsCount)")
+                    Text(totalQuestionsCount.map(String.init) ?? "—")
                         .font(DesignTokens.Typography.statsValue)
                         .foregroundColor(.white) // Белый текст для лучшей читаемости
                 }
@@ -211,6 +212,7 @@ struct ProfileStatsSectionView: View {
     }
     
     private func loadProgressStats() {
+        guard let totalQuestionsCount else { return }
         let manager = DefaultQuestionPoolProgressManager()
         let stats = manager.getProgressStats(total: totalQuestionsCount, version: 1)
         studiedCount = stats.used

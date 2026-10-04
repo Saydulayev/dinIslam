@@ -18,6 +18,8 @@ struct ProfileCardView: View {
     
     let hasAvatar: Bool
     
+    /// Фото читается с диска в фоне, а не в body при каждой перерисовке
+    @State private var avatarImage: Image?
     @State private var showingSignOutConfirmation = false
     @State private var showingDeleteAccountConfirmation = false
     @State private var isDeletingAccount = false
@@ -27,7 +29,7 @@ struct ProfileCardView: View {
         VStack(spacing: DesignTokens.Spacing.xxl) {
             // Avatar
             ZStack(alignment: .bottomTrailing) {
-                if let image = ProfileViewHelpers.avatarImage(for: manager) {
+                if let image = avatarImage {
                     image
                         .resizable()
                         .scaledToFill()
@@ -95,6 +97,10 @@ struct ProfileCardView: View {
                     }
                     .accessibilityLabel("profile.avatar.change".localized)
                 }
+            }
+            // Файл перезаписывается по тому же пути, поэтому ключ включает дату изменения профиля
+            .task(id: AvatarKey(url: manager.profile.avatarURL, updatedAt: manager.profile.metadata.updatedAt)) {
+                avatarImage = await ProfileViewHelpers.loadAvatarImage(from: manager.profile.avatarURL)
             }
             
             // User name with edit functionality
@@ -183,12 +189,13 @@ struct ProfileCardView: View {
                             .tint(DesignTokens.Colors.textSecondary)
                     }
                 } else {
-                    // Sign in with Apple button в стиле главного экрана
+                    // Белый стиль: чёрная кнопка сливается с тёмным фоном
                     SignInWithAppleButton(.signIn) { request in
                         manager.prepareSignInRequest(request)
                     } onCompletion: { result in
                         manager.handleSignInResult(result)
                     }
+                    .signInWithAppleButtonStyle(.white)
                     .frame(height: 50)
                     .overlay(
                         RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
@@ -266,6 +273,11 @@ struct ProfileCardView: View {
         } message: {
             Text("profile.deleteAccount.error.message".localized)
         }
+    }
+    
+    private struct AvatarKey: Equatable {
+        let url: URL?
+        let updatedAt: Date
     }
     
     private var displayNameBinding: Binding<String> {

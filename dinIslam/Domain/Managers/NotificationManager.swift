@@ -17,6 +17,8 @@ class NotificationManager {
     var isNotificationEnabled = false
     var reminderTime = Date()
     var hasPermission = false
+    /// Пользователь отказал: системный запрос больше не появится, включить можно только в Настройках
+    var isPermissionDenied = false
     
     @ObservationIgnored private let center = UNUserNotificationCenter.current()
     @ObservationIgnored private let localizationProvider: LocalizationProviding
@@ -34,6 +36,7 @@ class NotificationManager {
             let granted = try await center.requestAuthorization(options: [.alert, .badge, .sound])
             await MainActor.run {
                 self.hasPermission = granted
+                self.isPermissionDenied = !granted
                 if granted {
                     self.isNotificationEnabled = true
                     // Schedule notifications if enabled
@@ -49,12 +52,14 @@ class NotificationManager {
         }
     }
     
-    private func checkNotificationPermission() {
+    /// Вызывается и при возврате в приложение: разрешение могли изменить в Настройках
+    func checkNotificationPermission() {
         center.getNotificationSettings { [weak self] settings in
             guard let self = self else { return }
             Task { @MainActor [weak self] in
                 guard let self = self else { return }
                 self.hasPermission = settings.authorizationStatus == .authorized
+                self.isPermissionDenied = settings.authorizationStatus == .denied
             }
         }
     }
@@ -125,6 +130,7 @@ class NotificationManager {
             Task { @MainActor [weak self] in
                 guard let self = self else { return }
                 self.hasPermission = settings.authorizationStatus == .authorized
+                self.isPermissionDenied = settings.authorizationStatus == .denied
                 if self.hasPermission && self.isNotificationEnabled {
                     self.scheduleDailyReminder()
                 }

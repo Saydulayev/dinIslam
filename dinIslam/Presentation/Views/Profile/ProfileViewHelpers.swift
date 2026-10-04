@@ -68,23 +68,13 @@ enum ProfileViewHelpers {
     }
 
     #if os(iOS)
-    static func avatarImage(for manager: ProfileManager) -> Image? {
-        guard let url = manager.profile.avatarURL,
-              FileManager.default.fileExists(atPath: url.path),
-              let uiImage = UIImage(contentsOfFile: url.path) else {
-            return nil
-        }
-        return Image(uiImage: uiImage)
-    }
-    #else
-    static func avatarImage(for manager: ProfileManager) -> Image? {
-        guard let url = manager.profile.avatarURL,
-              FileManager.default.fileExists(atPath: url.path),
-              let data = try? Data(contentsOf: url),
-              let nsImage = NSImage(data: data) else {
-            return nil
-        }
-        return Image(nsImage: nsImage)
+    /// Чтение и декодирование файла уходит с главного потока
+    static func loadAvatarImage(from url: URL?) async -> Image? {
+        guard let url else { return nil }
+        let uiImage = await Task.detached(priority: .userInitiated) {
+            UIImage(contentsOfFile: url.path)?.preparingForDisplay()
+        }.value
+        return uiImage.map { Image(uiImage: $0) }
     }
     #endif
 }

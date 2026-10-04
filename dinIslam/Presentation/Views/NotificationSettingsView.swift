@@ -11,6 +11,8 @@ import UserNotifications
 struct NotificationSettingsView: View {
     @Environment(\.notificationManager) private var notificationManager: NotificationManager
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.openURL) private var openURL
+    @Environment(\.scenePhase) private var scenePhase
     @State private var showingPermissionAlert = false
     @State private var isNotificationEnabled: Bool = false
     @State private var reminderTime: Date = Date()
@@ -44,7 +46,10 @@ struct NotificationSettingsView: View {
                                         .font(DesignTokens.Typography.bodyRegular)
                                         .foregroundColor(DesignTokens.Colors.textPrimary)
                                     
-                                    Text("notification.permission.message".localized)
+                                    // После отказа системный запрос не появится — объясняем, где включить
+                                    Text((notificationManager.isPermissionDenied ?
+                                          "notification.permission.denied.message" :
+                                          "notification.permission.message").localized)
                                         .font(DesignTokens.Typography.label)
                                         .foregroundColor(DesignTokens.Colors.textSecondary)
                                 }
@@ -53,6 +58,10 @@ struct NotificationSettingsView: View {
                             }
                             
                             Button(action: {
+                                if notificationManager.isPermissionDenied {
+                                    openNotificationSettings()
+                                    return
+                                }
                                 Task {
                                     let granted = await notificationManager.requestNotificationPermission()
                                     if !granted {
@@ -60,7 +69,9 @@ struct NotificationSettingsView: View {
                                     }
                                 }
                             }) {
-                                Text("notification.permission.request".localized)
+                                Text((notificationManager.isPermissionDenied ?
+                                      "notification.permission.openSettings" :
+                                      "notification.permission.request").localized)
                                     .font(DesignTokens.Typography.secondarySemibold)
                                     .foregroundColor(.white)
                                     .frame(maxWidth: .infinity)
@@ -240,6 +251,12 @@ struct NotificationSettingsView: View {
         .onChange(of: notificationManager.reminderTime) { _, newValue in
             reminderTime = newValue
         }
+        .onChange(of: scenePhase) { _, newPhase in
+            // Разрешение могли включить в Настройках, пока приложение было в фоне
+            if newPhase == .active {
+                notificationManager.checkNotificationPermission()
+            }
+        }
         .navigationTitle("notification.settings.title".localized)
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(.clear, for: .navigationBar) // прозрачный toolbar для градиента
@@ -255,11 +272,18 @@ struct NotificationSettingsView: View {
         }
         .alert("notification.permission.title".localized,
                isPresented: $showingPermissionAlert) {
-            Button("error.ok".localized) {
-                showingPermissionAlert = false
+            Button("notification.permission.openSettings".localized) {
+                openNotificationSettings()
             }
+            Button("error.ok".localized, role: .cancel) { }
         } message: {
             Text("notification.permission.denied.message".localized)
+        }
+    }
+    
+    private func openNotificationSettings() {
+        if let url = URL(string: UIApplication.openNotificationSettingsURLString) {
+            openURL(url)
         }
     }
 }

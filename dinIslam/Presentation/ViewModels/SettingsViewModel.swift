@@ -8,7 +8,6 @@
 import Foundation
 import Observation
 import UIKit
-import StoreKit
 import AudioToolbox
 
 @Observable
@@ -28,6 +27,33 @@ class SettingsViewModel {
     var showingPrivacyPolicy = false
     var showingTermsOfService = false
     var refreshTrigger = UUID()
+    /// Адрес, письмо на который не удалось открыть (нет настроенной почты)
+    var unavailableMailRecipient: FeedbackRecipient?
+    
+    enum FeedbackRecipient {
+        case technical
+        case religious
+        
+        var address: String {
+            switch self {
+            case .technical: return "saydulayev.wien@gmail.com"
+            case .religious: return "amigomuslim65@gmail.com"
+            }
+        }
+        
+        var mailURL: URL? {
+            let subjectKey: String
+            switch self {
+            case .technical: subjectKey = "settings.feedback.technical.subject"
+            case .religious: subjectKey = "settings.feedback.religious.subject"
+            }
+            var components = URLComponents()
+            components.scheme = "mailto"
+            components.path = address
+            components.queryItems = [URLQueryItem(name: "subject", value: subjectKey.localized)]
+            return components.url
+        }
+    }
     
     init(
         settingsManager: SettingsManager,
@@ -91,11 +117,9 @@ class SettingsViewModel {
         hapticManager.selectionChanged()
     }
     
-    func requestAppReview() {
-        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
-            SKStoreReviewController.requestReview(in: windowScene)
-        }
-    }
+    /// Системный запрос оценки может не показаться (лимит Apple, TestFlight),
+    /// поэтому кнопка открывает форму отзыва в App Store
+    let writeReviewURL = URL(string: "https://apps.apple.com/app/id6754708587?action=write-review")
     
     // MARK: - About Actions
     func openAppStore() {

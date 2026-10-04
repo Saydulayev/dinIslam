@@ -6,11 +6,10 @@
 //
 
 import SwiftUI
-import MessageUI
 
 struct SettingsView: View {
     @Bindable var viewModel: SettingsViewModel
-    @Environment(\.dismiss) private var dismiss
+    @Environment(\.openURL) private var openURL
     @Environment(\.notificationManager) private var notificationManager: NotificationManager
     @State private var showingNotificationSettings = false
     
@@ -148,10 +147,7 @@ struct SettingsView: View {
                                 subtitle: "settings.feedback.technical.subtitle".localized,
                                 showChevron: false
                             ) {
-                                let techSubject = "settings.feedback.technical.subject".localized.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "Technical"
-                                if let url = URL(string: "mailto:saydulayev.wien@gmail.com?subject=\(techSubject)&body=") {
-                                    UIApplication.shared.open(url)
-                                }
+                                sendFeedback(to: .technical)
                             }
                             
                             Divider()
@@ -165,10 +161,7 @@ struct SettingsView: View {
                                 subtitle: "settings.feedback.religious.subtitle".localized,
                                 showChevron: false
                             ) {
-                                let relSubject = "settings.feedback.religious.subject".localized.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "Religious"
-                                if let url = URL(string: "mailto:amigomuslim65@gmail.com?subject=\(relSubject)&body=") {
-                                    UIApplication.shared.open(url)
-                                }
+                                sendFeedback(to: .religious)
                             }
                             
                             Divider()
@@ -182,7 +175,9 @@ struct SettingsView: View {
                                 subtitle: "settings.rate.subtitle".localized,
                                 showChevron: false
                             ) {
-                                viewModel.requestAppReview()
+                                if let url = viewModel.writeReviewURL {
+                                    openURL(url)
+                                }
                             }
                             
                             Divider()
@@ -309,15 +304,6 @@ struct SettingsView: View {
         .id(viewModel.refreshTrigger)
         .navigationTitle("settings.title".localized)
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button("settings.done".localized) {
-                    dismiss()
-                }
-                .font(DesignTokens.Typography.secondarySemibold)
-                .foregroundColor(DesignTokens.Colors.textPrimary)
-            }
-        }
         .toolbarBackground(.clear, for: .navigationBar) // прозрачный toolbar для градиента
         .toolbarColorScheme(.dark, for: .navigationBar)
         .navigationBarBackButtonHidden(false)
@@ -340,6 +326,32 @@ struct SettingsView: View {
         .sheet(isPresented: $viewModel.showingTermsOfService) {
             NavigationStack {
                 TermsOfServiceView()
+            }
+        }
+        .alert(
+            "settings.feedback.mailUnavailable.title".localized,
+            isPresented: Binding(
+                get: { viewModel.unavailableMailRecipient != nil },
+                set: { if !$0 { viewModel.unavailableMailRecipient = nil } }
+            ),
+            presenting: viewModel.unavailableMailRecipient
+        ) { recipient in
+            Button("settings.feedback.mailUnavailable.copy".localized) {
+                UIPasteboard.general.string = recipient.address
+            }
+            Button("error.ok".localized, role: .cancel) { }
+        } message: { recipient in
+            Text(String(format: "settings.feedback.mailUnavailable.message".localized, recipient.address))
+        }
+    }
+    
+    /// Без настроенной почты mailto: не открывается — тогда показываем адрес,
+    /// чтобы его можно было скопировать
+    private func sendFeedback(to recipient: SettingsViewModel.FeedbackRecipient) {
+        guard let url = recipient.mailURL else { return }
+        openURL(url) { accepted in
+            if !accepted {
+                viewModel.unavailableMailRecipient = recipient
             }
         }
     }
@@ -488,15 +500,22 @@ struct SettingsViewWithDependencies: View {
     @Environment(\.localizationProvider) private var localizationProvider
     @Environment(\.achievementManager) private var achievementManager
     let settingsManager: SettingsManager
+    /// ViewModel создаётся один раз: иначе каждая перерисовка сбрасывала бы её состояние (открытые листы)
+    @State private var viewModel: SettingsViewModel?
     
     var body: some View {
-        SettingsView(
-            viewModel: SettingsViewModel(
-                settingsManager: settingsManager,
-                localizationProvider: localizationProvider,
-                achievementManager: achievementManager
-            )
-        )
+        if let viewModel {
+            SettingsView(viewModel: viewModel)
+        } else {
+            Color.clear
+                .onAppear {
+                    viewModel = SettingsViewModel(
+                        settingsManager: settingsManager,
+                        localizationProvider: localizationProvider,
+                        achievementManager: achievementManager
+                    )
+                }
+        }
     }
 }
 

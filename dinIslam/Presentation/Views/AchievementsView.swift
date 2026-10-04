@@ -45,6 +45,16 @@ struct AchievementsView: View {
                         onTap: { selectedAchievement = achievement }
                     )
                 }
+                
+                // Разрушительное действие — внизу списка, а не в верхней панели
+                MinimalButton(
+                    icon: "arrow.counterclockwise",
+                    title: "achievements.reset".localized,
+                    foregroundColor: DesignTokens.Colors.iconRed
+                ) {
+                    showingResetAlert = true
+                }
+                .padding(.top, DesignTokens.Spacing.lg)
             }
             .padding(.horizontal, DesignTokens.Spacing.xxl)
             .padding(.top, DesignTokens.Spacing.lg)
@@ -85,15 +95,6 @@ struct AchievementsView: View {
         }
         .navigationTitle("achievements.title".localized)
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button("achievements.reset".localized) {
-                    showingResetAlert = true
-                }
-                .font(DesignTokens.Typography.secondarySemibold)
-                .foregroundColor(DesignTokens.Colors.iconRed)
-            }
-        }
         .toolbarBackground(.clear, for: .navigationBar) // прозрачный toolbar для градиента
         .toolbarColorScheme(.dark, for: .navigationBar)
         .alert(

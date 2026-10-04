@@ -19,8 +19,8 @@ struct UnifiedProfileView: View {
     @State private var avatarPickerItem: PhotosPickerItem?
     @State private var showResetConfirmation = false
     @State private var isResettingProfile = false
-    @State private var totalQuestionsCount: Int = 0
-    @State private var showingResetAlert = false
+    /// nil, пока количество вопросов загружается
+    @State private var totalQuestionsCount: Int?
     @State private var statsRefreshTrigger: Int = 0
     @State private var isEditingDisplayName = false
     @State private var editingDisplayName = ""
@@ -88,6 +88,16 @@ struct UnifiedProfileView: View {
                         onSyncQuestions: syncQuestions,
                         onCheckForUpdates: checkForUpdates
                     )
+                    
+                    // Разрушительное действие — внизу экрана, а не в верхней панели
+                    MinimalButton(
+                        icon: "arrow.counterclockwise",
+                        title: "stats.reset".localized,
+                        foregroundColor: DesignTokens.Colors.iconRed
+                    ) {
+                        showResetConfirmation = true
+                    }
+                    .disabled(isResettingProfile || manager.isLoading)
                 }
                 .padding(.horizontal, DesignTokens.Spacing.xxl)
                 .padding(.top, DesignTokens.Spacing.lg)
@@ -96,24 +106,6 @@ struct UnifiedProfileView: View {
         }
         .navigationTitle("profile.title".localized)
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                if manager.isSignedIn {
-                    Button("stats.reset".localized) {
-                        showResetConfirmation = true
-                    }
-                    .font(DesignTokens.Typography.secondarySemibold)
-                    .foregroundColor(DesignTokens.Colors.iconRed)
-                    .disabled(isResettingProfile || manager.isLoading)
-                } else {
-                    Button("stats.reset".localized) {
-                        showingResetAlert = true
-                    }
-                    .font(DesignTokens.Typography.secondarySemibold)
-                    .foregroundColor(DesignTokens.Colors.iconRed)
-                }
-            }
-        }
         .toolbarBackground(.clear, for: .navigationBar) // прозрачный toolbar для градиента
         .toolbarColorScheme(.dark, for: .navigationBar)
         .onAppear {
@@ -143,27 +135,7 @@ struct UnifiedProfileView: View {
             }
             Button("profile.sync.reset.cancel".localized, role: .cancel) { }
         } message: {
-            Text("profile.sync.reset.message".localized)
-        }
-        .alert(
-            "stats.reset.confirm.title".localized,
-            isPresented: $showingResetAlert
-        ) {
-            Button("stats.reset.confirm.cancel".localized, role: .cancel) {
-                showingResetAlert = false
-            }
-            Button("stats.reset.confirm.ok".localized, role: .destructive) {
-                statsManager.resetStatsExceptTotalQuestions()
-                // Очищаем прогресс изучения вопросов (usedIds)
-                let questionPoolProgressManager = DefaultQuestionPoolProgressManager()
-                questionPoolProgressManager.reset(version: 1)
-                questionPoolProgressManager.setReviewMode(false, version: 1)
-                showingResetAlert = false
-                // Триггерим обновление статистики
-                statsRefreshTrigger += 1
-            }
-        } message: {
-            Text("stats.reset.confirm.message".localized)
+            Text((manager.isSignedIn ? "profile.sync.reset.message" : "profile.sync.reset.message.guest").localized)
         }
         .onChange(of: avatarPickerItem) { previous, current in
             guard let item = current, previous != current else { return }

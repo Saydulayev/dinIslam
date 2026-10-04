@@ -238,10 +238,9 @@ final class ProfileManager {
         examStatisticsManager.resetStatistics()
         lastRecommendations = []
         profile.progress = ProfileProgress()
-        profile.customDisplayName = nil
         profile.metadata.updatedAt = Date()
         profile.metadata.lastSyncedAt = nil
-        // Фото не сбрасываем — удаляется только через кнопку «Удалить фото»
+        // Имя и фото не сбрасываем: это сброс статистики, а не профиля
         progressService.rebuildProgressFromLocalStats(profile: &profile)
         localStore.saveProfile(profile)
         
