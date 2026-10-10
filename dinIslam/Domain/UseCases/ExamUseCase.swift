@@ -207,11 +207,7 @@ class ExamStatisticsManager: ExamStatisticsManaging {
     }
     
     private static func loadStatistics() -> ExamStatistics {
-        guard let data = UserDefaults.standard.data(forKey: "ExamStatistics"),
-              let statistics = try? JSONDecoder().decode(ExamStatistics.self, from: data) else {
-            return ExamStatistics()
-        }
-        return statistics
+        UserDefaults.standard.decodeStored(ExamStatistics.self, forKey: "ExamStatistics") ?? ExamStatistics()
     }
     
     // MARK: - Profile Progress Sync

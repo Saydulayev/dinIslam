@@ -95,6 +95,24 @@ struct CodableAchievement: Codable {
     }
 }
 
+// Достижение читается по `id`; остальные поля нужны только для записи в старом формате,
+// поэтому отсутствующие получают значения по умолчанию (см. StoredDataDecoding.swift)
+extension CodableAchievement {
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(String.self, forKey: .id)
+        title = container.decode(.title, default: "")
+        description = container.decode(.description, default: "")
+        icon = container.decode(.icon, default: "")
+        colorName = container.decode(.colorName, default: "")
+        // Неизвестный тип (достижение из более новой версии) — запись пропускается
+        type = try container.decode(AchievementType.self, forKey: .type)
+        requirement = container.decode(.requirement, default: 0)
+        isUnlocked = container.decode(.isUnlocked, default: false)
+        unlockedDate = container.decodeOptional(.unlockedDate)
+    }
+}
+
 // MARK: - Achievement Types
 enum AchievementType: String, Codable, CaseIterable {
     case firstQuiz = "first_quiz"

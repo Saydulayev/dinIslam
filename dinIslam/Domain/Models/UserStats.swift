@@ -178,3 +178,58 @@ struct DifficultyStat: Codable {
         adaptiveScore = Double(correctAnswers) / Double(totalAnswers) * 100
     }
 }
+
+// MARK: - Decoding
+// Каждое поле читается отдельно: отсутствующее (новое в модели) поле получает значение
+// по умолчанию, а не обнуляет всю статистику (см. StoredDataDecoding.swift)
+
+extension QuizResultRecord {
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        percentage = container.decode(.percentage, default: 0)
+        date = try container.decode(Date.self, forKey: .date)
+        questionsCount = container.decode(.questionsCount, default: 0)
+    }
+}
+
+extension UserStats {
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        totalQuestionsStudied = container.decode(.totalQuestionsStudied, default: 0)
+        correctAnswers = container.decode(.correctAnswers, default: 0)
+        incorrectAnswers = container.decode(.incorrectAnswers, default: 0)
+        correctedMistakes = container.decode(.correctedMistakes, default: 0)
+        wrongQuestionIds = container.decode(.wrongQuestionIds, default: [])
+        lastQuizDate = container.decodeOptional(.lastQuizDate)
+        totalQuizzesCompleted = container.decode(.totalQuizzesCompleted, default: 0)
+        currentStreak = container.decode(.currentStreak, default: 0)
+        perfectScores = container.decode(.perfectScores, default: 0)
+        longestStreak = container.decode(.longestStreak, default: 0)
+        lastQuizPercentage = container.decode(.lastQuizPercentage, default: 0)
+        recentQuizResults = container.decodeLossyArray(.recentQuizResults)
+        topicStats = container.decode(.topicStats, default: [:])
+        difficultyStats = container.decode(.difficultyStats, default: [:])
+        lastActivityAt = container.decodeOptional(.lastActivityAt)
+    }
+}
+
+extension TopicStat {
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        correctAnswers = container.decode(.correctAnswers, default: 0)
+        totalAnswers = container.decode(.totalAnswers, default: 0)
+        streak = container.decode(.streak, default: 0)
+        longestStreak = container.decode(.longestStreak, default: 0)
+        lastUpdated = container.decodeOptional(.lastUpdated)
+    }
+}
+
+extension DifficultyStat {
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        correctAnswers = container.decode(.correctAnswers, default: 0)
+        totalAnswers = container.decode(.totalAnswers, default: 0)
+        adaptiveScore = container.decode(.adaptiveScore, default: 0)
+        lastUpdated = container.decodeOptional(.lastUpdated)
+    }
+}

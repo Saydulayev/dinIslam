@@ -137,24 +137,25 @@ struct ProfileProgress: Codable, Equatable {
     }
     
     init(from decoder: Decoder) throws {
+        // Каждое поле читается отдельно, массивы — поэлементно (см. StoredDataDecoding.swift)
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        totalQuestionsAnswered = try container.decode(Int.self, forKey: .totalQuestionsAnswered)
-        correctAnswers = try container.decode(Int.self, forKey: .correctAnswers)
-        incorrectAnswers = try container.decode(Int.self, forKey: .incorrectAnswers)
-        // Обработка отсутствующего поля для обратной совместимости
-        correctedMistakes = try container.decodeIfPresent(Int.self, forKey: .correctedMistakes) ?? 0
-        examsPassed = try container.decode(Int.self, forKey: .examsPassed)
-        examsTaken = try container.decode(Int.self, forKey: .examsTaken)
-        currentStreak = try container.decode(Int.self, forKey: .currentStreak)
-        longestStreak = try container.decode(Int.self, forKey: .longestStreak)
-        averageQuizScore = try container.decode(Double.self, forKey: .averageQuizScore)
-        masteryLevel = try container.decode(MasteryLevel.self, forKey: .masteryLevel)
-        difficultyStats = try container.decode([DifficultyPerformance].self, forKey: .difficultyStats)
-        topicProgress = try container.decode([TopicProgress].self, forKey: .topicProgress)
-        recommendations = try container.decode([LearningRecommendation].self, forKey: .recommendations)
-        quizHistory = try container.decode([QuizHistoryEntry].self, forKey: .quizHistory)
-        examHistory = try container.decode([ExamHistoryEntry].self, forKey: .examHistory)
-        lastActivityAt = try container.decodeIfPresent(Date.self, forKey: .lastActivityAt)
+        let defaults = ProfileProgress()
+        totalQuestionsAnswered = container.decode(.totalQuestionsAnswered, default: 0)
+        correctAnswers = container.decode(.correctAnswers, default: 0)
+        incorrectAnswers = container.decode(.incorrectAnswers, default: 0)
+        correctedMistakes = container.decode(.correctedMistakes, default: 0)
+        examsPassed = container.decode(.examsPassed, default: 0)
+        examsTaken = container.decode(.examsTaken, default: 0)
+        currentStreak = container.decode(.currentStreak, default: 0)
+        longestStreak = container.decode(.longestStreak, default: 0)
+        averageQuizScore = container.decode(.averageQuizScore, default: 0)
+        masteryLevel = container.decode(.masteryLevel, default: defaults.masteryLevel)
+        difficultyStats = container.decodeLossyArray(.difficultyStats, default: defaults.difficultyStats)
+        topicProgress = container.decodeLossyArray(.topicProgress)
+        recommendations = container.decodeLossyArray(.recommendations)
+        quizHistory = container.decodeLossyArray(.quizHistory)
+        examHistory = container.decodeLossyArray(.examHistory)
+        lastActivityAt = container.decodeOptional(.lastActivityAt)
     }
     
     func encode(to encoder: Encoder) throws {
@@ -420,3 +421,128 @@ enum UIDeviceIdentifierProvider {
     }
 }
 
+
+// MARK: - Decoding
+// Профиль — это и локальный файл, и запись в iCloud. Каждое поле читается отдельно,
+// массивы — поэлементно: новое поле или нечитаемая запись истории не теряют весь профиль
+// (см. StoredDataDecoding.swift). Обязательны только поля, без которых запись не имеет смысла.
+
+extension UserProfile {
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(String.self, forKey: .id)
+        authMethod = container.decode(.authMethod, default: .anonymous)
+        fullName = container.decodeOptional(.fullName)
+        customDisplayName = container.decodeOptional(.customDisplayName)
+        localeIdentifier = container.decode(.localeIdentifier, default: Locale.current.identifier)
+        avatarURL = container.decodeOptional(.avatarURL)
+        progress = container.decode(.progress, default: ProfileProgress())
+        preferences = container.decode(.preferences, default: ProfilePreferences())
+        metadata = container.decode(.metadata, default: Metadata(createdAt: .distantPast, updatedAt: .distantPast))
+    }
+}
+
+extension UserProfile.Metadata {
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        createdAt = container.decode(.createdAt, default: .distantPast)
+        // Без даты изменения запись проигрывает при выборе более новой
+        updatedAt = container.decode(.updatedAt, default: .distantPast)
+        lastSyncedAt = container.decodeOptional(.lastSyncedAt)
+        lastDeviceIdentifier = container.decodeOptional(.lastDeviceIdentifier)
+    }
+}
+
+extension ProfilePreferences {
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let defaults = ProfilePreferences()
+        preferredDifficulty = container.decodeOptional(.preferredDifficulty)
+        dailyGoal = container.decode(.dailyGoal, default: defaults.dailyGoal)
+        notificationsEnabled = container.decode(.notificationsEnabled, default: defaults.notificationsEnabled)
+        syncedSettings = container.decode(.syncedSettings, default: defaults.syncedSettings)
+        preferredStudyTopics = container.decode(.preferredStudyTopics, default: defaults.preferredStudyTopics)
+    }
+}
+
+extension DifficultyPerformance {
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        // Неизвестная сложность — запись пропускается
+        difficulty = try container.decode(Difficulty.self, forKey: .difficulty)
+        correctAnswers = container.decode(.correctAnswers, default: 0)
+        totalAnswers = container.decode(.totalAnswers, default: 0)
+        adaptiveScore = container.decode(.adaptiveScore, default: 0)
+        masteryLevel = container.decode(.masteryLevel, default: .novice)
+    }
+}
+
+extension TopicProgress {
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        topicId = try container.decode(String.self, forKey: .topicId)
+        displayName = container.decodeOptional(.displayName)
+        correctAnswers = container.decode(.correctAnswers, default: 0)
+        totalAnswers = container.decode(.totalAnswers, default: 0)
+        masteryLevel = container.decode(.masteryLevel, default: .novice)
+        streak = container.decode(.streak, default: 0)
+        recommendedDifficulty = container.decodeOptional(.recommendedDifficulty)
+        lastActivityAt = container.decodeOptional(.lastActivityAt)
+    }
+}
+
+extension LearningRecommendation {
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(UUID.self, forKey: .id)
+        // Неизвестный тип рекомендации — запись пропускается
+        type = try container.decode(RecommendationType.self, forKey: .type)
+        title = container.decode(.title, default: "")
+        message = container.decode(.message, default: "")
+        topicId = container.decodeOptional(.topicId)
+        targetDifficulty = container.decodeOptional(.targetDifficulty)
+        createdAt = container.decode(.createdAt, default: .distantPast)
+        expiresAt = container.decodeOptional(.expiresAt)
+    }
+}
+
+extension QuizHistoryEntry {
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        // id и дата обязательны: по ним записи объединяются и сортируются
+        id = try container.decode(UUID.self, forKey: .id)
+        date = try container.decode(Date.self, forKey: .date)
+        percentage = container.decode(.percentage, default: 0)
+        correctAnswers = container.decode(.correctAnswers, default: 0)
+        totalQuestions = container.decode(.totalQuestions, default: 0)
+        difficultyBreakdown = container.decode(.difficultyBreakdown, default: [:])
+        topicBreakdown = container.decode(.topicBreakdown, default: [:])
+    }
+}
+
+extension ExamHistoryEntry {
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        // id и дата обязательны: по ним записи объединяются и сортируются
+        id = try container.decode(UUID.self, forKey: .id)
+        date = try container.decode(Date.self, forKey: .date)
+        percentage = container.decode(.percentage, default: 0)
+        duration = container.decode(.duration, default: 0)
+        correctAnswers = container.decode(.correctAnswers, default: 0)
+        totalQuestions = container.decode(.totalQuestions, default: 0)
+        passed = container.decode(.passed, default: false)
+        configuration = container.decode(.configuration, default: ExamConfigurationSnapshot(configuration: .default))
+    }
+}
+
+extension ExamConfigurationSnapshot {
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let defaults = ExamConfigurationSnapshot(configuration: .default)
+        totalQuestions = container.decode(.totalQuestions, default: defaults.totalQuestions)
+        timePerQuestion = container.decode(.timePerQuestion, default: defaults.timePerQuestion)
+        allowSkip = container.decode(.allowSkip, default: defaults.allowSkip)
+        autoSubmit = container.decode(.autoSubmit, default: defaults.autoSubmit)
+        passingThreshold = container.decode(.passingThreshold, default: defaults.passingThreshold)
+    }
+}

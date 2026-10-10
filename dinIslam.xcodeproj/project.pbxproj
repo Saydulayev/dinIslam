@@ -12,6 +12,7 @@
 		T227477C2EA631EA00F2199C /* ExamResultTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T22747772EA631EA00F2199C /* ExamResultTests.swift */; };
 		T227477E2EA631EA00F2199C /* QuestionsLoadingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T227477D2EA631EA00F2199C /* QuestionsLoadingTests.swift */; };
 		T22747902EA631EA00F2199C /* LearningLoopTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T22747912EA631EA00F2199C /* LearningLoopTests.swift */; };
+		T227479A2EA631EA00F2199C /* StoredDataCompatibilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T227479B2EA631EA00F2199C /* StoredDataCompatibilityTests.swift */; };
 		T22747922EA631EA00F2199C /* ExamViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T22747932EA631EA00F2199C /* ExamViewModelTests.swift */; };
 /* End PBXBuildFile section */
 
@@ -33,6 +34,7 @@
 		T22747772EA631EA00F2199C /* ExamResultTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExamResultTests.swift; sourceTree = "<group>"; };
 		T227477D2EA631EA00F2199C /* QuestionsLoadingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuestionsLoadingTests.swift; sourceTree = "<group>"; };
 		T22747912EA631EA00F2199C /* LearningLoopTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LearningLoopTests.swift; sourceTree = "<group>"; };
+		T227479B2EA631EA00F2199C /* StoredDataCompatibilityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoredDataCompatibilityTests.swift; sourceTree = "<group>"; };
 		T22747932EA631EA00F2199C /* ExamViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExamViewModelTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -101,6 +103,7 @@
 				T22747772EA631EA00F2199C /* ExamResultTests.swift */,
 				T227477D2EA631EA00F2199C /* QuestionsLoadingTests.swift */,
 				T22747912EA631EA00F2199C /* LearningLoopTests.swift */,
+				T227479B2EA631EA00F2199C /* StoredDataCompatibilityTests.swift */,
 				T22747932EA631EA00F2199C /* ExamViewModelTests.swift */,
 			);
 			path = dinIslamTests;
@@ -214,6 +217,7 @@
 				T227477C2EA631EA00F2199C /* ExamResultTests.swift in Sources */,
 				T227477E2EA631EA00F2199C /* QuestionsLoadingTests.swift in Sources */,
 				T22747902EA631EA00F2199C /* LearningLoopTests.swift in Sources */,
+				T227479A2EA631EA00F2199C /* StoredDataCompatibilityTests.swift in Sources */,
 				T22747922EA631EA00F2199C /* ExamViewModelTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

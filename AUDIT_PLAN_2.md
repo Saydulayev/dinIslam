@@ -6,7 +6,7 @@
 Обозначения пунктов — как в отчёте аудита: **H** — High, **M** — Medium, **L** — Low.
 Critical-проблем не найдено.
 
-**Статус:** этап 1 выполнен, сборка и тесты на Mac пройдены. Следующий — этап 2.
+**Статус:** этапы 1–2 выполнены. Следующий — этап 3.
 
 ## Порядок работы на каждом этапе
 
@@ -49,13 +49,15 @@ Critical-проблем не найдено.
 
 Делается до любых изменений моделей (этапы 6–7).
 
-- [ ] **H2** — у `UserStats`, `DailyProgress`, `ReviewSchedule`, `ExamStatistics`, `AppSettings`, `CodableAchievement` синтезированный `Decodable`: новое поле в модели → старые данные не читаются → `try?` подставляет пустую модель → первое сохранение стирает данные. Перейти на `decodeIfPresent` со значениями по умолчанию (как у `ProfileProgress`).
+- [x] **H2** — у `UserStats`, `DailyProgress`, `ReviewSchedule`, `ExamStatistics`, `AppSettings`, `CodableAchievement` синтезированный `Decodable`: новое поле в модели → старые данные не читаются → `try?` подставляет пустую модель → первое сохранение стирает данные. Перейти на `decodeIfPresent` со значениями по умолчанию (как у `ProfileProgress`).
   `UserStats.swift:23`, `StatsManager.swift:35–37, 48–51`, `ExamUseCase.swift:212–218`, `AppSettings.swift`, `AchievementManager.swift:324–330`
-- [ ] **H2** — то же для вложенных и облачных типов: `TopicStat`, `DifficultyStat`, `QuizResultRecord` (`UserStats.swift`); `UserProfile`, `ProfilePreferences`, `DifficultyPerformance`, `TopicProgress`, `LearningRecommendation`, `QuizHistoryEntry`, `ExamHistoryEntry`, `ExamConfigurationSnapshot` (`UserProfile.swift`). `UserProfile` — это и полезная нагрузка записи в iCloud: ошибка чтения в одном вложенном типе теряет весь профиль.
-- [ ] **H2** — перечисления (`MasteryLevel`, `Difficulty` и др.): неизвестное значение не должно ломать чтение всего объекта — значение по умолчанию при неизвестном `rawValue`.
-- [ ] Тесты: JSON без новых полей, JSON с неизвестным значением перечисления и JSON текущей версии читаются без потерь.
-- [ ] При ошибке чтения не перезаписывать сохранённые данные пустыми (логировать и оставлять исходный ключ). В частности, `StatsManager.init` сразу вызывает `saveReviewSchedule()` — при неудачном чтении расписание тут же затирается.
+- [x] **H2** — то же для вложенных и облачных типов: `TopicStat`, `DifficultyStat`, `QuizResultRecord` (`UserStats.swift`); `UserProfile`, `ProfilePreferences`, `DifficultyPerformance`, `TopicProgress`, `LearningRecommendation`, `QuizHistoryEntry`, `ExamHistoryEntry`, `ExamConfigurationSnapshot` (`UserProfile.swift`). `UserProfile` — это и полезная нагрузка записи в iCloud: ошибка чтения в одном вложенном типе теряет весь профиль.
+- [x] **H2** — перечисления (`MasteryLevel`, `Difficulty` и др.): неизвестное значение не должно ломать чтение всего объекта — значение по умолчанию при неизвестном `rawValue`.
+- [x] Тесты: JSON без новых полей, JSON с неизвестным значением перечисления и JSON текущей версии читаются без потерь.
+- [x] При ошибке чтения не перезаписывать сохранённые данные пустыми (логировать и оставлять исходный ключ). В частности, `StatsManager.init` сразу вызывает `saveReviewSchedule()` — при неудачном чтении расписание тут же затирается.
   `StatsManager.swift:35–42`
+  *Сделано: общие помощники в `StoredDataDecoding.swift` — `decode(_:default:)` (отсутствующее или нечитаемое поле, в том числе неизвестное значение перечисления, получает значение по умолчанию), `decodeLossyArray` (нечитаемый элемент массива пропускается), `UserDefaults.decodeStored` (нечитаемые данные копируются в `<ключ>.unreadable`). Обязательными оставлены только поля, без которых запись бессмысленна (`id`, дата записи истории, тип достижения или сложности) — такая запись пропускается, а не ломает весь объект. Нечитаемый файл профиля копируется в `<id>.unreadable.json`.*
+  *Сверх плана: достижения больше не заменяют список приложения сохранённым — из сохранённых данных берётся только, что открыто и когда. Иначе новые достижения и изменённые требования (этап 12) не дошли бы до тех, у кого данные уже сохранены.*
 
 ## Расширение банка до 731 вопроса (параллельно с этапами)
 

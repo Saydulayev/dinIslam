@@ -58,6 +58,11 @@ final class ProfileLocalStore {
             return try decoder.decode(UserProfile.self, from: data)
         } catch {
             AppLogger.error("Failed to load profile \(id)", error: error, category: AppLogger.data)
+            // Следующее сохранение профиля с тем же id перезапишет файл — оставляем копию
+            let backupURL = fileURL.deletingPathExtension().appendingPathExtension("unreadable.json")
+            if !fileManager.fileExists(atPath: backupURL.path) {
+                try? fileManager.copyItem(at: fileURL, to: backupURL)
+            }
             return nil
         }
     }

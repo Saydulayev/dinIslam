@@ -229,3 +229,23 @@ struct ExamStatistics: Codable {
         }
     }
 }
+
+// MARK: - Decoding
+// Отсутствующее поле получает значение по умолчанию, а не обнуляет статистику экзаменов
+// (см. StoredDataDecoding.swift)
+extension ExamStatistics {
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        totalExamsCompleted = container.decode(.totalExamsCompleted, default: 0)
+        totalQuestionsAnswered = container.decode(.totalQuestionsAnswered, default: 0)
+        totalCorrectAnswers = container.decode(.totalCorrectAnswers, default: 0)
+        totalTimeSpent = container.decode(.totalTimeSpent, default: 0)
+        bestScore = container.decode(.bestScore, default: 0)
+        averageScore = container.decode(.averageScore, default: 0)
+        examsPassed = container.decode(.examsPassed, default: 0)
+        examsFailed = container.decode(.examsFailed, default: 0)
+        lastExamDate = container.decodeOptional(.lastExamDate)
+        currentStreak = container.decode(.currentStreak, default: 0)
+        longestStreak = container.decode(.longestStreak, default: 0)
+    }
+}

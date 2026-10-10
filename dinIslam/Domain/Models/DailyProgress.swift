@@ -60,3 +60,15 @@ struct DailyProgress: Codable, Equatable {
         lastDailyGoalDay = calendar.startOfDay(for: date)
     }
 }
+
+// MARK: - Decoding
+// Отсутствующее поле получает значение по умолчанию, а не обнуляет серию (см. StoredDataDecoding.swift)
+extension DailyProgress {
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        currentStreak = container.decode(.currentStreak, default: 0)
+        longestStreak = container.decode(.longestStreak, default: 0)
+        lastActiveDay = container.decodeOptional(.lastActiveDay)
+        lastDailyGoalDay = container.decodeOptional(.lastDailyGoalDay)
+    }
+}

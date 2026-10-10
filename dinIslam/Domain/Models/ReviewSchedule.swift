@@ -109,3 +109,21 @@ struct ReviewSchedule: Codable, Equatable {
         return calendar.date(byAdding: .day, value: days, to: startOfDay) ?? date.addingTimeInterval(TimeInterval(days) * 86_400)
     }
 }
+
+// MARK: - Decoding
+// Отсутствующее поле получает значение по умолчанию, а не обнуляет расписание (см. StoredDataDecoding.swift)
+extension ReviewItem {
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        stage = container.decode(.stage, default: 0)
+        // Без срока вопрос доступен для повторения сразу
+        dueDate = container.decode(.dueDate, default: .distantPast)
+    }
+}
+
+extension ReviewSchedule {
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        items = container.decode(.items, default: [:])
+    }
+}

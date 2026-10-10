@@ -46,8 +46,7 @@ class StatsManager {
     }
     
     private static func load<T: Decodable>(_ type: T.Type, from userDefaults: UserDefaults, key: String) -> T? {
-        guard let data = userDefaults.data(forKey: key) else { return nil }
-        return try? JSONDecoder().decode(type, from: data)
+        userDefaults.decodeStored(type, forKey: key)
     }
     
     func recordQuizSession(_ summary: QuizSessionSummary) {

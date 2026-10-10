@@ -39,7 +39,6 @@ class AchievementManager: ObservableObject, AchievementManaging {
         // Use provided localization provider or create default for backward compatibility
         self.localizationProvider = localizationProvider ?? LocalizationManager()
         loadAchievements()
-        initializeDefaultAchievements()
     }
     
     @available(*, deprecated, message: "Pass notificationManager in init instead")
@@ -147,13 +146,6 @@ class AchievementManager: ObservableObject, AchievementManaging {
     }
     
     // MARK: - Private Methods
-    
-    private func initializeDefaultAchievements() {
-        if achievements.isEmpty {
-            achievements = createDefaultAchievements()
-            saveAchievements()
-        }
-    }
     
     private func createDefaultAchievements() -> [Achievement] {
         return [
@@ -321,11 +313,34 @@ class AchievementManager: ObservableObject, AchievementManaging {
         }
     }
     
+    /// Список достижений берётся из приложения, из сохранённых данных — только что открыто и когда.
+    /// Так новые достижения и изменённые требования доходят до тех, у кого данные уже сохранены,
+    /// а нечитаемая запись теряет одно достижение, а не все.
     private func loadAchievements() {
-        guard let data = userDefaults.data(forKey: achievementsKey),
-              let loadedCodableAchievements = try? JSONDecoder().decode([CodableAchievement].self, from: data) else {
-            return
+        let stored = userDefaults.decodeStored([LossyDecodable<CodableAchievement>].self, forKey: achievementsKey)?
+            .compactMap(\.value) ?? []
+        let unlockedById = Dictionary(
+            stored.filter(\.isUnlocked).map { ($0.id, $0.unlockedDate) },
+            uniquingKeysWith: { first, _ in first }
+        )
+
+        achievements = createDefaultAchievements().map { achievement in
+            guard let unlockedDate = unlockedById[achievement.id] else { return achievement }
+            return Achievement(
+                id: achievement.id,
+                title: achievement.title,
+                description: achievement.description,
+                icon: achievement.icon,
+                color: achievement.color,
+                type: achievement.type,
+                requirement: achievement.requirement,
+                isUnlocked: true,
+                unlockedDate: unlockedDate
+            )
         }
-        achievements = loadedCodableAchievements.map { $0.toAchievement() }
+
+        if stored.isEmpty {
+            saveAchievements()
+        }
     }
 }

@@ -121,11 +121,7 @@ final class SettingsManager {
     }
     
     private static func loadSettings(from userDefaults: UserDefaults, key: String) -> AppSettings {
-        guard let data = userDefaults.data(forKey: key),
-              let settings = try? JSONDecoder().decode(AppSettings.self, from: data) else {
-            return AppSettings()
-        }
-        return settings
+        userDefaults.decodeStored(AppSettings.self, forKey: key) ?? AppSettings()
     }
     
     private func applyLanguageSettings() {
@@ -143,4 +139,18 @@ final class SettingsManager {
     }
     
     private static let appleLanguagesKey = "AppleLanguages"
+}
+
+// MARK: - Decoding
+// Отсутствующее или неизвестное значение получает значение по умолчанию, а не сбрасывает
+// все настройки (см. StoredDataDecoding.swift)
+extension AppSettings {
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let defaults = AppSettings()
+        language = container.decode(.language, default: defaults.language)
+        soundEnabled = container.decode(.soundEnabled, default: defaults.soundEnabled)
+        hapticEnabled = container.decode(.hapticEnabled, default: defaults.hapticEnabled)
+        notificationsEnabled = container.decode(.notificationsEnabled, default: defaults.notificationsEnabled)
+    }
 }
