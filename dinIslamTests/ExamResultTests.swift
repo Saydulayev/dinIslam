@@ -35,6 +35,18 @@ final class ExamResultTests: XCTestCase {
         XCTAssertTrue(result.isPassed)
     }
 
+    // MARK: - Statistics
+
+    /// Экзамен без единого ответа не даёт NaN в среднем балле (JSONEncoder не сохраняет NaN)
+    @MainActor
+    func testStatistics_examWithoutAnswers_averageScoreIsZero() throws {
+        var statistics = ExamStatistics()
+        statistics.updateStatistics(with: makeResult(percentage: 0, skippedQuestions: 20))
+
+        XCTAssertEqual(statistics.averageScore, 0)
+        XCTAssertNoThrow(try JSONEncoder().encode(statistics))
+    }
+
     // MARK: - grade
 
     func testGrade_percentage90_returnsExcellent() {
@@ -101,4 +113,81 @@ final class ExamResultTests: XCTestCase {
             completedAt: Date()
         )
     }
+}
+
+// MARK: - Выбор вопросов для экзамена
+
+@MainActor
+final class ExamQuestionSelectionTests: XCTestCase {
+
+    func testExamQuestions_differBetweenExams() async throws {
+        let useCase = makeUseCase(Self.questions(prefix: "m", count: 100, difficulty: .medium))
+        var selectedSets = Set<Set<String>>()
+
+        for _ in 0..<5 {
+            let selected = try await useCase.loadExamQuestions(language: "ru", count: 10)
+            XCTAssertEqual(selected.count, 10)
+            XCTAssertEqual(Set(selected.map(\.id)).count, 10)
+            selectedSets.insert(Set(selected.map(\.id)))
+        }
+
+        XCTAssertGreaterThan(selectedSets.count, 1, "Каждый экзамен состоит из одних и тех же вопросов")
+    }
+
+    func testExamQuestions_preferMediumAndHard() async throws {
+        let useCase = makeUseCase(
+            Self.questions(prefix: "e", count: 20, difficulty: .easy)
+                + Self.questions(prefix: "h", count: 20, difficulty: .hard)
+        )
+
+        let selected = try await useCase.loadExamQuestions(language: "ru", count: 10)
+
+        XCTAssertEqual(selected.count, 10)
+        XCTAssertFalse(selected.contains { $0.difficulty == .easy })
+    }
+
+    func testExamQuestions_notEnoughHard_fillWithEasy() async throws {
+        let useCase = makeUseCase(
+            Self.questions(prefix: "h", count: 3, difficulty: .hard)
+                + Self.questions(prefix: "e", count: 20, difficulty: .easy)
+        )
+
+        let selected = try await useCase.loadExamQuestions(language: "ru", count: 10)
+
+        XCTAssertEqual(selected.count, 10)
+        XCTAssertEqual(Set(selected.map(\.id)).count, 10)
+        XCTAssertEqual(selected.filter { $0.difficulty == .hard }.count, 3)
+    }
+
+    // MARK: - Helpers
+
+    private func makeUseCase(_ questions: [Question]) -> ExamUseCase {
+        ExamUseCase(
+            questionsRepository: StubQuestionsRepository(questions: questions),
+            examStatisticsManager: NoopExamStatistics()
+        )
+    }
+
+    private static func questions(prefix: String, count: Int, difficulty: Difficulty) -> [Question] {
+        (0..<count).map { index in
+            Question(
+                id: "\(prefix)\(index)",
+                text: "?",
+                answers: [Answer(id: "a", text: "A"), Answer(id: "b", text: "B")],
+                correctIndex: 0,
+                category: "fiqh",
+                difficulty: difficulty
+            )
+        }
+    }
+}
+
+private struct StubQuestionsRepository: QuestionsRepositoryProtocol {
+    let questions: [Question]
+
+    func loadQuestions(language: String) async throws -> [Question] { questions }
+}
+
+private struct NoopExamStatistics: ExamStatisticsManaging {
+    func updateStatistics(with result: ExamResult) {}
 }

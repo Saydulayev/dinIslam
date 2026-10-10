@@ -268,6 +268,17 @@ final class StatsManagerReviewTests: XCTestCase {
         XCTAssertEqual(manager.stats.currentStreak, 0)
     }
 
+    /// Сброс достижений обнуляет счётчик изученных вопросов, но точность считается по ответам и не превышает 100%
+    func testAchievementReset_keepsAccuracyBasedOnAnswers() {
+        let manager = makeManager()
+        manager.recordQuizSession(summary([("q1", true), ("q2", true), ("q3", false), ("q4", true)]))
+
+        manager.resetAchievementProgress()
+
+        XCTAssertEqual(manager.stats.totalQuestionsStudied, 0)
+        XCTAssertEqual(manager.stats.accuracyPercentage, 75, accuracy: 0.001)
+    }
+
     func testReset_clearsScheduleAndStreak() {
         let manager = makeManager()
         manager.recordQuizSession(summary([("q1", false)]))
@@ -301,6 +312,37 @@ final class QuestionFormatTests: XCTestCase {
 
         XCTAssertEqual(question.category, QuestionCategory.generalId)
         XCTAssertEqual(question.difficulty, .medium)
+    }
+
+    /// Индекс правильного ответа вне массива: вопрос отбрасывается, а не получает чужой правильный ответ
+    func testCorrectIndexOutOfRange_questionIsSkipped() throws {
+        let json = """
+        [{"id": "q1", "q": "Вопрос?", "a": ["А", "Б"], "c": 0},
+         {"id": "q2", "q": "Опечатка в c", "a": ["А", "Б", "В", "Г"], "c": 4}]
+        """
+        let questions = try QuestionsFile.decode(Data(json.utf8))
+
+        XCTAssertEqual(questions.map(\.id), ["q1"])
+    }
+
+    func testCorrectIndexOnEmptyAnswer_questionIsSkipped() throws {
+        let json = """
+        [{"id": "q1", "q": "Вопрос?", "a": ["А", "Б"], "c": 0},
+         {"id": "q2", "q": "Правильный ответ пустой", "a": ["А", "", "Б"], "c": 1}]
+        """
+        let questions = try QuestionsFile.decode(Data(json.utf8))
+
+        XCTAssertEqual(questions.map(\.id), ["q1"])
+    }
+
+    func testEmptyAnswerBeforeCorrect_correctAnswerIsKept() throws {
+        let json = """
+        [{"id": "q1", "q": "Вопрос?", "a": ["А", "", "Б"], "c": 2}]
+        """
+        let question = try XCTUnwrap(QuestionsFile.decode(Data(json.utf8)).first)
+
+        XCTAssertEqual(question.answers.map(\.text), ["А", "Б"])
+        XCTAssertEqual(question.answers[question.correctIndex].text, "Б")
     }
 
     func testShuffle_keepsCategory() {

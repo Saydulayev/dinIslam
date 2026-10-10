@@ -79,8 +79,4 @@ struct QuizResult: Equatable, Hashable {
     let correctAnswers: Int
     let percentage: Double
     let timeSpent: TimeInterval
-    
-    var isNewRecord: Bool {
-        return percentage > 0.8 // 80% threshold for new record
-    }
 }

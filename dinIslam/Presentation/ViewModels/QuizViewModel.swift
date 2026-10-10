@@ -41,38 +41,17 @@ class QuizViewModel {
     
     private var startTime: Date?
     private var questionResults: [String: Bool] = [:] // ID вопроса -> правильный ли ответ
-    
-    // Мемоизация для избежания повторных вычислений
-    private var memoizedProgress: Double?
-    private var memoizedCurrentQuestion: Question?
     private var nextQuestionTask: Task<Void, Never>?
-    
+
     // MARK: - Computed Properties
     var currentQuestion: Question? {
         guard currentQuestionIndex < questions.count else { return nil }
-        
-        // Мемоизация для избежания повторных обращений к массиву
-        if let memoized = memoizedCurrentQuestion, 
-           memoized.id == questions[currentQuestionIndex].id {
-            return memoized
-        }
-        
-        let question = questions[currentQuestionIndex]
-        memoizedCurrentQuestion = question
-        return question
+        return questions[currentQuestionIndex]
     }
-    
+
     var progress: Double {
         guard !questions.isEmpty else { return 0 }
-        
-        // Мемоизация прогресса
-        if let memoized = memoizedProgress {
-            return memoized
-        }
-        
-        let progressValue = Double(currentQuestionIndex) / Double(questions.count)
-        memoizedProgress = progressValue
-        return progressValue
+        return Double(currentQuestionIndex) / Double(questions.count)
     }
     
     var isLastQuestion: Bool {
@@ -263,10 +242,6 @@ class QuizViewModel {
             currentQuestionIndex += 1
             selectedAnswerIndex = nil
             isAnswerSelected = false
-            
-            // Сброс мемоизации при переходе к следующему вопросу
-            memoizedProgress = nil
-            memoizedCurrentQuestion = nil
         }
     }
     
@@ -351,8 +326,6 @@ class QuizViewModel {
         lastSessionReport = nil
         questionResults.removeAll()
         nextQuestionTask?.cancel()
-        memoizedProgress = nil
-        memoizedCurrentQuestion = nil
     }
     
     @MainActor
@@ -371,10 +344,6 @@ class QuizViewModel {
         questionResults.removeAll()
         nextQuestionTask?.cancel()
         nextQuestionTask = nil
-        
-        // Сброс мемоизации при перезапуске
-        memoizedProgress = nil
-        memoizedCurrentQuestion = nil
     }
     
     // MARK: - Mistakes Review Methods
@@ -423,12 +392,13 @@ class QuizViewModel {
     @MainActor
     func finishMistakesReview() {
         let timeSpent = Date().timeIntervalSince(startTime ?? Date())
+        // При досрочном завершении процент считается от отвеченных вопросов, как в обычной викторине
         quizResult = quizUseCase.calculateResult(
             correctAnswers: correctAnswers,
-            totalQuestions: questions.count,
+            totalQuestions: questionResults.count,
             timeSpent: timeSpent
         )
-        
+
         // Продвигаем вопросы по расписанию повторения; выученные уходят из списка ошибок
         let reviewSummary = statisticsRecorder.recordReviewAnswers(questionResults)
         let outcomes = questions.compactMap { question -> QuizQuestionOutcome? in

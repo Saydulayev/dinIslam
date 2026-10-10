@@ -80,7 +80,6 @@ final class AdaptiveLearningEngine {
         }
 
         progress.recommendations = generateRecommendationsInternal(for: progress)
-        progress.recommendations = generateRecommendationsInternal(for: progress)
         profile.progress = progress
         profile.metadata.updatedAt = Date()
     }

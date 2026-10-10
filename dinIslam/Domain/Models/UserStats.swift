@@ -37,9 +37,12 @@ struct UserStats: Codable {
     var difficultyStats: [String: DifficultyStat] = [:]
     var lastActivityAt: Date?
     
+    /// Доля верных ответов. Знаменатель — сами ответы, а не totalQuestionsStudied:
+    /// сброс достижений обнуляет счётчик изученных вопросов, но сохраняет ответы
     var accuracyPercentage: Double {
-        guard totalQuestionsStudied > 0 else { return 0 }
-        return Double(correctAnswers) / Double(totalQuestionsStudied) * 100
+        let answered = correctAnswers + incorrectAnswers
+        guard answered > 0 else { return 0 }
+        return Double(correctAnswers) / Double(answered) * 100
     }
     
     var averageRecentScore: Double {

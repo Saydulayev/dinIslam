@@ -211,7 +211,10 @@ struct ExamStatistics: Codable {
         }
         
         // Update average score
-        averageScore = Double(totalCorrectAnswers) / Double(totalQuestionsAnswered) * 100
+        // Без единого ответа деление дало бы NaN, а JSONEncoder его не сохраняет
+        averageScore = totalQuestionsAnswered > 0
+            ? Double(totalCorrectAnswers) / Double(totalQuestionsAnswered) * 100
+            : 0
         
         // Update pass/fail count
         if result.isPassed {

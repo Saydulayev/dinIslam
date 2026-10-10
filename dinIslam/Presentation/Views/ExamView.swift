@@ -211,7 +211,8 @@ struct ExamView: View {
                         }
                     }
                     .buttonStyle(DSButtonStyle())
-                    
+                    .disabled(viewModel.state != .active(.paused) && !viewModel.canPause)
+
                     // Finish button
                     Button(action: {
                         showingStopAlert = true

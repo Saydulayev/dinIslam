@@ -151,19 +151,16 @@ class ExamUseCase: ExamUseCaseProtocol {
     
     func loadExamQuestions(language: String, count: Int) async throws -> [Question] {
         let allQuestions = try await questionsRepository.loadQuestions(language: language)
-        
-        // Filter questions by difficulty for exam mode
-        let examQuestions = allQuestions.filter { question in
-            // In exam mode, prefer medium and hard questions
-            question.difficulty == .medium || question.difficulty == .hard
+
+        // Перемешиваем до отбора, иначе каждый экзамен состоит из первых вопросов файла
+        let preferred = allQuestions.filter { $0.difficulty != .easy }.shuffled()
+        guard preferred.count < count else {
+            return Array(preferred.prefix(count))
         }
-        
-        // If not enough medium/hard questions, include easy ones
-        let finalQuestions = examQuestions.count >= count ? 
-            Array(examQuestions.prefix(count)) :
-            Array(allQuestions.prefix(count))
-        
-        return finalQuestions.shuffled()
+
+        // Вопросов средней и высокой сложности не хватает — добираем лёгкими
+        let easy = allQuestions.filter { $0.difficulty == .easy }.shuffled()
+        return (preferred + easy.prefix(count - preferred.count)).shuffled()
     }
 }
 

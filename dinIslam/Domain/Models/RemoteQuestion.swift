@@ -62,13 +62,10 @@ struct RemoteQuestion: Codable {
             filtered.append((originalIndex: idx, answer: a))
         }
         let questionAnswers = filtered.map(\.answer)
-        let newCorrectIndex: Int
-        if let found = filtered.firstIndex(where: { $0.originalIndex == correctIndex }) {
-            newCorrectIndex = found
-        } else {
-            newCorrectIndex = min(max(0, correctIndex), questionAnswers.count - 1)
-        }
-        
+        // Индекс вне массива или указывает на пустой ответ: правильный ответ неизвестен.
+        // -1 не проходит QuestionValidator, и вопрос отбрасывается, а не получает чужой правильный ответ
+        let newCorrectIndex = filtered.firstIndex { $0.originalIndex == correctIndex } ?? -1
+
         // Определяем difficulty
         let questionDifficulty: Difficulty
         if let difficultyStr = difficulty,
@@ -78,15 +75,11 @@ struct RemoteQuestion: Codable {
             questionDifficulty = .medium
         }
         
-        let finalAnswers = questionAnswers.isEmpty ? rawAnswers : questionAnswers
-        let finalCorrectIndex = questionAnswers.isEmpty ? correctIndex : newCorrectIndex
-        let safeCorrectIndex = finalAnswers.isEmpty ? 0 : max(0, min(finalCorrectIndex, finalAnswers.count - 1))
-
         return Question(
             id: questionId,
             text: questionText,
-            answers: finalAnswers,
-            correctIndex: safeCorrectIndex,
+            answers: questionAnswers,
+            correctIndex: newCorrectIndex,
             category: questionCategory,
             difficulty: questionDifficulty
         )

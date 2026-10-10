@@ -102,6 +102,24 @@ final class ExamViewModelTests: XCTestCase {
         XCTAssertNotNil(viewModel.answers["q1"])
     }
 
+    /// После ответа уже идёт переход к следующему вопросу — пауза в этот момент не срабатывает
+    func testPauseRightAfterAnswer_isIgnored_andExamAdvances() async throws {
+        await viewModel.startExam(configuration: makeConfiguration(), language: "ru")
+        XCTAssertTrue(viewModel.canPause)
+
+        viewModel.selectAnswer(at: 0)
+        XCTAssertFalse(viewModel.canPause)
+        viewModel.pauseExam()
+        XCTAssertEqual(viewModel.state, .active(.playing))
+
+        try await Task.sleep(for: .seconds(1.8))
+
+        XCTAssertEqual(viewModel.currentQuestionIndex, 1)
+        XCTAssertEqual(viewModel.state, .active(.playing))
+        XCTAssertTrue(timer.isTimerActive)
+        XCTAssertTrue(viewModel.canPause)
+    }
+
     // MARK: - Timer display
 
     func testTimeRemainingFormatted_roundsUp() async {

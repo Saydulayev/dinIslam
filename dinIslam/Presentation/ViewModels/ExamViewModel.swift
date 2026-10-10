@@ -108,6 +108,12 @@ class ExamViewModel {
     var canSubmitExam: Bool {
         return answeredQuestionsCount > 0
     }
+
+    /// Пауза только пока на вопрос не ответили: после ответа уже идёт переход к следующему вопросу
+    var canPause: Bool {
+        guard state == .active(.playing), let currentQuestion else { return false }
+        return answers[currentQuestion.id] == nil
+    }
     
     // MARK: - Initialization
     init(
@@ -278,7 +284,7 @@ class ExamViewModel {
     }
     
     func pauseExam() {
-        guard state == .active(.playing) else { return }
+        guard canPause else { return }
         
         stopQuestionTimer()
         state = .active(.paused)
