@@ -254,11 +254,14 @@ class QuizViewModel {
             ? questions
             : questions.filter { questionResults[$0.id] != nil }
         
-        let result = quizUseCase.calculateResult(
+        var result = quizUseCase.calculateResult(
             correctAnswers: correctAnswers,
             totalQuestions: sessionQuestions.count,
             timeSpent: timeSpent
         )
+        if !isComplete {
+            result.plannedQuestions = questions.count
+        }
         quizResult = result
         
         if !sessionQuestions.isEmpty {
@@ -393,11 +396,15 @@ class QuizViewModel {
     func finishMistakesReview() {
         let timeSpent = Date().timeIntervalSince(startTime ?? Date())
         // При досрочном завершении процент считается от отвеченных вопросов, как в обычной викторине
-        quizResult = quizUseCase.calculateResult(
+        var result = quizUseCase.calculateResult(
             correctAnswers: correctAnswers,
             totalQuestions: questionResults.count,
             timeSpent: timeSpent
         )
+        if questionResults.count < questions.count {
+            result.plannedQuestions = questions.count
+        }
+        quizResult = result
 
         // Продвигаем вопросы по расписанию повторения; выученные уходят из списка ошибок
         let reviewSummary = statisticsRecorder.recordReviewAnswers(questionResults)

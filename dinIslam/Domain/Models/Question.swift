@@ -75,8 +75,11 @@ enum ErrorState: Equatable {
 }
 
 struct QuizResult: Equatable, Hashable {
+    /// Отвеченные вопросы: при досрочном завершении процент считается от них
     let totalQuestions: Int
     let correctAnswers: Int
     let percentage: Double
     let timeSpent: TimeInterval
+    /// Сколько вопросов было в сессии, если её завершили досрочно; nil — пройдена до конца
+    var plannedQuestions: Int? = nil
 }

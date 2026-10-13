@@ -41,6 +41,12 @@ struct ResultView: View {
                         LocalizedText("result.title")
                             .font(DesignTokens.Typography.h1)
                             .foregroundStyle(DesignTokens.Colors.textPrimary)
+                        
+                        if isFinishedEarly {
+                            LocalizedText("result.finishedEarly")
+                                .font(DesignTokens.Typography.secondarySemibold)
+                                .foregroundStyle(DesignTokens.Colors.textSecondary)
+                        }
                     }
                     
                     // Score details card
@@ -51,7 +57,7 @@ struct ResultView: View {
                                 .font(DesignTokens.Typography.scoreLarge)
                                 .foregroundStyle(resultColor)
                             
-                            LocalizedText("result.correctAnswers")
+                            LocalizedText(isFinishedEarly ? "result.correctOfAnswered" : "result.correctAnswers")
                                 .font(DesignTokens.Typography.bodyRegular)
                                 .foregroundStyle(DesignTokens.Colors.textSecondary)
                         }
@@ -61,10 +67,17 @@ struct ResultView: View {
                         
                         // Detailed stats
                         VStack(spacing: DesignTokens.Spacing.md) {
-                            StatRow(
-                                title: "result.totalQuestions".localized,
-                                value: "\(result.totalQuestions)"
-                            )
+                            if let plannedQuestions = result.plannedQuestions {
+                                StatRow(
+                                    title: "result.answered".localized,
+                                    value: "result.answeredValue".localized(arguments: result.totalQuestions, plannedQuestions)
+                                )
+                            } else {
+                                StatRow(
+                                    title: "result.totalQuestions".localized,
+                                    value: "\(result.totalQuestions)"
+                                )
+                            }
                             
                             StatRow(
                                 title: "result.correctAnswers".localized,
@@ -167,7 +180,15 @@ struct ResultView: View {
         }
     }
     
+    /// Досрочно завершённую сессию не оцениваем по проценту: он посчитан только от отвеченных вопросов
+    private var isFinishedEarly: Bool {
+        result.plannedQuestions != nil
+    }
+    
     private var resultIcon: String {
+        if isFinishedEarly {
+            return "flag.fill"
+        }
         switch result.percentage {
         case 80...:
             return "trophy.fill"
@@ -181,6 +202,9 @@ struct ResultView: View {
     }
     
     private var resultColor: Color {
+        if isFinishedEarly {
+            return DesignTokens.Colors.iconBlue
+        }
         switch result.percentage {
         case 80...:
             return DesignTokens.Colors.iconOrange
@@ -194,6 +218,9 @@ struct ResultView: View {
     }
     
     private var resultFeedbackMessage: String {
+        if isFinishedEarly {
+            return "result.feedback.finishedEarly"
+        }
         switch result.percentage {
         case 90...:
             return "result.feedback.excellent"
@@ -213,6 +240,9 @@ struct ResultView: View {
     }
     
     private var feedbackIcon: String {
+        if isFinishedEarly {
+            return "arrow.uturn.forward"
+        }
         switch result.percentage {
         case 90...:
             return "star.fill"
@@ -232,6 +262,9 @@ struct ResultView: View {
     }
     
     private var feedbackColor: Color {
+        if isFinishedEarly {
+            return DesignTokens.Colors.iconBlue
+        }
         switch result.percentage {
         case 90...:
             return DesignTokens.Colors.iconOrange

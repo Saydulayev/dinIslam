@@ -25,6 +25,7 @@ enum StartRoute: Hashable {
         let correctAnswers: Int
         let percentage: Double
         let timeSpent: Double
+        let plannedQuestions: Int?
         let report: SessionReport?
         
         init(from result: QuizResult, report: SessionReport? = nil) {
@@ -32,6 +33,7 @@ enum StartRoute: Hashable {
             correctAnswers = result.correctAnswers
             percentage = result.percentage
             timeSpent = result.timeSpent
+            plannedQuestions = result.plannedQuestions
             self.report = report
         }
         
@@ -40,7 +42,8 @@ enum StartRoute: Hashable {
                 totalQuestions: totalQuestions,
                 correctAnswers: correctAnswers,
                 percentage: percentage,
-                timeSpent: timeSpent
+                timeSpent: timeSpent,
+                plannedQuestions: plannedQuestions
             )
         }
     }

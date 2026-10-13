@@ -107,6 +107,11 @@
 "result.feedback.average" = "Средний результат";
 "result.feedback.needImprovement" = "Нужно больше практики";
 "result.feedback.keepPracticing" = "Продолжайте практиковаться";
+"result.feedback.finishedEarly" = "Неотвеченные вопросы встретятся снова";
+"result.finishedEarly" = "Завершено досрочно";
+"result.correctOfAnswered" = "правильных из отвеченных";
+"result.answered" = "Отвечено:";
+"result.answeredValue" = "%d из %d";
 "result.playAgain" = "Продолжить изучение";
 "result.backToStart" = "В главное меню";
 
