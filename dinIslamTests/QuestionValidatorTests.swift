@@ -112,6 +112,20 @@ final class QuestionValidatorTests: XCTestCase {
         } match: { if case .emptyAnswerText = $0 { return true }; return false }
     }
 
+    func testValidate_duplicateAnswerId_throwsDuplicateAnswerId() {
+        let question = Question(
+            id: "q1",
+            text: "Q?",
+            answers: [Answer(id: "a1", text: "A"), Answer(id: "a1", text: "B")],
+            correctIndex: 0,
+            category: "test",
+            difficulty: .easy
+        )
+        assertThrows(expectedQuestionId: "q1") {
+            try sut.validate([question])
+        } match: { if case .duplicateAnswerId(_, let answerId) = $0 { return answerId == "a1" }; return false }
+    }
+
     // MARK: - validQuestions (skip invalid)
 
     func testValidQuestions_skipsInvalidAndDuplicates_keepsOrder() {

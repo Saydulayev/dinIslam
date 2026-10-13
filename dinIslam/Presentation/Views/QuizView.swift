@@ -24,14 +24,6 @@ struct QuizView: View {
         "\(viewModel.currentQuestionIndex + 1) / \(viewModel.questions.count)"
     }
     
-    // Мемоизированные индексы ответов для избежания повторных вычислений
-    private var answerIndices: [String: Int] {
-        guard let question = viewModel.currentQuestion else { return [:] }
-        return Dictionary(uniqueKeysWithValues: 
-            question.answers.enumerated().map { ($1.id, $0) }
-        )
-    }
-    
     var body: some View {
         ZStack {
             AppBackground()
@@ -111,8 +103,7 @@ struct QuizView: View {
                             
                                 // Answer options
                                 VStack(spacing: DesignTokens.Spacing.md) {
-                                    ForEach(question.answers, id: \.id) { answer in
-                                        let index = answerIndices[answer.id] ?? 0
+                                    ForEach(Array(question.answers.enumerated()), id: \.element.id) { index, answer in
                                         AnswerButton(
                                             answer: answer,
                                             index: index,

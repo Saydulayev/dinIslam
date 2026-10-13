@@ -199,6 +199,22 @@ class EnhancedRemoteQuestionsService {
     @ObservationIgnored private let configuration: CacheConfiguration
     @ObservationIgnored private var networkStatusCancellable: AnyCancellable?
     
+    /// Разобранные вопросы по языку: файл кэша читается и разбирается один раз за запуск
+    @ObservationIgnored private var memoryCache: [AppLanguage: CachedQuestions] = [:]
+    /// Встроенные вопросы, если ни сети, ни кэша нет
+    @ObservationIgnored private var bundledQuestions: [AppLanguage: [Question]] = [:]
+    /// Идущие запросы к GitHub: одновременные вызовы ждут один запрос
+    @ObservationIgnored private var refreshTasks: [AppLanguage: Task<[Question], Error>] = [:]
+    /// Языки, для которых банк уже сверялся с GitHub за этот запуск
+    @ObservationIgnored private var revalidatedLanguages: Set<AppLanguage> = []
+    
+    private struct CachedQuestions {
+        let questions: [Question]
+        let etag: String?
+        let lastModified: Date?
+        let timestamp: Date
+    }
+    
     init(
         networkManager: NetworkManager = NetworkManager(),
         cacheManager: CacheManager = CacheManager(),
@@ -227,179 +243,107 @@ class EnhancedRemoteQuestionsService {
     
     // MARK: - Public Methods
     
+    /// Вопросы для викторины. Кэш (даже просроченный) отдаётся сразу, а просроченный обновляется в фоне —
+    /// новые вопросы появятся со следующей викторины. Сеть ждём, только если кэша нет; без сети — встроенные вопросы.
     func fetchQuestions(
         for language: AppLanguage,
         manageLoadingState: Bool = true
     ) async -> [Question] {
+        if let cached = cachedQuestions(for: language) {
+            cachedQuestionsCount = cached.questions.count
+            if isExpired(cached) {
+                AppLogger.info("Cache expired for \(language.rawValue), refreshing in background", category: AppLogger.data)
+                refreshInBackground(language)
+            }
+            return cached.questions
+        }
+        
         if manageLoadingState {
-            await MainActor.run {
-                isLoading = true
-            }
-        }
-        
-        defer {
-            if manageLoadingState {
-                Task { @MainActor in
-                    isLoading = false
-                }
-            }
-        }
-        
-        let cacheKey = Self.cacheKey(for: language)
-        
-        // Get cached data with metadata (including ETag)
-        let cachedDataWithMetadata = cacheManager.getCachedDataWithMetadata([Question].self, for: cacheKey)
-        
-        // If we have valid (non-expired) cache, return it
-        if let cached = cachedDataWithMetadata, !cached.isExpired {
-            AppLogger.info("Using valid cached questions for \(language.rawValue)", category: AppLogger.data)
-            await MainActor.run {
-                cachedQuestionsCount = cached.data.count
-            }
-            return cached.data
-        }
-        
-        // Try to fetch from remote with ETag
-        do {
-            let response = try await loadFromRemoteWithETag(
-                language: language,
-                cachedEtag: cachedDataWithMetadata?.etag,
-                cachedData: cachedDataWithMetadata?.data
-            )
-
-            // Cache the data to refresh timestamp (revalidation) and persist new metadata when updated.
-            cacheManager.cacheData(
-                response.data,
-                for: cacheKey,
-                etag: response.etag ?? cachedDataWithMetadata?.etag,
-                lastModified: response.lastModified ?? cachedDataWithMetadata?.lastModified
-            )
-
-            if response.notModified {
-                AppLogger.info("Cache revalidated via 304 Not Modified for \(language.rawValue)", category: AppLogger.data)
-            } else {
-                AppLogger.info("Cached updated questions with ETag: \(response.etag ?? "none")", category: AppLogger.data)
-            }
-            
-            // Update metadata
-            await MainActor.run {
-                lastUpdateDate = Date()
-                remoteQuestionsCount = response.data.count
-                cachedQuestionsCount = response.data.count
-            }
-            
-            return response.data
-            
-        } catch {
-            AppLogger.error("Failed to fetch remote questions", error: error, category: AppLogger.network)
-            
-            // Try to use expired cache as backup
-            if let expired = cachedDataWithMetadata {
-                AppLogger.warning("Using expired cache as backup for \(language.rawValue)", category: AppLogger.data)
-                return expired.data
-            }
-            
-            // Final fallback to local questions
-            return loadLocalQuestions(for: language)
-        }
-    }
-    
-    func checkForUpdates(for language: AppLanguage) async {
-        await MainActor.run {
             isLoading = true
         }
-        
         defer {
-            Task { @MainActor in
+            if manageLoadingState {
                 isLoading = false
             }
         }
         
         do {
-            let cacheKey = Self.cacheKey(for: language)
-            let cachedDataWithMetadata = cacheManager.getCachedDataWithMetadata([Question].self, for: cacheKey)
+            return try await refresh(language)
+        } catch {
+            AppLogger.error("Failed to fetch remote questions, using bundled questions", error: error, category: AppLogger.network)
+            return loadLocalQuestions(for: language)
+        }
+    }
+    
+    /// Прогревает кэш в памяти и один раз за запуск сверяет банк с GitHub (по ETag, обычно ответ 304).
+    func preloadQuestions(for language: AppLanguage) async {
+        _ = await fetchQuestions(for: language, manageLoadingState: false)
+        if !revalidatedLanguages.contains(language) {
+            refreshInBackground(language)
+        }
+    }
+    
+    func checkForUpdates(for language: AppLanguage) async {
+        isLoading = true
+        defer {
+            isLoading = false
+        }
+        
+        do {
+            let cached = cachedQuestions(for: language)
             
             // Fetch remote questions with ETag support
             let response = try await loadFromRemoteWithETag(
                 language: language,
-                cachedEtag: cachedDataWithMetadata?.etag,
-                cachedData: cachedDataWithMetadata?.data
+                cachedEtag: cached?.etag,
+                cachedData: cached?.questions
             )
             
             let remoteCount = response.data.count
-            let cachedCount = cachedDataWithMetadata?.data.count ?? 0
-            let cachedEtag = cachedDataWithMetadata?.etag
+            let cachedCount = cached?.questions.count ?? 0
+            let cachedEtag = cached?.etag
             
             // Check if there are updates based on ETag or count
             let etagChanged = (response.etag != cachedEtag) && (response.etag != nil)
             let countChanged = remoteCount != cachedCount
             let updates = etagChanged || countChanged
             
-            await MainActor.run {
-                remoteQuestionsCount = remoteCount
-                cachedQuestionsCount = cachedCount
-                hasUpdates = updates
-                
-                AppLogger.info(
-                    "Update check: Remote=\(remoteCount), Cached=\(cachedCount), ETagChanged=\(etagChanged), CountChanged=\(countChanged), HasUpdates=\(updates)",
-                    category: AppLogger.network
-                )
-            }
+            remoteQuestionsCount = remoteCount
+            cachedQuestionsCount = cachedCount
+            hasUpdates = updates
+            
+            AppLogger.info(
+                "Update check: Remote=\(remoteCount), Cached=\(cachedCount), ETagChanged=\(etagChanged), CountChanged=\(countChanged), HasUpdates=\(updates)",
+                category: AppLogger.network
+            )
         } catch {
             AppLogger.error("Failed to check for updates", error: error, category: AppLogger.network)
-            await MainActor.run {
-                hasUpdates = false
-            }
+            hasUpdates = false
         }
     }
     
     func forceSync(for language: AppLanguage) async -> [Question] {
         AppLogger.info("Force sync started for \(language.rawValue)", category: AppLogger.network)
         
-        await MainActor.run {
-            isLoading = true
-        }
-        
+        isLoading = true
         defer {
-            Task { @MainActor in
-                isLoading = false
-            }
+            isLoading = false
         }
         
         do {
-            let cacheKey = Self.cacheKey(for: language)
-            let cachedDataWithMetadata = cacheManager.getCachedDataWithMetadata([Question].self, for: cacheKey)
-            
-            // Use ETag-based loading with validation
-            let response = try await loadFromRemoteWithETag(
-                language: language,
-                cachedEtag: cachedDataWithMetadata?.etag,
-                cachedData: cachedDataWithMetadata?.data
-            )
-            
-            // Clear old cache and save new data with ETag
-            cacheManager.invalidateCache(for: cacheKey)
-            cacheManager.cacheData(
-                response.data,
-                for: cacheKey,
-                etag: response.etag ?? cachedDataWithMetadata?.etag,
-                lastModified: response.lastModified ?? cachedDataWithMetadata?.lastModified
-            )
-            
-            await MainActor.run {
-                lastUpdateDate = Date()
-                hasUpdates = false
-                cachedQuestionsCount = response.data.count
-                remoteQuestionsCount = response.data.count
-            }
-            
-            AppLogger.info("Force sync completed: \(response.data.count) questions with ETag: \(response.etag ?? cachedDataWithMetadata?.etag ?? "none")", category: AppLogger.network)
-            return response.data
-            
+            let questions = try await refresh(language)
+            hasUpdates = false
+            AppLogger.info("Force sync completed: \(questions.count) questions", category: AppLogger.network)
+            return questions
         } catch {
             AppLogger.error("Force sync failed", error: error, category: AppLogger.network)
-            return cacheManager.getCachedData([Question].self, for: Self.cacheKey(for: language)) ?? []
+            return cachedQuestions(for: language)?.questions ?? []
         }
+    }
+    
+    /// Идущее обновление из GitHub (для тестов: дождаться фонового обновления)
+    func pendingRefresh(for language: AppLanguage) -> Task<[Question], Error>? {
+        refreshTasks[language]
     }
     
     /// Удаляет кэш старой системы загрузки (RemoteQuestionsService хранил вопросы в UserDefaults).
@@ -410,6 +354,7 @@ class EnhancedRemoteQuestionsService {
     
     func clearCache() {
         cacheManager.clearAllCache()
+        memoryCache.removeAll()
         AppLogger.info("Cache cleared", category: AppLogger.data)
     }
     
@@ -420,6 +365,84 @@ class EnhancedRemoteQuestionsService {
     }
     
     // MARK: - Private Methods
+    
+    /// Кэш из памяти, при первом обращении за запуск — из файла
+    private func cachedQuestions(for language: AppLanguage) -> CachedQuestions? {
+        if let cached = memoryCache[language] {
+            return cached
+        }
+        guard let stored = cacheManager.getCachedDataWithMetadata([Question].self, for: Self.cacheKey(for: language)) else {
+            return nil
+        }
+        let cached = CachedQuestions(
+            questions: stored.data,
+            etag: stored.etag,
+            lastModified: stored.lastModified,
+            timestamp: stored.timestamp
+        )
+        memoryCache[language] = cached
+        return cached
+    }
+    
+    private func isExpired(_ cached: CachedQuestions) -> Bool {
+        Date().timeIntervalSince(cached.timestamp) > configuration.ttl
+    }
+    
+    private func refreshInBackground(_ language: AppLanguage) {
+        startRefresh(language)
+    }
+    
+    private func refresh(_ language: AppLanguage) async throws -> [Question] {
+        try await startRefresh(language).value
+    }
+    
+    /// Загружает банк из GitHub (по ETag) и обновляет кэш; пока запрос идёт, новые вызовы получают его же
+    @discardableResult
+    private func startRefresh(_ language: AppLanguage) -> Task<[Question], Error> {
+        if let running = refreshTasks[language] {
+            return running
+        }
+        let task = Task {
+            defer { refreshTasks[language] = nil }
+            return try await downloadAndCache(language)
+        }
+        refreshTasks[language] = task
+        return task
+    }
+    
+    private func downloadAndCache(_ language: AppLanguage) async throws -> [Question] {
+        let cacheKey = Self.cacheKey(for: language)
+        let cached = cachedQuestions(for: language)
+        
+        let response = try await loadFromRemoteWithETag(
+            language: language,
+            cachedEtag: cached?.etag,
+            cachedData: cached?.questions
+        )
+        
+        // Cache the data to refresh timestamp (revalidation) and persist new metadata when updated.
+        let etag = response.etag ?? cached?.etag
+        let lastModified = response.lastModified ?? cached?.lastModified
+        cacheManager.cacheData(response.data, for: cacheKey, etag: etag, lastModified: lastModified)
+        memoryCache[language] = CachedQuestions(
+            questions: response.data,
+            etag: etag,
+            lastModified: lastModified,
+            timestamp: Date()
+        )
+        revalidatedLanguages.insert(language)
+        
+        if response.notModified {
+            AppLogger.info("Cache revalidated via 304 Not Modified for \(language.rawValue)", category: AppLogger.data)
+        } else {
+            AppLogger.info("Cached updated questions with ETag: \(response.etag ?? "none")", category: AppLogger.data)
+        }
+        
+        lastUpdateDate = Date()
+        remoteQuestionsCount = response.data.count
+        cachedQuestionsCount = response.data.count
+        return response.data
+    }
     
     private func loadFromRemoteWithETag(
         language: AppLanguage,
@@ -469,8 +492,13 @@ class EnhancedRemoteQuestionsService {
     }
     
     private func loadLocalQuestions(for language: AppLanguage) -> [Question] {
+        if let bundled = bundledQuestions[language] {
+            return bundled
+        }
         do {
-            return try QuestionsFile.loadBundled(for: language)
+            let questions = try QuestionsFile.loadBundled(for: language)
+            bundledQuestions[language] = questions
+            return questions
         } catch {
             AppLogger.error("Failed to load local questions for \(language.rawValue)", error: error, category: AppLogger.data)
             return []

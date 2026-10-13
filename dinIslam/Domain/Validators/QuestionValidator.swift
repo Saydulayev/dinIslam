@@ -16,6 +16,7 @@ enum ValidationError: Error, LocalizedError {
     case duplicateQuestionId(questionId: String)
     case emptyAnswerText(questionId: String, answerIndex: Int)
     case negativeCorrectIndex(questionId: String, index: Int)
+    case duplicateAnswerId(questionId: String, answerId: String)
     
     var errorDescription: String? {
         switch self {
@@ -31,6 +32,8 @@ enum ValidationError: Error, LocalizedError {
             return "Question '\(questionId)': answer at index \(answerIndex) has empty text"
         case .negativeCorrectIndex(let questionId, let index):
             return "Question '\(questionId)': correctIndex is negative (\(index))"
+        case .duplicateAnswerId(let questionId, let answerId):
+            return "Question '\(questionId)': duplicate answer ID '\(answerId)'"
         }
     }
 }
@@ -162,6 +165,16 @@ class QuestionValidator: QuestionValidating {
                     answerIndex: index
                 )
             }
+        }
+        
+        // 6. Validate answer IDs are unique (the quiz screen identifies answers by ID)
+        var seenAnswerIds = Set<String>()
+        for answer in question.answers where !seenAnswerIds.insert(answer.id).inserted {
+            AppLogger.error(
+                "Validation failed: Question '\(question.id)' has duplicate answer ID '\(answer.id)'",
+                category: AppLogger.data
+            )
+            throw ValidationError.duplicateAnswerId(questionId: question.id, answerId: answer.id)
         }
     }
 }

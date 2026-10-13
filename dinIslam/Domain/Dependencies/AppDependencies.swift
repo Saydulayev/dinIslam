@@ -72,10 +72,7 @@ struct AppDependencies: AppDependenciesProtocol {
         let remoteQuestionsService = EnhancedRemoteQuestionsService(networkManager: networkManager)
         self.networkManager = networkManager
         self.remoteQuestionsService = remoteQuestionsService
-        self.questionsRepository = EnhancedQuestionsRepository(
-            remoteService: remoteQuestionsService,
-            networkManager: networkManager
-        )
+        self.questionsRepository = EnhancedQuestionsRepository(remoteService: remoteQuestionsService)
         
         // Initialize question selection strategies
         let adaptiveStrategy = AdaptiveQuestionSelectionStrategy(adaptiveEngine: adaptiveLearningEngine)

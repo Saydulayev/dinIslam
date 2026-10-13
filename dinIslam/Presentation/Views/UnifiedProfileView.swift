@@ -20,7 +20,7 @@ struct UnifiedProfileView: View {
     @State private var showResetConfirmation = false
     @State private var isResettingProfile = false
     /// nil, пока количество вопросов загружается
-    @State private var totalQuestionsCount: Int?
+    @State private var questionIds: Set<String>?
     @State private var statsRefreshTrigger: Int = 0
     @State private var isEditingDisplayName = false
     @State private var editingDisplayName = ""
@@ -56,7 +56,7 @@ struct UnifiedProfileView: View {
                     ProfileStatsSectionView(
                         manager: manager,
                         statsManager: statsManager,
-                        totalQuestionsCount: totalQuestionsCount,
+                        questionIds: questionIds,
                         isResettingProfile: isResettingProfile,
                         statsRefreshTrigger: statsRefreshTrigger
                     )
@@ -100,7 +100,7 @@ struct UnifiedProfileView: View {
         .toolbarColorScheme(.dark, for: .navigationBar)
         .onAppear {
             manager.validateAvatar()
-            loadTotalQuestionsCount()
+            loadQuestionIds()
             // Инициализируем editingDisplayName текущим значением
             if !isEditingDisplayName {
                 let name = manager.editableDisplayName
@@ -139,12 +139,12 @@ struct UnifiedProfileView: View {
     }
     
     // MARK: - Helper Methods
-    private func loadTotalQuestionsCount() {
+    private func loadQuestionIds() {
         loadQuestionsTask?.cancel()
         loadQuestionsTask = Task { @MainActor [settingsManager, remoteService] in
             // Same service as the quiz: fresh cache is used without a network request
             let questions = await remoteService.fetchQuestions(for: settingsManager.settings.language.resolved, manageLoadingState: false)
-            totalQuestionsCount = questions.count
+            questionIds = Set(questions.map(\.id))
         }
     }
     
@@ -156,7 +156,7 @@ struct UnifiedProfileView: View {
         let questions = await remoteService.forceSync(for: settingsManager.settings.language.resolved)
         
         await MainActor.run {
-            totalQuestionsCount = questions.count
+            questionIds = Set(questions.map(\.id))
         }
     }
 }

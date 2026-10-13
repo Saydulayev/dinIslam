@@ -11,8 +11,8 @@ struct ProfileStatsSectionView: View {
     @Environment(\.questionPoolProgressManager) private var questionPoolProgressManager
     @Bindable var manager: ProfileManager
     @Bindable var statsManager: StatsManager
-    /// nil, пока количество вопросов загружается — вместо «0 / 0» показываем прочерк
-    let totalQuestionsCount: Int?
+    /// id вопросов текущего банка; nil, пока вопросы загружаются — вместо «0 / 0» показываем прочерк
+    let questionIds: Set<String>?
     let isResettingProfile: Bool
     let statsRefreshTrigger: Int
     @State private var studiedCount: Int = 0
@@ -32,7 +32,7 @@ struct ProfileStatsSectionView: View {
                     // Questions Studied
                     ProgressCardView(
                         icon: "questionmark.circle",
-                        value: totalQuestionsCount.map { "\(studiedCount) / \($0)" } ?? "—",
+                        value: questionIds.map { "\(studiedCount) / \($0.count)" } ?? "—",
                         label: manager.isSignedIn ? "profile.progress.questions".localized : "stats.questionsStudied.title".localized,
                         iconColor: DesignTokens.Colors.iconBlue,
                         backgroundColor: DesignTokens.Colors.iconBlue.opacity(0.2)
@@ -122,7 +122,7 @@ struct ProfileStatsSectionView: View {
                         .font(DesignTokens.Typography.label)
                         .foregroundStyle(.white.opacity(0.9)) // Белый текст с небольшой прозрачностью
                     
-                    Text(totalQuestionsCount.map(String.init) ?? "—")
+                    Text(questionIds.map { String($0.count) } ?? "—")
                         .font(DesignTokens.Typography.statsValue)
                         .foregroundStyle(.white) // Белый текст для лучшей читаемости
                 }
@@ -158,7 +158,7 @@ struct ProfileStatsSectionView: View {
         .onAppear {
             loadProgressStats()
         }
-        .onChange(of: totalQuestionsCount) { _, _ in
+        .onChange(of: questionIds) { _, _ in
             loadProgressStats()
         }
         .onChange(of: isResettingProfile) { _, newValue in
@@ -174,8 +174,9 @@ struct ProfileStatsSectionView: View {
     }
     
     private func loadProgressStats() {
-        guard let totalQuestionsCount else { return }
-        let stats = questionPoolProgressManager.getProgressStats(total: totalQuestionsCount, version: 1)
+        guard let questionIds else { return }
+        // Только вопросы текущего банка: id удалённых вопросов не увеличивают «Изучено»
+        let stats = questionPoolProgressManager.getProgressStats(total: questionIds.count, currentQuestionIds: questionIds, version: 1)
         studiedCount = stats.used
     }
 }

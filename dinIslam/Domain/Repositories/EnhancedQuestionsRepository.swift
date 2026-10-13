@@ -39,31 +39,22 @@ class EnhancedQuestionsRepository: EnhancedQuestionsRepositoryProtocol {
     private let bundle: Bundle
     private let remoteService: EnhancedRemoteQuestionsService
     private let useRemoteQuestions: Bool
-    private let networkManager: NetworkManager
     
     init(
         bundle: Bundle = .main,
         remoteService: EnhancedRemoteQuestionsService = EnhancedRemoteQuestionsService(),
-        useRemoteQuestions: Bool = true,
-        networkManager: NetworkManager = NetworkManager()
+        useRemoteQuestions: Bool = true
     ) {
         self.bundle = bundle
         self.remoteService = remoteService
         self.useRemoteQuestions = useRemoteQuestions
-        self.networkManager = networkManager
     }
     
     func loadQuestions(language: String) async throws -> [Question] {
         let appLanguage: AppLanguage = language == "en" ? .english : .russian
         
-        // Check network connectivity
-        guard networkManager.isConnected || !useRemoteQuestions else {
-            AppLogger.info("No internet connection, falling back to local questions", category: AppLogger.network)
-            return try loadLocalQuestions(language: language)
-        }
-        
         if useRemoteQuestions {
-            // Try to load from remote with fallback strategy
+            // Кэш → GitHub → встроенные; без сети сервис отдаёт кэш, а не встроенные вопросы
             let remoteQuestions = await remoteService.fetchQuestions(for: appLanguage)
             if !remoteQuestions.isEmpty {
                 return remoteQuestions
@@ -84,7 +75,7 @@ class EnhancedQuestionsRepository: EnhancedQuestionsRepositoryProtocol {
         
         for language in uniqueLanguages {
             let appLanguage: AppLanguage = language == "en" ? .english : .russian
-            _ = await remoteService.fetchQuestions(for: appLanguage, manageLoadingState: false)
+            await remoteService.preloadQuestions(for: appLanguage)
             AppLogger.info("Preloaded questions for \(language)", category: AppLogger.data)
         }
     }

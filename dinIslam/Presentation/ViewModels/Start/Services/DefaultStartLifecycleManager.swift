@@ -32,8 +32,9 @@ final class DefaultStartLifecycleManager: StartLifecycleManaging {
         let newLanguageCode = settingsManager.settings.language.languageCode
         onLanguageCodeUpdate(newLanguageCode)
         
+        // Только текущий язык: вопросы другого языка загрузятся при первом обращении
         Task {
-            await questionsPreloading.preloadQuestions(for: ["ru", "en"])
+            await questionsPreloading.preloadQuestions(for: [newLanguageCode])
         }
         
         if profileManager.isSignedIn {

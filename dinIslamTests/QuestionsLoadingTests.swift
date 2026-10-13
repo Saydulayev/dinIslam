@@ -2,7 +2,7 @@
 //  QuestionsLoadingTests.swift
 //  dinIslamTests
 //
-//  Загрузка вопросов: GitHub → кэш → встроенные. Сеть подменяется через URLProtocol,
+//  Загрузка вопросов: кэш → GitHub → встроенные. Сеть подменяется через URLProtocol,
 //  кэш пишется во временную папку — реальный кэш приложения не трогается.
 //  Тесты помечены @MainActor: в приложении типы по умолчанию привязаны к главному
 //  потоку (SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor).
@@ -77,20 +77,28 @@ final class QuestionsLoadingTests: XCTestCase {
         cache.cacheData(Self.questions(ids: ["c1", "c2"]), for: EnhancedRemoteQuestionsService.cacheKey(for: .russian), etag: "\"v1\"")
 
         let questions = await service.fetchQuestions(for: .russian, manageLoadingState: false)
+        _ = try? await service.pendingRefresh(for: .russian)?.value
 
         XCTAssertEqual(questions.map(\.id), ["c1", "c2"])
         XCTAssertEqual(StubURLProtocol.requests.first?.value(forHTTPHeaderField: "If-None-Match"), "\"v1\"")
     }
 
+    /// Просроченный кэш отдаётся сразу, без ожидания сети; новые вопросы — со следующей загрузки.
     @MainActor
-    func testExpiredCache_200_replacesCache() async {
+    func testExpiredCache_isReturnedImmediately_andRefreshedInBackground() async throws {
         StubURLProtocol.respond(status: 200, etag: "\"v2\"", body: Self.remoteJSON(ids: ["n1", "n2", "n3"]))
         let (service, cache) = makeService(ttl: -1)
         cache.cacheData(Self.questions(ids: ["c1"]), for: EnhancedRemoteQuestionsService.cacheKey(for: .russian), etag: "\"v1\"")
 
-        let questions = await service.fetchQuestions(for: .russian, manageLoadingState: false)
+        let first = await service.fetchQuestions(for: .russian, manageLoadingState: false)
+        XCTAssertEqual(first.map(\.id), ["c1"])
 
-        XCTAssertEqual(questions.map(\.id), ["n1", "n2", "n3"])
+        let refresh = try XCTUnwrap(service.pendingRefresh(for: .russian), "Просроченный кэш должен обновляться в фоне")
+        _ = try await refresh.value
+
+        let second = await service.fetchQuestions(for: .russian, manageLoadingState: false)
+        _ = try? await service.pendingRefresh(for: .russian)?.value
+        XCTAssertEqual(second.map(\.id), ["n1", "n2", "n3"])
         let cached = cache.getCachedDataWithMetadata([Question].self, for: EnhancedRemoteQuestionsService.cacheKey(for: .russian))
         XCTAssertEqual(cached?.data.map(\.id), ["n1", "n2", "n3"])
         XCTAssertEqual(cached?.etag, "\"v2\"")
@@ -103,8 +111,84 @@ final class QuestionsLoadingTests: XCTestCase {
         cache.cacheData(Self.questions(ids: ["c1", "c2"]), for: EnhancedRemoteQuestionsService.cacheKey(for: .russian), etag: "\"v1\"")
 
         let questions = await service.fetchQuestions(for: .russian, manageLoadingState: false)
+        _ = try? await service.pendingRefresh(for: .russian)?.value
 
         XCTAssertEqual(questions.map(\.id), ["c1", "c2"])
+    }
+
+    /// Без сети используется кэш, а не встроенные вопросы, и запросов в сеть нет.
+    @MainActor
+    func testNoConnection_repositoryUsesCacheInsteadOfBundled() async throws {
+        let (service, cache, network) = makeServiceWithNetwork(ttl: -1)
+        network.isConnected = false
+        cache.cacheData(Self.questions(ids: ["c1", "c2"]), for: EnhancedRemoteQuestionsService.cacheKey(for: .russian), etag: "\"v1\"")
+        let repository = EnhancedQuestionsRepository(remoteService: service)
+
+        let questions = try await repository.loadQuestions(language: "ru")
+        _ = try? await service.pendingRefresh(for: .russian)?.value
+
+        XCTAssertEqual(questions.map(\.id), ["c1", "c2"])
+        XCTAssertTrue(StubURLProtocol.requests.isEmpty)
+    }
+
+    /// Повторная загрузка того же языка берёт вопросы из памяти, файл кэша не читается.
+    @MainActor
+    func testRepeatedFetch_usesMemoryCache() async {
+        let (service, cache) = makeService()
+        let key = EnhancedRemoteQuestionsService.cacheKey(for: .russian)
+        cache.cacheData(Self.questions(ids: ["c1"]), for: key, etag: "\"v1\"")
+
+        let first = await service.fetchQuestions(for: .russian, manageLoadingState: false)
+        cache.cacheData(Self.questions(ids: ["other"]), for: key, etag: "\"v9\"")
+        let second = await service.fetchQuestions(for: .russian, manageLoadingState: false)
+
+        XCTAssertEqual(first.map(\.id), ["c1"])
+        XCTAssertEqual(second.map(\.id), ["c1"])
+        XCTAssertTrue(StubURLProtocol.requests.isEmpty)
+    }
+
+    /// Одновременные загрузки без кэша (предзагрузка и старт викторины) ждут один запрос.
+    @MainActor
+    func testConcurrentFetches_withoutCache_sendSingleRequest() async {
+        StubURLProtocol.respond(status: 200, etag: "\"v1\"", body: Self.remoteJSON(ids: ["q1"]))
+        let (service, _) = makeService()
+
+        async let first = service.fetchQuestions(for: .russian, manageLoadingState: false)
+        async let second = service.fetchQuestions(for: .russian, manageLoadingState: false)
+        let results = await [first, second]
+
+        XCTAssertEqual(results.map { $0.map(\.id) }, [["q1"], ["q1"]])
+        XCTAssertEqual(StubURLProtocol.requests.count, 1)
+    }
+
+    /// Предзагрузка сверяет банк с GitHub один раз за запуск, даже при свежем кэше.
+    @MainActor
+    func testPreload_revalidatesOncePerLaunch() async throws {
+        StubURLProtocol.respond(status: 304, etag: "\"v1\"", body: Data())
+        let (service, cache) = makeService()
+        cache.cacheData(Self.questions(ids: ["c1"]), for: EnhancedRemoteQuestionsService.cacheKey(for: .russian), etag: "\"v1\"")
+
+        await service.preloadQuestions(for: .russian)
+        _ = try await XCTUnwrap(service.pendingRefresh(for: .russian)).value
+        await service.preloadQuestions(for: .russian)
+
+        XCTAssertNil(service.pendingRefresh(for: .russian))
+        XCTAssertEqual(StubURLProtocol.requests.count, 1)
+    }
+
+    /// Ручное обновление сразу меняет вопросы, которые получит викторина.
+    @MainActor
+    func testForceSync_updatesMemoryCache() async {
+        StubURLProtocol.respond(status: 200, etag: "\"v2\"", body: Self.remoteJSON(ids: ["n1"]))
+        let (service, cache) = makeService()
+        cache.cacheData(Self.questions(ids: ["c1"]), for: EnhancedRemoteQuestionsService.cacheKey(for: .russian), etag: "\"v1\"")
+        _ = await service.fetchQuestions(for: .russian, manageLoadingState: false)
+
+        let synced = await service.forceSync(for: .russian)
+        let next = await service.fetchQuestions(for: .russian, manageLoadingState: false)
+
+        XCTAssertEqual(synced.map(\.id), ["n1"])
+        XCTAssertEqual(next.map(\.id), ["n1"])
     }
 
     // MARK: - Ошибки в данных
@@ -115,10 +199,10 @@ final class QuestionsLoadingTests: XCTestCase {
         var items = Self.remoteItems(ids: ["n1", "n2"])
         items.append(["id": "bad", "q": "Вопрос с одним ответом", "a": ["Единственный"], "c": 0])
         StubURLProtocol.respond(status: 200, etag: "\"v2\"", body: Self.json(items))
-        let (service, cache) = makeService(ttl: -1)
+        let (service, cache) = makeService()
         cache.cacheData(Self.questions(ids: ["c1"]), for: EnhancedRemoteQuestionsService.cacheKey(for: .russian), etag: "\"v1\"")
 
-        let questions = await service.fetchQuestions(for: .russian, manageLoadingState: false)
+        let questions = await service.forceSync(for: .russian)
 
         XCTAssertEqual(questions.map(\.id), ["n1", "n2"])
         let cached = cache.getCachedDataWithMetadata([Question].self, for: EnhancedRemoteQuestionsService.cacheKey(for: .russian))
@@ -157,10 +241,10 @@ final class QuestionsLoadingTests: XCTestCase {
     func testNoValidQuestions_keepsOldCache() async {
         let items: [[String: Any]] = [["id": "bad", "q": "", "a": ["A", "B"], "c": 0]]
         StubURLProtocol.respond(status: 200, etag: "\"v2\"", body: Self.json(items))
-        let (service, cache) = makeService(ttl: -1)
+        let (service, cache) = makeService()
         cache.cacheData(Self.questions(ids: ["c1"]), for: EnhancedRemoteQuestionsService.cacheKey(for: .russian), etag: "\"v1\"")
 
-        let questions = await service.fetchQuestions(for: .russian, manageLoadingState: false)
+        let questions = await service.forceSync(for: .russian)
 
         XCTAssertEqual(questions.map(\.id), ["c1"])
         XCTAssertEqual(cache.getCachedDataWithMetadata([Question].self, for: EnhancedRemoteQuestionsService.cacheKey(for: .russian))?.etag, "\"v1\"")
@@ -237,6 +321,11 @@ final class QuestionsLoadingTests: XCTestCase {
     // MARK: - Helpers
 
     private func makeService(ttl: TimeInterval = 6 * 60 * 60) -> (EnhancedRemoteQuestionsService, CacheManager) {
+        let (service, cache, _) = makeServiceWithNetwork(ttl: ttl)
+        return (service, cache)
+    }
+
+    private func makeServiceWithNetwork(ttl: TimeInterval) -> (EnhancedRemoteQuestionsService, CacheManager, NetworkManager) {
         let sessionConfig = URLSessionConfiguration.ephemeral
         sessionConfig.protocolClasses = [StubURLProtocol.self]
         sessionConfig.urlCache = nil
@@ -248,7 +337,7 @@ final class QuestionsLoadingTests: XCTestCase {
         let cacheConfig = CacheConfiguration(ttl: ttl, maxCacheSize: 10 * 1024 * 1024, compressionEnabled: false)
         let cache = CacheManager(configuration: cacheConfig, cacheDirectory: cacheDirectory)
         let service = EnhancedRemoteQuestionsService(networkManager: network, cacheManager: cache, configuration: cacheConfig)
-        return (service, cache)
+        return (service, cache, network)
     }
 
     private static func remoteItems(ids: [String]) -> [[String: Any]] {
