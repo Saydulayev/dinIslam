@@ -79,16 +79,7 @@ class ExamUseCase: ExamUseCaseProtocol {
     }
     
     func shuffleAnswers(for question: Question) -> Question {
-        guard question.correctIndex >= 0, question.correctIndex < question.answers.count else {
-            return question
-        }
-        let shuffledAnswers = question.answers.shuffled()
-        let correctAnswer = question.answers[question.correctIndex]
-        
-        // Find new index of correct answer
-        let newCorrectIndex = shuffledAnswers.firstIndex { $0.id == correctAnswer.id } ?? 0
-        
-        return question.withAnswers(shuffledAnswers, correctIndex: newCorrectIndex)
+        question.withShuffledAnswers()
     }
     
     func calculateExamResult(

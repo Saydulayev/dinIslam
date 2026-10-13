@@ -160,17 +160,7 @@ class EnhancedQuizUseCase: EnhancedQuizUseCaseProtocol {
     }
     
     func shuffleAnswers(for question: Question) -> Question {
-        guard question.correctIndex >= 0, question.correctIndex < question.answers.count else {
-            return question
-        }
-        let shuffledAnswers = question.answers.shuffled()
-        let correctAnswer = question.answers[question.correctIndex]
-        
-        guard let newCorrectIndex = shuffledAnswers.firstIndex(where: { $0.id == correctAnswer.id }) else {
-            return question
-        }
-        
-        return question.withAnswers(shuffledAnswers, correctIndex: newCorrectIndex)
+        question.withShuffledAnswers()
     }
     
     func loadAllQuestions(language: String) async throws -> [Question] {

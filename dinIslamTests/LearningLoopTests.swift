@@ -361,6 +361,70 @@ final class QuestionFormatTests: XCTestCase {
         XCTAssertEqual(shuffled.answers[shuffled.correctIndex].id, "a3")
     }
 
+    func testRefersToOtherAnswers_recognizesBothLanguages() {
+        let aggregate = [
+            "Всё перечисленное", "Все вышеперечисленное", "Всё выше перечисленное обозначает книгу Аллаха",
+            "Всеми перечисленными названиями обозначается Книга Аллаха", "Оба варианта", "На обоих",
+            "Ни один из перечисленных", "All of the above", "All of the listed names designate the Book of Allah",
+            "Both", "None of the above"
+        ]
+        let ordinary = ["Аиша", "Всевышний Аллах", "Все пророки", "Allah", "All prophets", "Bothaina"]
+
+        for text in aggregate {
+            XCTAssertTrue(Answer(id: "a", text: text).refersToOtherAnswers, text)
+        }
+        for text in ordinary {
+            XCTAssertFalse(Answer(id: "a", text: text).refersToOtherAnswers, text)
+        }
+    }
+
+    /// В обоих встроенных банках «Всё перечисленное» распознаётся в одних и тех же вопросах
+    func testBundledQuestions_fixedLastAnswerMatchesInBothLanguages() throws {
+        let russian = try QuestionsFile.loadBundled(for: .russian)
+        let english = try QuestionsFile.loadBundled(for: .english)
+        let fixedRussian = Set(russian.filter(\.isLastAnswerFixed).map(\.id))
+        let fixedEnglish = Set(english.filter(\.isLastAnswerFixed).map(\.id))
+
+        XCTAssertFalse(fixedRussian.isEmpty)
+        XCTAssertEqual(fixedRussian, fixedEnglish)
+    }
+
+    /// «Всё перечисленное» всегда последний, остальные ответы перемешиваются, правильный ответ не теряется
+    func testShuffle_fixedLastAnswer_staysLast() {
+        let question = Question(
+            id: "q1",
+            text: "?",
+            answers: (1...3).map { Answer(id: "a\($0)", text: "\($0)") } + [Answer(id: "a4", text: "Всё перечисленное")],
+            correctIndex: 1,
+            category: "fiqh",
+            difficulty: .easy
+        )
+
+        var firstThreeOrders = Set<[String]>()
+        for _ in 0..<200 {
+            let shuffled = question.withShuffledAnswers()
+            XCTAssertEqual(shuffled.answers.last?.id, "a4")
+            XCTAssertEqual(shuffled.answers[shuffled.correctIndex].id, "a2")
+            XCTAssertTrue(shuffled.isLastAnswerFixed)
+            firstThreeOrders.insert(shuffled.answers.dropLast().map(\.id))
+        }
+        XCTAssertGreaterThan(firstThreeOrders.count, 1, "Остальные ответы должны перемешиваться")
+    }
+
+    func testShuffle_ordinaryLastAnswer_moves() {
+        let question = Question(
+            id: "q1",
+            text: "?",
+            answers: (1...4).map { Answer(id: "a\($0)", text: "\($0)") },
+            correctIndex: 3,
+            category: "fiqh",
+            difficulty: .easy
+        )
+
+        let lastIds = Set((0..<200).map { _ in question.withShuffledAnswers().answers.last?.id })
+        XCTAssertGreaterThan(lastIds.count, 1)
+    }
+
     func testTopicResults_groupAndSortByVolume() {
         let outcomes = [
             QuizQuestionOutcome(questionId: "1", category: "fiqh", difficulty: .easy, isCorrect: true),
