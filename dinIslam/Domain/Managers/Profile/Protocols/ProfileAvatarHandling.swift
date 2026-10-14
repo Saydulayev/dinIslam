@@ -8,11 +8,7 @@
 import Foundation
 
 protocol ProfileAvatarHandling {
-    func updateAvatar(
-        profile: inout UserProfile,
-        data: Data,
-        fileExtension: String
-    ) -> Bool
+    func updateAvatar(profile: inout UserProfile, data: Data) -> Bool
     
     func deleteAvatar(profile: inout UserProfile)
     

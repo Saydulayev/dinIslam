@@ -14,16 +14,8 @@ final class DefaultProfileAvatarService: ProfileAvatarHandling {
         self.avatarManager = avatarManager
     }
     
-    func updateAvatar(
-        profile: inout UserProfile,
-        data: Data,
-        fileExtension: String
-    ) -> Bool {
-        return avatarManager.updateAvatar(
-            profile: &profile,
-            data: data,
-            fileExtension: fileExtension
-        )
+    func updateAvatar(profile: inout UserProfile, data: Data) -> Bool {
+        avatarManager.updateAvatar(profile: &profile, data: data)
     }
     
     func deleteAvatar(profile: inout UserProfile) {

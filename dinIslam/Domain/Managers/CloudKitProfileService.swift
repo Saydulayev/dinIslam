@@ -32,8 +32,14 @@ final class CloudKitProfileService {
     private let encoder: JSONEncoder
     private let decoder: JSONDecoder
     private let recordType = "UserProfile"
+    private let avatarKey = "avatar"
+    /// Отпечаток фото в записи: `""` — фото нет, `nil` — запись старого формата
+    private let avatarHashKey = "avatarHash"
+    /// Поля записи без фото: фото скачивается отдельно и только если изменилось
+    private var profileKeys: [CKRecord.FieldKey] {
+        ["payload", "updatedAt", "createdAt", "authMethod", "locale", avatarHashKey]
+    }
     private let localStore: ProfileLocalStore
-    private let fileManager = FileManager.default
 
     init(containerIdentifier: String? = nil, localStore: ProfileLocalStore = ProfileLocalStore()) {
         if let identifier = containerIdentifier {
@@ -57,8 +63,10 @@ final class CloudKitProfileService {
     func fetchProfile(for userId: String) async throws -> UserProfile? {
         let recordID = CKRecord.ID(recordName: userId)
         do {
-            let record = try await fetchRecord(with: recordID)
-            return try decodeProfile(from: record)
+            let record = try await fetchRecord(with: recordID, desiredKeys: profileKeys)
+            var profile = try decodeProfile(from: record)
+            await downloadAvatarIfChanged(for: &profile, record: record)
+            return profile
         } catch let error as CKError where error.code == .unknownItem {
             return nil
         }
@@ -68,7 +76,7 @@ final class CloudKitProfileService {
         let recordID = CKRecord.ID(recordName: profile.id)
         let record: CKRecord
 
-        if let existingRecord = try? await fetchRecord(with: recordID) {
+        if let existingRecord = try? await fetchRecord(with: recordID, desiredKeys: profileKeys) {
             record = existingRecord
         } else {
             record = CKRecord(recordType: recordType, recordID: recordID)
@@ -100,10 +108,17 @@ final class CloudKitProfileService {
         record["authMethod"] = profile.authMethod.rawValue as CKRecordValue
         record["locale"] = profile.localeIdentifier as CKRecordValue
 
-        if let avatarURL = profile.avatarURL, fileManager.fileExists(atPath: avatarURL.path) {
-            record["avatar"] = CKAsset(fileURL: avatarURL)
-        } else {
-            record["avatar"] = nil
+        // Фото передаётся только при изменении: иначе поле не трогаем, и CloudKit его не загружает
+        let remoteHash = record[avatarHashKey] as? String
+        if let avatarURL = profile.avatarURL,
+           let localHash = AvatarImageProcessor.fingerprint(ofFileAt: avatarURL) {
+            if localHash != remoteHash {
+                record[avatarKey] = CKAsset(fileURL: avatarURL)
+                record[avatarHashKey] = localHash as CKRecordValue
+            }
+        } else if remoteHash != "" {
+            record[avatarKey] = nil
+            record[avatarHashKey] = "" as CKRecordValue
         }
     }
 
@@ -116,50 +131,48 @@ final class CloudKitProfileService {
             throw CloudKitProfileError.decodingFailed
         }
 
-        // Обработка аватара из CloudKit
-        let avatarValue = record["avatar"]
-        let hasAvatarAsset = avatarValue is CKAsset
-        
-        if let asset = avatarValue as? CKAsset,
-           let assetURL = asset.fileURL,
-           let avatarData = try? Data(contentsOf: assetURL) {
-            // Аватар есть в CloudKit - сохраняем локально
-            let fileExtension = assetURL.pathExtension.isEmpty ? "dat" : assetURL.pathExtension
-            profile.avatarURL = localStore.saveAvatarData(avatarData, for: profile.id, fileExtension: fileExtension)
-        } else {
-            // Аватара нет в CloudKit (удален, задержка репликации или CKAsset без fileURL после save)
-            // Удаляем локальный аватар только если в записи явно установлено avatar = nil (удалено на другом устройстве).
-            // Не удаляем при отсутствии ключа/ассета — иначе после добавления фото refreshFromCloud
-            // подтянет старую запись без аватара и сотрёт только что загруженное фото.
-            let avatarWasExplicitlyDeleted = record.allKeys().contains("avatar") && !hasAvatarAsset
-            
-            if avatarWasExplicitlyDeleted {
-                localStore.deleteAvatar(for: profile.id)
-                profile.avatarURL = nil
-            } else if let existingAvatar = localStore.loadAvatar(for: profile.id) {
-                // Сохраняем локальный аватар (репликация ещё не подтянула или ответ save без fileURL)
-                profile.avatarURL = existingAvatar
-            } else {
-                profile.avatarURL = nil
-            }
-        }
+        // Фото берётся из локального файла; новое фото из CloudKit скачивает downloadAvatarIfChanged.
+        // Отсутствие фото в записи локальный файл не удаляет — иначе refreshFromCloud
+        // мог бы подтянуть старую запись и стереть только что выбранное фото.
+        profile.avatarURL = localStore.loadAvatar(for: profile.id)
 
         profile.metadata.lastSyncedAt = record.modificationDate
         return profile
     }
 
-    private func fetchRecord(with id: CKRecord.ID) async throws -> CKRecord {
-        try await withCheckedThrowingContinuation { continuation in
-            database.fetch(withRecordID: id) { record, error in
-                if let error = error {
-                    continuation.resume(throwing: error)
-                } else if let record = record {
-                    continuation.resume(returning: record)
-                } else {
-                    continuation.resume(throwing: CloudKitProfileError.unknown)
-                }
-            }
+    /// Скачивает фото, если его отпечаток в записи отличается от локального файла.
+    /// Ошибка скачивания не мешает загрузке профиля: остаётся локальное фото.
+    private func downloadAvatarIfChanged(for profile: inout UserProfile, record: CKRecord) async {
+        let remoteHash = record[avatarHashKey] as? String
+        guard remoteHash != "" else { return }
+        let localHash = profile.avatarURL.flatMap { AvatarImageProcessor.fingerprint(ofFileAt: $0) }
+        if let remoteHash, remoteHash == localHash { return }
+
+        guard let avatarRecord = try? await fetchRecord(with: record.recordID, desiredKeys: [avatarKey]),
+              let assetURL = (avatarRecord[avatarKey] as? CKAsset)?.fileURL,
+              let remoteData = try? Data(contentsOf: assetURL) else {
+            return
         }
+        // В записях старого формата (без отпечатка) фото исходного размера — уменьшаем при сохранении
+        let avatarData = remoteHash == nil ? AvatarImageProcessor.prepare(remoteData) : remoteData
+        guard let avatarData,
+              let savedURL = localStore.saveAvatarData(avatarData, for: profile.id, fileExtension: AvatarImageProcessor.fileExtension) else {
+            return
+        }
+        profile.avatarURL = savedURL
+    }
+
+    private func fetchRecord(with id: CKRecord.ID, desiredKeys: [CKRecord.FieldKey]) async throws -> CKRecord {
+        let results: [CKRecord.ID: Result<CKRecord, Error>]
+        do {
+            results = try await database.records(for: [id], desiredKeys: desiredKeys)
+        } catch let error as CKError where error.code == .partialFailure {
+            throw error.partialErrorsByItemID?[id] ?? error
+        }
+        guard let result = results[id] else {
+            throw CloudKitProfileError.unknown
+        }
+        return try result.get()
     }
 
     private func save(record: CKRecord) async throws -> CKRecord {

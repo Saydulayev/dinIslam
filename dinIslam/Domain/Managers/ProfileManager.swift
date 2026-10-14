@@ -259,8 +259,8 @@ final class ProfileManager {
         isLoading = false
     }
 
-    func updateAvatar(with data: Data, fileExtension: String = "dat") async {
-        guard avatarService.updateAvatar(profile: &profile, data: data, fileExtension: fileExtension) else {
+    func updateAvatar(with data: Data) async {
+        guard avatarService.updateAvatar(profile: &profile, data: data) else {
             return
         }
         localStore.saveProfile(profile)

@@ -14,12 +14,10 @@ final class ProfileAvatarManager {
         self.localStore = localStore
     }
     
-    func updateAvatar(
-        profile: inout UserProfile,
-        data: Data,
-        fileExtension: String = "dat"
-    ) -> Bool {
-        guard let savedURL = localStore.saveAvatarData(data, for: profile.id, fileExtension: fileExtension) else {
+    /// Сохраняет фото уменьшенным до 512 px, в JPEG без метаданных.
+    func updateAvatar(profile: inout UserProfile, data: Data) -> Bool {
+        guard let preparedData = AvatarImageProcessor.prepare(data),
+              let savedURL = localStore.saveAvatarData(preparedData, for: profile.id, fileExtension: AvatarImageProcessor.fileExtension) else {
             return false
         }
         profile.avatarURL = savedURL
@@ -53,6 +51,20 @@ final class ProfileAvatarManager {
                 profile.avatarURL = existingAvatar
             }
         }
+        migrateLegacyAvatar(profile: &profile)
+    }
+
+    /// Фото, сохранённые до уменьшения (исходный размер, с метаданными), пересохраняются один раз.
+    /// Обработанное фото хранится с расширением `jpg`; при следующей синхронизации оно уйдёт в iCloud.
+    private func migrateLegacyAvatar(profile: inout UserProfile) {
+        guard let avatarURL = profile.avatarURL,
+              avatarURL.pathExtension != AvatarImageProcessor.fileExtension,
+              let data = try? Data(contentsOf: avatarURL),
+              let preparedData = AvatarImageProcessor.prepare(data),
+              let savedURL = localStore.saveAvatarData(preparedData, for: profile.id, fileExtension: AvatarImageProcessor.fileExtension) else {
+            return
+        }
+        profile.avatarURL = savedURL
     }
 }
 

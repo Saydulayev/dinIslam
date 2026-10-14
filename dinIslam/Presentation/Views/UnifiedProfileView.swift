@@ -131,8 +131,7 @@ struct UnifiedProfileView: View {
             guard let item = current, previous != current else { return }
             Task { @MainActor [manager] in
                 if let data = try? await item.loadTransferable(type: Data.self) {
-                    let fileExtension = item.supportedContentTypes.first?.preferredFilenameExtension ?? "dat"
-                    await manager.updateAvatar(with: data, fileExtension: fileExtension)
+                    await manager.updateAvatar(with: data)
                 }
             }
         }
