@@ -345,19 +345,13 @@ struct AnswerButtonStyle: ButtonStyle {
 
 #Preview {
     let statsManager = StatsManager()
-    let examStatsManager = ExamStatisticsManager()
     let adaptiveEngine = AdaptiveLearningEngine()
-    let profileManager = ProfileManager(
-        adaptiveEngine: adaptiveEngine,
-        statsManager: statsManager,
-        examStatisticsManager: examStatsManager
-    )
     let adaptiveStrategy = AdaptiveQuestionSelectionStrategy(adaptiveEngine: adaptiveEngine)
     let fallbackStrategy = FallbackQuestionSelectionStrategy()
     let questionPoolProgressManager = DefaultQuestionPoolProgressManager()
     let quizUseCase = QuizUseCase(
         questionsRepository: EnhancedQuestionsRepository(),
-        profileProgressProvider: profileManager, // ProfileManager implements ProfileProgressProviding
+        topicStatsProvider: statsManager,
         questionSelectionStrategy: adaptiveStrategy,
         fallbackStrategy: fallbackStrategy,
         questionPoolProgressManager: questionPoolProgressManager

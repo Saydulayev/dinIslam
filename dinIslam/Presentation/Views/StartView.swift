@@ -411,22 +411,22 @@ struct StartView: View {
     let settingsManager = SettingsManager()
     let examStatsManager = ExamStatisticsManager()
     let adaptiveEngine = AdaptiveLearningEngine()
-    let profileManager = ProfileManager(
-        adaptiveEngine: adaptiveEngine,
-        statsManager: statsManager,
-        examStatisticsManager: examStatsManager
-    )
     let notificationManager = NotificationManager()
     let achievementManager = AchievementManager(
         notificationManager: notificationManager,
         localizationProvider: LocalizationManager()
+    )
+    let profileManager = ProfileManager(
+        statsManager: statsManager,
+        examStatisticsManager: examStatsManager,
+        achievementManager: achievementManager
     )
     let adaptiveStrategy = AdaptiveQuestionSelectionStrategy(adaptiveEngine: adaptiveEngine)
     let fallbackStrategy = FallbackQuestionSelectionStrategy()
     let questionPoolProgressManager = DefaultQuestionPoolProgressManager()
     let quizUseCase = QuizUseCase(
         questionsRepository: EnhancedQuestionsRepository(),
-        profileProgressProvider: profileManager, // ProfileManager implements ProfileProgressProviding
+        topicStatsProvider: statsManager,
         questionSelectionStrategy: adaptiveStrategy,
         fallbackStrategy: fallbackStrategy,
         questionPoolProgressManager: questionPoolProgressManager

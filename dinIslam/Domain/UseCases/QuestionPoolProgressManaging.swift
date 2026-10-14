@@ -11,6 +11,7 @@ protocol QuestionPoolProgressManaging {
     func getUsedIds(version: Int) -> Set<String>
     func markUsed(_ questionIds: [String], version: Int)
     func reset(version: Int)
+    func replaceUsedIds(_ questionIds: Set<String>, version: Int)
     
     // Legacy method - deprecated in favor of intersection-based calculation
     func getProgressStats(total: Int, version: Int) -> (used: Int, remaining: Int)

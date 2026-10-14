@@ -22,133 +22,22 @@ struct ProfileSyncSectionView: View {
     }
     
     var body: some View {
-        if manager.isSignedIn {
-            unifiedSyncSection
-        } else {
-            questionsSyncSection
-        }
-    }
-    
-    // MARK: - Unified Sync Section
-    private var unifiedSyncSection: some View {
         VStack(alignment: .leading, spacing: DesignTokens.Spacing.xxl) {
             Text("profile.sync.title".localized)
                 .font(DesignTokens.Typography.h2)
                 .foregroundStyle(DesignTokens.Colors.textPrimary)
             
-            // CloudKit Statistics Sync Section
-            VStack(alignment: .leading, spacing: DesignTokens.Spacing.md) {
-                HStack(spacing: DesignTokens.Spacing.md) {
-                    Image(systemName: ProfileViewHelpers.syncIcon(for: manager.syncState))
-                        .font(.system(size: DesignTokens.Sizes.iconSmall))
-                        .foregroundStyle(ProfileViewHelpers.syncColor(for: manager.syncState))
-                    
-                    Text(ProfileViewHelpers.syncMessage(for: manager, settingsManager: settingsManager))
-                        .font(DesignTokens.Typography.secondaryRegular)
-                        .foregroundStyle(DesignTokens.Colors.textSecondary)
-                }
-                
-                // Показываем более заметное сообщение об ошибке при неудачной синхронизации
-                if case .failed(let message) = manager.syncState {
-                    VStack(alignment: .leading, spacing: DesignTokens.Spacing.sm) {
-                        HStack(spacing: DesignTokens.Spacing.sm) {
-                            Image(systemName: "exclamationmark.triangle.fill")
-                                .font(.system(size: DesignTokens.Sizes.iconSmall))
-                                .foregroundStyle(DesignTokens.Colors.warning)
-                            
-                            Text(message)
-                                .font(DesignTokens.Typography.secondaryRegular)
-                                .foregroundStyle(DesignTokens.Colors.warning)
-                        }
-                        .padding(DesignTokens.Spacing.md)
-                        .background(
-                            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
-                                .fill(DesignTokens.Colors.warning.opacity(0.1))
-                        )
-                        
-                        MinimalButton(
-                            icon: "arrow.clockwise",
-                            title: "profile.sync.retry".localized,
-                            role: .warning
-                        ) {
-                            Task { @MainActor [manager] in
-                                await manager.refreshFromCloud(mergeStrategy: .newest)
-                            }
-                        }
-                        .disabled(isResettingProfile || manager.isLoading)
-                    }
-                } else {
-                    MinimalButton(
-                        icon: "icloud.fill",
-                        title: "profile.sync.refresh".localized
-                    ) {
-                        Task { @MainActor [manager] in
-                            await manager.refreshFromCloud(mergeStrategy: .newest)
-                        }
-                    }
-                    .disabled(isResettingProfile || manager.isLoading)
-                }
+            if manager.isSyncEnabled {
+                statisticsSyncSection
+            } else {
+                iCloudUnavailableSection
             }
             
             // Divider
             Divider()
                 .overlay(Color.white.opacity(0.1))
             
-            // Questions Sync Section
-            VStack(alignment: .leading, spacing: DesignTokens.Spacing.md) {
-                HStack {
-                    Text("stats.sync.questions.status".localized)
-                        .font(DesignTokens.Typography.secondaryRegular)
-                        .foregroundStyle(DesignTokens.Colors.textSecondary)
-                    Spacer()
-                    if remoteService.isLoading {
-                        ProgressView()
-                            .scaleEffect(0.8)
-                            .tint(DesignTokens.Colors.textSecondary)
-                    } else if remoteService.hasUpdates {
-                        HStack(spacing: DesignTokens.Spacing.xs) {
-                            Text("stats.sync.available".localized)
-                                .font(DesignTokens.Typography.secondaryRegular)
-                                .fontWeight(.semibold)
-                                .foregroundStyle(DesignTokens.Colors.iconGreen)
-                            if newQuestionsCount > 0 {
-                                Text("+\(newQuestionsCount)")
-                                    .font(DesignTokens.Typography.label)
-                                    .fontWeight(.semibold)
-                                    .foregroundStyle(DesignTokens.Colors.iconGreen)
-                            }
-                        }
-                    } else {
-                        Text("stats.sync.upToDate".localized)
-                            .font(DesignTokens.Typography.secondaryRegular)
-                            .fontWeight(.semibold)
-                            .foregroundStyle(DesignTokens.Colors.iconBlue)
-                    }
-                }
-                
-                if remoteService.hasUpdates {
-                    MinimalButton(
-                        icon: "arrow.down.circle",
-                        title: "stats.sync.sync".localized,
-                        role: .success
-                    ) {
-                        Task { @MainActor in
-                            await onSyncQuestions()
-                        }
-                    }
-                    .disabled(remoteService.isLoading)
-                } else {
-                    MinimalButton(
-                        icon: "tray.and.arrow.down.fill",
-                        title: "stats.sync.check".localized
-                    ) {
-                        Task { @MainActor in
-                            await onCheckForUpdates()
-                        }
-                    }
-                    .disabled(remoteService.isLoading)
-                }
-            }
+            questionsSection
             
             if isResettingProfile {
                 HStack(spacing: DesignTokens.Spacing.md) {
@@ -165,75 +54,130 @@ struct ProfileSyncSectionView: View {
         .glowBorder(cornerRadius: DesignTokens.CornerRadius.xlarge)
     }
     
-    // MARK: - Questions Sync Section (for non-signed in users)
-    private var questionsSyncSection: some View {
-        VStack(alignment: .leading, spacing: DesignTokens.Spacing.lg) {
-            Text("stats.sync.title".localized)
-                .font(DesignTokens.Typography.h2)
-                .foregroundStyle(DesignTokens.Colors.textPrimary)
+    // MARK: - iCloud Statistics Sync
+    private var iCloudUnavailableSection: some View {
+        HStack(alignment: .top, spacing: DesignTokens.Spacing.md) {
+            Image(systemName: manager.iCloudStatus == .checking ? "icloud" : "icloud.slash")
+                .font(.system(size: DesignTokens.Sizes.iconSmall))
+                .foregroundStyle(DesignTokens.Colors.textSecondary)
             
-            VStack(spacing: DesignTokens.Spacing.md) {
-                HStack {
-                    Text("stats.sync.questions.status".localized)
-                        .font(DesignTokens.Typography.secondaryRegular)
-                        .foregroundStyle(DesignTokens.Colors.textSecondary)
-                    Spacer()
-                    if remoteService.isLoading {
-                        ProgressView()
-                            .scaleEffect(0.8)
-                            .tint(DesignTokens.Colors.textSecondary)
-                    } else if remoteService.hasUpdates {
+            Text(ProfileViewHelpers.iCloudStatusMessage(for: manager.iCloudStatus))
+                .font(DesignTokens.Typography.secondaryRegular)
+                .foregroundStyle(DesignTokens.Colors.textSecondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+    
+    private var statisticsSyncSection: some View {
+        VStack(alignment: .leading, spacing: DesignTokens.Spacing.md) {
+            HStack(spacing: DesignTokens.Spacing.md) {
+                Image(systemName: ProfileViewHelpers.syncIcon(for: manager.syncState))
+                    .font(.system(size: DesignTokens.Sizes.iconSmall))
+                    .foregroundStyle(ProfileViewHelpers.syncColor(for: manager.syncState))
+                
+                Text(ProfileViewHelpers.syncMessage(for: manager, settingsManager: settingsManager))
+                    .font(DesignTokens.Typography.secondaryRegular)
+                    .foregroundStyle(DesignTokens.Colors.textSecondary)
+            }
+            
+            // Показываем более заметное сообщение об ошибке при неудачной синхронизации
+            if case .failed(let message) = manager.syncState {
+                VStack(alignment: .leading, spacing: DesignTokens.Spacing.sm) {
+                    HStack(spacing: DesignTokens.Spacing.sm) {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .font(.system(size: DesignTokens.Sizes.iconSmall))
+                            .foregroundStyle(DesignTokens.Colors.warning)
+                        
+                        Text(message)
+                            .font(DesignTokens.Typography.secondaryRegular)
+                            .foregroundStyle(DesignTokens.Colors.warning)
+                    }
+                    .padding(DesignTokens.Spacing.md)
+                    .background(
+                        RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
+                            .fill(DesignTokens.Colors.warning.opacity(0.1))
+                    )
+                    
+                    MinimalButton(
+                        icon: "arrow.clockwise",
+                        title: "profile.sync.retry".localized,
+                        role: .warning
+                    ) {
+                        Task { @MainActor [manager] in
+                            await manager.syncNow()
+                        }
+                    }
+                    .disabled(isResettingProfile || manager.isLoading)
+                }
+            } else {
+                MinimalButton(
+                    icon: "icloud.fill",
+                    title: "profile.sync.refresh".localized
+                ) {
+                    Task { @MainActor [manager] in
+                        await manager.syncNow()
+                    }
+                }
+                .disabled(isResettingProfile || manager.isLoading)
+            }
+        }
+    }
+    
+    // MARK: - Questions Sync
+    private var questionsSection: some View {
+        VStack(alignment: .leading, spacing: DesignTokens.Spacing.md) {
+            HStack {
+                Text("stats.sync.questions.status".localized)
+                    .font(DesignTokens.Typography.secondaryRegular)
+                    .foregroundStyle(DesignTokens.Colors.textSecondary)
+                Spacer()
+                if remoteService.isLoading {
+                    ProgressView()
+                        .scaleEffect(0.8)
+                        .tint(DesignTokens.Colors.textSecondary)
+                } else if remoteService.hasUpdates {
+                    HStack(spacing: DesignTokens.Spacing.xs) {
                         Text("stats.sync.available".localized)
                             .font(DesignTokens.Typography.secondaryRegular)
                             .fontWeight(.semibold)
                             .foregroundStyle(DesignTokens.Colors.iconGreen)
-                    } else {
-                        Text("stats.sync.upToDate".localized)
-                            .font(DesignTokens.Typography.secondaryRegular)
-                            .fontWeight(.semibold)
-                            .foregroundStyle(DesignTokens.Colors.iconBlue)
-                    }
-                }
-                
-                if remoteService.hasUpdates && newQuestionsCount > 0 {
-                    HStack {
-                        Text("stats.sync.newQuestions.title".localized)
-                            .font(DesignTokens.Typography.label)
-                            .foregroundStyle(DesignTokens.Colors.textSecondary)
-                        Spacer()
-                        Text("+\(newQuestionsCount)")
-                            .font(DesignTokens.Typography.label)
-                            .fontWeight(.semibold)
-                            .foregroundStyle(DesignTokens.Colors.iconGreen)
-                    }
-                }
-                
-                if remoteService.hasUpdates {
-                    MinimalButton(
-                        icon: "arrow.down.circle",
-                        title: "stats.sync.sync".localized,
-                        role: .success
-                    ) {
-                        Task { @MainActor in
-                            await onSyncQuestions()
+                        if newQuestionsCount > 0 {
+                            Text("+\(newQuestionsCount)")
+                                .font(DesignTokens.Typography.label)
+                                .fontWeight(.semibold)
+                                .foregroundStyle(DesignTokens.Colors.iconGreen)
                         }
                     }
-                    .disabled(remoteService.isLoading)
                 } else {
-                    MinimalButton(
-                        icon: "tray.and.arrow.down.fill",
-                        title: "stats.sync.check".localized
-                    ) {
-                        Task { @MainActor in
-                            await onCheckForUpdates()
-                        }
-                    }
-                    .disabled(remoteService.isLoading)
+                    Text("stats.sync.upToDate".localized)
+                        .font(DesignTokens.Typography.secondaryRegular)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(DesignTokens.Colors.iconBlue)
                 }
             }
+            
+            if remoteService.hasUpdates {
+                MinimalButton(
+                    icon: "arrow.down.circle",
+                    title: "stats.sync.sync".localized,
+                    role: .success
+                ) {
+                    Task { @MainActor in
+                        await onSyncQuestions()
+                    }
+                }
+                .disabled(remoteService.isLoading)
+            } else {
+                MinimalButton(
+                    icon: "tray.and.arrow.down.fill",
+                    title: "stats.sync.check".localized
+                ) {
+                    Task { @MainActor in
+                        await onCheckForUpdates()
+                    }
+                }
+                .disabled(remoteService.isLoading)
+            }
         }
-        .padding(DesignTokens.Spacing.xxl)
-        .glowBorder(cornerRadius: DesignTokens.CornerRadius.xlarge)
     }
 }
-

@@ -12,7 +12,8 @@ final class ProfileLocalStore {
     private enum Constants {
         static let directoryName = "Profiles"
         static let currentProfileKey = "CurrentProfileID"
-        static let anonymousProfileKey = "AnonymousProfileID"
+        /// Ключ версий со входом через Apple; только удаляется
+        static let legacyAnonymousProfileKey = "AnonymousProfileID"
     }
 
     private let fileManager: FileManager
@@ -73,9 +74,6 @@ final class ProfileLocalStore {
             let data = try encoder.encode(profile)
             try data.write(to: fileURL, options: .atomic)
             userDefaults.set(profile.id, forKey: Constants.currentProfileKey)
-            if profile.authMethod == .anonymous {
-                userDefaults.set(profile.id, forKey: Constants.anonymousProfileKey)
-            }
         } catch {
             AppLogger.error("Failed to save profile \(profile.id)", error: error, category: AppLogger.data)
         }
@@ -89,24 +87,21 @@ final class ProfileLocalStore {
         }
     }
 
-    /// Удаляет все сохранённые профили (вошедшие и анонимный) и их фото.
+    /// Удаляет все сохранённые профили и их фото.
     func deleteAllProfiles() {
         try? fileManager.removeItem(at: directoryURL)
         userDefaults.removeObject(forKey: Constants.currentProfileKey)
-        userDefaults.removeObject(forKey: Constants.anonymousProfileKey)
+        userDefaults.removeObject(forKey: Constants.legacyAnonymousProfileKey)
         ensureDirectoryExists()
     }
 
-    func loadOrCreateAnonymousProfile() -> UserProfile {
-        if let anonymousId = userDefaults.string(forKey: Constants.anonymousProfileKey),
-           let storedProfile = loadProfile(withId: anonymousId) {
+    /// Текущий профиль устройства; при первом запуске или после удаления данных создаётся новый.
+    func loadOrCreateProfile() -> UserProfile {
+        if let storedProfile = loadCurrentProfile() {
             return storedProfile
         }
 
-        let profile = UserProfile(
-            id: UUID().uuidString,
-            authMethod: .anonymous
-        )
+        let profile = UserProfile(id: UUID().uuidString)
         saveProfile(profile)
         return profile
     }

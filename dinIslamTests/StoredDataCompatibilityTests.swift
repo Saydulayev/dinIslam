@@ -141,56 +141,59 @@ final class StoredDataCompatibilityTests: XCTestCase {
 
     // MARK: - Профиль
 
-    func testProfileProgress_unknownMasteryAndBrokenHistoryEntry_keepsTheRest() throws {
-        let progress = try decode(ProfileProgress.self, """
-        {
-          "totalQuestionsAnswered": 50,
-          "correctAnswers": 40,
-          "masteryLevel": "grandmaster",
-          "difficultyStats": [
-            {"difficulty": "hard", "correctAnswers": 4, "totalAnswers": 5},
-            {"difficulty": "legendary", "correctAnswers": 1, "totalAnswers": 1}
-          ],
-          "quizHistory": [
-            {"id": "11111111-1111-1111-1111-111111111111", "date": 0, "percentage": 90},
-            {"percentage": 10}
-          ]
-        }
-        """)
-
-        XCTAssertEqual(progress.totalQuestionsAnswered, 50)
-        XCTAssertEqual(progress.correctAnswers, 40)
-        XCTAssertEqual(progress.masteryLevel, .novice)
-        XCTAssertEqual(progress.difficultyStats.map(\.difficulty), [.hard])
-        XCTAssertEqual(progress.quizHistory.map(\.percentage), [90])
-        XCTAssertTrue(progress.examHistory.isEmpty)
-    }
-
-    func testUserProfile_missingSectionsAndUnknownAuthMethod_keepsIdentityAndProgress() throws {
+    func testUserProfile_legacyFormat_keepsIdentityAndName() throws {
         let profile = try decode(UserProfile.self, """
         {
           "id": "user-1",
-          "authMethod": "iCloudAccount",
+          "authMethod": "signInWithApple",
+          "fullName": "Ахмед Апле",
           "customDisplayName": "Ахмед",
-          "progress": {"totalQuestionsAnswered": 7}
+          "progress": {"totalQuestionsAnswered": 7},
+          "preferences": {"dailyGoal": 3}
         }
         """)
 
         XCTAssertEqual(profile.id, "user-1")
-        XCTAssertEqual(profile.authMethod, .anonymous)
         XCTAssertEqual(profile.customDisplayName, "Ахмед")
-        XCTAssertEqual(profile.progress.totalQuestionsAnswered, 7)
-        XCTAssertEqual(profile.preferences, ProfilePreferences())
+        XCTAssertEqual(profile.displayNameUpdatedAt, .distantPast)
+        XCTAssertEqual(profile.avatarUpdatedAt, .distantPast)
         XCTAssertEqual(profile.metadata.updatedAt, .distantPast)
     }
 
+    func testUserProfile_nameFromAppleSignIn_becomesDisplayName() throws {
+        let profile = try decode(UserProfile.self, #"{"id": "user-1", "fullName": "Ахмед"}"#)
+
+        XCTAssertEqual(profile.customDisplayName, "Ахмед")
+    }
+
     func testUserProfile_currentFormat_roundTrips() throws {
-        var progress = ProfileProgress(totalQuestionsAnswered: 20, correctAnswers: 15, examsTaken: 1)
-        progress.quizHistory = [QuizHistoryEntry(date: Date(timeIntervalSinceReferenceDate: 10), percentage: 75, correctAnswers: 15, totalQuestions: 20, difficultyBreakdown: [:], topicBreakdown: [:])]
-        progress.examHistory = [ExamHistoryEntry(date: Date(timeIntervalSinceReferenceDate: 20), percentage: 80, duration: 60, correctAnswers: 8, totalQuestions: 10, passed: true, configuration: ExamConfigurationSnapshot(configuration: .quick))]
-        let profile = UserProfile(id: "user-2", authMethod: .signInWithApple, customDisplayName: "Имя", progress: progress)
+        let profile = UserProfile(
+            id: "user-2",
+            customDisplayName: "Имя",
+            displayNameUpdatedAt: Date(timeIntervalSinceReferenceDate: 10),
+            avatarUpdatedAt: Date(timeIntervalSinceReferenceDate: 20)
+        )
 
         XCTAssertEqual(try roundTrip(profile), profile)
+    }
+
+    // MARK: - Снимок синхронизации
+
+    func testSyncSnapshot_missingSections_getDefaults() throws {
+        let snapshot = try decode(SyncSnapshot.self, """
+        {
+          "format": 1,
+          "stats": {"reviewItems": {"q1": {"stage": 2}}, "devices": {"a": {"seq": 3, "counters": {"correctAnswers": 5}}}}
+        }
+        """)
+
+        XCTAssertEqual(snapshot.stats.reviewItems["q1"]?.stage, 2)
+        XCTAssertEqual(snapshot.stats.reviewItems["q1"]?.dueDate, .distantPast)
+        XCTAssertEqual(snapshot.stats.devices["a"]?.counters.correctAnswers, 5)
+        XCTAssertEqual(snapshot.stats.devices["a"]?.counters.topics, [:])
+        XCTAssertEqual(snapshot.stats.epoch, .initial)
+        XCTAssertEqual(snapshot.achievements, AchievementsSection())
+        XCTAssertEqual(snapshot.displayName.value, nil)
     }
 
     // MARK: - Нечитаемые данные

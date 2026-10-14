@@ -105,7 +105,7 @@ final class StartViewModel {
                 self?.cachedLanguageCode = newCode
             },
             onProfileSync: { [weak self] in
-                await self?.profileManager.refreshFromCloud(mergeStrategy: .newest)
+                await self?.profileManager.syncNow()
             }
         )
         visualEffectsManager.startGlowAnimationIfNeeded()

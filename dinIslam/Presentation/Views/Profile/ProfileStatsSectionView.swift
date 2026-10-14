@@ -33,7 +33,7 @@ struct ProfileStatsSectionView: View {
                     ProgressCardView(
                         icon: "questionmark.circle",
                         value: questionIds.map { "\(studiedCount) / \($0.count)" } ?? "—",
-                        label: manager.isSignedIn ? "profile.progress.questions".localized : "stats.questionsStudied.title".localized,
+                        label: "stats.questionsStudied.title".localized,
                         iconColor: DesignTokens.Colors.iconBlue,
                         backgroundColor: DesignTokens.Colors.iconBlue.opacity(0.2)
                     )
@@ -41,8 +41,8 @@ struct ProfileStatsSectionView: View {
                     // Correct Answers
                     ProgressCardView(
                         icon: "checkmark.circle",
-                        value: "\(manager.isSignedIn ? manager.progress.correctAnswers : statsManager.stats.correctAnswers)",
-                        label: manager.isSignedIn ? "profile.progress.correct".localized : "stats.correctAnswers.title".localized,
+                        value: "\(statsManager.stats.correctAnswers)",
+                        label: "stats.correctAnswers.title".localized,
                         iconColor: DesignTokens.Colors.iconGreen,
                         backgroundColor: DesignTokens.Colors.iconGreen.opacity(0.2)
                     )
@@ -52,8 +52,8 @@ struct ProfileStatsSectionView: View {
                     // Incorrect Answers
                     ProgressCardView(
                         icon: "xmark.circle",
-                        value: "\(manager.isSignedIn ? manager.progress.incorrectAnswers : statsManager.stats.incorrectAnswers)",
-                        label: manager.isSignedIn ? "profile.progress.incorrect".localized : "stats.incorrectAnswers.title".localized,
+                        value: "\(statsManager.stats.incorrectAnswers)",
+                        label: "stats.incorrectAnswers.title".localized,
                         iconColor: DesignTokens.Colors.iconRed,
                         backgroundColor: DesignTokens.Colors.iconRed.opacity(0.2)
                     )
@@ -61,52 +61,31 @@ struct ProfileStatsSectionView: View {
                     // Corrected Mistakes
                     ProgressCardView(
                         icon: "exclamationmark.circle",
-                        value: "\(manager.isSignedIn ? manager.progress.correctedMistakes : statsManager.stats.correctedMistakes)",
-                        label: manager.isSignedIn ? "profile.progress.corrected".localized : "stats.correctedMistakes.title".localized,
+                        value: "\(statsManager.stats.correctedMistakes)",
+                        label: "stats.correctedMistakes.title".localized,
                         iconColor: DesignTokens.Colors.iconYellow,
                         backgroundColor: DesignTokens.Colors.iconYellow.opacity(0.2)
                     )
                 }
                 
                 GridRow {
-                    // Accuracy or Quizzes Completed (для обоих показываем одинаково)
-                    if manager.isSignedIn {
-                        ProgressCardView(
-                            icon: "chart.bar",
-                            value: manager.progress.averageQuizScore.displayScore,
-                            label: "profile.progress.accuracy".localized,
-                            iconColor: DesignTokens.Colors.iconPurple,
-                            backgroundColor: DesignTokens.Colors.iconPurple.opacity(0.2)
-                        )
-                    } else {
-                        // Для неавторизованных показываем точность из statsManager
-                        ProgressCardView(
-                            icon: "chart.bar",
-                            value: statsManager.stats.accuracyPercentage.displayScore,
-                            label: "profile.progress.accuracy".localized,
-                            iconColor: DesignTokens.Colors.iconPurple,
-                            backgroundColor: DesignTokens.Colors.iconPurple.opacity(0.2)
-                        )
-                    }
+                    // Accuracy
+                    ProgressCardView(
+                        icon: "chart.bar",
+                        value: statsManager.stats.accuracyPercentage.displayScore,
+                        label: "profile.progress.accuracy".localized,
+                        iconColor: DesignTokens.Colors.iconPurple,
+                        backgroundColor: DesignTokens.Colors.iconPurple.opacity(0.2)
+                    )
                     
-                    // Streak or Quizzes Completed
-                    if manager.isSignedIn {
-                        ProgressCardView(
-                            icon: "flame",
-                            value: "\(manager.progress.currentStreak)",
-                            label: "profile.progress.streak".localized,
-                            iconColor: DesignTokens.Colors.iconFlame,
-                            backgroundColor: DesignTokens.Colors.iconFlame.opacity(0.2)
-                        )
-                    } else {
-                        ProgressCardView(
-                            icon: "flame",
-                            value: "\(statsManager.stats.currentStreak)",
-                            label: "profile.progress.streak".localized,
-                            iconColor: DesignTokens.Colors.iconFlame,
-                            backgroundColor: DesignTokens.Colors.iconFlame.opacity(0.2)
-                        )
-                    }
+                    // Streak
+                    ProgressCardView(
+                        icon: "flame",
+                        value: "\(statsManager.stats.currentStreak)",
+                        label: "profile.progress.streak".localized,
+                        iconColor: DesignTokens.Colors.iconFlame,
+                        backgroundColor: DesignTokens.Colors.iconFlame.opacity(0.2)
+                    )
                 }
             }
             
@@ -168,7 +147,11 @@ struct ProfileStatsSectionView: View {
             }
         }
         .onChange(of: statsRefreshTrigger) { _, _ in
-            // Обновляем статистику при изменении триггера (например, после сброса для неавторизованных)
+            // Обновляем статистику при изменении триггера (например, после сброса)
+            loadProgressStats()
+        }
+        .onChange(of: manager.profile.metadata.lastSyncedAt) { _, _ in
+            // Пройденные вопросы могли прийти с другого устройства
             loadProgressStats()
         }
     }

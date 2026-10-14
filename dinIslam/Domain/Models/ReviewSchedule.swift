@@ -33,6 +33,10 @@ struct ReviewSchedule: Codable, Equatable {
 
     private(set) var items: [String: ReviewItem] = [:]
 
+    init(items: [String: ReviewItem] = [:]) {
+        self.items = items
+    }
+
     var count: Int { items.count }
 
     func isTracked(_ questionId: String) -> Bool {

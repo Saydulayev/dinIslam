@@ -37,7 +37,7 @@ final class DefaultStartLifecycleManager: StartLifecycleManaging {
             await questionsPreloading.preloadQuestions(for: [newLanguageCode])
         }
         
-        if profileManager.isSignedIn {
+        if profileManager.isSyncEnabled {
             Task {
                 await onProfileSync()
             }

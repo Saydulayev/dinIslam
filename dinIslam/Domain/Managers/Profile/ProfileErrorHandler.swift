@@ -22,6 +22,17 @@ final class ProfileErrorHandler {
             return "profile.sync.error.conflict".localized
         }
         
+        if let profileError = error as? CloudKitProfileError {
+            switch profileError {
+            case .newerFormat:
+                return "profile.sync.error.newerFormat".localized
+            case .iCloudUnavailable:
+                return "profile.icloud.unavailable".localized
+            default:
+                break
+            }
+        }
+        
         // Check for CKError first
         if let ckError = error as? CKError {
             switch ckError.code {

@@ -98,6 +98,7 @@ class AchievementManager: ObservableObject, AchievementManaging {
         if !newlyUnlocked.isEmpty {
             newAchievements = newlyUnlocked
             saveAchievements()
+            SyncedDataChange.post()
             
             // Schedule notification for each new achievement
             for achievement in newlyUnlocked {
@@ -142,6 +143,37 @@ class AchievementManager: ObservableObject, AchievementManaging {
         newAchievements.removeAll()
         
         // Save changes
+        saveAchievements()
+        SyncedDataChange.post(resetSections: [.achievements])
+    }
+    
+    // MARK: - Sync
+    
+    /// Открытые достижения: id → дата открытия
+    var unlockedDates: [String: Date] {
+        Dictionary(
+            achievements.filter(\.isUnlocked).map { ($0.id, $0.unlockedDate ?? .distantPast) },
+            uniquingKeysWith: { first, _ in first }
+        )
+    }
+    
+    /// Открытые достижения из iCloud: записываются без уведомления о локальном изменении
+    func applyUnlockedDates(_ unlocked: [String: Date]) {
+        guard unlocked != unlockedDates else { return }
+        achievements = achievements.map { achievement in
+            let unlockedDate = unlocked[achievement.id]
+            return Achievement(
+                id: achievement.id,
+                title: achievement.title,
+                description: achievement.description,
+                icon: achievement.icon,
+                color: achievement.color,
+                type: achievement.type,
+                requirement: achievement.requirement,
+                isUnlocked: unlockedDate != nil,
+                unlockedDate: unlockedDate
+            )
+        }
         saveAchievements()
     }
     

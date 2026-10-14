@@ -12,36 +12,58 @@ import OSLog
 enum CloudKitProfileError: Error, LocalizedError {
     case encodingFailed
     case decodingFailed
+    case newerFormat
+    case iCloudUnavailable
     case unknown
 
     var errorDescription: String? {
         switch self {
         case .encodingFailed:
-            return "Не удалось закодировать профиль для сохранения."
+            return "Не удалось закодировать данные для сохранения."
         case .decodingFailed:
-            return "Не удалось декодировать профиль из CloudKit."
+            return "Не удалось прочитать данные из CloudKit."
+        case .newerFormat:
+            return "Данные в iCloud сохранены более новой версией приложения."
+        case .iCloudUnavailable:
+            return "iCloud временно недоступен."
         case .unknown:
             return "Неизвестная ошибка CloudKit."
         }
     }
 }
 
-final class CloudKitProfileService {
+/// Запись профиля в iCloud: снимок данных (SyncSnapshot) и фото
+struct RemoteProfileRecord {
+    let record: CKRecord
+    /// `nil` — запись прежнего формата без снимка
+    let snapshot: SyncSnapshot?
+}
+
+/// Что сделать с фото в записи при сохранении
+enum AvatarUpload {
+    case keep
+    case upload(URL)
+    case remove
+}
+
+/// Хранилище снимка в iCloud (в тестах — в памяти)
+protocol ProfileCloudStoring: AnyObject {
+    func accountId() async throws -> String
+    func fetchProfileRecord() async throws -> RemoteProfileRecord?
+    func fetchAvatarData() async throws -> Data?
+    func save(_ snapshot: SyncSnapshot, to existingRecord: CKRecord?, avatar: AvatarUpload) async throws
+}
+
+final class CloudKitProfileService: ProfileCloudStoring {
     private let container: CKContainer
     private let database: CKDatabase
-    private let encoder: JSONEncoder
-    private let decoder: JSONDecoder
     private let recordType = "UserProfile"
+    /// Личная база iCloud принадлежит одному аккаунту, поэтому профиль — одна запись с фиксированным именем
+    private let profileRecordID = CKRecord.ID(recordName: "profile")
+    private let snapshotKey = "snapshot"
     private let avatarKey = "avatar"
-    /// Отпечаток фото в записи: `""` — фото нет, `nil` — запись старого формата
-    private let avatarHashKey = "avatarHash"
-    /// Поля записи без фото: фото скачивается отдельно и только если изменилось
-    private var profileKeys: [CKRecord.FieldKey] {
-        ["payload", "updatedAt", "createdAt", "authMethod", "locale", avatarHashKey]
-    }
-    private let localStore: ProfileLocalStore
 
-    init(containerIdentifier: String? = nil, localStore: ProfileLocalStore = ProfileLocalStore()) {
+    init(containerIdentifier: String? = nil) {
         if let identifier = containerIdentifier {
             container = CKContainer(identifier: identifier)
         } else if let configuredIdentifier = Bundle.main.object(forInfoDictionaryKey: "CloudKitContainerIdentifier") as? String {
@@ -51,154 +73,94 @@ final class CloudKitProfileService {
         }
 
         database = container.privateCloudDatabase
-        self.localStore = localStore
-
-        encoder = JSONEncoder()
-        encoder.dateEncodingStrategy = .iso8601
-        decoder = JSONDecoder()
-        decoder.dateDecodingStrategy = .iso8601
     }
 
-    // MARK: - CRUD
-    func fetchProfile(for userId: String) async throws -> UserProfile? {
-        let recordID = CKRecord.ID(recordName: userId)
+    // MARK: - Account
+    /// Синхронизация работает, только когда на устройстве выполнен вход в iCloud
+    func accountStatus() async throws -> CKAccountStatus {
+        try await container.accountStatus()
+    }
+
+    /// Идентификатор аккаунта iCloud: по нему видно, что на устройстве сменили Apple ID
+    func accountId() async throws -> String {
+        try await container.userRecordID().recordName
+    }
+
+    // MARK: - Record
+    /// Запись без фото (фото скачивается отдельно и только когда изменилось); `nil` — записи ещё нет
+    func fetchProfileRecord() async throws -> RemoteProfileRecord? {
+        let record: CKRecord
         do {
-            let record = try await fetchRecord(with: recordID, desiredKeys: profileKeys)
-            var profile = try decodeProfile(from: record)
-            await downloadAvatarIfChanged(for: &profile, record: record)
-            return profile
+            record = try await fetchRecord(desiredKeys: [snapshotKey])
         } catch let error as CKError where error.code == .unknownItem {
             return nil
         }
-    }
 
-    func saveProfile(_ profile: UserProfile) async throws -> UserProfile {
-        let recordID = CKRecord.ID(recordName: profile.id)
-        let record: CKRecord
-
-        if let existingRecord = try? await fetchRecord(with: recordID, desiredKeys: profileKeys) {
-            record = existingRecord
-        } else {
-            record = CKRecord(recordType: recordType, recordID: recordID)
+        guard let data = record[snapshotKey] as? Data else {
+            return RemoteProfileRecord(record: record, snapshot: nil)
         }
-
-        try encode(profile, into: record)
-        let savedRecord = try await save(record: record)
-        return try decodeProfile(from: savedRecord)
-    }
-
-    func deleteProfile(with userId: String) async throws {
-        let recordID = CKRecord.ID(recordName: userId)
-        do {
-            try await delete(recordID: recordID)
-        } catch let error as CKError where error.code == .unknownItem {
-            AppLogger.warning("Profile \(userId) already deleted: \(error.localizedDescription)", category: AppLogger.data)
+        guard let snapshot = try? SyncSnapshot.decoded(from: data) else {
+            throw CloudKitProfileError.decodingFailed
         }
+        // Более новый формат может содержать данные, которые эта версия потеряла бы при перезаписи
+        guard snapshot.format <= SyncSnapshot.currentFormat else {
+            throw CloudKitProfileError.newerFormat
+        }
+        return RemoteProfileRecord(record: record, snapshot: snapshot)
     }
 
-    // MARK: - Private Helpers
-    private func encode(_ profile: UserProfile, into record: CKRecord) throws {
-        guard let data = try? encoder.encode(profile) else {
+    func fetchAvatarData() async throws -> Data? {
+        let record = try await fetchRecord(desiredKeys: [avatarKey])
+        guard let assetURL = (record[avatarKey] as? CKAsset)?.fileURL else { return nil }
+        return try Data(contentsOf: assetURL)
+    }
+
+    /// Сохраняет снимок в запись, прочитанную `fetchProfileRecord` (`nil` — создать запись).
+    /// Если запись изменило другое устройство, бросает `CKError.serverRecordChanged`: снимок нужно слить заново.
+    func save(_ snapshot: SyncSnapshot, to existingRecord: CKRecord?, avatar: AvatarUpload) async throws {
+        let record = existingRecord ?? CKRecord(recordType: recordType, recordID: profileRecordID)
+        guard let data = try? snapshot.encoded() else {
             throw CloudKitProfileError.encodingFailed
         }
 
-        record["payload"] = data as CKRecordValue
-        record["updatedAt"] = profile.metadata.updatedAt as CKRecordValue
-        record["createdAt"] = profile.metadata.createdAt as CKRecordValue
-        record["authMethod"] = profile.authMethod.rawValue as CKRecordValue
-        record["locale"] = profile.localeIdentifier as CKRecordValue
-
-        // Фото передаётся только при изменении: иначе поле не трогаем, и CloudKit его не загружает
-        let remoteHash = record[avatarHashKey] as? String
-        if let avatarURL = profile.avatarURL,
-           let localHash = AvatarImageProcessor.fingerprint(ofFileAt: avatarURL) {
-            if localHash != remoteHash {
-                record[avatarKey] = CKAsset(fileURL: avatarURL)
-                record[avatarHashKey] = localHash as CKRecordValue
-            }
-        } else if remoteHash != "" {
+        record[snapshotKey] = data as CKRecordValue
+        record["updatedAt"] = Date() as CKRecordValue
+        switch avatar {
+        case .keep:
+            break
+        case .upload(let fileURL):
+            record[avatarKey] = CKAsset(fileURL: fileURL)
+        case .remove:
             record[avatarKey] = nil
-            record[avatarHashKey] = "" as CKRecordValue
         }
+
+        _ = try await database.modifyRecords(saving: [record], deleting: [], savePolicy: .ifServerRecordUnchanged)
+            .saveResults[record.recordID]?.get()
     }
 
-    private func decodeProfile(from record: CKRecord) throws -> UserProfile {
-        guard let data = record["payload"] as? Data else {
-            throw CloudKitProfileError.decodingFailed
-        }
-
-        guard var profile = try? decoder.decode(UserProfile.self, from: data) else {
-            throw CloudKitProfileError.decodingFailed
-        }
-
-        // Фото берётся из локального файла; новое фото из CloudKit скачивает downloadAvatarIfChanged.
-        // Отсутствие фото в записи локальный файл не удаляет — иначе refreshFromCloud
-        // мог бы подтянуть старую запись и стереть только что выбранное фото.
-        profile.avatarURL = localStore.loadAvatar(for: profile.id)
-
-        profile.metadata.lastSyncedAt = record.modificationDate
-        return profile
-    }
-
-    /// Скачивает фото, если его отпечаток в записи отличается от локального файла.
-    /// Ошибка скачивания не мешает загрузке профиля: остаётся локальное фото.
-    private func downloadAvatarIfChanged(for profile: inout UserProfile, record: CKRecord) async {
-        let remoteHash = record[avatarHashKey] as? String
-        guard remoteHash != "" else { return }
-        let localHash = profile.avatarURL.flatMap { AvatarImageProcessor.fingerprint(ofFileAt: $0) }
-        if let remoteHash, remoteHash == localHash { return }
-
-        guard let avatarRecord = try? await fetchRecord(with: record.recordID, desiredKeys: [avatarKey]),
-              let assetURL = (avatarRecord[avatarKey] as? CKAsset)?.fileURL,
-              let remoteData = try? Data(contentsOf: assetURL) else {
-            return
-        }
-        // В записях старого формата (без отпечатка) фото исходного размера — уменьшаем при сохранении
-        let avatarData = remoteHash == nil ? AvatarImageProcessor.prepare(remoteData) : remoteData
-        guard let avatarData,
-              let savedURL = localStore.saveAvatarData(avatarData, for: profile.id, fileExtension: AvatarImageProcessor.fileExtension) else {
-            return
-        }
-        profile.avatarURL = savedURL
-    }
-
-    private func fetchRecord(with id: CKRecord.ID, desiredKeys: [CKRecord.FieldKey]) async throws -> CKRecord {
+    // MARK: - Private Helpers
+    private func fetchRecord(desiredKeys: [CKRecord.FieldKey]) async throws -> CKRecord {
         let results: [CKRecord.ID: Result<CKRecord, Error>]
         do {
-            results = try await database.records(for: [id], desiredKeys: desiredKeys)
+            results = try await database.records(for: [profileRecordID], desiredKeys: desiredKeys)
         } catch let error as CKError where error.code == .partialFailure {
-            throw error.partialErrorsByItemID?[id] ?? error
+            throw error.partialErrorsByItemID?[profileRecordID] ?? error
         }
-        guard let result = results[id] else {
+        guard let result = results[profileRecordID] else {
             throw CloudKitProfileError.unknown
         }
         return try result.get()
     }
-
-    private func save(record: CKRecord) async throws -> CKRecord {
-        try await withCheckedThrowingContinuation { continuation in
-            database.save(record) { record, error in
-                if let error = error {
-                    continuation.resume(throwing: error)
-                } else if let record = record {
-                    continuation.resume(returning: record)
-                } else {
-                    continuation.resume(throwing: CloudKitProfileError.unknown)
-                }
-            }
-        }
-    }
-
-    private func delete(recordID: CKRecord.ID) async throws {
-        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
-            database.delete(withRecordID: recordID) { _, error in
-                if let error = error {
-                    continuation.resume(throwing: error)
-                } else {
-                    continuation.resume(returning: ())
-                }
-            }
-        }
-    }
 }
 
+extension Error {
+    /// Запись изменило другое устройство между чтением и сохранением
+    var isServerRecordChanged: Bool {
+        guard let ckError = self as? CKError else { return false }
+        if ckError.code == .serverRecordChanged { return true }
+        if ckError.code == .partialFailure {
+            return ckError.partialErrorsByItemID?.values.contains { ($0 as? CKError)?.code == .serverRecordChanged } ?? false
+        }
+        return false
+    }
+}

@@ -96,7 +96,8 @@ extension EnvironmentValues {
         get { 
             self[ProfileManagerKey.self] ?? ProfileManager(
                 statsManager: StatsManager(),
-                examStatisticsManager: ExamStatisticsManager()
+                examStatisticsManager: ExamStatisticsManager(),
+                achievementManager: achievementManager
             )
         }
         set { 

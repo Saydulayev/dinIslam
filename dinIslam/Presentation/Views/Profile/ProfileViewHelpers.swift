@@ -58,6 +58,21 @@ enum ProfileViewHelpers {
         }
     }
 
+    static func iCloudStatusMessage(for status: ProfileManager.ICloudStatus) -> String {
+        switch status {
+        case .checking:
+            return "profile.icloud.checking".localized
+        case .available:
+            return "profile.sync.never".localized
+        case .noAccount:
+            return "profile.icloud.noAccount".localized
+        case .restricted:
+            return "profile.icloud.restricted".localized
+        case .unavailable:
+            return "profile.icloud.unavailable".localized
+        }
+    }
+
     static func avatarExists(for manager: ProfileManager) -> Bool {
         guard let url = manager.profile.avatarURL else { return false }
         let fileManager = FileManager.default

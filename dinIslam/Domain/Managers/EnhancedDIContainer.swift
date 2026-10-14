@@ -28,7 +28,7 @@ struct EnhancedDependencies {
             questionsRepository: baseDependencies.questionsRepository,
             networkManager: baseDependencies.networkManager,
             adaptiveEngine: baseDependencies.adaptiveLearningEngine,
-            profileManager: baseDependencies.profileManager,
+            topicStatsProvider: baseDependencies.statsManager,
             questionPoolProgressManager: baseDependencies.questionPoolProgressManager
         )
     }
@@ -57,7 +57,7 @@ class EnhancedQuizUseCase: EnhancedQuizUseCaseProtocol {
     private let questionsRepository: EnhancedQuestionsRepositoryProtocol
     private let networkManager: NetworkManager
     private let adaptiveEngine: AdaptiveLearningEngine
-    private let profileManager: ProfileManager
+    private let topicStatsProvider: TopicStatsProviding
     private let questionPoolProgressManager: QuestionPoolProgressManaging
     private let questionPoolVersion = 1
     
@@ -65,13 +65,13 @@ class EnhancedQuizUseCase: EnhancedQuizUseCaseProtocol {
         questionsRepository: EnhancedQuestionsRepositoryProtocol,
         networkManager: NetworkManager,
         adaptiveEngine: AdaptiveLearningEngine,
-        profileManager: ProfileManager,
+        topicStatsProvider: TopicStatsProviding,
         questionPoolProgressManager: QuestionPoolProgressManaging? = nil
     ) {
         self.questionsRepository = questionsRepository
         self.networkManager = networkManager
         self.adaptiveEngine = adaptiveEngine
-        self.profileManager = profileManager
+        self.topicStatsProvider = topicStatsProvider
         self.questionPoolProgressManager = questionPoolProgressManager ?? DefaultQuestionPoolProgressManager()
     }
     
@@ -99,7 +99,7 @@ class EnhancedQuizUseCase: EnhancedQuizUseCaseProtocol {
             
             var selected = adaptiveEngine.selectQuestions(
                 from: allQuestions,
-                progress: profileManager.progress,
+                topicStats: topicStatsProvider.topicStats,
                 usedQuestionIds: used,
                 sessionCount: actualSessionCount
             )
@@ -127,7 +127,7 @@ class EnhancedQuizUseCase: EnhancedQuizUseCaseProtocol {
             // Режим повторения: используем текущую логику с повторами
             var selected = adaptiveEngine.selectQuestions(
                 from: allQuestions,
-                progress: profileManager.progress,
+                topicStats: topicStatsProvider.topicStats,
                 usedQuestionIds: used,
                 sessionCount: sessionCount
             )

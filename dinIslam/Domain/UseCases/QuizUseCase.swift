@@ -19,7 +19,7 @@ protocol QuizUseCaseProtocol {
 
 class QuizUseCase: QuizUseCaseProtocol {
     private let questionsRepository: QuestionsRepositoryProtocol
-    private let profileProgressProvider: ProfileProgressProviding
+    private let topicStatsProvider: TopicStatsProviding
     private let questionSelectionStrategy: QuestionSelectionStrategy
     private let fallbackStrategy: QuestionSelectionStrategy
     private let questionPoolProgressManager: QuestionPoolProgressManaging
@@ -27,13 +27,13 @@ class QuizUseCase: QuizUseCaseProtocol {
     
     init(
         questionsRepository: QuestionsRepositoryProtocol,
-        profileProgressProvider: ProfileProgressProviding,
+        topicStatsProvider: TopicStatsProviding,
         questionSelectionStrategy: QuestionSelectionStrategy,
         fallbackStrategy: QuestionSelectionStrategy? = nil,
         questionPoolProgressManager: QuestionPoolProgressManaging
     ) {
         self.questionsRepository = questionsRepository
-        self.profileProgressProvider = profileProgressProvider
+        self.topicStatsProvider = topicStatsProvider
         self.questionSelectionStrategy = questionSelectionStrategy
         self.fallbackStrategy = fallbackStrategy ?? FallbackQuestionSelectionStrategy()
         self.questionPoolProgressManager = questionPoolProgressManager
@@ -66,7 +66,7 @@ class QuizUseCase: QuizUseCaseProtocol {
             // Используем адаптивную стратегию только для новых вопросов
             var selected = questionSelectionStrategy.selectQuestions(
                 from: allQuestions,
-                progress: profileProgressProvider.progress,
+                topicStats: topicStatsProvider.topicStats,
                 usedQuestionIds: used,
                 sessionCount: actualSessionCount
             )
@@ -94,7 +94,7 @@ class QuizUseCase: QuizUseCaseProtocol {
             // Режим повторения: используем текущую логику с повторами
             var selected = questionSelectionStrategy.selectQuestions(
                 from: allQuestions,
-                progress: profileProgressProvider.progress,
+                topicStats: topicStatsProvider.topicStats,
                 usedQuestionIds: used,
                 sessionCount: sessionCount
             )
@@ -107,7 +107,7 @@ class QuizUseCase: QuizUseCaseProtocol {
                 
                 let fallbackSelected = fallbackStrategy.selectQuestions(
                     from: remainingQuestions,
-                    progress: profileProgressProvider.progress,
+                    topicStats: topicStatsProvider.topicStats,
                     usedQuestionIds: used.union(alreadySelectedIds),
                     sessionCount: remainingNeeded
                 )

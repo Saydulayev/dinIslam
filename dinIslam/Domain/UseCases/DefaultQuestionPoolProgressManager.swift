@@ -30,9 +30,21 @@ struct DefaultQuestionPoolProgressManager: QuestionPoolProgressManaging {
             set.insert(id)
         }
         userDefaults.set(Array(set), forKey: usedIdsKey)
+        SyncedDataChange.post()
     }
     
     func reset(version: Int) {
+        clear(version: version)
+        SyncedDataChange.post(resetSections: [.questionPool])
+    }
+    
+    /// Пройденные вопросы из iCloud: записываются без уведомления о локальном изменении
+    func replaceUsedIds(_ questionIds: Set<String>, version: Int) {
+        ensureVersion(version)
+        userDefaults.set(Array(questionIds), forKey: usedIdsKey)
+    }
+    
+    private func clear(version: Int) {
         userDefaults.set(version, forKey: versionKey)
         userDefaults.set([], forKey: usedIdsKey)
         userDefaults.set(false, forKey: reviewModeKey)
@@ -84,8 +96,9 @@ struct DefaultQuestionPoolProgressManager: QuestionPoolProgressManaging {
     
     private func ensureVersion(_ currentVersion: Int) {
         let savedVersion = userDefaults.integer(forKey: versionKey)
+        // Смена версии банка на устройстве — не сброс пользователем, новое поколение не начинается
         if savedVersion != currentVersion {
-            reset(version: currentVersion)
+            clear(version: currentVersion)
         }
     }
 }

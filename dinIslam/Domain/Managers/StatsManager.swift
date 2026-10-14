@@ -11,7 +11,6 @@ import Observation
 @MainActor
 @Observable
 class StatsManager {
-    private var profileProgressSyncer: ProfileProgressSyncing?
     var stats: UserStats
     /// Когда повторять каждую ошибку (хранится локально, как и список ошибок)
     private(set) var reviewSchedule: ReviewSchedule
@@ -26,11 +25,9 @@ class StatsManager {
     
     init(
         userDefaults: UserDefaults = .standard,
-        profileProgressSyncer: ProfileProgressSyncing? = nil,
         now: @escaping () -> Date = Date.init
     ) {
         self.userDefaults = userDefaults
-        self.profileProgressSyncer = profileProgressSyncer
         self.now = now
         self.stats = Self.load(UserStats.self, from: userDefaults, key: statsKey) ?? UserStats()
         self.reviewSchedule = Self.load(ReviewSchedule.self, from: userDefaults, key: reviewScheduleKey) ?? ReviewSchedule()
@@ -39,10 +36,6 @@ class StatsManager {
         // Ошибки, накопленные до появления расписания, доступны для повторения сразу
         reviewSchedule.sync(with: stats.wrongQuestionIds, now: self.now())
         saveReviewSchedule()
-    }
-    
-    func setProfileProgressSyncer(_ syncer: ProfileProgressSyncing?) {
-        self.profileProgressSyncer = syncer
     }
     
     private static func load<T: Decodable>(_ type: T.Type, from userDefaults: UserDefaults, key: String) -> T? {
@@ -67,7 +60,7 @@ class StatsManager {
         saveStats()
         saveReviewSchedule()
         saveDailyProgress()
-        profileProgressSyncer?.syncStatsUpdate(summary)
+        SyncedDataChange.post()
     }
     
     /// Итог повторения ошибок: правильные ответы в срок продвигают вопрос по расписанию,
@@ -111,14 +104,14 @@ class StatsManager {
         saveStats()
         saveReviewSchedule()
         saveDailyProgress()
-        // Уведомляем syncer об обновлении статистики для синхронизации с ProfileManager
-        profileProgressSyncer?.syncStatsDidUpdate()
+        SyncedDataChange.post()
         return summary
     }
     
     func registerDailyGoal() {
         dailyProgress.registerDailyGoal(at: now())
         saveDailyProgress()
+        SyncedDataChange.post()
     }
     
     func clearWrongQuestions() {
@@ -126,6 +119,7 @@ class StatsManager {
         reviewSchedule.removeAll()
         saveStats()
         saveReviewSchedule()
+        SyncedDataChange.post()
     }
     
     func getWrongQuestions(from allQuestions: [Question]) -> [Question] {
@@ -185,7 +179,7 @@ class StatsManager {
         saveStats()
         saveReviewSchedule()
         saveDailyProgress()
-        profileProgressSyncer?.syncStatsReset()
+        SyncedDataChange.post(resetSections: [.stats, .achievementProgress])
     }
     
     func resetStatsExceptTotalQuestions() {
@@ -219,62 +213,24 @@ class StatsManager {
         stats.perfectScores = 0
         stats.longestStreak = 0
         saveStats()
-        profileProgressSyncer?.syncStatsReset()
+        SyncedDataChange.post(resetSections: [.achievementProgress])
     }
     
-    // MARK: - Profile Progress Sync
-    func updateFromProfileProgress(_ progress: ProfileProgress, quizHistory: [QuizHistoryEntry]) {
-        // Сохраняем wrongQuestionIds, чтобы не потерять их при обновлении
-        let preservedWrongQuestionIds = stats.wrongQuestionIds
-        
-        // Обновляем основные метрики
-        stats.totalQuestionsStudied = progress.totalQuestionsAnswered
-        stats.correctAnswers = progress.correctAnswers
-        stats.incorrectAnswers = progress.incorrectAnswers
-        stats.correctedMistakes = progress.correctedMistakes
-        stats.currentStreak = progress.currentStreak
-        stats.longestStreak = progress.longestStreak
-        stats.lastActivityAt = progress.lastActivityAt
-        stats.lastQuizDate = progress.lastActivityAt
-        
-        // Восстанавливаем wrongQuestionIds (они не синхронизируются с CloudKit, остаются локальными)
-        stats.wrongQuestionIds = preservedWrongQuestionIds
-        
-        // Обновляем recentQuizResults из quizHistory
-        stats.recentQuizResults = quizHistory.prefix(10).map { entry in
-            QuizResultRecord(
-                percentage: entry.percentage,
-                date: entry.date,
-                questionsCount: entry.totalQuestions
-            )
-        }
-        
-        // Обновляем topicStats из topicProgress
-        stats.topicStats = Dictionary(uniqueKeysWithValues: progress.topicProgress.map { topic in
-            (topic.topicId, TopicStat(
-                correctAnswers: topic.correctAnswers,
-                totalAnswers: topic.totalAnswers,
-                streak: topic.streak,
-                longestStreak: topic.streak, // Используем текущий streak как longest, так как в TopicProgress нет longestStreak
-                lastUpdated: topic.lastActivityAt
-            ))
-        })
-        
-        // Обновляем difficultyStats из difficultyStats
-        stats.difficultyStats = Dictionary(uniqueKeysWithValues: progress.difficultyStats.map { difficulty in
-            (difficulty.difficulty.rawValue, DifficultyStat(
-                correctAnswers: difficulty.correctAnswers,
-                totalAnswers: difficulty.totalAnswers,
-                adaptiveScore: difficulty.adaptiveScore,
-                lastUpdated: nil // В DifficultyPerformance нет lastUpdated
-            ))
-        })
-        
-        // Вычисляем totalQuizzesCompleted из quizHistory
-        stats.totalQuizzesCompleted = quizHistory.count
-        
-        // averageRecentScore вычисляется автоматически через computed property в UserStats
-        
+    // MARK: - Sync
+    /// Данные из iCloud: записываются без уведомления о локальном изменении
+    func applySyncedState(stats: UserStats, reviewSchedule: ReviewSchedule, dailyProgress: DailyProgress) {
+        self.stats = stats
+        self.reviewSchedule = reviewSchedule
+        self.dailyProgress = dailyProgress
         saveStats()
+        saveReviewSchedule()
+        saveDailyProgress()
+    }
+}
+
+// MARK: - TopicStatsProviding
+extension StatsManager: TopicStatsProviding {
+    var topicStats: [String: TopicStat] {
+        stats.topicStats
     }
 }

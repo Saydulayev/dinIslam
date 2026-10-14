@@ -283,11 +283,10 @@ struct ExamResultActionsView: View {
 #Preview {
     let statsManager = StatsManager()
     let examStatsManager = ExamStatisticsManager()
-    let adaptiveEngine = AdaptiveLearningEngine()
     let profileManager = ProfileManager(
-        adaptiveEngine: adaptiveEngine,
         statsManager: statsManager,
-        examStatisticsManager: examStatsManager
+        examStatisticsManager: examStatsManager,
+        achievementManager: AchievementManager(notificationManager: NotificationManager())
     )
     NavigationStack {
         ExamResultView(

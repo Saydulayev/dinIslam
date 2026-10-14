@@ -16,13 +16,13 @@ final class AdaptiveQuestionSelectionStrategy: QuestionSelectionStrategy {
     
     func selectQuestions(
         from allQuestions: [Question],
-        progress: ProfileProgress,
+        topicStats: [String: TopicStat],
         usedQuestionIds: Set<String>,
         sessionCount: Int
     ) -> [Question] {
         return adaptiveEngine.selectQuestions(
             from: allQuestions,
-            progress: progress,
+            topicStats: topicStats,
             usedQuestionIds: usedQuestionIds,
             sessionCount: sessionCount
         )

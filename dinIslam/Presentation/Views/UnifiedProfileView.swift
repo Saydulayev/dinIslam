@@ -125,7 +125,7 @@ struct UnifiedProfileView: View {
             }
             Button("profile.sync.reset.cancel".localized, role: .cancel) { }
         } message: {
-            Text((manager.isSignedIn ? "profile.sync.reset.message" : "profile.sync.reset.message.guest").localized)
+            Text((manager.isSyncEnabled ? "profile.sync.reset.message" : "profile.sync.reset.message.local").localized)
         }
         .onChange(of: avatarPickerItem) { previous, current in
             guard let item = current, previous != current else { return }
@@ -163,11 +163,10 @@ struct UnifiedProfileView: View {
 #Preview {
     let statsManager = StatsManager()
     let examStatsManager = ExamStatisticsManager()
-    let adaptiveEngine = AdaptiveLearningEngine()
     let profileManager = ProfileManager(
-        adaptiveEngine: adaptiveEngine,
         statsManager: statsManager,
-        examStatisticsManager: examStatsManager
+        examStatisticsManager: examStatsManager,
+        achievementManager: AchievementManager(notificationManager: NotificationManager())
     )
     return NavigationStack {
         UnifiedProfileView(statsManager: statsManager, onStartMistakesReview: {})

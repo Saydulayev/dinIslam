@@ -5,8 +5,9 @@
 //  Created by Saydulayev on 12.01.26.
 //
 
-import AuthenticationServices
+import CloudKit
 import Foundation
+import UIKit
 
 @MainActor
 @Observable
@@ -17,444 +18,339 @@ final class ProfileManager {
         case failed(String)
     }
 
+    /// Вход в iCloud на устройстве: синхронизация включается автоматически, когда он доступен
+    enum ICloudStatus: Equatable {
+        case checking
+        case available
+        case noAccount
+        case restricted
+        case unavailable
+
+        init(_ status: CKAccountStatus) {
+            switch status {
+            case .available: self = .available
+            case .noAccount: self = .noAccount
+            case .restricted: self = .restricted
+            case .couldNotDetermine, .temporarilyUnavailable: self = .unavailable
+            @unknown default: self = .unavailable
+            }
+        }
+    }
+
     var profile: UserProfile
+    var iCloudStatus: ICloudStatus = .checking
     var syncState: SyncState = .idle
     var isLoading = false
     var errorMessage: String?
-    var lastRecommendations: [LearningRecommendation] = []
 
-    var isSignedIn: Bool {
-        profile.authMethod != .anonymous
+    var isSyncEnabled: Bool {
+        iCloudStatus == .available
     }
 
     var displayName: String {
-        if !editableDisplayName.isEmpty {
-            return editableDisplayName
-        }
-
-        // Apple передаёт имя только при первом входе, поэтому вошедший пользователь может остаться без имени
-        if isSignedIn {
-            return "profile.noName".localized
-        }
-        return "profile.anonymous".localized
+        editableDisplayName.isEmpty ? "profile.noName".localized : editableDisplayName
     }
 
-    /// Имя для поля редактирования: пользовательское, затем имя из Apple, иначе пустая строка
+    /// Имя для поля редактирования, иначе пустая строка
     var editableDisplayName: String {
-        if let customName = profile.customDisplayName, !customName.isEmpty {
-            return customName
-        }
-        if let fullName = profile.fullName, !fullName.isEmpty {
-            return fullName
-        }
-        return ""
+        profile.customDisplayName ?? ""
     }
 
     var needsDisplayName: Bool {
-        isSignedIn && editableDisplayName.isEmpty
-    }
-
-    var recommendations: [LearningRecommendation] {
-        profile.progress.recommendations
-    }
-
-    var progress: ProfileProgress {
-        profile.progress
+        editableDisplayName.isEmpty
     }
 
     @ObservationIgnored private let localStore: ProfileLocalStore
     @ObservationIgnored private let cloudService: CloudKitProfileService
-    @ObservationIgnored private let adaptiveEngine: AdaptiveLearningEngine
+    @ObservationIgnored private let syncService: ProgressSyncService
+    @ObservationIgnored private let avatarService: ProfileAvatarHandling
     @ObservationIgnored private let statsManager: StatsManager
     @ObservationIgnored private let examStatisticsManager: ExamStatisticsManager
-    
-    // Services via protocols
-    @ObservationIgnored private let authService: ProfileAuthHandling
-    @ObservationIgnored private let syncService: ProfileSyncing
-    @ObservationIgnored private let mergeService: ProfileMergeService
-    @ObservationIgnored private let avatarService: ProfileAvatarHandling
-    @ObservationIgnored private let progressService: ProfileProgressManaging
     @ObservationIgnored private let questionPoolProgressManager: QuestionPoolProgressManaging
+    @ObservationIgnored private var scheduledSync: Task<Void, Never>?
+    @ObservationIgnored private var isSyncRunning = false
+    @ObservationIgnored private var needsAnotherSync = false
+    @ObservationIgnored nonisolated(unsafe) private var observationTasks: [Task<Void, Never>] = []
+    @ObservationIgnored nonisolated(unsafe) private var localChangeObserver: NSObjectProtocol?
+
+    /// Пауза после изменения на устройстве: несколько изменений подряд уходят одной синхронизацией
+    private let syncDebounce: Duration = .seconds(2)
+
+    /// В модульных тестах приложение только запускает тесты: его синхронизация не должна
+    /// реагировать на хранилища тестов и обращаться к iCloud симулятора
+    private static let isUnitTestHost = ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
 
     init(
         localStore localStoreOverride: ProfileLocalStore? = nil,
         cloudService cloudServiceOverride: CloudKitProfileService? = nil,
-        adaptiveEngine adaptiveEngineOverride: AdaptiveLearningEngine? = nil,
+        syncStateStore: LocalSyncStateStore? = nil,
         statsManager: StatsManager,
         examStatisticsManager: ExamStatisticsManager,
-        authService: ProfileAuthHandling? = nil,
-        syncService: ProfileSyncing? = nil,
-        avatarService: ProfileAvatarHandling? = nil,
-        progressService: ProfileProgressManaging? = nil,
-        questionPoolProgressManager: QuestionPoolProgressManaging? = nil
+        achievementManager: AchievementManager,
+        questionPoolProgressManager: QuestionPoolProgressManaging? = nil,
+        avatarService: ProfileAvatarHandling? = nil
     ) {
-        let resolvedLocalStore: ProfileLocalStore
-        if let override = localStoreOverride {
-            resolvedLocalStore = override
-        } else {
-            resolvedLocalStore = ProfileLocalStore()
-        }
+        let localStore = localStoreOverride ?? ProfileLocalStore()
+        let cloudService = cloudServiceOverride ?? CloudKitProfileService()
+        let questionPoolProgressManager = questionPoolProgressManager ?? DefaultQuestionPoolProgressManager()
 
-        let resolvedCloudService: CloudKitProfileService
-        if let override = cloudServiceOverride {
-            resolvedCloudService = override
-        } else {
-            resolvedCloudService = CloudKitProfileService(localStore: resolvedLocalStore)
-        }
-
-        let resolvedAdaptiveEngine: AdaptiveLearningEngine
-        if let override = adaptiveEngineOverride {
-            resolvedAdaptiveEngine = override
-        } else {
-            resolvedAdaptiveEngine = AdaptiveLearningEngine()
-        }
-
-        self.localStore = resolvedLocalStore
-        self.cloudService = resolvedCloudService
-        self.adaptiveEngine = resolvedAdaptiveEngine
+        self.localStore = localStore
+        self.cloudService = cloudService
         self.statsManager = statsManager
         self.examStatisticsManager = examStatisticsManager
-        self.questionPoolProgressManager = questionPoolProgressManager ?? DefaultQuestionPoolProgressManager()
-
-        // Initialize services with default implementations if not provided
-        self.mergeService = ProfileMergeService(adaptiveEngine: resolvedAdaptiveEngine)
-        
-        let resolvedAvatarManager = ProfileAvatarManager(localStore: resolvedLocalStore)
-        let resolvedAvatarService = avatarService ?? DefaultProfileAvatarService(avatarManager: resolvedAvatarManager)
-        
-        let resolvedProgressBuilder = ProfileProgressBuilder(
-            adaptiveEngine: resolvedAdaptiveEngine,
+        self.questionPoolProgressManager = questionPoolProgressManager
+        self.avatarService = avatarService ?? DefaultProfileAvatarService(
+            avatarManager: ProfileAvatarManager(localStore: localStore)
+        )
+        self.syncService = ProgressSyncService(
+            cloudService: cloudService,
+            stateStore: syncStateStore ?? LocalSyncStateStore(),
             statsManager: statsManager,
-            examStatisticsManager: examStatisticsManager
+            examStatisticsManager: examStatisticsManager,
+            questionPoolProgressManager: questionPoolProgressManager,
+            achievementManager: achievementManager
         )
-        let resolvedProgressService = progressService ?? DefaultProfileProgressService(progressBuilder: resolvedProgressBuilder)
-        
-        let resolvedSyncService = ProfileSyncService(
-            cloudService: resolvedCloudService,
-            localStore: resolvedLocalStore,
-            mergeService: mergeService,
-            avatarManager: resolvedAvatarManager
-        )
-        let resolvedSyncServiceWrapper = syncService ?? DefaultProfileSyncService(syncService: resolvedSyncService)
-        
-        let resolvedAuthService = authService ?? DefaultProfileAuthService(authService: ProfileAuthService())
-        
-        // Assign services to properties
-        self.avatarService = resolvedAvatarService
-        self.progressService = resolvedProgressService
-        self.syncService = resolvedSyncServiceWrapper
-        self.authService = resolvedAuthService
 
-        if let storedProfile = resolvedLocalStore.loadCurrentProfile() {
-            profile = storedProfile
-        } else {
-            profile = resolvedLocalStore.loadOrCreateAnonymousProfile()
-        }
-
+        profile = localStore.loadOrCreateProfile()
         // Валидация аватара при загрузке профиля
         self.avatarService.validateAvatar(profile: &profile)
         localStore.saveProfile(profile)
 
-        self.progressService.rebuildProgressFromLocalStats(profile: &profile)
-        localStore.saveProfile(profile)
+        syncService.profileProvider = self
+        startObserving()
+    }
 
-        if profile.authMethod != .anonymous {
-            Task {
-                await refreshFromCloud(mergeStrategy: .newest)
-            }
+    nonisolated deinit {
+        observationTasks.forEach { $0.cancel() }
+        if let localChangeObserver {
+            NotificationCenter.default.removeObserver(localChangeObserver)
         }
     }
 
-    // MARK: - Sign In with Apple
-    func prepareSignInRequest(_ request: ASAuthorizationAppleIDRequest) {
-        authService.prepareSignInRequest(request)
-    }
-
-    func handleSignInResult(_ result: Result<ASAuthorization, Error>) {
-        authService.handleSignInResult(
-            result,
-            onSuccess: { [weak self] credential in
-                await self?.handleAppleCredential(credential)
-            },
-            onFailure: { [weak self] message in
-                self?.errorMessage = message
-                self?.syncState = .failed(message)
+    private func startObserving() {
+        guard !Self.isUnitTestHost else { return }
+        // Сброс должен начать новое поколение до следующего снимка, поэтому наблюдатель синхронный
+        localChangeObserver = NotificationCenter.default.addObserver(
+            forName: .syncedDataDidChange,
+            object: nil,
+            queue: nil
+        ) { [weak self] notification in
+            let resetSections = SyncedDataChange.resetSections(from: notification)
+            MainActor.assumeIsolated {
+                self?.handleLocalChange(resetSections: resetSections)
             }
-        )
+        }
+
+        observationTasks = [
+            Task { [weak self] in
+                await self?.updateICloudStatus()
+                // Вход в iCloud, выход или смена аккаунта в Настройках
+                for await _ in NotificationCenter.default.notifications(named: .CKAccountChanged) {
+                    await self?.updateICloudStatus()
+                }
+            },
+            Task { [weak self] in
+                // Изменения с других устройств подтягиваются при возвращении в приложение
+                for await _ in NotificationCenter.default.notifications(named: UIApplication.didBecomeActiveNotification) {
+                    await self?.syncNow()
+                }
+            }
+        ]
     }
 
-    func signOut() {
-        guard isSignedIn else { return }
-        let signedInProfileId = profile.id
-        
-        // Сохраняем данные из ProfileProgress в локальные StatsManager перед выходом
-        progressService.syncProgressToLocalStats(profile: profile)
-        
-        // Переключаемся на анонимный профиль
-        profile = localStore.loadOrCreateAnonymousProfile()
-        
-        // Восстанавливаем локальные данные в новый анонимный профиль
-        progressService.rebuildProgressFromLocalStats(profile: &profile)
-        
-        localStore.saveProfile(profile)
-        syncState = .idle
-        errorMessage = nil
-        localStore.deleteAvatar(for: signedInProfileId)
+    // MARK: - iCloud
+    /// Проверяет вход в iCloud; когда синхронизация становится доступной, сразу синхронизирует
+    func updateICloudStatus() async {
+        let wasSyncEnabled = isSyncEnabled
+        do {
+            iCloudStatus = ICloudStatus(try await cloudService.accountStatus())
+        } catch {
+            AppLogger.warning("Failed to get iCloud account status: \(error.localizedDescription)", category: AppLogger.data)
+            iCloudStatus = .unavailable
+        }
+
+        if isSyncEnabled && !wasSyncEnabled {
+            await syncNow()
+        } else if !isSyncEnabled {
+            scheduledSync?.cancel()
+            syncState = .idle
+            errorMessage = nil
+        }
     }
 
-    /// Удаление аккаунта: запись профиля в iCloud, все локальные профили и фото, статистика и прогресс изучения вопросов.
-    /// Если запись в iCloud удалить не удалось, бросает ошибку и локальные данные не трогает.
-    func deleteAccount() async throws {
-        guard isSignedIn else { return }
+    // MARK: - Sync
+    /// Синхронизирует сейчас; запрос во время синхронизации выполнится сразу после неё
+    func syncNow() async {
+        guard isSyncEnabled else { return }
+        guard !isSyncRunning else {
+            needsAnotherSync = true
+            return
+        }
+
+        isSyncRunning = true
+        defer { isSyncRunning = false }
+        repeat {
+            needsAnotherSync = false
+            syncState = .syncing
+            do {
+                try await syncService.sync()
+                profile.metadata.lastSyncedAt = Date()
+                localStore.saveProfile(profile)
+                syncState = .idle
+                errorMessage = nil
+            } catch {
+                let message = ProfileErrorHandler.userFriendlyErrorMessage(from: error)
+                syncState = .failed(message)
+                errorMessage = message
+                return
+            }
+        } while needsAnotherSync && isSyncEnabled
+    }
+
+    private func scheduleSync() {
+        guard isSyncEnabled else { return }
+        scheduledSync?.cancel()
+        scheduledSync = Task { [weak self, syncDebounce] in
+            try? await Task.sleep(for: syncDebounce)
+            guard !Task.isCancelled else { return }
+            await self?.syncNow()
+        }
+    }
+
+    private func handleLocalChange(resetSections: [SyncSection]) {
+        if !resetSections.isEmpty {
+            syncService.startNewEpoch(for: resetSections)
+        }
+        scheduleSync()
+    }
+
+    private func waitForRunningSync() async {
+        scheduledSync?.cancel()
+        while isSyncRunning {
+            try? await Task.sleep(for: .milliseconds(100))
+        }
+    }
+
+    // MARK: - Data
+    /// Удаление всех данных: в iCloud и на устройстве (имя, фото, статистика, ошибки, прогресс, достижения).
+    /// Другие устройства удалят данные при своей синхронизации. Синхронизация остаётся включённой.
+    /// Если iCloud временно недоступен или запись не удалось сохранить, бросает ошибку и ничего не удаляет.
+    func deleteAllData() async throws {
         isLoading = true
         defer { isLoading = false }
+        await waitForRunningSync()
 
-        // Отложенная синхронизация не должна заново создать запись после удаления
-        syncService.cancelSync()
-        try await cloudService.deleteProfile(with: profile.id)
-
-        localStore.deleteAllProfiles()
-        // Сначала переключаемся на анонимный профиль: сброс статистики ниже вызывает
-        // syncStatsReset → scheduleSync, а для анонимного профиля синхронизация с iCloud не запускается
-        profile = localStore.loadOrCreateAnonymousProfile()
-        syncState = .idle
-        errorMessage = nil
-        lastRecommendations = []
-
-        statsManager.resetStats()
-        examStatisticsManager.resetStatistics()
-        questionPoolProgressManager.reset(version: 1)
-        questionPoolProgressManager.setReviewMode(false, version: 1)
-
-        progressService.rebuildProgressFromLocalStats(profile: &profile)
-        localStore.saveProfile(profile)
-    }
-
-    /// Сброс статистики и отображаемого имени. Фото профиля не затрагивается — для удаления есть отдельная кнопка.
-    func resetProfileData() async {
-        isLoading = true
-        syncService.cancelSync()
-        errorMessage = nil
-
-        statsManager.resetStats()
-        examStatisticsManager.resetStatistics()
-        lastRecommendations = []
-        profile.progress = ProfileProgress()
-        profile.metadata.updatedAt = Date()
-        profile.metadata.lastSyncedAt = nil
-        // Имя и фото не сбрасываем: это сброс статистики, а не профиля
-        progressService.rebuildProgressFromLocalStats(profile: &profile)
-        localStore.saveProfile(profile)
-        
-        // Очищаем прогресс изучения вопросов (usedIds)
-        questionPoolProgressManager.reset(version: 1)
-        questionPoolProgressManager.setReviewMode(false, version: 1)
-
-        if isSignedIn {
-            await performSync()
-        } else {
-            syncState = .idle
+        let includeICloud: Bool
+        switch try await cloudService.accountStatus() {
+        case .available:
+            includeICloud = true
+        case .noAccount, .restricted:
+            // Без входа в iCloud данных там нет
+            includeICloud = false
+        default:
+            throw CloudKitProfileError.iCloudUnavailable
         }
 
-        isLoading = false
+        try await syncService.deleteAllData(includeICloud: includeICloud)
+        profile.metadata.lastSyncedAt = includeICloud ? Date() : nil
+        localStore.saveProfile(profile)
+        syncState = .idle
+        errorMessage = nil
     }
 
+    /// Сброс статистики, ошибок, экзаменов и пройденных вопросов — на этом устройстве и на всех остальных.
+    /// Имя, фото и достижения не меняются.
+    func resetProfileData() async {
+        isLoading = true
+        defer { isLoading = false }
+        await waitForRunningSync()
+        errorMessage = nil
+
+        statsManager.resetStats()
+        examStatisticsManager.resetStatistics()
+        questionPoolProgressManager.reset(version: 1)
+        questionPoolProgressManager.setReviewMode(false, version: 1)
+
+        scheduledSync?.cancel()
+        await syncNow()
+    }
+
+    // MARK: - Name and Photo
     func updateAvatar(with data: Data) async {
         guard avatarService.updateAvatar(profile: &profile, data: data) else {
             return
         }
+        profile.avatarUpdatedAt = .syncTimestamp
         localStore.saveProfile(profile)
-        if isSignedIn {
-            await performSync()
-            // Проверяем статус синхронизации после завершения
-            if case .failed(let message) = syncState {
-                AppLogger.warning("Failed to sync avatar update to CloudKit: \(message)", category: AppLogger.data)
-            }
-        }
+        await syncNow()
     }
 
     func deleteAvatar() async {
         avatarService.deleteAvatar(profile: &profile)
+        profile.avatarUpdatedAt = .syncTimestamp
         localStore.saveProfile(profile)
-        if isSignedIn {
-            await performSync()
-            // Проверяем статус синхронизации после завершения
-            if case .failed(let message) = syncState {
-                AppLogger.warning("Failed to sync avatar deletion to CloudKit: \(message)", category: AppLogger.data)
-            }
-        }
+        await syncNow()
     }
-    
+
     func updateDisplayName(_ newName: String?) async {
         let trimmedName = newName?.trimmingCharacters(in: .whitespacesAndNewlines)
         profile.customDisplayName = trimmedName?.isEmpty == false ? trimmedName : nil
+        profile.displayNameUpdatedAt = .syncTimestamp
         profile.metadata.updatedAt = Date()
         localStore.saveProfile(profile)
-        if isSignedIn {
-            await performSync()
-            // Проверяем статус синхронизации после завершения
-            if case .failed(let message) = syncState {
-                AppLogger.warning("Failed to sync display name update to CloudKit: \(message)", category: AppLogger.data)
-            }
-        }
+        await syncNow()
     }
 
     func validateAvatar() {
         avatarService.validateAvatar(profile: &profile)
         localStore.saveProfile(profile)
     }
-
-    // MARK: - Sync Management
-    func refreshFromCloud(mergeStrategy: ProfileMergeStrategy = .newest) async {
-        let currentProfile = profile
-        await syncService.refreshFromCloud(
-            profile: currentProfile,
-            mergeStrategy: mergeStrategy,
-            onSuccess: { [weak self] updatedProfile in
-                self?.profile = updatedProfile
-                self?.syncState = .idle
-                self?.errorMessage = nil
-            },
-            onError: { [weak self] message in
-                self?.errorMessage = message
-                self?.syncState = .failed(message)
-            }
-        )
-    }
-
-    private func scheduleSync() {
-        let currentProfile = profile
-        syncService.scheduleSync(
-            profile: currentProfile,
-            isSignedIn: isSignedIn
-        ) { [weak self] updatedProfile in
-            guard let self = self, let updated = updatedProfile else { return }
-            self.profile = updated
-        }
-    }
-
-    private func performSync() async {
-        syncState = .syncing
-        let currentProfile = profile
-        await syncService.performSync(
-            profile: currentProfile,
-            onSuccess: { [weak self] updatedProfile in
-                self?.profile = updatedProfile
-                self?.syncState = .idle
-                self?.errorMessage = nil
-            },
-            onError: { [weak self] message in
-                self?.errorMessage = message
-                self?.syncState = .failed(message)
-            }
-        )
-    }
-
-    // MARK: - Private Helpers
-    private func handleAppleCredential(_ credential: ASAuthorizationAppleIDCredential) async {
-        isLoading = true
-        defer { isLoading = false }
-
-        let userId = credential.user
-        
-        var signedInProfile = UserProfile(
-            id: userId,
-            authMethod: .signInWithApple,
-            fullName: formattedName(from: credential.fullName) ?? profile.fullName,
-            customDisplayName: profile.customDisplayName, // Сохраняем пользовательское имя
-            localeIdentifier: Locale.current.identifier,
-            avatarURL: profile.avatarURL,
-            progress: ProfileProgress(),
-            preferences: profile.preferences,
-            metadata: UserProfile.Metadata(
-                createdAt: profile.metadata.createdAt,
-                updatedAt: Date(),
-                lastSyncedAt: nil,
-                lastDeviceIdentifier: UIDeviceIdentifierProvider.currentIdentifier()
-            )
-        )
-        
-        // Временно устанавливаем signedInProfile как текущий профиль для rebuildProgressFromLocalStats
-        let originalProfile = profile
-        profile = signedInProfile
-        progressService.rebuildProgressFromLocalStats(profile: &profile)
-        signedInProfile = profile
-        profile = originalProfile
-
-        do {
-            var hasRemoteProfile = false
-            if let remoteProfile = try await cloudService.fetchProfile(for: userId) {
-                // Объединяем локальные данные (уже в signedInProfile.progress) с удаленными
-                signedInProfile = mergeService.mergeProfile(local: signedInProfile, remote: remoteProfile, strategy: .newest)
-                hasRemoteProfile = true
-            }
-
-            profile = signedInProfile
-            
-            // Если есть удаленный профиль, обновляем локальные данные из объединенного профиля
-            if hasRemoteProfile {
-                progressService.syncProgressToLocalStats(profile: profile)
-            }
-            // Если нет удаленного профиля, локальные данные уже перенесены в ProfileProgress выше
-            
-            // Валидация аватара после входа
-            avatarService.validateAvatar(profile: &profile)
-            localStore.saveProfile(profile)
-            await performSync()
-            errorMessage = nil
-        } catch {
-            let friendlyMessage = ProfileErrorHandler.userFriendlyErrorMessage(from: error)
-            errorMessage = friendlyMessage
-            syncState = .failed(friendlyMessage)
-        }
-    }
-
-    private func formattedName(from components: PersonNameComponents?) -> String? {
-        guard let components else { return nil }
-        let formatter = PersonNameComponentsFormatter()
-        return formatter.string(from: components)
-    }
-    
-    nonisolated deinit {
-        syncService.cancelSync()
-    }
 }
 
-// MARK: - ProfileProgressSyncing Implementation
-extension ProfileManager: ProfileProgressSyncing {
-    func syncStatsUpdate(_ summary: QuizSessionSummary) {
-        lastRecommendations = adaptiveEngine.applyQuizSummary(summary, to: &profile)
-        localStore.saveProfile(profile)
-        scheduleSync()
+// MARK: - SyncProfileProviding
+extension ProfileManager: SyncProfileProviding {
+    var syncDisplayName: Timestamped<String?> {
+        Timestamped(value: profile.customDisplayName, updatedAt: profile.displayNameUpdatedAt)
     }
 
-    func syncStatsReset() {
-        progressService.rebuildProgressFromLocalStats(profile: &profile)
-        localStore.saveProfile(profile)
-        scheduleSync()
-    }
-    
-    func syncStatsDidUpdate() {
-        // Обновляем progress из локальных данных при изменении статистики (например, при исправлении ошибок)
-        progressService.rebuildProgressFromLocalStats(profile: &profile)
-        localStore.saveProfile(profile)
-        scheduleSync()
-    }
-    
-    func syncExamUpdate(_ summary: ExamSessionSummary) {
-        adaptiveEngine.applyExamSummary(summary, to: &profile)
-        localStore.saveProfile(profile)
-        scheduleSync()
+    var syncAvatar: Timestamped<String> {
+        let hash = syncAvatarFileURL.flatMap { AvatarImageProcessor.fingerprint(ofFileAt: $0) } ?? ""
+        return Timestamped(value: hash, updatedAt: profile.avatarUpdatedAt)
     }
 
-    func syncExamReset() {
-        progressService.rebuildProgressFromLocalStats(profile: &profile)
-        localStore.saveProfile(profile)
-        scheduleSync()
+    var syncAvatarFileURL: URL? {
+        guard let url = profile.avatarURL, FileManager.default.fileExists(atPath: url.path) else { return nil }
+        return url
     }
-}
 
-// MARK: - ProfileProgressProviding Implementation
-extension ProfileManager: ProfileProgressProviding {
-    // Уже реализовано через var progress: ProfileProgress { profile.progress }
+    func applySyncedDisplayName(_ displayName: Timestamped<String?>) {
+        profile.customDisplayName = displayName.value
+        profile.displayNameUpdatedAt = displayName.updatedAt
+        localStore.saveProfile(profile)
+    }
+
+    func applySyncedAvatar(_ avatar: Timestamped<String>, data: Data?) {
+        if avatar.value.isEmpty {
+            localStore.deleteAvatar(for: profile.id)
+            profile.avatarURL = nil
+            profile.metadata.updatedAt = Date()
+        } else if let data,
+                  let savedURL = localStore.saveAvatarData(data, for: profile.id, fileExtension: AvatarImageProcessor.fileExtension) {
+            profile.avatarURL = savedURL
+            // Файл перезаписан по тому же пути: дата изменения обновляет картинку на экране
+            profile.metadata.updatedAt = Date()
+        }
+        profile.avatarUpdatedAt = avatar.updatedAt
+        localStore.saveProfile(profile)
+    }
+
+    func clearProfileForSync() {
+        localStore.deleteAvatar(for: profile.id)
+        profile.avatarURL = nil
+        profile.customDisplayName = nil
+        profile.displayNameUpdatedAt = .distantPast
+        profile.avatarUpdatedAt = .distantPast
+        profile.metadata.updatedAt = Date()
+        localStore.saveProfile(profile)
+    }
 }

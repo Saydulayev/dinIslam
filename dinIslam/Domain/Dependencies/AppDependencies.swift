@@ -54,16 +54,13 @@ struct AppDependencies: AppDependenciesProtocol {
         self.questionPoolProgressManager = DefaultQuestionPoolProgressManager(userDefaults: userDefaults)
         
         // Initialize profile manager
+        // Profile manager syncs all of the above with iCloud
         self.profileManager = ProfileManager(
-            adaptiveEngine: adaptiveLearningEngine,
             statsManager: statsManager,
             examStatisticsManager: examStatisticsManager,
+            achievementManager: achievementManager,
             questionPoolProgressManager: questionPoolProgressManager
         )
-        
-        // Set up synchronization: ProfileManager implements ProfileProgressSyncing
-        statsManager.setProfileProgressSyncer(profileManager)
-        examStatisticsManager.setProfileProgressSyncer(profileManager)
         
         // Initialize questions loading (GitHub → cache → bundled)
         EnhancedRemoteQuestionsService.removeLegacyCache(from: userDefaults)
@@ -81,7 +78,7 @@ struct AppDependencies: AppDependenciesProtocol {
         // Initialize use cases
         self.quizUseCase = QuizUseCase(
             questionsRepository: questionsRepository,
-            profileProgressProvider: profileManager, // ProfileManager implements ProfileProgressProviding
+            topicStatsProvider: statsManager,
             questionSelectionStrategy: adaptiveStrategy,
             fallbackStrategy: fallbackStrategy,
             questionPoolProgressManager: questionPoolProgressManager

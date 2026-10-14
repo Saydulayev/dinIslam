@@ -63,6 +63,25 @@ struct DailyProgress: Codable, Equatable {
 
 // MARK: - Decoding
 // Отсутствующее поле получает значение по умолчанию, а не обнуляет серию (см. StoredDataDecoding.swift)
+// MARK: - Sync
+extension DailyProgress {
+    /// Слияние с другим устройством: серия — с устройства, где занимались позже
+    /// (в тот же день — бо́льшая), рекорд и день выполнения цели — наибольшие
+    static func merged(_ lhs: DailyProgress, _ rhs: DailyProgress) -> DailyProgress {
+        let lhsDay = lhs.lastActiveDay ?? .distantPast
+        let rhsDay = rhs.lastActiveDay ?? .distantPast
+        var result: DailyProgress
+        if lhsDay != rhsDay {
+            result = lhsDay > rhsDay ? lhs : rhs
+        } else {
+            result = lhs.currentStreak >= rhs.currentStreak ? lhs : rhs
+        }
+        result.longestStreak = max(lhs.longestStreak, rhs.longestStreak, result.currentStreak)
+        result.lastDailyGoalDay = [lhs.lastDailyGoalDay, rhs.lastDailyGoalDay].compactMap { $0 }.max()
+        return result
+    }
+}
+
 extension DailyProgress {
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)

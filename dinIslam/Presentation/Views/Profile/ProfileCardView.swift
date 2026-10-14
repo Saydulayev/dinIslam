@@ -5,13 +5,11 @@
 //  Created by Saydulayev on 13.11.25.
 //
 
-import AuthenticationServices
 import PhotosUI
 import SwiftUI
 
 struct ProfileCardView: View {
     @Bindable var manager: ProfileManager
-    @Environment(\.achievementManager) private var achievementManager: AchievementManager
     @Binding var avatarPickerItem: PhotosPickerItem?
     @Binding var isEditingDisplayName: Bool
     @Binding var editingDisplayName: String
@@ -20,10 +18,9 @@ struct ProfileCardView: View {
     
     /// Фото читается с диска в фоне, а не в body при каждой перерисовке
     @State private var avatarImage: Image?
-    @State private var showingSignOutConfirmation = false
-    @State private var showingDeleteAccountConfirmation = false
-    @State private var isDeletingAccount = false
-    @State private var showingDeleteAccountError = false
+    @State private var showingDeleteAllDataConfirmation = false
+    @State private var isDeletingAllData = false
+    @State private var showingDeleteAllDataError = false
     
     var body: some View {
         VStack(spacing: DesignTokens.Spacing.xxl) {
@@ -52,7 +49,7 @@ struct ProfileCardView: View {
                             height: DesignTokens.Sizes.avatarSize
                         )
                         .overlay(
-                            Image(systemName: manager.isSignedIn ? "person.crop.circle.fill" : "person.circle.fill")
+                            Image(systemName: "person.crop.circle.fill")
                                 .font(.system(size: DesignTokens.Sizes.iconDisplay))
                                 .foregroundStyle(DesignTokens.Colors.textSecondary)
                         )
@@ -65,38 +62,36 @@ struct ProfileCardView: View {
                 }
                 
                 // Edit button
-                if manager.isSignedIn {
-                    PhotosPicker(selection: $avatarPickerItem, matching: .images) {
-                        ZStack {
-                            Circle()
-                                .fill(DesignTokens.Colors.cardBackground)
-                                .frame(
-                                    width: DesignTokens.Sizes.editButtonSize,
-                                    height: DesignTokens.Sizes.editButtonSize
-                                )
-                                .overlay(
-                                    Circle()
-                                        .strokeBorder(
-                                            DesignTokens.Colors.borderSubtle,
-                                            lineWidth: 1
-                                        )
-                                )
-                                .shadow(
-                                    color: Color.black.opacity(0.3),
-                                    radius: 6,
-                                    x: 0,
-                                    y: 2
-                                )
-                            
-                            Image(systemName: "pencil")
-                                .font(.system(size: DesignTokens.Sizes.editIconSize))
-                                .foregroundStyle(DesignTokens.Colors.textPrimary)
-                        }
-                        .frame(width: 44, height: 44)
-                        .contentShape(Circle())
+                PhotosPicker(selection: $avatarPickerItem, matching: .images) {
+                    ZStack {
+                        Circle()
+                            .fill(DesignTokens.Colors.cardBackground)
+                            .frame(
+                                width: DesignTokens.Sizes.editButtonSize,
+                                height: DesignTokens.Sizes.editButtonSize
+                            )
+                            .overlay(
+                                Circle()
+                                    .strokeBorder(
+                                        DesignTokens.Colors.borderSubtle,
+                                        lineWidth: 1
+                                    )
+                            )
+                            .shadow(
+                                color: Color.black.opacity(0.3),
+                                radius: 6,
+                                x: 0,
+                                y: 2
+                            )
+                        
+                        Image(systemName: "pencil")
+                            .font(.system(size: DesignTokens.Sizes.editIconSize))
+                            .foregroundStyle(DesignTokens.Colors.textPrimary)
                     }
-                    .accessibilityLabel("profile.avatar.change".localized)
+                    .frame(width: 44, height: 44)
+                    .contentShape(Circle())
                 }
+                .accessibilityLabel("profile.avatar.change".localized)
             }
             // Файл перезаписывается по тому же пути, поэтому ключ включает дату изменения профиля
             .task(id: AvatarKey(url: manager.profile.avatarURL, updatedAt: manager.profile.metadata.updatedAt)) {
@@ -121,26 +116,24 @@ struct ProfileCardView: View {
                             .foregroundStyle(DesignTokens.Colors.textPrimary)
                     }
                 
-                    if manager.isSignedIn {
-                        Button(action: {
-                            if isEditingDisplayName {
-                                saveDisplayName()
-                            } else {
-                                let name = manager.editableDisplayName
-                                editingDisplayName = String(name.prefix(DesignTokens.Limits.maxDisplayNameLength))
-                                isEditingDisplayName = true
-                            }
-                        }) {
-                            Image(systemName: isEditingDisplayName ? "checkmark" : "pencil")
-                                .font(.system(size: DesignTokens.Sizes.iconSmall))
-                                .foregroundStyle(DesignTokens.Colors.textSecondary)
-                                .frame(width: 44, height: 44)
-                                .contentShape(Rectangle())
+                    Button(action: {
+                        if isEditingDisplayName {
+                            saveDisplayName()
+                        } else {
+                            let name = manager.editableDisplayName
+                            editingDisplayName = String(name.prefix(DesignTokens.Limits.maxDisplayNameLength))
+                            isEditingDisplayName = true
                         }
-                        .accessibilityLabel(
-                            (isEditingDisplayName ? "accessibility.displayName.save" : "accessibility.displayName.edit").localized
-                        )
+                    }) {
+                        Image(systemName: isEditingDisplayName ? "checkmark" : "pencil")
+                            .font(.system(size: DesignTokens.Sizes.iconSmall))
+                            .foregroundStyle(DesignTokens.Colors.textSecondary)
+                            .frame(width: 44, height: 44)
+                            .contentShape(Rectangle())
                     }
+                    .accessibilityLabel(
+                        (isEditingDisplayName ? "accessibility.displayName.save" : "accessibility.displayName.edit").localized
+                    )
                 }
                 
                 if manager.needsDisplayName && !isEditingDisplayName {
@@ -153,86 +146,53 @@ struct ProfileCardView: View {
             
             // Action buttons
             VStack(spacing: DesignTokens.Spacing.sm) {
-                if manager.isSignedIn {
-                    if hasAvatar {
-                        MinimalButton(
-                            icon: "trash",
-                            title: "profile.avatar.delete".localized,
-                            role: .secondary
-                        ) {
-                            Task { @MainActor [manager] in
-                                await manager.deleteAvatar()
-                            }
+                if hasAvatar {
+                    MinimalButton(
+                        icon: "trash",
+                        title: "profile.avatar.delete".localized,
+                        role: .secondary
+                    ) {
+                        Task { @MainActor [manager] in
+                            await manager.deleteAvatar()
                         }
                     }
-                    
-                    MinimalButton(
-                        icon: "rectangle.portrait.and.arrow.right",
-                        title: "profile.signout".localized,
-                        role: .destructive
-                    ) {
-                        showingSignOutConfirmation = true
-                    }
-                    .disabled(manager.isLoading)
-                    
-                    MinimalButton(
-                        icon: "person.crop.circle.badge.xmark",
-                        title: "profile.deleteAccount".localized,
-                        role: .destructive
-                    ) {
-                        showingDeleteAccountConfirmation = true
-                    }
-                    .disabled(manager.isLoading)
-                    
-                    if isDeletingAccount {
-                        ProgressView()
-                            .tint(DesignTokens.Colors.textSecondary)
-                    }
-                } else {
-                    // Белый стиль: чёрная кнопка сливается с тёмным фоном
-                    SignInWithAppleButton(.signIn) { request in
-                        manager.prepareSignInRequest(request)
-                    } onCompletion: { result in
-                        manager.handleSignInResult(result)
-                    }
-                    .signInWithAppleButtonStyle(.white)
-                    .frame(height: 50)
-                    .overlay(GlowBorder())
-                    .clipShape(RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium))
+                }
+                
+                MinimalButton(
+                    icon: "person.crop.circle.badge.xmark",
+                    title: "profile.deleteAllData".localized,
+                    role: .destructive
+                ) {
+                    showingDeleteAllDataConfirmation = true
+                }
+                .disabled(manager.isLoading)
+                
+                if isDeletingAllData {
+                    ProgressView()
+                        .tint(DesignTokens.Colors.textSecondary)
                 }
             }
         }
         .padding(DesignTokens.Spacing.xxxl)
         .glowBorder(cornerRadius: DesignTokens.CornerRadius.xlarge)
         .alert(
-            "profile.signout.confirm.title".localized,
-            isPresented: $showingSignOutConfirmation
+            "profile.deleteAllData.confirm.title".localized,
+            isPresented: $showingDeleteAllDataConfirmation
         ) {
-            Button("profile.signout.confirm.ok".localized, role: .destructive) {
-                manager.signOut()
+            Button("profile.deleteAllData.confirm.ok".localized, role: .destructive) {
+                deleteAllData()
             }
-            Button("profile.signout.confirm.cancel".localized, role: .cancel) { }
+            Button("profile.deleteAllData.confirm.cancel".localized, role: .cancel) { }
         } message: {
-            Text("profile.signout.confirm.message".localized)
+            Text("profile.deleteAllData.confirm.message".localized)
         }
         .alert(
-            "profile.deleteAccount.confirm.title".localized,
-            isPresented: $showingDeleteAccountConfirmation
+            "profile.deleteAllData.error.title".localized,
+            isPresented: $showingDeleteAllDataError
         ) {
-            Button("profile.deleteAccount.confirm.ok".localized, role: .destructive) {
-                deleteAccount()
-            }
-            Button("profile.deleteAccount.confirm.cancel".localized, role: .cancel) { }
+            Button("profile.deleteAllData.error.ok".localized, role: .cancel) { }
         } message: {
-            Text("profile.deleteAccount.confirm.message".localized)
-        }
-        .alert(
-            "profile.deleteAccount.error.title".localized,
-            isPresented: $showingDeleteAccountError
-        ) {
-            Button("profile.deleteAccount.error.ok".localized, role: .cancel) { }
-        } message: {
-            Text("profile.deleteAccount.error.message".localized)
+            Text("profile.deleteAllData.error.message".localized)
         }
     }
     
@@ -251,16 +211,15 @@ struct ProfileCardView: View {
         )
     }
     
-    private func deleteAccount() {
-        Task { @MainActor [manager, achievementManager] in
-            isDeletingAccount = true
-            defer { isDeletingAccount = false }
+    private func deleteAllData() {
+        Task { @MainActor [manager] in
+            isDeletingAllData = true
+            defer { isDeletingAllData = false }
             do {
-                try await manager.deleteAccount()
-                achievementManager.resetAllAchievements()
+                try await manager.deleteAllData()
             } catch {
-                AppLogger.error("Failed to delete account", error: error, category: AppLogger.data)
-                showingDeleteAccountError = true
+                AppLogger.error("Failed to delete all data", error: error, category: AppLogger.data)
+                showingDeleteAllDataError = true
             }
         }
     }

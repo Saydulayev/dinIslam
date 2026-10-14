@@ -10,7 +10,7 @@ import Foundation
 final class FallbackQuestionSelectionStrategy: QuestionSelectionStrategy {
     func selectQuestions(
         from allQuestions: [Question],
-        progress: ProfileProgress,
+        topicStats: [String: TopicStat],
         usedQuestionIds: Set<String>,
         sessionCount: Int
     ) -> [Question] {
