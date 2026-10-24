@@ -146,7 +146,7 @@ struct StartView: View {
                         }
                     )
                 case .achievements:
-                    AchievementsView()
+                    AchievementsView(examStatisticsManager: model.examStatisticsManager)
                 case .settings:
                     SettingsViewWithDependencies(settingsManager: model.settingsManager)
                 case .profile:

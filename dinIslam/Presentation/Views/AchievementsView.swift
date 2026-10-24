@@ -8,13 +8,27 @@
 import SwiftUI
 
 struct AchievementsView: View {
+    let examStatisticsManager: ExamStatisticsManager
     @Environment(\.achievementManager) private var achievementManager: AchievementManager
     @Environment(\.dismiss) private var dismiss
     @Environment(\.settingsManager) private var settingsManager
     @Environment(\.statsManager) private var statsManager: StatsManager
     @Environment(\.localizationProvider) private var localizationProvider
+    @Environment(\.remoteQuestionsService) private var remoteService: EnhancedRemoteQuestionsService
+    @Environment(\.questionPoolProgressManager) private var questionPoolProgressManager
     @State private var showingResetAlert = false
     @State private var selectedAchievement: Achievement?
+    /// nil, пока банк загружается: прогресс «Ищущего знания» и «Мудрого» не показывается
+    @State private var bankProgress: BankProgress?
+    
+    private var context: AchievementContext {
+        AchievementContext(
+            stats: statsManager.stats,
+            dayStreak: statsManager.dayStreak,
+            bankProgress: bankProgress,
+            examsPassed: examStatisticsManager.statistics.examsPassed
+        )
+    }
     
     private var achievementsList: some View {
         ScrollView {
@@ -22,6 +36,7 @@ struct AchievementsView: View {
                 ForEach(achievementManager.achievements) { achievement in
                     AchievementCard(
                         achievement: achievement,
+                        progress: achievementManager.getAchievementProgress(for: achievement.type, context: context),
                         onTap: { selectedAchievement = achievement }
                     )
                 }
@@ -90,28 +105,31 @@ struct AchievementsView: View {
             Text("achievements.reset.confirm.message".localized)
         }
         .overlay(expandedCardOverlay)
+        .task {
+            // Тот же сервис, что у викторины: свежий кэш используется без запроса в сеть
+            let questions = await remoteService.fetchQuestions(
+                for: settingsManager.settings.language.resolved,
+                manageLoadingState: false
+            )
+            let ids = Set(questions.map(\.id))
+            guard !ids.isEmpty else { return }
+            let stats = questionPoolProgressManager.getProgressStats(total: ids.count, currentQuestionIds: ids, version: 1)
+            bankProgress = BankProgress(studied: stats.used, total: ids.count)
+        }
     }
 }
 
 struct AchievementCard: View {
     let achievement: Achievement
+    /// nil — прогресс пока не известен (банк вопросов загружается)
+    let progress: AchievementProgress?
     let onTap: () -> Void
     @Environment(\.localizationProvider) private var localizationProvider
     @Environment(\.settingsManager) private var settingsManager
-    @Environment(\.achievementManager) private var achievementManager: AchievementManager
-    @Environment(\.statsManager) private var statsManager: StatsManager
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     
     private var isUnlocked: Bool {
         achievement.isUnlocked
-    }
-    
-    private var progress: AchievementProgress {
-        return achievementManager.getAchievementProgress(
-            for: achievement.type,
-            stats: statsManager.stats,
-            dayStreak: statsManager.dayStreak
-        )
     }
     
     private var iconColor: Color {
@@ -184,12 +202,12 @@ struct AchievementCard: View {
                 
                 if isUnlocked, let unlockedDate = achievement.unlockedDate {
                     Text(localizationProvider.localizedString(for: "achievements.unlocked") + " " + 
-                         unlockedDate.formatted(date: .abbreviated, time: .omitted))
+                         unlockedDate.localizedFormatted(date: .abbreviated, time: .omitted))
                     .font(DesignTokens.Typography.label)
                     .foregroundStyle(DesignTokens.Colors.iconGreen)
                     .fontWeight(.medium)
                     .padding(.top, DesignTokens.Spacing.xs)
-                } else {
+                } else if let progress {
                     VStack(alignment: .leading, spacing: DesignTokens.Spacing.xs) {
                         // Прогресс-бар
                         ProgressView(value: progress.progressPercentage)
@@ -272,7 +290,7 @@ struct ExpandedAchievementCard: View {
                     
                     if let unlockedDate = achievement.unlockedDate {
                         Text(localizationProvider.localizedString(for: "achievements.unlocked") + " " + 
-                             unlockedDate.formatted(date: .abbreviated, time: .omitted))
+                             unlockedDate.localizedFormatted(date: .abbreviated, time: .omitted))
                         .font(DesignTokens.Typography.label)
                         .foregroundStyle(DesignTokens.Colors.iconGreen)
                         .fontWeight(.medium)
@@ -361,7 +379,7 @@ struct ExpandedAchievementCard: View {
     
     private func generateShareText() -> String {
         let appName = localizationProvider.localizedString(for: "app.name")
-        let unlockedDate = achievement.unlockedDate?.formatted(date: .abbreviated, time: .omitted) ?? ""
+        let unlockedDate = achievement.unlockedDate?.localizedFormatted(date: .abbreviated, time: .omitted) ?? ""
         
         return """
         🏆 \(achievement.title)
@@ -455,7 +473,7 @@ struct ShareableAchievementCardView: View {
                                     .foregroundStyle(DesignTokens.Colors.iconGreen)
                                 
                                 Text(localizationProvider.localizedString(for: "achievements.unlocked") + " " + 
-                                     unlockedDate.formatted(date: .abbreviated, time: .omitted))
+                                     unlockedDate.localizedFormatted(date: .abbreviated, time: .omitted))
                                 .font(.system(size: 32, weight: .medium))
                                 .foregroundStyle(DesignTokens.Colors.iconGreen)
                             }
@@ -513,7 +531,7 @@ struct ShareableAchievementCardView: View {
 
 #Preview {
     NavigationStack {
-        AchievementsView()
+        AchievementsView(examStatisticsManager: ExamStatisticsManager())
             .environment(\.achievementManager, AchievementManager(notificationManager: NotificationManager()))
             .environment(\.settingsManager, SettingsManager())
             .environment(\.localizationProvider, LocalizationManager())

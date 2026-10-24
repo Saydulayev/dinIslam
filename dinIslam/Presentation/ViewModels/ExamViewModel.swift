@@ -472,9 +472,14 @@ class ExamViewModel {
         // Список «новых» общий с викториной: забираем только открытые сейчас,
         // чтобы они не показались ещё раз после следующей викторины
         achievementChecker.clearNewAchievements()
+        // Экзамен не меняет пройденные вопросы банка: достижения за банк здесь не проверяются
         achievementChecker.checkAchievements(
-            for: statisticsRecorder.stats,
-            dayStreak: statisticsRecorder.dayStreak,
+            AchievementContext(
+                stats: statisticsRecorder.stats,
+                dayStreak: statisticsRecorder.dayStreak,
+                bankProgress: nil,
+                examsPassed: examStatisticsManager.statistics.examsPassed
+            ),
             quizResult: nil
         )
         newAchievements = achievementChecker.newAchievements

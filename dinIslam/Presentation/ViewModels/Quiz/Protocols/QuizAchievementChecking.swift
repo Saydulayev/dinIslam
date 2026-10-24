@@ -10,7 +10,7 @@ import Foundation
 protocol QuizAchievementChecking {
     var newAchievements: [Achievement] { get }
     
-    func checkAchievements(for stats: UserStats, dayStreak: Int, quizResult: QuizResult?)
+    func checkAchievements(_ context: AchievementContext, quizResult: QuizResult?)
     func clearNewAchievements()
 }
 

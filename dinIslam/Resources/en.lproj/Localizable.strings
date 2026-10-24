@@ -183,7 +183,6 @@
 "achievements.singular" = "Achievement";
 "achievements.unlocked" = "Unlocked";
 "achievements.locked" = "Locked";
-"achievements.progress" = "Progress";
 "achievements.newAchievement" = "New Achievement!";
 "achievements.congratulations" = "Congratulations!";
 "achievements.notification.counter" = "%d of %d";
@@ -192,7 +191,7 @@
 "achievements.share.text" = "Achievement unlocked";
 "achievements.reset" = "Reset Achievements";
 "achievements.reset.confirm.title" = "Reset Achievements?";
-"achievements.reset.confirm.message" = "All achievements will be locked, and the counters they are based on will be reset: questions studied, quizzes completed, and perfect scores. Your day streak, correct and incorrect answers, the mistakes list, and question progress will be kept. This action cannot be undone.";
+"achievements.reset.confirm.message" = "All achievements will be locked, and the counters they are based on will be reset: answers counted for Student and Explorer, quizzes completed, and perfect scores. Your day streak, correct and incorrect answers, the mistakes list, and question progress will be kept, so achievements based on them will unlock again after your next session. This action cannot be undone.";
 "achievements.reset.confirm.ok" = "Reset";
 "achievements.reset.confirm.cancel" = "Cancel";
 
@@ -207,58 +206,64 @@
 "achievements.explorer.title" = "Explorer";
 "achievements.perfectionist.title" = "Successful";
 "achievements.legend.title" = "Wise";
+"achievements.examPassed.title" = "Exam Passed";
+"achievements.streakWeek.title" = "Week of Knowledge";
+"achievements.streakMonth.title" = "Unwavering";
+"achievements.mistakesLearned.title" = "Learning from Mistakes";
+"achievements.mistakesMastered.title" = "Patient";
 
 // Achievement Descriptions (Locked)
 "achievements.firstQuiz.description" = "Complete your first quiz";
 "achievements.perfectScore.description" = "Get 100% in any quiz";
 "achievements.speedRunner.description" = "Complete a quiz in under 2 minutes with 80%+ score";
-"achievements.scholar.description" = "Study 100 questions";
+"achievements.scholar.description" = "Answer 100 questions";
 "achievements.dedicated.description" = "Complete 10 quizzes";
-"achievements.master.description" = "Complete 50 quizzes";
+"achievements.master.description" = "Study half of the question bank";
 "achievements.streak.description" = "Study for 5 days in a row";
-"achievements.explorer.description" = "Study 500 questions";
+"achievements.explorer.description" = "Answer 500 questions";
 "achievements.perfectionist.description" = "Get 10 perfect scores";
-"achievements.legend.description" = "Complete 100 quizzes";
+"achievements.legend.description" = "Study the entire question bank";
+"achievements.examPassed.description" = "Pass an exam with 70% or more";
+"achievements.streakWeek.description" = "Study for 7 days in a row";
+"achievements.streakMonth.description" = "Study for 30 days in a row";
+"achievements.mistakesLearned.description" = "Master 10 mistakes in review";
+"achievements.mistakesMastered.description" = "Master 50 mistakes in review";
 
 // Achievement Descriptions (Unlocked)
 "achievements.firstQuiz.description.unlocked" = "You completed your first quiz";
 "achievements.perfectScore.description.unlocked" = "You got 100% in a quiz";
 "achievements.speedRunner.description.unlocked" = "You completed a quiz in under 2 minutes with 80%+ score";
-"achievements.scholar.description.unlocked" = "You studied 100 questions";
+"achievements.scholar.description.unlocked" = "You answered 100 questions";
 "achievements.dedicated.description.unlocked" = "You completed 10 quizzes";
-"achievements.master.description.unlocked" = "You completed 50 quizzes";
+"achievements.master.description.unlocked" = "You studied half of the question bank";
 "achievements.streak.description.unlocked" = "You studied for 5 days in a row";
-"achievements.explorer.description.unlocked" = "You studied 500 questions";
+"achievements.explorer.description.unlocked" = "You answered 500 questions";
 "achievements.perfectionist.description.unlocked" = "You got 10 perfect scores";
-"achievements.legend.description.unlocked" = "You completed 100 quizzes";
+"achievements.legend.description.unlocked" = "You studied the entire question bank";
+"achievements.examPassed.description.unlocked" = "You passed an exam";
+"achievements.streakWeek.description.unlocked" = "You studied for 7 days in a row";
+"achievements.streakMonth.description.unlocked" = "You studied for 30 days in a row";
+"achievements.mistakesLearned.description.unlocked" = "You mastered 10 mistakes";
+"achievements.mistakesMastered.description.unlocked" = "You mastered 50 mistakes";
 
 // Achievement Notifications (Unlocked)
 "achievements.firstQuiz.notification" = "You completed your first quiz! Great start.";
 "achievements.perfectScore.notification" = "Excellent! You got a perfect score.";
 "achievements.speedRunner.notification" = "Incredible speed! You know the material perfectly.";
-"achievements.scholar.notification" = "Great work! You've studied 100 questions.";
+"achievements.scholar.notification" = "Great work! You've answered 100 questions.";
 "achievements.dedicated.notification" = "Impressive dedication! You completed 10 quizzes.";
-"achievements.master.notification" = "Incredible mastery! You completed 50 quizzes.";
+"achievements.master.notification" = "Halfway there! You studied half of the question bank.";
 "achievements.streak.notification" = "Amazing consistency! You've studied for 5 days straight.";
-"achievements.explorer.notification" = "Deep knowledge! You've studied 500 questions.";
+"achievements.explorer.notification" = "Deep knowledge! You've answered 500 questions.";
 "achievements.perfectionist.notification" = "Excellent precision! You got 10 perfect scores.";
-"achievements.legend.notification" = "Legendary achievement! You completed 100 quizzes.";
+"achievements.legend.notification" = "The entire question bank studied — a true achievement!";
+"achievements.examPassed.notification" = "You passed an exam — knowledge put to the test.";
+"achievements.streakWeek.notification" = "A whole week without a break! Keep it up.";
+"achievements.streakMonth.notification" = "A month of study in a row — remarkable consistency!";
+"achievements.mistakesLearned.notification" = "10 mistakes mastered — review pays off.";
+"achievements.mistakesMastered.notification" = "50 mistakes mastered! Patience and effort pay off.";
 
 // Achievement Progress Descriptions - Pluralization
-"achievements.progress.quiz" = "%d quiz";
-"achievements.progress.quiz_other" = "%d quizzes";
-"achievements.progress.perfect" = "%d perfect score";
-"achievements.progress.perfect_other" = "%d perfect scores";
-"achievements.progress.speed" = "%d fast completion";
-"achievements.progress.speed_other" = "%d fast completions";
-"achievements.progress.questions" = "%d question studied";
-"achievements.progress.questions_other" = "%d questions studied";
-"achievements.progress.quizzes" = "%d quiz completed";
-"achievements.progress.quizzes_other" = "%d quizzes completed";
-"achievements.progress.streak" = "%d day in a row";
-"achievements.progress.streak_other" = "%d days in a row";
-"achievements.progress.perfects" = "%d perfect score";
-"achievements.progress.perfects_other" = "%d perfect scores";
 
 // Notifications
 "notification.title" = "Study Time";

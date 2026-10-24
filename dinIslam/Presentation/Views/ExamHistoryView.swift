@@ -69,7 +69,7 @@ struct ExamHistoryRow: View {
                     .foregroundStyle(statusColor)
             }
 
-            Text(record.date.formatted(date: .abbreviated, time: .shortened))
+            Text(record.date.localizedFormatted(date: .abbreviated, time: .shortened))
                 .font(DesignTokens.Typography.label)
                 .foregroundStyle(DesignTokens.Colors.textTertiary)
 

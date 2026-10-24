@@ -291,6 +291,9 @@ final class ExamViewModelTests: XCTestCase {
         XCTAssertEqual(summary.outcomes.map(\.isCorrect), [false, true])
         XCTAssertEqual(summary.correctAnswers, 1)
         XCTAssertEqual(achievements.checkCount, 1)
+        // Сданные экзамены — для достижения «Экзамен сдан»; банк экзамен не меняет
+        XCTAssertNotNil(achievements.lastContext?.examsPassed)
+        XCTAssertNil(achievements.lastContext?.bankProgress)
     }
 
     func testFinish_unansweredQuestionsAreNotRecorded() async {
@@ -358,10 +361,12 @@ private final class SpyStatisticsRecorder: QuizStatisticsRecording {
 private final class SpyAchievementChecker: QuizAchievementChecking {
     private(set) var newAchievements: [Achievement] = []
     private(set) var checkCount = 0
+    private(set) var lastContext: AchievementContext?
     var unlockOnCheck: [Achievement] = []
 
-    func checkAchievements(for stats: UserStats, dayStreak: Int, quizResult: QuizResult?) {
+    func checkAchievements(_ context: AchievementContext, quizResult: QuizResult?) {
         checkCount += 1
+        lastContext = context
         if !unlockOnCheck.isEmpty {
             newAchievements = unlockOnCheck
         }

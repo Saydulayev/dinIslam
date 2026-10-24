@@ -184,7 +184,6 @@
 "achievements.singular" = "Достижение";
 "achievements.unlocked" = "Разблокировано";
 "achievements.locked" = "Заблокировано";
-"achievements.progress" = "Прогресс";
 "achievements.newAchievement" = "Новое достижение!";
 "achievements.congratulations" = "Поздравляем!";
 "achievements.notification.counter" = "%d из %d";
@@ -193,7 +192,7 @@
 "achievements.share.text" = "Достижение разблокировано";
 "achievements.reset" = "Сбросить достижения";
 "achievements.reset.confirm.title" = "Сбросить достижения?";
-"achievements.reset.confirm.message" = "Все достижения будут заблокированы, а счётчики, по которым они выдаются, обнулятся: изученные вопросы, пройденные викторины и идеальные результаты. Серия дней, правильные и неправильные ответы, список ошибок и прогресс изучения вопросов сохранятся. Это действие нельзя отменить.";
+"achievements.reset.confirm.message" = "Все достижения будут заблокированы, а счётчики, по которым они выдаются, обнулятся: ответы для «Ученика» и «Исследователя», пройденные викторины и идеальные результаты. Серия дней, правильные и неправильные ответы, список ошибок и прогресс изучения вопросов сохранятся, поэтому достижения за них откроются снова после следующего занятия. Это действие нельзя отменить.";
 "achievements.reset.confirm.ok" = "Сбросить";
 "achievements.reset.confirm.cancel" = "Отмена";
 
@@ -208,65 +207,64 @@
 "achievements.explorer.title" = "Исследователь";
 "achievements.perfectionist.title" = "Успешный";
 "achievements.legend.title" = "Мудрый";
+"achievements.examPassed.title" = "Экзамен сдан";
+"achievements.streakWeek.title" = "Неделя знаний";
+"achievements.streakMonth.title" = "Стойкий";
+"achievements.mistakesLearned.title" = "Работа над ошибками";
+"achievements.mistakesMastered.title" = "Терпеливый";
 
 // Achievement Descriptions (Locked)
 "achievements.firstQuiz.description" = "Пройдите первую викторину";
 "achievements.perfectScore.description" = "Получите 100% в любой викторине";
 "achievements.speedRunner.description" = "Пройдите викторину менее чем за 2 минуты с результатом 80%+";
-"achievements.scholar.description" = "Изучите 100 вопросов";
+"achievements.scholar.description" = "Ответьте на 100 вопросов";
 "achievements.dedicated.description" = "Пройдите 10 викторин";
-"achievements.master.description" = "Пройдите 50 викторин";
-"achievements.streak.description" = "Изучайте 5 дней подряд";
-"achievements.explorer.description" = "Изучите 500 вопросов";
+"achievements.master.description" = "Изучите половину вопросов банка";
+"achievements.streak.description" = "Занимайтесь 5 дней подряд";
+"achievements.explorer.description" = "Ответьте на 500 вопросов";
 "achievements.perfectionist.description" = "Получите 10 идеальных результатов";
-"achievements.legend.description" = "Пройдите 100 викторин";
+"achievements.legend.description" = "Изучите все вопросы банка";
+"achievements.examPassed.description" = "Сдайте экзамен на 70% и выше";
+"achievements.streakWeek.description" = "Занимайтесь 7 дней подряд";
+"achievements.streakMonth.description" = "Занимайтесь 30 дней подряд";
+"achievements.mistakesLearned.description" = "Выучите 10 ошибок в повторении";
+"achievements.mistakesMastered.description" = "Выучите 50 ошибок в повторении";
 
 // Achievement Descriptions (Unlocked)
 "achievements.firstQuiz.description.unlocked" = "Вы прошли первую викторину";
 "achievements.perfectScore.description.unlocked" = "Вы получили 100% в викторине";
 "achievements.speedRunner.description.unlocked" = "Вы прошли викторину менее чем за 2 минуты с результатом 80%+";
-"achievements.scholar.description.unlocked" = "Вы изучили 100 вопросов";
+"achievements.scholar.description.unlocked" = "Вы ответили на 100 вопросов";
 "achievements.dedicated.description.unlocked" = "Вы прошли 10 викторин";
-"achievements.master.description.unlocked" = "Вы прошли 50 викторин";
-"achievements.streak.description.unlocked" = "Вы изучали 5 дней подряд";
-"achievements.explorer.description.unlocked" = "Вы изучили 500 вопросов";
+"achievements.master.description.unlocked" = "Вы изучили половину вопросов банка";
+"achievements.streak.description.unlocked" = "Вы занимались 5 дней подряд";
+"achievements.explorer.description.unlocked" = "Вы ответили на 500 вопросов";
 "achievements.perfectionist.description.unlocked" = "Вы получили 10 идеальных результатов";
-"achievements.legend.description.unlocked" = "Вы прошли 100 викторин";
+"achievements.legend.description.unlocked" = "Вы изучили все вопросы банка";
+"achievements.examPassed.description.unlocked" = "Вы сдали экзамен";
+"achievements.streakWeek.description.unlocked" = "Вы занимались 7 дней подряд";
+"achievements.streakMonth.description.unlocked" = "Вы занимались 30 дней подряд";
+"achievements.mistakesLearned.description.unlocked" = "Вы выучили 10 ошибок";
+"achievements.mistakesMastered.description.unlocked" = "Вы выучили 50 ошибок";
 
 // Achievement Notifications (Unlocked)
 "achievements.firstQuiz.notification" = "Вы прошли свою первую викторину! Начало положено.";
 "achievements.perfectScore.notification" = "Превосходно! Вы получили идеальный результат.";
 "achievements.speedRunner.notification" = "Невероятная скорость! Вы знаете материал на отлично.";
-"achievements.scholar.notification" = "Отличная работа! Вы изучили 100 вопросов.";
+"achievements.scholar.notification" = "Отличная работа! Вы ответили на 100 вопросов.";
 "achievements.dedicated.notification" = "Впечатляющая преданность! Вы прошли 10 викторин.";
-"achievements.master.notification" = "Невероятное мастерство! Вы прошли 50 викторин.";
+"achievements.master.notification" = "Половина пути! Вы изучили половину вопросов банка.";
 "achievements.streak.notification" = "Удивительное постоянство! Вы учитесь 5 дней подряд.";
-"achievements.explorer.notification" = "Глубокие знания! Вы изучили 500 вопросов.";
+"achievements.explorer.notification" = "Глубокие знания! Вы ответили на 500 вопросов.";
 "achievements.perfectionist.notification" = "Великолепная точность! Вы получили 10 идеальных результатов.";
-"achievements.legend.notification" = "Легендарное достижение! Вы прошли 100 викторин.";
+"achievements.legend.notification" = "Все вопросы банка изучены — настоящее достижение!";
+"achievements.examPassed.notification" = "Вы сдали экзамен — знания проверены на деле.";
+"achievements.streakWeek.notification" = "Целая неделя без перерыва! Так держать.";
+"achievements.streakMonth.notification" = "Месяц занятий подряд — удивительное постоянство!";
+"achievements.mistakesLearned.notification" = "10 ошибок выучено — повторение приносит плоды.";
+"achievements.mistakesMastered.notification" = "50 ошибок выучено! Терпение и труд вознаграждаются.";
 
 // Achievement Progress Descriptions - Pluralization (Russian)
-"achievements.progress.quiz" = "%d викторина";
-"achievements.progress.quiz_2" = "%d викторины";
-"achievements.progress.quiz_5" = "%d викторин";
-"achievements.progress.perfect" = "%d идеальный результат";
-"achievements.progress.perfect_2" = "%d идеальных результата";
-"achievements.progress.perfect_5" = "%d идеальных результатов";
-"achievements.progress.speed" = "%d быстрое прохождение";
-"achievements.progress.speed_2" = "%d быстрых прохождения";
-"achievements.progress.speed_5" = "%d быстрых прохождений";
-"achievements.progress.questions" = "%d вопрос изучен";
-"achievements.progress.questions_2" = "%d вопроса изучено";
-"achievements.progress.questions_5" = "%d вопросов изучено";
-"achievements.progress.quizzes" = "%d викторина завершена";
-"achievements.progress.quizzes_2" = "%d викторины завершено";
-"achievements.progress.quizzes_5" = "%d викторин завершено";
-"achievements.progress.streak" = "%d день подряд";
-"achievements.progress.streak_2" = "%d дня подряд";
-"achievements.progress.streak_5" = "%d дней подряд";
-"achievements.progress.perfects" = "%d идеальный результат";
-"achievements.progress.perfects_2" = "%d идеальных результата";
-"achievements.progress.perfects_5" = "%d идеальных результатов";
 
 // Notifications
 "notification.title" = "Время изучения";

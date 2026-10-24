@@ -15,6 +15,8 @@ protocol QuizUseCaseProtocol {
     func calculateResult(correctAnswers: Int, totalQuestions: Int, timeSpent: TimeInterval) -> QuizResult
     func isBankCompleted(language: String) async throws -> (isCompleted: Bool, totalQuestions: Int, studiedCount: Int)
     func markQuestionsUsed(_ questionIds: [String])
+    /// Изучено вопросов банка, загруженного последним; nil — банк ещё не загружался
+    func bankProgress() -> BankProgress?
 }
 
 class QuizUseCase: QuizUseCaseProtocol {
@@ -24,6 +26,8 @@ class QuizUseCase: QuizUseCaseProtocol {
     private let fallbackStrategy: QuestionSelectionStrategy
     private let questionPoolProgressManager: QuestionPoolProgressManaging
     private let questionPoolVersion = 1
+    /// id вопросов банка, загруженного последним: по ним считается прогресс для достижений
+    private var bankQuestionIds: Set<String>?
     
     init(
         questionsRepository: QuestionsRepositoryProtocol,
@@ -42,7 +46,7 @@ class QuizUseCase: QuizUseCaseProtocol {
     nonisolated static let standardSessionSize = 20
     
     func startQuiz(language: String, sessionSize: Int = QuizUseCase.standardSessionSize) async throws -> [Question] {
-        let allQuestions = try await questionsRepository.loadQuestions(language: language)
+        let allQuestions = try await loadBank(language: language)
         let currentQuestionIds = Set(allQuestions.map { $0.id })
         let used = questionPoolProgressManager.getUsedIds(version: questionPoolVersion)
         let isReviewMode = questionPoolProgressManager.isReviewMode(version: questionPoolVersion)
@@ -128,7 +132,7 @@ class QuizUseCase: QuizUseCaseProtocol {
         guard selected.count < size else { return selected }
         
         let selectedIds = Set(selected.map(\.id))
-        let allQuestions = try await questionsRepository.loadQuestions(language: language)
+        let allQuestions = try await loadBank(language: language)
         let filler = allQuestions.filter { !selectedIds.contains($0.id) }.shuffled()
         selected.append(contentsOf: filler.prefix(size - selected.count))
         return selected
@@ -138,12 +142,28 @@ class QuizUseCase: QuizUseCaseProtocol {
         questionPoolProgressManager.markUsed(questionIds, version: questionPoolVersion)
     }
     
+    func bankProgress() -> BankProgress? {
+        guard let bankQuestionIds else { return nil }
+        let stats = questionPoolProgressManager.getProgressStats(
+            total: bankQuestionIds.count,
+            currentQuestionIds: bankQuestionIds,
+            version: questionPoolVersion
+        )
+        return BankProgress(studied: stats.used, total: bankQuestionIds.count)
+    }
+    
+    private func loadBank(language: String) async throws -> [Question] {
+        let questions = try await questionsRepository.loadQuestions(language: language)
+        bankQuestionIds = Set(questions.map(\.id))
+        return questions
+    }
+    
     func shuffleAnswers(for question: Question) -> Question {
         question.withShuffledAnswers()
     }
     
     func loadAllQuestions(language: String) async throws -> [Question] {
-        return try await questionsRepository.loadQuestions(language: language)
+        return try await loadBank(language: language)
     }
     
     func calculateResult(correctAnswers: Int, totalQuestions: Int, timeSpent: TimeInterval) -> QuizResult {
@@ -157,7 +177,7 @@ class QuizUseCase: QuizUseCaseProtocol {
     }
     
     func isBankCompleted(language: String) async throws -> (isCompleted: Bool, totalQuestions: Int, studiedCount: Int) {
-        let allQuestions = try await questionsRepository.loadQuestions(language: language)
+        let allQuestions = try await loadBank(language: language)
         let currentQuestionIds = Set(allQuestions.map { $0.id })
         let totalQuestions = allQuestions.count
         let isCompleted = questionPoolProgressManager.isBankCompleted(

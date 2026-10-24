@@ -187,17 +187,92 @@ final class StatsManagerReviewTests: XCTestCase {
         )
     }
 
-    /// «Постоянный» выдаётся за 5 дней подряд
-    func testStreakAchievement_usesDayStreak() {
-        let manager = AchievementManager(userDefaults: defaults, notificationManager: NotificationManager())
-        let stats = UserStats()
+    // MARK: - Achievements
 
-        manager.checkAchievements(for: stats, dayStreak: 4)
-        XCTAssertFalse(manager.achievements.first { $0.type == .streak }?.isUnlocked ?? true)
-        XCTAssertEqual(manager.getAchievementProgress(for: .streak, stats: stats, dayStreak: 4).currentProgress, 4)
+    private func makeAchievementManager() -> AchievementManager {
+        AchievementManager(userDefaults: defaults, notificationManager: NotificationManager())
+    }
 
-        manager.checkAchievements(for: UserStats(), dayStreak: 5)
-        XCTAssertTrue(manager.achievements.first { $0.type == .streak }?.isUnlocked ?? false)
+    private func context(
+        stats: UserStats? = nil,
+        dayStreak: Int = 0,
+        bank: BankProgress? = nil,
+        examsPassed: Int? = nil
+    ) -> AchievementContext {
+        AchievementContext(stats: stats ?? UserStats(), dayStreak: dayStreak, bankProgress: bank, examsPassed: examsPassed)
+    }
+
+    private func isUnlocked(_ type: AchievementType, in manager: AchievementManager) -> Bool {
+        manager.achievements.first { $0.type == type }?.isUnlocked ?? false
+    }
+
+    /// «Постоянный», «Неделя знаний» и «Стойкий» — по серии дней: 5, 7 и 30
+    func testStreakAchievements_useDayStreak() {
+        let manager = makeAchievementManager()
+
+        manager.checkAchievements(context(dayStreak: 4))
+        XCTAssertFalse(isUnlocked(.streak, in: manager))
+        XCTAssertEqual(manager.getAchievementProgress(for: .streak, context: context(dayStreak: 4))?.currentProgress, 4)
+
+        manager.checkAchievements(context(dayStreak: 7))
+        XCTAssertTrue(isUnlocked(.streak, in: manager))
+        XCTAssertTrue(isUnlocked(.streakWeek, in: manager))
+        XCTAssertFalse(isUnlocked(.streakMonth, in: manager))
+
+        manager.checkAchievements(context(dayStreak: 30))
+        XCTAssertTrue(isUnlocked(.streakMonth, in: manager))
+    }
+
+    func testMistakeAchievements_useCorrectedMistakes() {
+        let manager = makeAchievementManager()
+        var stats = UserStats()
+        stats.correctedMistakes = 10
+
+        manager.checkAchievements(context(stats: stats))
+        XCTAssertTrue(isUnlocked(.mistakesLearned, in: manager))
+        XCTAssertFalse(isUnlocked(.mistakesMastered, in: manager))
+
+        stats.correctedMistakes = 50
+        manager.checkAchievements(context(stats: stats))
+        XCTAssertTrue(isUnlocked(.mistakesMastered, in: manager))
+    }
+
+    /// «Ищущий знания» — половина банка, «Мудрый» — весь банк; требование растёт вместе с банком
+    func testBankAchievements_followBankSize() {
+        let manager = makeAchievementManager()
+
+        manager.checkAchievements(context(bank: BankProgress(studied: 363, total: 727)))
+        XCTAssertFalse(isUnlocked(.master, in: manager))
+        XCTAssertEqual(manager.getAchievementProgress(for: .master, context: context(bank: BankProgress(studied: 363, total: 727)))?.requirement, 364)
+
+        manager.checkAchievements(context(bank: BankProgress(studied: 364, total: 727)))
+        XCTAssertTrue(isUnlocked(.master, in: manager))
+        XCTAssertFalse(isUnlocked(.legend, in: manager))
+
+        manager.checkAchievements(context(bank: BankProgress(studied: 727, total: 727)))
+        XCTAssertTrue(isUnlocked(.legend, in: manager))
+    }
+
+    /// Неизвестный банк (экзамен) и неизвестные экзамены (викторина) достижения не открывают
+    func testUnknownData_doesNotUnlock() {
+        let manager = makeAchievementManager()
+
+        manager.checkAchievements(context(bank: nil, examsPassed: nil))
+
+        XCTAssertFalse(isUnlocked(.master, in: manager))
+        XCTAssertFalse(isUnlocked(.legend, in: manager))
+        XCTAssertFalse(isUnlocked(.examPassed, in: manager))
+        XCTAssertNil(manager.getAchievementProgress(for: .legend, context: context(bank: nil)))
+    }
+
+    func testExamPassedAchievement() {
+        let manager = makeAchievementManager()
+
+        manager.checkAchievements(context(examsPassed: 0))
+        XCTAssertFalse(isUnlocked(.examPassed, in: manager))
+
+        manager.checkAchievements(context(examsPassed: 1))
+        XCTAssertTrue(isUnlocked(.examPassed, in: manager))
     }
 
     func testRefreshCurrentDate_keepsValuesForCurrentDay() {

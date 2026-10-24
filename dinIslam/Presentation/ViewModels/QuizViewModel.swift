@@ -300,14 +300,11 @@ class QuizViewModel {
             )
             
             // Достижения за результат сессии (идеальный, быстрый) — только за пройденную до конца викторину
-            achievementChecker.checkAchievements(
-                for: statisticsRecorder.stats,
-                dayStreak: statisticsRecorder.dayStreak,
-                quizResult: isComplete ? result : nil
-            )
-            
             // Неотвеченные вопросы остаются в пуле и попадутся снова
             quizUseCase.markQuestionsUsed(sessionQuestions.map(\.id))
+            
+            // После отметки пройденных: «Ищущий знания» и «Мудрый» считаются по изученной части банка
+            achievementChecker.checkAchievements(achievementContext(), quizResult: isComplete ? result : nil)
         }
         
         state = .completed(.finished)
@@ -413,11 +410,7 @@ class QuizViewModel {
         let reviewSummary = statisticsRecorder.recordReviewAnswers(questionResults)
         // Повторение тоже продлевает серию дней — «Постоянный» может открыться и здесь
         if !questionResults.isEmpty {
-            achievementChecker.checkAchievements(
-                for: statisticsRecorder.stats,
-                dayStreak: statisticsRecorder.dayStreak,
-                quizResult: nil
-            )
+            achievementChecker.checkAchievements(achievementContext(), quizResult: nil)
         }
         let outcomes = questions.compactMap { question -> QuizQuestionOutcome? in
             guard let isCorrect = questionResults[question.id] else { return nil }
@@ -443,6 +436,16 @@ class QuizViewModel {
     }
     
     // MARK: - Achievement Methods
+    /// Экзамены сдаются в другом экране: достижение за экзамен здесь не проверяется
+    private func achievementContext() -> AchievementContext {
+        AchievementContext(
+            stats: statisticsRecorder.stats,
+            dayStreak: statisticsRecorder.dayStreak,
+            bankProgress: quizUseCase.bankProgress(),
+            examsPassed: nil
+        )
+    }
+    
     func clearNewAchievements() {
         achievementChecker.clearNewAchievements()
     }

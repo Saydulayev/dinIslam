@@ -51,13 +51,12 @@ class AchievementManager: AchievementManaging {
     
     // MARK: - Public Methods
     
-    /// `dayStreak` — серия дней с занятиями на сегодня (StatsManager.dayStreak)
-    func checkAchievements(for stats: UserStats, dayStreak: Int, quizResult: QuizResult? = nil) {
+    func checkAchievements(_ context: AchievementContext, quizResult: QuizResult? = nil) {
         var newlyUnlocked: [Achievement] = []
         
         for achievementType in AchievementType.allCases {
             if let achievement = achievements.first(where: { $0.type == achievementType && !$0.isUnlocked }) {
-                if shouldUnlockAchievement(achievement, stats: stats, dayStreak: dayStreak, quizResult: quizResult) {
+                if shouldUnlockAchievement(achievement, context: context, quizResult: quizResult) {
                     let unlockedAchievement = Achievement(
                         id: achievement.id,
                         title: achievement.title,
@@ -92,9 +91,12 @@ class AchievementManager: AchievementManaging {
         }
     }
     
-    func getAchievementProgress(for type: AchievementType, stats: UserStats, dayStreak: Int) -> AchievementProgress {
-        let requirement = getRequirement(for: type)
-        let currentProgress = getCurrentProgress(for: type, stats: stats, dayStreak: dayStreak)
+    /// nil — прогресс не известен (размер банка ещё не загружен)
+    func getAchievementProgress(for type: AchievementType, context: AchievementContext) -> AchievementProgress? {
+        guard let requirement = getRequirement(for: type, bankProgress: context.bankProgress),
+              let currentProgress = getCurrentProgress(for: type, context: context) else {
+            return nil
+        }
         
         return AchievementProgress(
             achievementType: type,
@@ -164,105 +166,41 @@ class AchievementManager: AchievementManaging {
     
     // MARK: - Private Methods
     
+    /// Порядок — как в списке на экране. `requirement` для «Ищущего знания» и «Мудрого» — 0:
+    /// их требование зависит от размера банка и считается в getRequirement
     private func createDefaultAchievements() -> [Achievement] {
-        return [
-            Achievement(
-                id: "first_quiz",
-                title: AchievementType.firstQuiz.title(using: localizationProvider),
-                description: AchievementType.firstQuiz.description(using: localizationProvider),
-                icon: "play.circle.fill",
-                color: .blue,
-                type: .firstQuiz,
-                requirement: 1
-            ),
-            Achievement(
-                id: "perfect_score",
-                title: AchievementType.perfectScore.title(using: localizationProvider),
-                description: AchievementType.perfectScore.description(using: localizationProvider),
-                icon: "star.fill",
-                color: .yellow,
-                type: .perfectScore,
-                requirement: 1
-            ),
-            Achievement(
-                id: "speed_runner",
-                title: AchievementType.speedRunner.title(using: localizationProvider),
-                description: AchievementType.speedRunner.description(using: localizationProvider),
-                icon: "timer",
-                color: .orange,
-                type: .speedRunner,
-                requirement: 1
-            ),
-            Achievement(
-                id: "scholar",
-                title: AchievementType.scholar.title(using: localizationProvider),
-                description: AchievementType.scholar.description(using: localizationProvider),
-                icon: "book.fill",
-                color: .purple,
-                type: .scholar,
-                requirement: 100
-            ),
-            Achievement(
-                id: "dedicated",
-                title: AchievementType.dedicated.title(using: localizationProvider),
-                description: AchievementType.dedicated.description(using: localizationProvider),
-                icon: "flame.fill",
-                color: .red,
-                type: .dedicated,
-                requirement: 10
-            ),
-            Achievement(
-                id: "master",
-                title: AchievementType.master.title(using: localizationProvider),
-                description: AchievementType.master.description(using: localizationProvider),
-                icon: "crown.fill",
-                color: .yellow,
-                type: .master,
-                requirement: 50
-            ),
-            Achievement(
-                id: "streak",
-                title: AchievementType.streak.title(using: localizationProvider),
-                description: AchievementType.streak.description(using: localizationProvider),
-                icon: "bolt.fill",
-                color: .cyan,
-                type: .streak,
-                requirement: 5
-            ),
-            Achievement(
-                id: "explorer",
-                title: AchievementType.explorer.title(using: localizationProvider),
-                description: AchievementType.explorer.description(using: localizationProvider),
-                icon: "globe",
-                color: .green,
-                type: .explorer,
-                requirement: 500
-            ),
-            Achievement(
-                id: "perfectionist",
-                title: AchievementType.perfectionist.title(using: localizationProvider),
-                description: AchievementType.perfectionist.description(using: localizationProvider),
-                icon: "diamond.fill",
-                color: .pink,
-                type: .perfectionist,
-                requirement: 10
-            ),
-            Achievement(
-                id: "legend",
-                title: AchievementType.legend.title(using: localizationProvider),
-                description: AchievementType.legend.description(using: localizationProvider),
-                icon: "trophy.fill",
-                color: .indigo,
-                type: .legend,
-                requirement: 100
-            )
+        let definitions: [(type: AchievementType, icon: String, color: Color, requirement: Int)] = [
+            (.firstQuiz, "play.circle.fill", .blue, 1),
+            (.examPassed, "graduationcap.fill", .purple, 1),
+            (.perfectScore, "star.fill", .yellow, 1),
+            (.speedRunner, "timer", .orange, 1),
+            (.scholar, "book.fill", .purple, 100),
+            (.dedicated, "flame.fill", .red, 10),
+            (.streak, "bolt.fill", .cyan, 5),
+            (.streakWeek, "calendar", .orange, 7),
+            (.streakMonth, "calendar.badge.checkmark", .red, 30),
+            (.mistakesLearned, "arrow.triangle.2.circlepath", .green, 10),
+            (.mistakesMastered, "checkmark.seal.fill", .cyan, 50),
+            (.explorer, "globe", .green, 500),
+            (.perfectionist, "diamond.fill", .pink, 10),
+            (.master, "crown.fill", .yellow, 0),
+            (.legend, "trophy.fill", .indigo, 0)
         ]
+        return definitions.map { definition in
+            Achievement(
+                id: definition.type.rawValue,
+                title: definition.type.title(using: localizationProvider),
+                description: definition.type.description(using: localizationProvider),
+                icon: definition.icon,
+                color: definition.color,
+                type: definition.type,
+                requirement: definition.requirement
+            )
+        }
     }
     
-    private func shouldUnlockAchievement(_ achievement: Achievement, stats: UserStats, dayStreak: Int, quizResult: QuizResult?) -> Bool {
+    private func shouldUnlockAchievement(_ achievement: Achievement, context: AchievementContext, quizResult: QuizResult?) -> Bool {
         switch achievement.type {
-        case .firstQuiz:
-            return stats.totalQuizzesCompleted >= 1
         case .perfectScore:
             // Используем >= 99.99 для учета погрешности округления при расчете процента
             return (quizResult?.percentage ?? 0) >= 99.99
@@ -270,57 +208,67 @@ class AchievementManager: AchievementManaging {
             // Проверяем, что викторина завершена менее чем за 2 минуты И с минимум 80% правильных ответов
             guard let result = quizResult else { return false }
             return result.timeSpent < 120 && result.percentage >= 80.0
-        case .scholar:
-            return stats.totalQuestionsStudied >= 100
-        case .dedicated:
-            return stats.totalQuizzesCompleted >= 10
-        case .master:
-            return stats.totalQuizzesCompleted >= 50
-        case .streak:
-            // Серия дней с занятиями, как на главном экране
-            return dayStreak >= 5
-        case .explorer:
-            return stats.totalQuestionsStudied >= 500
-        case .perfectionist:
-            return stats.perfectScores >= 10
-        case .legend:
-            return stats.totalQuizzesCompleted >= 100
+        default:
+            guard let requirement = getRequirement(for: achievement.type, bankProgress: context.bankProgress),
+                  let progress = getCurrentProgress(for: achievement.type, context: context),
+                  requirement > 0 else {
+                return false
+            }
+            return progress >= requirement
         }
     }
     
-    private func getRequirement(for type: AchievementType) -> Int {
+    /// Требование: «Ищущий знания» — половина банка, «Мудрый» — весь банк
+    private func getRequirement(for type: AchievementType, bankProgress: BankProgress?) -> Int? {
         switch type {
-        case .firstQuiz, .perfectScore, .speedRunner:
+        case .firstQuiz, .examPassed, .perfectScore, .speedRunner:
             return 1
         case .scholar:
             return 100
         case .dedicated:
             return 10
-        case .master:
-            return 50
         case .streak:
             return 5
+        case .streakWeek:
+            return 7
+        case .streakMonth:
+            return 30
+        case .mistakesLearned:
+            return 10
+        case .mistakesMastered:
+            return 50
         case .explorer:
             return 500
         case .perfectionist:
             return 10
+        case .master:
+            return bankProgress.map { ($0.total + 1) / 2 }
         case .legend:
-            return 100
+            return bankProgress?.total
         }
     }
     
-    private func getCurrentProgress(for type: AchievementType, stats: UserStats, dayStreak: Int) -> Int {
+    private func getCurrentProgress(for type: AchievementType, context: AchievementContext) -> Int? {
+        let stats = context.stats
         switch type {
-        case .firstQuiz, .perfectScore, .speedRunner:
+        case .perfectScore, .speedRunner:
             return 0 // These are checked differently
+        case .firstQuiz, .dedicated:
+            return stats.totalQuizzesCompleted
+        case .examPassed:
+            return context.examsPassed
         case .scholar, .explorer:
             return stats.totalQuestionsStudied
-        case .dedicated, .master, .legend:
-            return stats.totalQuizzesCompleted
-        case .streak:
-            return dayStreak
+        case .streak, .streakWeek, .streakMonth:
+            // Серия дней с занятиями, как на главном экране
+            return context.dayStreak
+        case .mistakesLearned, .mistakesMastered:
+            // Ошибки, прошедшие все этапы повторения
+            return stats.correctedMistakes
         case .perfectionist:
             return stats.perfectScores
+        case .master, .legend:
+            return context.bankProgress?.studied
         }
     }
     

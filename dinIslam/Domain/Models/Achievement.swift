@@ -116,143 +116,73 @@ extension CodableAchievement {
 // MARK: - Achievement Types
 enum AchievementType: String, Codable, CaseIterable {
     case firstQuiz = "first_quiz"
+    case examPassed = "exam_passed"
     case perfectScore = "perfect_score"
     case speedRunner = "speed_runner"
     case scholar = "scholar"
     case dedicated = "dedicated"
     case master = "master"
     case streak = "streak"
+    case streakWeek = "streak_7"
+    case streakMonth = "streak_30"
     case explorer = "explorer"
     case perfectionist = "perfectionist"
+    case mistakesLearned = "mistakes_10"
+    case mistakesMastered = "mistakes_50"
     case legend = "legend"
     
-    // MARK: Dependency-injected helpers (preferred)
-    func title(using localization: LocalizationProviding) -> String {
+    /// Часть ключа строк: `achievements.<key>.title` и т. д.
+    private var localizationKey: String {
         switch self {
-        case .firstQuiz:
-            return localization.localizedString(for: "achievements.firstQuiz.title")
-        case .perfectScore:
-            return localization.localizedString(for: "achievements.perfectScore.title")
-        case .speedRunner:
-            return localization.localizedString(for: "achievements.speedRunner.title")
-        case .scholar:
-            return localization.localizedString(for: "achievements.scholar.title")
-        case .dedicated:
-            return localization.localizedString(for: "achievements.dedicated.title")
-        case .master:
-            return localization.localizedString(for: "achievements.master.title")
-        case .streak:
-            return localization.localizedString(for: "achievements.streak.title")
-        case .explorer:
-            return localization.localizedString(for: "achievements.explorer.title")
-        case .perfectionist:
-            return localization.localizedString(for: "achievements.perfectionist.title")
-        case .legend:
-            return localization.localizedString(for: "achievements.legend.title")
+        case .firstQuiz: return "firstQuiz"
+        case .examPassed: return "examPassed"
+        case .perfectScore: return "perfectScore"
+        case .speedRunner: return "speedRunner"
+        case .scholar: return "scholar"
+        case .dedicated: return "dedicated"
+        case .master: return "master"
+        case .streak: return "streak"
+        case .streakWeek: return "streakWeek"
+        case .streakMonth: return "streakMonth"
+        case .explorer: return "explorer"
+        case .perfectionist: return "perfectionist"
+        case .mistakesLearned: return "mistakesLearned"
+        case .mistakesMastered: return "mistakesMastered"
+        case .legend: return "legend"
         }
+    }
+    
+    func title(using localization: LocalizationProviding) -> String {
+        localization.localizedString(for: "achievements.\(localizationKey).title")
     }
     
     func description(using localization: LocalizationProviding) -> String {
-        switch self {
-        case .firstQuiz:
-            return localization.localizedString(for: "achievements.firstQuiz.description")
-        case .perfectScore:
-            return localization.localizedString(for: "achievements.perfectScore.description")
-        case .speedRunner:
-            return localization.localizedString(for: "achievements.speedRunner.description")
-        case .scholar:
-            return localization.localizedString(for: "achievements.scholar.description")
-        case .dedicated:
-            return localization.localizedString(for: "achievements.dedicated.description")
-        case .master:
-            return localization.localizedString(for: "achievements.master.description")
-        case .streak:
-            return localization.localizedString(for: "achievements.streak.description")
-        case .explorer:
-            return localization.localizedString(for: "achievements.explorer.description")
-        case .perfectionist:
-            return localization.localizedString(for: "achievements.perfectionist.description")
-        case .legend:
-            return localization.localizedString(for: "achievements.legend.description")
-        }
+        localization.localizedString(for: "achievements.\(localizationKey).description")
     }
     
     func unlockedDescription(using localization: LocalizationProviding) -> String {
-        switch self {
-        case .firstQuiz:
-            return localization.localizedString(for: "achievements.firstQuiz.description.unlocked")
-        case .perfectScore:
-            return localization.localizedString(for: "achievements.perfectScore.description.unlocked")
-        case .speedRunner:
-            return localization.localizedString(for: "achievements.speedRunner.description.unlocked")
-        case .scholar:
-            return localization.localizedString(for: "achievements.scholar.description.unlocked")
-        case .dedicated:
-            return localization.localizedString(for: "achievements.dedicated.description.unlocked")
-        case .master:
-            return localization.localizedString(for: "achievements.master.description.unlocked")
-        case .streak:
-            return localization.localizedString(for: "achievements.streak.description.unlocked")
-        case .explorer:
-            return localization.localizedString(for: "achievements.explorer.description.unlocked")
-        case .perfectionist:
-            return localization.localizedString(for: "achievements.perfectionist.description.unlocked")
-        case .legend:
-            return localization.localizedString(for: "achievements.legend.description.unlocked")
-        }
+        localization.localizedString(for: "achievements.\(localizationKey).description.unlocked")
     }
     
     func notification(using localization: LocalizationProviding) -> String {
-        switch self {
-        case .firstQuiz:
-            return localization.localizedString(for: "achievements.firstQuiz.notification")
-        case .perfectScore:
-            return localization.localizedString(for: "achievements.perfectScore.notification")
-        case .speedRunner:
-            return localization.localizedString(for: "achievements.speedRunner.notification")
-        case .scholar:
-            return localization.localizedString(for: "achievements.scholar.notification")
-        case .dedicated:
-            return localization.localizedString(for: "achievements.dedicated.notification")
-        case .master:
-            return localization.localizedString(for: "achievements.master.notification")
-        case .streak:
-            return localization.localizedString(for: "achievements.streak.notification")
-        case .explorer:
-            return localization.localizedString(for: "achievements.explorer.notification")
-        case .perfectionist:
-            return localization.localizedString(for: "achievements.perfectionist.notification")
-        case .legend:
-            return localization.localizedString(for: "achievements.legend.notification")
-        }
+        localization.localizedString(for: "achievements.\(localizationKey).notification")
     }
-    
-    // MARK: Backward-compatible computed properties (deprecated)
-    // These forward to GlobalLocalizationProvider.instance to avoid using LocalizationManager.shared
-    // and to silence the warnings while you migrate call sites to the DI-based helpers above.
-    @available(*, deprecated, message: "Use title(using:) with a LocalizationProviding instead")
-    var localizedTitle: String {
-        let provider: LocalizationProviding = GlobalLocalizationProvider.instance
-        return self.title(using: provider)
-    }
-    
-    @available(*, deprecated, message: "Use description(using:) with a LocalizationProviding instead")
-    var localizedDescription: String {
-        let provider: LocalizationProviding = GlobalLocalizationProvider.instance
-        return self.description(using: provider)
-    }
-    
-    @available(*, deprecated, message: "Use unlockedDescription(using:) with a LocalizationProviding instead")
-    var localizedUnlockedDescription: String {
-        let provider: LocalizationProviding = GlobalLocalizationProvider.instance
-        return self.unlockedDescription(using: provider)
-    }
-    
-    @available(*, deprecated, message: "Use notification(using:) with a LocalizationProviding instead")
-    var localizedNotification: String {
-        let provider: LocalizationProviding = GlobalLocalizationProvider.instance
-        return self.notification(using: provider)
-    }
+}
+
+// MARK: - Achievement Context
+/// Изучено разных вопросов текущего банка и его размер
+struct BankProgress: Equatable {
+    let studied: Int
+    let total: Int
+}
+
+/// Всё, по чему открываются достижения. nil — данные не известны в этом месте
+/// (например, экзамен не меняет пройденные вопросы): такие достижения не проверяются
+struct AchievementContext {
+    var stats: UserStats
+    var dayStreak: Int
+    var bankProgress: BankProgress?
+    var examsPassed: Int?
 }
 
 // MARK: - Achievement Progress

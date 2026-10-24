@@ -94,6 +94,15 @@ extension String {
     }
 }
 
+// MARK: - Localized Dates
+extension Date {
+    /// Дата на языке приложения, а не системы
+    func localizedFormatted(date: Date.FormatStyle.DateStyle, time: Date.FormatStyle.TimeStyle) -> String {
+        let locale = Locale(identifier: GlobalLocalizationProvider.instance.currentLanguage)
+        return formatted(Date.FormatStyle(date: date, time: time).locale(locale))
+    }
+}
+
 // MARK: - Localized Text View
 struct LocalizedText: View {
     let key: String

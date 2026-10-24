@@ -297,6 +297,18 @@ final class QuizQuestionPoolTests: XCTestCase {
         XCTAssertEqual(Set(selected.map(\.id)), ["q2", "q3", "q4"])
     }
 
+    /// Прогресс по банку для достижений — по загруженному банку и пройденным вопросам
+    func testBankProgress_afterLoading() async throws {
+        let questions = Self.questions(count: 10)
+        pool.markUsed(["q0", "q1", "old"], version: 1)
+        let useCase = makeUseCase(questions)
+        XCTAssertNil(useCase.bankProgress())
+
+        _ = try await useCase.startQuiz(language: "ru", sessionSize: 20)
+
+        XCTAssertEqual(useCase.bankProgress(), BankProgress(studied: 2, total: 10))
+    }
+
     func testMarkQuestionsUsed_excludesThemFromNextSession() async throws {
         let questions = Self.questions(count: 30)
         let useCase = makeUseCase(questions)
