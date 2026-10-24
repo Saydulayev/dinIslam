@@ -11,6 +11,8 @@ protocol ExamViewModelCreating {
     func createExamViewModel(
         examUseCase: ExamUseCaseProtocol,
         examStatisticsManager: ExamStatisticsManager,
+        statsManager: StatsManager,
+        achievementManager: AchievementManager,
         feedbackProvider: QuizFeedbackProviding?,
         settingsManager: SettingsManager?
     ) -> ExamViewModel

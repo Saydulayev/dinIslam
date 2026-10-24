@@ -11,6 +11,8 @@ final class DefaultExamViewModelFactory: ExamViewModelCreating {
     func createExamViewModel(
         examUseCase: ExamUseCaseProtocol,
         examStatisticsManager: ExamStatisticsManager,
+        statsManager: StatsManager,
+        achievementManager: AchievementManager,
         feedbackProvider: QuizFeedbackProviding? = nil,
         settingsManager: SettingsManager? = nil
     ) -> ExamViewModel {
@@ -20,6 +22,8 @@ final class DefaultExamViewModelFactory: ExamViewModelCreating {
         return ExamViewModel(
             examUseCase: examUseCase,
             examStatisticsManager: examStatisticsManager,
+            statisticsRecorder: DefaultQuizStatisticsRecorder(statsManager: statsManager),
+            achievementChecker: DefaultQuizAchievementChecker(achievementManager: achievementManager),
             feedbackProvider: feedbackProvider,
             timerManager: timerManager,
             navigationCoordinator: navigationCoordinator,

@@ -20,7 +20,8 @@ final class StartViewModel {
     let profileManager: ProfileManager
 
     private let examUseCase: ExamUseCaseProtocol
-    private let examStatisticsManager: ExamStatisticsManager
+    let examStatisticsManager: ExamStatisticsManager
+    @ObservationIgnored private let achievementManager: AchievementManager
     @ObservationIgnored private let enhancedQuizUseCase: (any EnhancedQuizUseCaseProtocol)?
     @ObservationIgnored private let questionPoolProgressManager: QuestionPoolProgressManaging
     
@@ -61,6 +62,7 @@ final class StartViewModel {
         profileManager: ProfileManager,
         examUseCase: ExamUseCaseProtocol,
         examStatisticsManager: ExamStatisticsManager,
+        achievementManager: AchievementManager,
         questionsPreloading: QuestionsPreloading,
         questionPoolProgressManager: QuestionPoolProgressManaging,
         enhancedQuizUseCase: (any EnhancedQuizUseCaseProtocol)? = nil,
@@ -75,6 +77,7 @@ final class StartViewModel {
         self.profileManager = profileManager
         self.examUseCase = examUseCase
         self.examStatisticsManager = examStatisticsManager
+        self.achievementManager = achievementManager
         self.enhancedQuizUseCase = enhancedQuizUseCase
         self.questionPoolProgressManager = questionPoolProgressManager
         
@@ -223,6 +226,8 @@ final class StartViewModel {
         let viewModel = examViewModelFactory.createExamViewModel(
             examUseCase: examUseCase,
             examStatisticsManager: examStatisticsManager,
+            statsManager: statsManager,
+            achievementManager: achievementManager,
             feedbackProvider: feedbackProvider,
             settingsManager: settingsManager
         )
@@ -259,6 +264,11 @@ final class StartViewModel {
 
     func showProfile() {
         navigationCoordinator.showProfile()
+        navigationPath = navigationCoordinator.navigationPath
+    }
+    
+    func showExamHistory() {
+        navigationCoordinator.showExamHistory()
         navigationPath = navigationCoordinator.navigationPath
     }
     

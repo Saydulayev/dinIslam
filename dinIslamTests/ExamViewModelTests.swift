@@ -3,6 +3,7 @@
 //  dinIslamTests
 //
 
+import SwiftUI
 import XCTest
 @testable import dinIslam
 
@@ -14,6 +15,8 @@ final class ExamViewModelTests: XCTestCase {
 
     private var useCase: MockExamUseCase!
     private var timer: ManualExamTimer!
+    private var recorder: SpyStatisticsRecorder!
+    private var achievements: SpyAchievementChecker!
     private var viewModel: ExamViewModel!
 
     override func setUp() async throws {
@@ -21,9 +24,13 @@ final class ExamViewModelTests: XCTestCase {
         savedStatistics = UserDefaults.standard.data(forKey: statisticsKey)
         useCase = MockExamUseCase()
         timer = ManualExamTimer()
+        recorder = SpyStatisticsRecorder()
+        achievements = SpyAchievementChecker()
         viewModel = ExamViewModel(
             examUseCase: useCase,
             examStatisticsManager: ExamStatisticsManager(),
+            statisticsRecorder: recorder,
+            achievementChecker: achievements,
             feedbackProvider: SilentFeedbackProvider(),
             timerManager: timer
         )
@@ -180,6 +187,56 @@ final class ExamViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.state, .completed(.finished))
     }
 
+    // MARK: - Recording answers
+
+    /// Ответы экзамена попадают в общую статистику; пропуск — неверный ответ
+    func testFinish_recordsAnswers_skipCountsAsMistake() async {
+        await viewModel.startExam(configuration: makeConfiguration(), language: "ru")
+        viewModel.skipQuestion()
+        viewModel.selectAnswer(at: 0)
+        viewModel.finishExam()
+
+        XCTAssertEqual(recorder.summaries.count, 1)
+        let summary = recorder.summaries[0]
+        XCTAssertFalse(summary.isComplete, "Экзамен не должен считаться пройденной викториной")
+        XCTAssertEqual(summary.outcomes.map(\.questionId), ["q1", "q2"])
+        XCTAssertEqual(summary.outcomes.map(\.isCorrect), [false, true])
+        XCTAssertEqual(summary.correctAnswers, 1)
+        XCTAssertEqual(achievements.checkCount, 1)
+    }
+
+    func testFinish_unansweredQuestionsAreNotRecorded() async {
+        await viewModel.startExam(configuration: makeConfiguration(), language: "ru")
+        viewModel.selectAnswer(at: 1)
+        viewModel.finishExam()
+
+        XCTAssertEqual(recorder.summaries.first?.outcomes.map(\.questionId), ["q1"])
+        XCTAssertEqual(recorder.summaries.first?.outcomes.first?.isCorrect, false)
+    }
+
+    func testFinishWithoutAnswers_recordsNothing() async {
+        await viewModel.startExam(configuration: makeConfiguration(), language: "ru")
+        viewModel.finishExam()
+
+        XCTAssertTrue(recorder.summaries.isEmpty)
+        XCTAssertEqual(achievements.checkCount, 0)
+        XCTAssertNotNil(viewModel.examResult)
+    }
+
+    /// Достижения экзамена показываются на его экране, а не после следующей викторины
+    func testFinish_takesNewAchievementsAndClearsSharedList() async {
+        let achievement = Achievement(
+            id: "scholar", title: "", description: "", icon: "", color: .blue, type: .scholar, requirement: 100
+        )
+        achievements.unlockOnCheck = [achievement]
+        await viewModel.startExam(configuration: makeConfiguration(), language: "ru")
+        viewModel.selectAnswer(at: 0)
+        viewModel.finishExam()
+
+        XCTAssertEqual(viewModel.newAchievements.map(\.id), ["scholar"])
+        XCTAssertTrue(achievements.newAchievements.isEmpty)
+    }
+
     // MARK: - Helpers
 
     private func makeConfiguration(timePerQuestion: TimeInterval = 30) -> ExamConfiguration {
@@ -193,6 +250,39 @@ final class ExamViewModelTests: XCTestCase {
 }
 
 // MARK: - Test Doubles
+
+private final class SpyStatisticsRecorder: QuizStatisticsRecording {
+    private(set) var summaries: [QuizSessionSummary] = []
+    var stats = UserStats()
+    var dayStreak = 0
+
+    func recordQuizSession(_ summary: QuizSessionSummary) {
+        summaries.append(summary)
+    }
+
+    func registerDailyGoal() {}
+
+    func getWrongQuestions(from allQuestions: [Question], scope: MistakesReviewScope) -> [Question] { [] }
+
+    func recordReviewAnswers(_ answers: [String: Bool]) -> ReviewSessionSummary { ReviewSessionSummary() }
+}
+
+private final class SpyAchievementChecker: QuizAchievementChecking {
+    private(set) var newAchievements: [Achievement] = []
+    private(set) var checkCount = 0
+    var unlockOnCheck: [Achievement] = []
+
+    func checkAchievements(for stats: UserStats, quizResult: QuizResult?) {
+        checkCount += 1
+        if !unlockOnCheck.isEmpty {
+            newAchievements = unlockOnCheck
+        }
+    }
+
+    func clearNewAchievements() {
+        newAchievements.removeAll()
+    }
+}
 
 private final class MockExamUseCase: ExamUseCaseProtocol {
     private(set) var startExamCalls: [(configuration: ExamConfiguration, language: String)] = []

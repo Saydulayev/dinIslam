@@ -192,6 +192,7 @@ struct ExamSummary: Codable, Equatable {
     var bestScore: Double = 0
     var currentStreak: Int = 0
     var longestStreak: Int = 0
+    var history: [ExamHistoryRecord] = []
 }
 
 struct WinStreak: Codable, Equatable {
@@ -327,6 +328,7 @@ extension ExamSummary {
         bestScore = container.decode(.bestScore, default: 0)
         currentStreak = container.decode(.currentStreak, default: 0)
         longestStreak = container.decode(.longestStreak, default: 0)
+        history = container.decodeLossyArray(.history)
     }
 }
 

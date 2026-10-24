@@ -174,6 +174,11 @@ struct ExamSettingsView: View {
                                 
                                 ExamPreviewCard(configuration: currentConfiguration)
                                     .padding(.horizontal, DesignTokens.Spacing.xxl)
+                                
+                                Text("exam.settings.rules".localized(arguments: ExamResult.passingPercentage.displayScore))
+                                    .font(DesignTokens.Typography.label)
+                                    .foregroundStyle(DesignTokens.Colors.textTertiary)
+                                    .padding(.horizontal, DesignTokens.Spacing.xxl)
                             }
                         }
                         .padding(.top, DesignTokens.Spacing.lg)

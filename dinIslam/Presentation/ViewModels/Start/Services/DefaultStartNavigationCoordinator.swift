@@ -35,6 +35,10 @@ final class DefaultStartNavigationCoordinator: StartNavigationCoordinating {
         navigationPath.append(StartRoute.exam)
     }
     
+    func showExamHistory() {
+        navigationPath.append(StartRoute.examHistory)
+    }
+    
     func resetNavigation() {
         navigationPath = NavigationPath()
     }

@@ -114,29 +114,68 @@ struct ExamResult: Codable, Equatable {
         return percentage
     }
     
+    /// Проходной порог — от всех вопросов экзамена
+    static let passingPercentage = 70.0
+    
+    /// Пропуск считается неверным ответом: он снижает процент, но сам по себе не означает провал
     var isPassed: Bool {
-        // Экзамен считается сданным только если:
-        // 1. Все вопросы были отвечены (нет пропущенных)
-        // 2. Процент правильных ответов от общего количества вопросов >= 70%
-        guard skippedQuestions == 0 else {
-            // Если есть пропущенные вопросы, экзамен не сдан
-            return false
-        }
-        return percentage >= 70.0 // 70% от общего количества вопросов для прохождения
+        percentage >= Self.passingPercentage
     }
     
     var grade: ExamGrade {
-        // Оценка основывается на проценте правильных ответов от общего количества вопросов
-        switch percentage {
-        case 90...100:
-            return .excellent
-        case 80..<90:
-            return .good
-        case 70..<80:
-            return .satisfactory
-        default:
-            return .unsatisfactory
-        }
+        ExamGrade(percentage: percentage)
+    }
+}
+
+// MARK: - Exam History
+/// Запись истории экзаменов
+struct ExamHistoryRecord: Codable, Equatable, Identifiable {
+    let date: Date
+    let totalQuestions: Int
+    let correctAnswers: Int
+    let incorrectAnswers: Int
+    let skippedQuestions: Int
+    let percentage: Double
+    let timeSpent: TimeInterval
+    
+    var id: Date { date }
+    
+    var isPassed: Bool {
+        percentage >= ExamResult.passingPercentage
+    }
+    
+    var grade: ExamGrade {
+        ExamGrade(percentage: percentage)
+    }
+    
+    init(
+        date: Date,
+        totalQuestions: Int,
+        correctAnswers: Int,
+        incorrectAnswers: Int,
+        skippedQuestions: Int,
+        percentage: Double,
+        timeSpent: TimeInterval
+    ) {
+        self.date = date
+        self.totalQuestions = totalQuestions
+        self.correctAnswers = correctAnswers
+        self.incorrectAnswers = incorrectAnswers
+        self.skippedQuestions = skippedQuestions
+        self.percentage = percentage
+        self.timeSpent = timeSpent
+    }
+    
+    init(result: ExamResult) {
+        self.init(
+            date: result.completedAt,
+            totalQuestions: result.totalQuestions,
+            correctAnswers: result.correctAnswers,
+            incorrectAnswers: result.incorrectAnswers,
+            skippedQuestions: result.skippedQuestions,
+            percentage: result.percentage,
+            timeSpent: result.totalTimeSpent
+        )
     }
 }
 
@@ -146,6 +185,20 @@ enum ExamGrade: String, CaseIterable, Codable {
     case good = "good"
     case satisfactory = "satisfactory"
     case unsatisfactory = "unsatisfactory"
+    
+    /// Оценка по проценту правильных ответов от общего количества вопросов
+    init(percentage: Double) {
+        switch percentage {
+        case 90...:
+            self = .excellent
+        case 80..<90:
+            self = .good
+        case 70..<80:
+            self = .satisfactory
+        default:
+            self = .unsatisfactory
+        }
+    }
     
     var localizedName: String {
         switch self {
@@ -187,6 +240,10 @@ struct ExamStatistics: Codable {
     var lastExamDate: Date?
     var currentStreak: Int = 0
     var longestStreak: Int = 0
+    /// Последние экзамены, новые — первыми
+    var history: [ExamHistoryRecord] = []
+    
+    static let historyLimit = 50
     
     var passRate: Double {
         guard totalExamsCompleted > 0 else { return 0 }
@@ -227,6 +284,11 @@ struct ExamStatistics: Codable {
             examsFailed += 1
             currentStreak = 0
         }
+        
+        history.insert(ExamHistoryRecord(result: result), at: 0)
+        if history.count > Self.historyLimit {
+            history.removeLast(history.count - Self.historyLimit)
+        }
     }
 }
 
@@ -247,5 +309,19 @@ extension ExamStatistics {
         lastExamDate = container.decodeOptional(.lastExamDate)
         currentStreak = container.decode(.currentStreak, default: 0)
         longestStreak = container.decode(.longestStreak, default: 0)
+        history = container.decodeLossyArray(.history)
+    }
+}
+
+extension ExamHistoryRecord {
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        date = try container.decode(Date.self, forKey: .date)
+        totalQuestions = container.decode(.totalQuestions, default: 0)
+        correctAnswers = container.decode(.correctAnswers, default: 0)
+        incorrectAnswers = container.decode(.incorrectAnswers, default: 0)
+        skippedQuestions = container.decode(.skippedQuestions, default: 0)
+        percentage = container.decode(.percentage, default: 0)
+        timeSpent = container.decode(.timeSpent, default: 0)
     }
 }

@@ -16,6 +16,8 @@ class ExamViewModel {
     // MARK: - Properties
     private let examUseCase: ExamUseCaseProtocol
     private let examStatisticsManager: ExamStatisticsManager
+    private let statisticsRecorder: QuizStatisticsRecording
+    private let achievementChecker: QuizAchievementChecking
     private let feedbackProvider: QuizFeedbackProviding
     private var timerManager: ExamTimerManaging
     private let navigationCoordinator: ExamNavigationCoordinating
@@ -27,6 +29,8 @@ class ExamViewModel {
     var currentQuestionIndex: Int = 0
     var answers: [String: ExamAnswer] = [:]
     var examResult: ExamResult?
+    /// Достижения, открытые этим экзаменом: показываются на экране результата
+    var newAchievements: [Achievement] = []
     var errorMessage: String?
     var isLoading: Bool = false
     
@@ -119,6 +123,8 @@ class ExamViewModel {
     init(
         examUseCase: ExamUseCaseProtocol,
         examStatisticsManager: ExamStatisticsManager,
+        statisticsRecorder: QuizStatisticsRecording,
+        achievementChecker: QuizAchievementChecking,
         feedbackProvider: QuizFeedbackProviding? = nil,
         timerManager: ExamTimerManaging? = nil,
         navigationCoordinator: ExamNavigationCoordinating? = nil,
@@ -127,6 +133,8 @@ class ExamViewModel {
     ) {
         self.examUseCase = examUseCase
         self.examStatisticsManager = examStatisticsManager
+        self.statisticsRecorder = statisticsRecorder
+        self.achievementChecker = achievementChecker
         self.timerManager = timerManager ?? DefaultExamTimerManager()
         self.navigationCoordinator = navigationCoordinator ?? DefaultExamNavigationCoordinator()
         self.statisticsCalculator = statisticsCalculator ?? DefaultExamStatisticsCalculator()
@@ -148,23 +156,6 @@ class ExamViewModel {
                 soundManager: SoundManager()
             )
         }
-    }
-    
-    convenience init(examUseCase: ExamUseCaseProtocol, examStatisticsManager: ExamStatisticsManager, settingsManager: SettingsManager) {
-        let hapticManager = HapticManager(settingsManager: settingsManager)
-        let soundManager = SoundManager(settingsManager: settingsManager)
-        let feedbackProvider = DefaultQuizFeedbackProvider(
-            hapticManager: hapticManager,
-            soundManager: soundManager
-        )
-        let statisticsCalculator = DefaultExamStatisticsCalculator()
-        self.init(
-            examUseCase: examUseCase,
-            examStatisticsManager: examStatisticsManager,
-            feedbackProvider: feedbackProvider,
-            statisticsCalculator: statisticsCalculator,
-            settingsManager: settingsManager
-        )
     }
     
     // MARK: - Public Methods
@@ -306,24 +297,7 @@ class ExamViewModel {
         if case .completed = state { return }
 
         stopQuestionTimer()
-        
-        // Calculate total time spent
-        if let startTime = examStartTime {
-            totalTimeSpent = Date().timeIntervalSince(startTime)
-        }
-        
-        // Calculate exam result
-        examResult = examUseCase.calculateExamResult(
-            questions: questions,
-            answers: answers,
-            configuration: configuration,
-            totalTimeSpent: totalTimeSpent
-        )
-        
-        // Update statistics
-        if let result = examResult {
-            examStatisticsManager.updateStatistics(with: result)
-        }
+        completeExam()
         
         state = .completed(.finished)
         
@@ -337,24 +311,8 @@ class ExamViewModel {
     func stopExam() {
         stopQuestionTimer()
         nextQuestionTask?.cancel()
-        
-        // Calculate total time spent
-        if let startTime = examStartTime {
-            totalTimeSpent = Date().timeIntervalSince(startTime)
-        }
-        
-        // Calculate exam result
-        examResult = examUseCase.calculateExamResult(
-            questions: questions,
-            answers: answers,
-            configuration: configuration,
-            totalTimeSpent: totalTimeSpent
-        )
-        
-        // Update statistics
-        if let result = examResult {
-            examStatisticsManager.updateStatistics(with: result)
-        }
+        if case .completed = state { return }
+        completeExam()
         
         state = .completed(.manuallyStopped)
         feedbackProvider.quizCompleted(success: false)
@@ -369,6 +327,7 @@ class ExamViewModel {
         currentQuestionIndex = 0
         answers.removeAll()
         examResult = nil
+        newAchievements = []
         errorMessage = nil
         timeRemaining = 0
         isTimerActive = false
@@ -384,6 +343,63 @@ class ExamViewModel {
     func retake() async {
         restartExam()
         await startExam(configuration: configuration, language: lastLanguage)
+    }
+    
+    // MARK: - Recording
+    
+    /// Считает результат и сохраняет его: статистику экзаменов и ответы — в общую статистику
+    private func completeExam() {
+        if let startTime = examStartTime {
+            totalTimeSpent = Date().timeIntervalSince(startTime)
+        }
+        
+        let result = examUseCase.calculateExamResult(
+            questions: questions,
+            answers: answers,
+            configuration: configuration,
+            totalTimeSpent: totalTimeSpent
+        )
+        examResult = result
+        
+        // Экзамен, остановленный до первого ответа, не сохраняется
+        guard !answers.isEmpty else { return }
+        
+        examStatisticsManager.updateStatistics(with: result)
+        recordAnswers(completedAt: result.completedAt)
+    }
+    
+    /// Ответы экзамена — в статистику по темам, повторение ошибок, серию дней и достижения.
+    /// Пропуск и истёкшее время считаются неверным ответом. Вопросы, до которых не дошли, не учитываются.
+    private func recordAnswers(completedAt: Date) {
+        let outcomes = questions.compactMap { question -> QuizQuestionOutcome? in
+            guard let answer = answers[question.id] else { return nil }
+            return QuizQuestionOutcome(
+                questionId: question.id,
+                category: question.category,
+                difficulty: question.difficulty,
+                isCorrect: answer.isCorrect
+            )
+        }
+        let correct = outcomes.filter(\.isCorrect).count
+        
+        // Экзамен — не викторина: в историю викторин, серию побед и их достижения он не входит
+        let summary = QuizSessionSummary(
+            correctAnswers: correct,
+            totalQuestions: outcomes.count,
+            percentage: Double(correct) / Double(outcomes.count) * 100,
+            duration: totalTimeSpent,
+            completedAt: completedAt,
+            outcomes: outcomes,
+            isComplete: false
+        )
+        statisticsRecorder.recordQuizSession(summary)
+        
+        // Список «новых» общий с викториной: забираем только открытые сейчас,
+        // чтобы они не показались ещё раз после следующей викторины
+        achievementChecker.clearNewAchievements()
+        achievementChecker.checkAchievements(for: statisticsRecorder.stats, quizResult: nil)
+        newAchievements = achievementChecker.newAchievements
+        achievementChecker.clearNewAchievements()
     }
     
     // MARK: - Timer Methods

@@ -179,7 +179,8 @@ final class ProgressSyncService {
                 lastExamDate: exam.lastExamDate,
                 bestScore: exam.bestScore,
                 currentStreak: exam.currentStreak,
-                longestStreak: exam.longestStreak
+                longestStreak: exam.longestStreak,
+                history: exam.history
             )
         )
 
@@ -305,6 +306,7 @@ final class ProgressSyncService {
         exam.lastExamDate = snapshot.stats.exam.lastExamDate
         exam.currentStreak = snapshot.stats.exam.currentStreak
         exam.longestStreak = snapshot.stats.exam.longestStreak
+        exam.history = snapshot.stats.exam.history
         examStatisticsManager.applySyncedStatistics(exam)
 
         questionPoolProgressManager.replaceUsedIds(snapshot.questionPool.usedIds, version: questionPoolVersion)

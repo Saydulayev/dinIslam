@@ -20,13 +20,19 @@ final class ExamResultTests: XCTestCase {
         XCTAssertFalse(result.isPassed)
     }
 
-    func testIsPassed_percentage70WithSkipped_returnsFalse() {
+    /// Пропуск — неверный ответ, а не автоматический провал
+    func testIsPassed_percentage70WithSkipped_returnsTrue() {
         let result = makeResult(percentage: 70.0, skippedQuestions: 1)
-        XCTAssertFalse(result.isPassed)
+        XCTAssertTrue(result.isPassed)
     }
 
-    func testIsPassed_highPercentageWithSkipped_returnsFalse() {
-        let result = makeResult(percentage: 100.0, skippedQuestions: 2)
+    func testIsPassed_highPercentageWithSkipped_returnsTrue() {
+        let result = makeResult(percentage: 95.0, skippedQuestions: 1)
+        XCTAssertTrue(result.isPassed)
+    }
+
+    func testIsPassed_skipsDropPercentageBelow70_returnsFalse() {
+        let result = makeResult(percentage: 65.0, skippedQuestions: 7)
         XCTAssertFalse(result.isPassed)
     }
 
@@ -45,6 +51,31 @@ final class ExamResultTests: XCTestCase {
 
         XCTAssertEqual(statistics.averageScore, 0)
         XCTAssertNoThrow(try JSONEncoder().encode(statistics))
+    }
+
+    func testStatistics_historyNewestFirst_limited() {
+        var statistics = ExamStatistics()
+        let start = Date(timeIntervalSinceReferenceDate: 0)
+        for index in 0..<(ExamStatistics.historyLimit + 5) {
+            statistics.updateStatistics(with: makeResult(
+                percentage: 80,
+                completedAt: start.addingTimeInterval(Double(index))
+            ))
+        }
+
+        XCTAssertEqual(statistics.history.count, ExamStatistics.historyLimit)
+        XCTAssertEqual(statistics.history.first?.date, start.addingTimeInterval(Double(ExamStatistics.historyLimit + 4)))
+        XCTAssertEqual(statistics.totalExamsCompleted, ExamStatistics.historyLimit + 5)
+    }
+
+    func testHistoryRecord_keepsResult() {
+        let record = ExamHistoryRecord(result: makeResult(percentage: 85, skippedQuestions: 2))
+
+        XCTAssertEqual(record.totalQuestions, 20)
+        XCTAssertEqual(record.correctAnswers, 17)
+        XCTAssertEqual(record.skippedQuestions, 2)
+        XCTAssertTrue(record.isPassed)
+        XCTAssertEqual(record.grade, .good)
     }
 
     // MARK: - grade
@@ -94,7 +125,8 @@ final class ExamResultTests: XCTestCase {
     private func makeResult(
         percentage: Double,
         skippedQuestions: Int = 0,
-        totalQuestions: Int = 20
+        totalQuestions: Int = 20,
+        completedAt: Date = Date()
     ) -> ExamResult {
         let answered = totalQuestions - skippedQuestions
         let correct = Int(round(percentage / 100.0 * Double(totalQuestions)))
@@ -110,7 +142,7 @@ final class ExamResultTests: XCTestCase {
             averageTimePerQuestion: 0,
             percentage: percentage,
             configuration: .default,
-            completedAt: Date()
+            completedAt: completedAt
         )
     }
 }

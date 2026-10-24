@@ -166,8 +166,18 @@ enum SyncMerger {
             lastExamDate: newer.lastExamDate,
             bestScore: max(local.bestScore, remote.bestScore),
             currentStreak: newer.currentStreak,
-            longestStreak: max(local.longestStreak, remote.longestStreak)
+            longestStreak: max(local.longestStreak, remote.longestStreak),
+            history: mergeExamHistory(local.history, remote.history)
         )
+    }
+
+    static func mergeExamHistory(_ local: [ExamHistoryRecord], _ remote: [ExamHistoryRecord]) -> [ExamHistoryRecord] {
+        var seen = Set<String>()
+        return (local + remote)
+            .sorted { $0.date > $1.date }
+            .filter { seen.insert("\($0.date.timeIntervalSinceReferenceDate)|\($0.percentage)|\($0.totalQuestions)").inserted }
+            .prefix(ExamStatistics.historyLimit)
+            .map { $0 }
     }
 
     /// Трёхстороннее слияние ошибок: берётся сторона, изменившая вопрос с прошлой синхронизации.

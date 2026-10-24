@@ -16,6 +16,12 @@
 "profile.mastery.proficient" = "Proficient";
 "profile.mastery.expert" = "Expert";
 "profile.progress.title" = "Progress";
+"profile.exams.title" = "Exams";
+"profile.exams.passed" = "Passed";
+"profile.exams.passedValue" = "%d of %d";
+"profile.exams.bestScore" = "Best score";
+"profile.exams.accuracy" = "Answer accuracy";
+"profile.exams.history" = "Exam history";
 "profile.progress.accuracy" = "Average Score";
 "profile.progress.streak" = "Streak";
 "profile.recommendations.title" = "Recommendations";
@@ -483,6 +489,7 @@
 "exam.settings.preview.options" = "Options";
 "exam.settings.preview.skip" = "Skip";
 "exam.settings.preview.timer" = "Timer";
+"exam.settings.rules" = "The exam is passed with at least %@ correct answers out of all questions. A skipped question or one you ran out of time on counts as a wrong answer and goes to mistakes review.";
 
 // Exam Presets
 "exam.preset.quick" = "Quick";
@@ -521,6 +528,8 @@
 "exam.result.timeSpent" = "Time spent";
 "exam.result.averageTime" = "Average time";
 "exam.result.timeExpired" = "Time expired";
+"exam.result.passingScore" = "Passing score";
+"exam.result.reviewNote" = "Mistakes and skipped questions have been added to mistakes review.";
 "exam.result.retake" = "Retake";
 "exam.result.share" = "Share";
 "exam.result.share.title" = "📚 Islamic Exam Results";
@@ -535,6 +544,14 @@
 "exam.grade.good" = "Good";
 "exam.grade.satisfactory" = "Satisfactory";
 "exam.grade.unsatisfactory" = "Unsatisfactory";
+
+// Exam History
+"exam.history.title" = "Exam History";
+"exam.history.empty" = "Your exam results will appear here.";
+"exam.history.passed" = "Passed";
+"exam.history.failed" = "Not passed";
+"exam.history.correct" = "%d of %d correct";
+"exam.history.skipped" = "skipped: %d";
 
 // Bank Completion
 "bank.completion.title" = "All Questions Studied!";

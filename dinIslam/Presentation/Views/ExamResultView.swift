@@ -14,6 +14,16 @@ struct ExamResultView: View {
     let onRetake: () -> Void
     let onBackToMenu: () -> Void
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    
+    /// Новые достижения показываются по одному: первое в очереди — текущее
+    @State private var pendingAchievements: [Achievement] = []
+    @State private var achievementsTotal = 0
+    
+    /// Ошибки и пропуски уходят в повторение ошибок
+    private var mistakesCount: Int {
+        result.incorrectAnswers + result.skippedQuestions
+    }
     
     var body: some View {
         ZStack {
@@ -29,6 +39,10 @@ struct ExamResultView: View {
                     
                     // Statistics cards
                     ExamStatsCardsView(result: result)
+                    
+                    if mistakesCount > 0 {
+                        ExamReviewNoteView()
+                    }
                     
                     // Detailed breakdown
                     ExamBreakdownView(result: result)
@@ -49,6 +63,55 @@ struct ExamResultView: View {
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
         .toolbarColorScheme(.dark, for: .navigationBar)
+        .overlay {
+            if let achievement = pendingAchievements.first {
+                ZStack {
+                    Color.black.opacity(0.4)
+                        .ignoresSafeArea()
+                        .accessibilityHidden(true)
+                    
+                    AchievementNotificationView(
+                        achievement: achievement,
+                        position: achievementsTotal - pendingAchievements.count + 1,
+                        total: achievementsTotal,
+                        onClose: { pendingAchievements.removeFirst() }
+                    )
+                    .id(achievement.id)
+                    .transition(reduceMotion ? .opacity : .scale(scale: 0.8).combined(with: .opacity))
+                    // Пока окно открыто, VoiceOver не уходит на экран результата под ним
+                    .accessibilityAddTraits(.isModal)
+                }
+            }
+        }
+        .animation(.dsSpring(reduceMotion: reduceMotion), value: pendingAchievements.first?.id)
+        .onAppear {
+            // Достижения показываются один раз: при возврате на экран очередь не наполняется заново
+            guard !viewModel.newAchievements.isEmpty else { return }
+            pendingAchievements = viewModel.newAchievements
+            achievementsTotal = pendingAchievements.count
+            viewModel.newAchievements = []
+        }
+    }
+}
+
+// MARK: - Exam Review Note
+struct ExamReviewNoteView: View {
+    var body: some View {
+        HStack(alignment: .top, spacing: DesignTokens.Spacing.md) {
+            Image(systemName: "arrow.counterclockwise.circle.fill")
+                .font(.system(size: DesignTokens.Sizes.iconMedium))
+                .foregroundStyle(DesignTokens.Colors.iconOrange)
+                .accessibilityHidden(true)
+            
+            Text("exam.result.reviewNote".localized)
+                .font(DesignTokens.Typography.secondaryRegular)
+                .foregroundStyle(DesignTokens.Colors.textSecondary)
+                .fixedSize(horizontal: false, vertical: true)
+            
+            Spacer(minLength: 0)
+        }
+        .padding(DesignTokens.Spacing.lg)
+        .glowBorder()
     }
 }
 
@@ -198,6 +261,12 @@ struct ExamBreakdownView: View {
                 )
                 
                 ExamBreakdownRow(
+                    title: "exam.result.passingScore".localized,
+                    value: ExamResult.passingPercentage.displayScore,
+                    color: DesignTokens.Colors.textPrimary
+                )
+                
+                ExamBreakdownRow(
                     title: "exam.result.timeSpent".localized,
                     value: formatTime(result.totalTimeSpent),
                     color: DesignTokens.Colors.iconBlue
@@ -309,6 +378,10 @@ struct ExamResultActionsView: View {
                     examStatisticsManager: examStatsManager
                 ),
                 examStatisticsManager: examStatsManager,
+                statisticsRecorder: DefaultQuizStatisticsRecorder(statsManager: statsManager),
+                achievementChecker: DefaultQuizAchievementChecker(
+                    achievementManager: AchievementManager(notificationManager: NotificationManager())
+                ),
                 settingsManager: SettingsManager()
             ),
             onRetake: {},

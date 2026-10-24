@@ -16,6 +16,12 @@
 "profile.mastery.proficient" = "Уверенный";
 "profile.mastery.expert" = "Мастер";
 "profile.progress.title" = "Прогресс";
+"profile.exams.title" = "Экзамены";
+"profile.exams.passed" = "Сдано";
+"profile.exams.passedValue" = "%d из %d";
+"profile.exams.bestScore" = "Лучший результат";
+"profile.exams.accuracy" = "Точность ответов";
+"profile.exams.history" = "История экзаменов";
 "profile.progress.accuracy" = "Средний результат";
 "profile.progress.streak" = "Серия";
 "profile.recommendations.title" = "Рекомендации";
@@ -499,6 +505,7 @@
 "exam.settings.preview.options" = "Опции";
 "exam.settings.preview.skip" = "Пропуск";
 "exam.settings.preview.timer" = "Таймер";
+"exam.settings.rules" = "Экзамен сдан, если правильных ответов не меньше %@ от всех вопросов. Пропущенный вопрос и вопрос, на который не хватило времени, считаются неверным ответом и попадают в повторение ошибок.";
 
 // Exam Presets
 "exam.preset.quick" = "Быстрый";
@@ -537,6 +544,8 @@
 "exam.result.timeSpent" = "Время выполнения";
 "exam.result.averageTime" = "Среднее время";
 "exam.result.timeExpired" = "Время истекло";
+"exam.result.passingScore" = "Проходной балл";
+"exam.result.reviewNote" = "Ошибки и пропущенные вопросы добавлены в повторение ошибок.";
 "exam.result.retake" = "Пересдать";
 "exam.result.share" = "Поделиться";
 "exam.result.share.title" = "📚 Результат экзамена по исламу";
@@ -551,6 +560,14 @@
 "exam.grade.good" = "Хорошо";
 "exam.grade.satisfactory" = "Удовлетворительно";
 "exam.grade.unsatisfactory" = "Неудовлетворительно";
+
+// Exam History
+"exam.history.title" = "История экзаменов";
+"exam.history.empty" = "Здесь появятся результаты экзаменов.";
+"exam.history.passed" = "Сдан";
+"exam.history.failed" = "Не сдан";
+"exam.history.correct" = "Правильно %d из %d";
+"exam.history.skipped" = "пропущено: %d";
 
 // Bank Completion
 "bank.completion.title" = "Все вопросы изучены!";

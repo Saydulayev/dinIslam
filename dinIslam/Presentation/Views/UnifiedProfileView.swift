@@ -13,8 +13,10 @@ struct UnifiedProfileView: View {
     @Environment(\.settingsManager) private var settingsManager
     @Environment(\.remoteQuestionsService) private var remoteService: EnhancedRemoteQuestionsService
     @Bindable var statsManager: StatsManager
+    let examStatisticsManager: ExamStatisticsManager
     /// Повторение ошибок идёт в общем потоке викторины (StartViewModel.startReview)
     let onStartMistakesReview: () -> Void
+    let onShowExamHistory: () -> Void
     
     @State private var avatarPickerItem: PhotosPickerItem?
     @State private var showResetConfirmation = false
@@ -30,9 +32,16 @@ struct UnifiedProfileView: View {
     @State private var syncTask: Task<Void, Never>?
     @State private var loadQuestionsTask: Task<Void, Never>?
     
-    init(statsManager: StatsManager, onStartMistakesReview: @escaping () -> Void) {
+    init(
+        statsManager: StatsManager,
+        examStatisticsManager: ExamStatisticsManager,
+        onStartMistakesReview: @escaping () -> Void,
+        onShowExamHistory: @escaping () -> Void
+    ) {
         self._statsManager = Bindable(statsManager)
+        self.examStatisticsManager = examStatisticsManager
         self.onStartMistakesReview = onStartMistakesReview
+        self.onShowExamHistory = onShowExamHistory
     }
     
     var body: some View {
@@ -69,6 +78,14 @@ struct UnifiedProfileView: View {
                         ProfileWrongQuestionsSectionView(
                             statsManager: statsManager,
                             onStartMistakesReview: onStartMistakesReview
+                        )
+                    }
+                    
+                    // Exams
+                    if examStatisticsManager.statistics.totalExamsCompleted > 0 {
+                        ProfileExamSectionView(
+                            statistics: examStatisticsManager.statistics,
+                            onShowHistory: onShowExamHistory
                         )
                     }
                     
@@ -169,7 +186,12 @@ struct UnifiedProfileView: View {
         achievementManager: AchievementManager(notificationManager: NotificationManager())
     )
     return NavigationStack {
-        UnifiedProfileView(statsManager: statsManager, onStartMistakesReview: {})
+        UnifiedProfileView(
+            statsManager: statsManager,
+            examStatisticsManager: examStatsManager,
+            onStartMistakesReview: {},
+            onShowExamHistory: {}
+        )
     }
     .environment(\.profileManager, profileManager)
     .environment(\.settingsManager, SettingsManager())

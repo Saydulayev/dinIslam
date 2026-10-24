@@ -18,6 +18,7 @@ enum StartRoute: Hashable {
     case settings
     case profile
     case exam
+    case examHistory
     case bankCompletion(totalQuestions: Int)
     
     struct ResultSnapshot: Hashable {
@@ -85,6 +86,7 @@ struct StartView: View {
                 profileManager: profileManager,
                 examUseCase: examUseCase,
                 examStatisticsManager: examStatisticsManager,
+                achievementManager: achievementManager,
                 questionsPreloading: questionsPreloading,
                 questionPoolProgressManager: questionPoolProgressManager,
                 enhancedQuizUseCase: enhancedQuizUseCase
@@ -149,8 +151,12 @@ struct StartView: View {
                 case .profile:
                     UnifiedProfileView(
                         statsManager: model.statsManager,
+                        examStatisticsManager: model.examStatisticsManager,
                         onStartMistakesReview: {
                             model.startReview(scope: .all)
+                        },
+                        onShowExamHistory: {
+                            model.showExamHistory()
                         }
                     )
                 case .exam:
@@ -159,6 +165,8 @@ struct StartView: View {
                             model.finishExamSession()
                         }
                     }
+                case .examHistory:
+                    ExamHistoryView(examStatisticsManager: model.examStatisticsManager)
                 case .bankCompletion(let totalQuestions):
                     BankCompletionView(
                         totalQuestions: totalQuestions,

@@ -389,6 +389,10 @@ struct ExamErrorView: View {
             examStatisticsManager: ExamStatisticsManager()
         ),
         examStatisticsManager: ExamStatisticsManager(),
+        statisticsRecorder: DefaultQuizStatisticsRecorder(statsManager: StatsManager()),
+        achievementChecker: DefaultQuizAchievementChecker(
+            achievementManager: AchievementManager(notificationManager: NotificationManager())
+        ),
         settingsManager: SettingsManager()
     ), onExit: {})
 }

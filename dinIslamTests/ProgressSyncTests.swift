@@ -97,6 +97,20 @@ final class SyncMergerTests: XCTestCase {
         XCTAssertEqual(merged.first?.date, day.addingTimeInterval(6))
     }
 
+    func testExamHistory_unionWithoutDuplicates_newestFirst() {
+        func record(_ offset: Double, _ percentage: Double) -> ExamHistoryRecord {
+            ExamHistoryRecord(
+                date: day.addingTimeInterval(offset), totalQuestions: 20, correctAnswers: 15,
+                incorrectAnswers: 5, skippedQuestions: 0, percentage: percentage, timeSpent: 300
+            )
+        }
+        let shared = record(0, 75)
+
+        let merged = SyncMerger.mergeExamHistory([shared, record(-10, 50)], [record(10, 90), shared])
+
+        XCTAssertEqual(merged.map(\.percentage), [90, 75, 50])
+    }
+
     func testDailyProgress_laterDayWins_recordIsMax() {
         var monday = DailyProgress()
         for offset in 0..<5 { monday.registerActivity(at: day.addingTimeInterval(Double(offset) * 86_400)) }
