@@ -364,6 +364,8 @@
 // Notifications
 "notification.title" = "Study Time";
 "notification.body" = "Time for new knowledge!";
+"notification.body.review" = "Time to review your mistakes: %d question is waiting.";
+"notification.body.review_other" = "Time to review your mistakes: %d questions are waiting.";
 "notification.permission.title" = "Allow Notifications";
 "notification.permission.message" = "Get reminders for daily study";
 "notification.permission.request" = "Allow";
@@ -377,10 +379,6 @@
 "achievement.notification.title" = "New Achievement!";
 "achievement.notification.body" = "Congratulations! You earned an achievement:";
 
-// Streak Notifications
-"streak.notification.title" = "Don't Break the Streak!";
-"streak.notification.body" = "Continue daily study to maintain your streak";
-
 // Settings
 "settings.on" = "On";
 "settings.off" = "Off";
@@ -391,7 +389,7 @@
 "notification.settings.features.daily" = "Daily study reminders";
 "notification.settings.features.achievements" = "New achievement notifications";
 "notification.settings.features.streak" = "Streak maintenance reminders";
-"notification.settings.footer" = "Reminders will be sent daily at the selected time.";
+"notification.settings.footer" = "The reminder arrives at the selected time if you haven't studied yet that day.";
 "notification.permission.denied.message" = "Notifications are turned off in iPhone Settings. Tap “Open Settings” and turn on “Allow Notifications”.";
 "notification.test.sent.title" = "Test Notification";
 "notification.test.sent.message" = "Test notification sent!";

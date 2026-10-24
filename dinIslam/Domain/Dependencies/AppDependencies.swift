@@ -42,6 +42,7 @@ struct AppDependencies: AppDependenciesProtocol {
         
         // Initialize stats managers with injected UserDefaults
         self.statsManager = StatsManager(userDefaults: userDefaults)
+        notificationManager.reminderContext = statsManager
         self.examStatisticsManager = ExamStatisticsManager()
         
         // Initialize achievement manager

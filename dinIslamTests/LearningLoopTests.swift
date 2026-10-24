@@ -2,7 +2,7 @@
 //  LearningLoopTests.swift
 //  dinIslamTests
 //
-//  Интервальное повторение ошибок, серия дней, новые поля вопросов (тема, сложность).
+//  Интервальное повторение ошибок, серия дней, напоминания, новые поля вопросов (тема, сложность).
 //  Тесты помечены @MainActor: в приложении типы по умолчанию привязаны к главному потоку.
 //
 
@@ -493,5 +493,73 @@ final class QuestionFormatTests: XCTestCase {
                 XCTAssertTrue(known.contains(question.category), "\(question.id): неизвестная тема \(question.category)")
             }
         }
+    }
+}
+
+// MARK: - Даты ежедневных напоминаний: сегодня — только если занятий не было и время не прошло
+
+@MainActor
+final class DailyReminderTests: XCTestCase {
+
+    private var calendar: Calendar!
+
+    override func setUp() {
+        super.setUp()
+        calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(identifier: "UTC")!
+    }
+
+    private func date(day: Int, hour: Int, minute: Int = 0) -> Date {
+        calendar.date(from: DateComponents(year: 2026, month: 3, day: day, hour: hour, minute: minute))!
+    }
+
+    func testNotStudiedToday_beforeReminderTime_startsToday() {
+        let dates = NotificationManager.reminderDates(
+            now: date(day: 1, hour: 10),
+            reminderTime: date(day: 1, hour: 20, minute: 30),
+            isActiveToday: false,
+            calendar: calendar
+        )
+
+        XCTAssertEqual(dates.count, NotificationManager.reminderDays)
+        XCTAssertEqual(dates.first, date(day: 1, hour: 20, minute: 30))
+        XCTAssertEqual(dates.last, date(day: 7, hour: 20, minute: 30))
+    }
+
+    /// После занятия сегодняшнее напоминание не приходит
+    func testStudiedToday_startsTomorrow() {
+        let dates = NotificationManager.reminderDates(
+            now: date(day: 1, hour: 10),
+            reminderTime: date(day: 1, hour: 20),
+            isActiveToday: true,
+            calendar: calendar
+        )
+
+        XCTAssertEqual(dates.count, NotificationManager.reminderDays)
+        XCTAssertEqual(dates.first, date(day: 2, hour: 20))
+    }
+
+    func testReminderTimePassed_startsTomorrow() {
+        let dates = NotificationManager.reminderDates(
+            now: date(day: 1, hour: 21),
+            reminderTime: date(day: 1, hour: 20),
+            isActiveToday: false,
+            calendar: calendar
+        )
+
+        XCTAssertEqual(dates.first, date(day: 2, hour: 20))
+    }
+
+    /// Время берётся из сохранённой даты любого дня
+    func testReminderTimeFromOtherDay_usesOnlyHourAndMinute() {
+        let dates = NotificationManager.reminderDates(
+            now: date(day: 10, hour: 8),
+            reminderTime: date(day: 1, hour: 9, minute: 15),
+            isActiveToday: false,
+            days: 2,
+            calendar: calendar
+        )
+
+        XCTAssertEqual(dates, [date(day: 10, hour: 9, minute: 15), date(day: 11, hour: 9, minute: 15)])
     }
 }

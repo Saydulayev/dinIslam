@@ -136,7 +136,6 @@ final class StoredDataCompatibilityTests: XCTestCase {
         XCTAssertEqual(settings.language, .system)
         XCTAssertFalse(settings.soundEnabled)
         XCTAssertFalse(settings.hapticEnabled)
-        XCTAssertTrue(settings.notificationsEnabled)
     }
 
     // MARK: - Профиль

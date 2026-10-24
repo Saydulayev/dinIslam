@@ -137,6 +137,7 @@ extension EnvironmentValues {
 struct dinIslamApp: App {
     private let dependencies: AppDependencies
     private let enhancedDependencies: EnhancedDependencies
+    @Environment(\.scenePhase) private var scenePhase
     
     init() {
         // Create dependencies
@@ -172,6 +173,16 @@ struct dinIslamApp: App {
             .environment(\.remoteQuestionsService, dependencies.remoteQuestionsService)
             .environment(\.questionPoolProgressManager, dependencies.questionPoolProgressManager)
             .preferredColorScheme(.dark)
+            // Напоминания: данные могли прийти из iCloud без уведомления об изменении — перепланируем при уходе в фон
+            .onChange(of: scenePhase) { _, newPhase in
+                if newPhase == .background {
+                    dependencies.notificationManager.scheduleDailyReminder()
+                }
+            }
+            // Текст напоминаний — на новом языке
+            .onChange(of: dependencies.settingsManager.settings.language) { _, _ in
+                dependencies.notificationManager.scheduleDailyReminder()
+            }
         }
     }
 }

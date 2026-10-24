@@ -13,13 +13,11 @@ struct AppSettings: Codable {
     var language: AppLanguage
     var soundEnabled: Bool
     var hapticEnabled: Bool
-    var notificationsEnabled: Bool
     
     init() {
         self.language = .system
         self.soundEnabled = true
         self.hapticEnabled = true
-        self.notificationsEnabled = true
     }
 }
 
@@ -109,11 +107,6 @@ final class SettingsManager {
         saveSettings()
     }
     
-    func updateNotificationsEnabled(_ enabled: Bool) {
-        settings.notificationsEnabled = enabled
-        saveSettings()
-    }
-    
     private func saveSettings() {
         if let encoded = try? JSONEncoder().encode(settings) {
             userDefaults.set(encoded, forKey: settingsKey)
@@ -151,6 +144,5 @@ extension AppSettings {
         language = container.decode(.language, default: defaults.language)
         soundEnabled = container.decode(.soundEnabled, default: defaults.soundEnabled)
         hapticEnabled = container.decode(.hapticEnabled, default: defaults.hapticEnabled)
-        notificationsEnabled = container.decode(.notificationsEnabled, default: defaults.notificationsEnabled)
     }
 }

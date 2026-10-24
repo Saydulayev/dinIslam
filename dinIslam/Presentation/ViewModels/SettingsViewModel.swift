@@ -96,12 +96,6 @@ class SettingsViewModel {
         }
     }
     
-    // MARK: - Notifications Settings
-    func updateNotificationsEnabled(_ enabled: Bool) {
-        settingsManager.updateNotificationsEnabled(enabled)
-        hapticManager.selectionChanged()
-    }
-    
     /// Системный запрос оценки может не показаться (лимит Apple, TestFlight),
     /// поэтому кнопка открывает форму отзыва в App Store
     let writeReviewURL = URL(string: "https://apps.apple.com/app/id6754708587?action=write-review")
@@ -155,7 +149,6 @@ class SettingsViewModel {
         settingsManager.updateLanguage(defaultSettings.language)
         settingsManager.updateSoundEnabled(defaultSettings.soundEnabled)
         settingsManager.updateHapticEnabled(defaultSettings.hapticEnabled)
-        settingsManager.updateNotificationsEnabled(defaultSettings.notificationsEnabled)
         achievementManager.refreshLocalization()
     }
 }

@@ -141,6 +141,11 @@ class StatsManager {
         reviewSchedule.dueCount(at: currentDate())
     }
     
+    /// Сколько ошибок будет к повторению на указанный момент (для напоминаний)
+    func dueReviewCount(at date: Date) -> Int {
+        reviewSchedule.dueCount(at: date)
+    }
+    
     var nextReviewDate: Date? {
         reviewSchedule.nextDueDate(after: currentDate())
     }
@@ -241,6 +246,9 @@ class StatsManager {
         saveDailyProgress()
     }
 }
+
+// MARK: - DailyReminderContextProviding
+extension StatsManager: DailyReminderContextProviding {}
 
 // MARK: - TopicStatsProviding
 extension StatsManager: TopicStatsProviding {
