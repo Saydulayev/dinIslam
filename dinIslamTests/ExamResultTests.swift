@@ -214,6 +214,175 @@ final class ExamQuestionSelectionTests: XCTestCase {
     }
 }
 
+// MARK: - Пул вопросов викторины
+
+@MainActor
+final class QuizQuestionPoolTests: XCTestCase {
+
+    private var defaults: UserDefaults!
+    private var suiteName: String!
+    private var pool: DefaultQuestionPoolProgressManager!
+
+    override func setUp() {
+        super.setUp()
+        suiteName = "QuizQuestionPoolTests-\(UUID().uuidString)"
+        defaults = UserDefaults(suiteName: suiteName)
+        pool = DefaultQuestionPoolProgressManager(userDefaults: defaults)
+    }
+
+    override func tearDown() {
+        defaults.removePersistentDomain(forName: suiteName)
+        defaults = nil
+        super.tearDown()
+    }
+
+    func testLearningMode_onlyNewQuestions_withoutRepeats() async throws {
+        let questions = Self.questions(count: 50)
+        pool.markUsed((0..<10).map { "q\($0)" }, version: 1)
+
+        let selected = try await makeUseCase(questions).startQuiz(language: "ru", sessionSize: 20)
+
+        XCTAssertEqual(selected.count, 20)
+        XCTAssertEqual(Set(selected.map(\.id)).count, 20)
+        XCTAssertTrue(Set(selected.map(\.id)).isDisjoint(with: pool.getUsedIds(version: 1)))
+    }
+
+    /// Новых вопросов меньше размера сессии — сессия короче, уже пройденные не добавляются
+    func testLearningMode_fewNewQuestionsLeft_returnsOnlyThem() async throws {
+        let questions = Self.questions(count: 25)
+        pool.markUsed((0..<20).map { "q\($0)" }, version: 1)
+
+        let selected = try await makeUseCase(questions).startQuiz(language: "ru", sessionSize: 20)
+
+        XCTAssertEqual(Set(selected.map(\.id)), Set((20..<25).map { "q\($0)" }))
+    }
+
+    func testBankCompleted_withoutReviewMode_returnsNothing() async throws {
+        let questions = Self.questions(count: 10)
+        pool.markUsed(questions.map(\.id), version: 1)
+        let useCase = makeUseCase(questions)
+
+        let selected = try await useCase.startQuiz(language: "ru", sessionSize: 20)
+        let completion = try await useCase.isBankCompleted(language: "ru")
+
+        XCTAssertTrue(selected.isEmpty)
+        XCTAssertTrue(completion.isCompleted)
+        XCTAssertEqual(completion.totalQuestions, 10)
+        XCTAssertEqual(completion.studiedCount, 10)
+    }
+
+    /// Режим повторения пройденного банка: вопросы повторяются, но не дублируются внутри сессии
+    func testReviewMode_completedBank_repeatsQuestions() async throws {
+        let questions = Self.questions(count: 30)
+        pool.markUsed(questions.map(\.id), version: 1)
+        pool.setReviewMode(true, version: 1)
+
+        let selected = try await makeUseCase(questions).startQuiz(language: "ru", sessionSize: 20)
+
+        XCTAssertEqual(selected.count, 20)
+        XCTAssertEqual(Set(selected.map(\.id)).count, 20)
+    }
+
+    /// Пройденные id удалённых из банка вопросов не делают банк пройденным
+    func testRemovedQuestionIds_doNotCompleteBank() async throws {
+        let questions = Self.questions(count: 5)
+        pool.markUsed(["q0", "q1", "old1", "old2", "old3"], version: 1)
+        let useCase = makeUseCase(questions)
+
+        let completion = try await useCase.isBankCompleted(language: "ru")
+        let selected = try await useCase.startQuiz(language: "ru", sessionSize: 20)
+
+        XCTAssertFalse(completion.isCompleted)
+        XCTAssertEqual(completion.studiedCount, 2)
+        XCTAssertEqual(Set(selected.map(\.id)), ["q2", "q3", "q4"])
+    }
+
+    func testMarkQuestionsUsed_excludesThemFromNextSession() async throws {
+        let questions = Self.questions(count: 30)
+        let useCase = makeUseCase(questions)
+
+        let first = try await useCase.startQuiz(language: "ru", sessionSize: 20)
+        useCase.markQuestionsUsed(first.map(\.id))
+        let second = try await useCase.startQuiz(language: "ru", sessionSize: 20)
+
+        XCTAssertEqual(second.count, 10)
+        XCTAssertTrue(Set(first.map(\.id)).isDisjoint(with: Set(second.map(\.id))))
+    }
+
+    /// Слабые темы (от 5 ответов, точность ниже 70%) занимают не меньше половины сессии, если вопросов хватает
+    func testWeakTopic_getsAtLeastHalfOfSession() async throws {
+        let questions = Self.questions(count: 30, category: "fiqh") + Self.questions(count: 30, category: "aqida", prefix: "a")
+        var weak = TopicStat()
+        weak.totalAnswers = 10
+        weak.correctAnswers = 3
+
+        let selected = try await makeUseCase(questions, topicStats: ["fiqh": weak]).startQuiz(language: "ru", sessionSize: 20)
+
+        XCTAssertEqual(selected.count, 20)
+        XCTAssertGreaterThanOrEqual(selected.filter { $0.category == "fiqh" }.count, 10)
+    }
+
+    func testDailyQuiz_takesNewQuestions() async throws {
+        let questions = Self.questions(count: 30)
+        pool.markUsed((0..<25).map { "q\($0)" }, version: 1)
+
+        let selected = try await makeUseCase(questions).startDailyQuiz(language: "ru")
+
+        XCTAssertEqual(Set(selected.map(\.id)), Set((25..<30).map { "q\($0)" }))
+    }
+
+    /// Ежедневная практика доступна и после прохождения банка: добирается пройденными
+    func testDailyQuiz_completedBank_stillHasFullSession() async throws {
+        let questions = Self.questions(count: 30)
+        pool.markUsed(questions.map(\.id), version: 1)
+
+        let selected = try await makeUseCase(questions).startDailyQuiz(language: "ru")
+
+        XCTAssertEqual(selected.count, DailyProgress.dailyGoalQuestions)
+        XCTAssertEqual(Set(selected.map(\.id)).count, DailyProgress.dailyGoalQuestions)
+    }
+
+    func testDailyQuiz_fewNewQuestions_filledWithStudied_withoutDuplicates() async throws {
+        let questions = Self.questions(count: 30)
+        pool.markUsed((0..<28).map { "q\($0)" }, version: 1)
+
+        let selected = try await makeUseCase(questions).startDailyQuiz(language: "ru")
+        let ids = Set(selected.map(\.id))
+
+        XCTAssertEqual(selected.count, DailyProgress.dailyGoalQuestions)
+        XCTAssertEqual(ids.count, DailyProgress.dailyGoalQuestions)
+        XCTAssertTrue(ids.isSuperset(of: ["q28", "q29"]))
+    }
+
+    // MARK: - Helpers
+
+    private func makeUseCase(_ questions: [Question], topicStats: [String: TopicStat] = [:]) -> QuizUseCase {
+        QuizUseCase(
+            questionsRepository: StubQuestionsRepository(questions: questions),
+            topicStatsProvider: StubTopicStats(topicStats: topicStats),
+            questionSelectionStrategy: AdaptiveQuestionSelectionStrategy(adaptiveEngine: AdaptiveLearningEngine()),
+            questionPoolProgressManager: pool
+        )
+    }
+
+    private static func questions(count: Int, category: String = "fiqh", prefix: String = "q") -> [Question] {
+        (0..<count).map { index in
+            Question(
+                id: "\(prefix)\(index)",
+                text: "?",
+                answers: [Answer(id: "a", text: "A"), Answer(id: "b", text: "B")],
+                correctIndex: 0,
+                category: category,
+                difficulty: .medium
+            )
+        }
+    }
+}
+
+private struct StubTopicStats: TopicStatsProviding {
+    let topicStats: [String: TopicStat]
+}
+
 private struct StubQuestionsRepository: QuestionsRepositoryProtocol {
     let questions: [Question]
 
