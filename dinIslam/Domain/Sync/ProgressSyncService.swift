@@ -193,12 +193,7 @@ final class ProgressSyncService {
             epoch: state.achievementProgressEpoch,
             devices: state.otherAchievementDevices.merging(
                 [deviceId: contribution(ownAchievementCounters, remote: remote?.achievementProgress.devices[deviceId], seq: state.seq)]
-            ) { _, own in own },
-            winStreak: WinStreak(
-                current: stats.currentStreak,
-                longest: stats.longestStreak,
-                updatedAt: stats.lastQuizDate ?? .distantPast
-            )
+            ) { _, own in own }
         )
 
         snapshot.achievements = AchievementsSection(
@@ -283,8 +278,6 @@ final class ProgressSyncService {
         stats.totalQuestionsStudied = achievementTotals.questionsStudied
         stats.totalQuizzesCompleted = achievementTotals.quizzesCompleted
         stats.perfectScores = achievementTotals.perfectScores
-        stats.currentStreak = snapshot.achievementProgress.winStreak.current
-        stats.longestStreak = snapshot.achievementProgress.winStreak.longest
 
         statsManager.applySyncedState(
             stats: stats,

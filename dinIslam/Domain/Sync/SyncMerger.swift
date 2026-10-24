@@ -109,12 +109,6 @@ enum SyncMerger {
 
         var merged = AchievementProgressSection(epoch: local.epoch)
         merged.devices = mergeDevices(local: local.devices, remote: remote.devices, deviceId: deviceId)
-        let newer = local.winStreak.updatedAt > remote.winStreak.updatedAt ? local.winStreak : remote.winStreak
-        merged.winStreak = WinStreak(
-            current: newer.current,
-            longest: max(local.winStreak.longest, remote.winStreak.longest),
-            updatedAt: newer.updatedAt
-        )
         return merged
     }
 

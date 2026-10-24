@@ -9,14 +9,19 @@ import Foundation
 
 @MainActor
 final class DefaultExamTimerManager: ExamTimerManaging {
-    var timeRemaining: TimeInterval = 0
+    /// Пока таймер идёт, остаток считается от момента окончания, иначе — сохранённый при остановке
+    var timeRemaining: TimeInterval {
+        get { deadline.map { max(0, $0.timeIntervalSinceNow) } ?? storedTimeRemaining }
+        set { storedTimeRemaining = newValue }
+    }
     var isTimerActive: Bool = false
     var questionStartTime: Date?
+    /// Момент окончания времени: остаток считается от него, поэтому погрешность сна не накапливается
+    private(set) var deadline: Date?
     
+    private var storedTimeRemaining: TimeInterval = 0
     private var timerTask: Task<Void, Never>?
     private var onTimeUpCallback: (@MainActor () -> Void)?
-    /// Момент окончания времени: остаток считается от него, поэтому погрешность сна не накапливается
-    private var deadline: Date?
     
     func startTimer(
         timeLimit: TimeInterval,
@@ -45,7 +50,7 @@ final class DefaultExamTimerManager: ExamTimerManaging {
     func stopTimer() {
         // Фиксируем остаток на момент остановки, чтобы после паузы продолжить с него
         if isTimerActive, let deadline {
-            timeRemaining = max(0, deadline.timeIntervalSinceNow)
+            storedTimeRemaining = max(0, deadline.timeIntervalSinceNow)
         }
         deadline = nil
         isTimerActive = false
@@ -54,22 +59,22 @@ final class DefaultExamTimerManager: ExamTimerManaging {
         onTimeUpCallback = nil
     }
     
+    /// Спим до момента окончания, а не опрашиваем остаток: экран считает секунды сам (TimelineView)
     private func runTimerLoop() async {
-        let interval: UInt64 = 100_000_000 // 0.1 секунды
-        while isTimerActive && !Task.isCancelled {
-            do {
-                try await Task.sleep(nanoseconds: interval)
-            } catch {
-                break
-            }
-            guard isTimerActive, let deadline else { break }
-            timeRemaining = max(0, deadline.timeIntervalSinceNow)
-            if timeRemaining <= 0 {
+        while isTimerActive, let deadline {
+            let remaining = deadline.timeIntervalSinceNow
+            if remaining <= 0 {
                 let callback = onTimeUpCallback
+                storedTimeRemaining = 0
                 isTimerActive = false
                 self.deadline = nil
                 callback?()
-                break
+                return
+            }
+            do {
+                try await Task.sleep(for: .seconds(remaining))
+            } catch {
+                return
             }
         }
     }

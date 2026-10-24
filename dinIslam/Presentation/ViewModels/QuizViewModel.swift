@@ -485,6 +485,12 @@ class HapticManager {
         let notificationFeedback = UINotificationFeedbackGenerator()
         notificationFeedback.notificationOccurred(.error)
     }
+    
+    func warning() {
+        guard isHapticEnabled() else { return }
+        let notificationFeedback = UINotificationFeedbackGenerator()
+        notificationFeedback.notificationOccurred(.warning)
+    }
 }
 
 // MARK: - Sound Manager

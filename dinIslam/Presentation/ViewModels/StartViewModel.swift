@@ -22,7 +22,7 @@ final class StartViewModel {
     private let examUseCase: ExamUseCaseProtocol
     let examStatisticsManager: ExamStatisticsManager
     @ObservationIgnored private let achievementManager: AchievementManager
-    @ObservationIgnored private let enhancedQuizUseCase: (any EnhancedQuizUseCaseProtocol)?
+    @ObservationIgnored private let quizUseCase: QuizUseCaseProtocol
     @ObservationIgnored private let questionPoolProgressManager: QuestionPoolProgressManaging
     
     // Services via protocols
@@ -65,7 +65,7 @@ final class StartViewModel {
         achievementManager: AchievementManager,
         questionsPreloading: QuestionsPreloading,
         questionPoolProgressManager: QuestionPoolProgressManaging,
-        enhancedQuizUseCase: (any EnhancedQuizUseCaseProtocol)? = nil,
+        quizUseCase: QuizUseCaseProtocol,
         navigationCoordinator: StartNavigationCoordinating? = nil,
         visualEffectsManager: StartVisualEffectsManaging? = nil,
         lifecycleManager: StartLifecycleManaging? = nil,
@@ -78,7 +78,7 @@ final class StartViewModel {
         self.examUseCase = examUseCase
         self.examStatisticsManager = examStatisticsManager
         self.achievementManager = achievementManager
-        self.enhancedQuizUseCase = enhancedQuizUseCase
+        self.quizUseCase = quizUseCase
         self.questionPoolProgressManager = questionPoolProgressManager
         
         // Initialize services with default implementations if not provided
@@ -167,19 +167,16 @@ final class StartViewModel {
         startQuizTask = Task { [weak self, cachedLanguageCode] in
             guard let self = self else { return }
             
-            // Проверяем завершение банка через enhancedQuizUseCase или quizUseCase
-            // (ежедневная практика доступна и после прохождения банка)
-            if kind == .standard, let enhancedUseCase = self.enhancedQuizUseCase {
+            // Банк пройден — экран завершения (ежедневная практика доступна и после прохождения банка)
+            if kind == .standard {
                 do {
-                    let completionInfo = try await enhancedUseCase.isBankCompleted(language: cachedLanguageCode)
-                    let isReviewMode = await self.isReviewMode()
+                    let completionInfo = try await self.quizUseCase.isBankCompleted(language: cachedLanguageCode)
+                    let isReviewMode = self.isReviewMode()
                     
                     if completionInfo.isCompleted && !isReviewMode {
                         // Показываем экран завершения
-                        await MainActor.run {
-                            self.navigationCoordinator.showBankCompletion(totalQuestions: completionInfo.totalQuestions)
-                            self.navigationPath = self.navigationCoordinator.navigationPath
-                        }
+                        self.navigationCoordinator.showBankCompletion(totalQuestions: completionInfo.totalQuestions)
+                        self.navigationPath = self.navigationCoordinator.navigationPath
                         return
                     }
                 } catch {
@@ -188,10 +185,8 @@ final class StartViewModel {
             }
             
             // Обычный запуск викторины
-            await MainActor.run {
-                self.navigationCoordinator.showQuiz()
-                self.navigationPath = self.navigationCoordinator.navigationPath
-            }
+            self.navigationCoordinator.showQuiz()
+            self.navigationPath = self.navigationCoordinator.navigationPath
             await self.quizViewModel.startQuiz(language: cachedLanguageCode, kind: kind)
             self.returnToStartIfSessionFailed()
         }
@@ -204,7 +199,7 @@ final class StartViewModel {
         navigationPath = navigationCoordinator.navigationPath
     }
     
-    private func isReviewMode() async -> Bool {
+    private func isReviewMode() -> Bool {
         questionPoolProgressManager.isReviewMode(version: 1)
     }
 

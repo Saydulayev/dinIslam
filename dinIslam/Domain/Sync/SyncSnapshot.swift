@@ -195,13 +195,6 @@ struct ExamSummary: Codable, Equatable {
     var history: [ExamHistoryRecord] = []
 }
 
-struct WinStreak: Codable, Equatable {
-    var current: Int = 0
-    var longest: Int = 0
-    /// Дата последней викторины, после которой серия известна
-    var updatedAt: Date = .distantPast
-}
-
 struct StatsSection: Codable, Equatable {
     var epoch: SyncEpoch = .initial
     var devices: [String: DeviceContribution<StatsCounters>] = [:]
@@ -217,7 +210,6 @@ struct StatsSection: Codable, Equatable {
 struct AchievementProgressSection: Codable, Equatable {
     var epoch: SyncEpoch = .initial
     var devices: [String: DeviceContribution<AchievementCounters>] = [:]
-    var winStreak = WinStreak()
 }
 
 struct AchievementsSection: Codable, Equatable {
@@ -332,15 +324,6 @@ extension ExamSummary {
     }
 }
 
-extension WinStreak {
-    init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        current = container.decode(.current, default: 0)
-        longest = container.decode(.longest, default: 0)
-        updatedAt = container.decode(.updatedAt, default: .distantPast)
-    }
-}
-
 extension StatsSection {
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -360,7 +343,6 @@ extension AchievementProgressSection {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         epoch = container.decode(.epoch, default: .initial)
         devices = container.decode(.devices, default: [:])
-        winStreak = container.decode(.winStreak, default: WinStreak())
     }
 }
 

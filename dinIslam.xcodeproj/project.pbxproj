@@ -14,8 +14,8 @@
 		T22747902EA631EA00F2199C /* LearningLoopTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T22747912EA631EA00F2199C /* LearningLoopTests.swift */; };
 		T22747922EA631EA00F2199C /* ExamViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T22747932EA631EA00F2199C /* ExamViewModelTests.swift */; };
 		T227479A2EA631EA00F2199C /* StoredDataCompatibilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T227479B2EA631EA00F2199C /* StoredDataCompatibilityTests.swift */; };
-		T227479E2EA631EA00F2199C /* ProgressSyncTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T227479F2EA631EA00F2199C /* ProgressSyncTests.swift */; };
 		T227479C2EA631EA00F2199C /* AvatarImageProcessorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T227479D2EA631EA00F2199C /* AvatarImageProcessorTests.swift */; };
+		T227479E2EA631EA00F2199C /* ProgressSyncTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T227479F2EA631EA00F2199C /* ProgressSyncTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -38,8 +38,8 @@
 		T22747912EA631EA00F2199C /* LearningLoopTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LearningLoopTests.swift; sourceTree = "<group>"; };
 		T22747932EA631EA00F2199C /* ExamViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExamViewModelTests.swift; sourceTree = "<group>"; };
 		T227479B2EA631EA00F2199C /* StoredDataCompatibilityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoredDataCompatibilityTests.swift; sourceTree = "<group>"; };
-		T227479F2EA631EA00F2199C /* ProgressSyncTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressSyncTests.swift; sourceTree = "<group>"; };
 		T227479D2EA631EA00F2199C /* AvatarImageProcessorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvatarImageProcessorTests.swift; sourceTree = "<group>"; };
+		T227479F2EA631EA00F2199C /* ProgressSyncTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressSyncTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */

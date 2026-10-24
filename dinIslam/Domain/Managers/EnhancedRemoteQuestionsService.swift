@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import Combine
 import Observation
 import OSLog
 
@@ -191,13 +190,11 @@ class EnhancedRemoteQuestionsService {
     var hasUpdates = false
     var remoteQuestionsCount = 0
     var cachedQuestionsCount = 0
-    var networkStatus: NetworkStatus = .unknown
     
     @ObservationIgnored private let baseURL = "https://raw.githubusercontent.com/Saydulayev/dinIslam-questions/main"
     @ObservationIgnored private let networkManager: NetworkManager
     @ObservationIgnored private let cacheManager: CacheManager
     @ObservationIgnored private let configuration: CacheConfiguration
-    @ObservationIgnored private var networkStatusCancellable: AnyCancellable?
     
     /// Разобранные вопросы по языку: файл кэша читается и разбирается один раз за запуск
     @ObservationIgnored private var memoryCache: [AppLanguage: CachedQuestions] = [:]
@@ -226,14 +223,6 @@ class EnhancedRemoteQuestionsService {
         
         // Кэш прежнего формата не содержит тем и объяснений, а при неизменном ETag (304) обновился бы не скоро
         AppLanguage.allCases.forEach { cacheManager.invalidateCache(for: "questions_\($0.rawValue)") }
-        
-        // Subscribe to network status changes
-        networkStatusCancellable = networkManager.$isConnected
-            .map { $0 ? NetworkStatus.connected : NetworkStatus.disconnected }
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] status in
-                self?.networkStatus = status
-            }
     }
     
     /// Версия в ключе сбрасывает кэш, когда в модели Question появляются новые поля
@@ -502,24 +491,6 @@ class EnhancedRemoteQuestionsService {
         } catch {
             AppLogger.error("Failed to load local questions for \(language.rawValue)", error: error, category: AppLogger.data)
             return []
-        }
-    }
-}
-
-// MARK: - Network Status
-enum NetworkStatus {
-    case connected
-    case disconnected
-    case unknown
-    
-    var localizedDescription: String {
-        switch self {
-        case .connected:
-            return "Connected"
-        case .disconnected:
-            return "No internet connection"
-        case .unknown:
-            return "Unknown"
         }
     }
 }

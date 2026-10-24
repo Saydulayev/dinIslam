@@ -8,21 +8,13 @@
 import SwiftUI
 
 struct AchievementsView: View {
-    @ObservedObject var achievementManager: AchievementManager
+    @Environment(\.achievementManager) private var achievementManager: AchievementManager
     @Environment(\.dismiss) private var dismiss
     @Environment(\.settingsManager) private var settingsManager
     @Environment(\.statsManager) private var statsManager: StatsManager
     @Environment(\.localizationProvider) private var localizationProvider
     @State private var showingResetAlert = false
     @State private var selectedAchievement: Achievement?
-    
-    init(achievementManager: AchievementManager? = nil) {
-        // Use the provided manager, or create a fallback (for previews)
-        _achievementManager = ObservedObject(wrappedValue: achievementManager ?? AchievementManager(
-            notificationManager: NotificationManager(),
-            localizationProvider: LocalizationManager()
-        ))
-    }
     
     private var achievementsList: some View {
         ScrollView {

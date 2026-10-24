@@ -6,24 +6,19 @@
 //
 
 import Foundation
+import Observation
 import SwiftUI
-import Combine
 
 // MARK: - Localization Manager
 @MainActor
-class LocalizationManager: ObservableObject, LocalizationProviding {
-    // MARK: - Backward Compatibility (Deprecated)
-    @available(*, deprecated, message: "Use dependency injection instead")
-    static let shared: LocalizationManager = {
-        let manager = LocalizationManager()
-        return manager
-    }()
-    
-    @Published var currentLanguage: String = "ru" // Default to Russian
+@Observable
+class LocalizationManager: LocalizationProviding {
+    var currentLanguage: String = "ru" // Default to Russian
     
     // MARK: - Caching
-    private var cachedLocalizedStrings: [String: String] = [:]
-    private let userDefaults: UserDefaults
+    // Кэш пополняется при чтении строк из body экранов: отслеживать его нельзя
+    @ObservationIgnored private var cachedLocalizedStrings: [String: String] = [:]
+    @ObservationIgnored private let userDefaults: UserDefaults
     
     init(userDefaults: UserDefaults = .standard) {
         self.userDefaults = userDefaults
@@ -41,9 +36,6 @@ class LocalizationManager: ObservableObject, LocalizationProviding {
         
         // Clear cache when language changes
         cachedLocalizedStrings.removeAll()
-        
-        // Force UI update
-        objectWillChange.send()
     }
     
     func localizedString(for key: String) -> String {

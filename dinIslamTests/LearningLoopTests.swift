@@ -187,11 +187,10 @@ final class StatsManagerReviewTests: XCTestCase {
         )
     }
 
-    /// «Постоянный» выдаётся за 5 дней подряд, а не за 5 викторин подряд от 80%
+    /// «Постоянный» выдаётся за 5 дней подряд
     func testStreakAchievement_usesDayStreak() {
         let manager = AchievementManager(userDefaults: defaults, notificationManager: NotificationManager())
-        var stats = UserStats()
-        stats.currentStreak = 10
+        let stats = UserStats()
 
         manager.checkAchievements(for: stats, dayStreak: 4)
         XCTAssertFalse(manager.achievements.first { $0.type == .streak }?.isUnlocked ?? true)
@@ -283,7 +282,6 @@ final class StatsManagerReviewTests: XCTestCase {
         // Сессия не засчитана как пройденная викторина
         XCTAssertEqual(manager.stats.totalQuizzesCompleted, 0)
         XCTAssertTrue(manager.stats.recentQuizResults.isEmpty)
-        XCTAssertEqual(manager.stats.currentStreak, 0)
     }
 
     func testIncompletePerfectQuiz_doesNotCountAsPerfectScore() {
@@ -291,7 +289,6 @@ final class StatsManagerReviewTests: XCTestCase {
         manager.recordQuizSession(summary([("q1", true)], isComplete: false))
 
         XCTAssertEqual(manager.stats.perfectScores, 0)
-        XCTAssertEqual(manager.stats.currentStreak, 0)
     }
 
     /// Сброс достижений обнуляет счётчик изученных вопросов, но точность считается по ответам и не превышает 100%

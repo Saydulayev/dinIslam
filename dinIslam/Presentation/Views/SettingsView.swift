@@ -155,14 +155,17 @@ struct SettingsView: View {
                                 .overlay(Color.white.opacity(0.1))
                             
                             // Share App
-                            SettingRow(
-                                icon: "square.and.arrow.up",
-                                iconColor: DesignTokens.Colors.iconGreen,
-                                title: "settings.share.title".localized,
-                                subtitle: "settings.share.subtitle".localized,
-                                showChevron: false
-                            ) {
-                                viewModel.shareApp()
+                            if let shareURL = viewModel.shareURL {
+                                ShareLink(item: shareURL, message: Text("settings.share.text".localized)) {
+                                    SettingRowLabel(
+                                        icon: "square.and.arrow.up",
+                                        iconColor: DesignTokens.Colors.iconGreen,
+                                        title: "settings.share.title".localized,
+                                        subtitle: "settings.share.subtitle".localized,
+                                        showChevron: false
+                                    )
+                                }
+                                .buttonStyle(.pressable)
                             }
                         }
                     }
@@ -304,37 +307,56 @@ struct SettingsView: View {
         
         var body: some View {
             Button(action: action) {
-                HStack(spacing: DesignTokens.Spacing.md) {
-                    Image(systemName: icon)
-                        .foregroundStyle(iconColor)
-                        .frame(width: DesignTokens.Sizes.iconLarge)
-                        .accessibilityHidden(true)
-                    
-                    VStack(alignment: .leading, spacing: DesignTokens.Spacing.xs) {
-                        Text(title)
-                            .font(DesignTokens.Typography.bodyRegular)
-                            .foregroundStyle(DesignTokens.Colors.textPrimary)
-                        
-                        if let subtitle = subtitle {
-                            Text(subtitle)
-                                .font(DesignTokens.Typography.label)
-                                .foregroundStyle(DesignTokens.Colors.textSecondary)
-                        }
-                    }
-                    
-                    Spacer()
-                    
-                    if showChevron {
-                        Image(systemName: "chevron.right")
-                            .font(.system(size: DesignTokens.Sizes.iconSmall))
-                            .foregroundStyle(DesignTokens.Colors.textSecondary)
-                            .accessibilityHidden(true)
-                    }
-                }
-                .padding(.vertical, DesignTokens.Spacing.xs)
-                .contentShape(Rectangle())
+                SettingRowLabel(
+                    icon: icon,
+                    iconColor: iconColor,
+                    title: title,
+                    subtitle: subtitle,
+                    showChevron: showChevron
+                )
             }
             .buttonStyle(.pressable)
+        }
+    }
+    
+    /// Содержимое строки настроек: и для кнопки, и для ShareLink
+    struct SettingRowLabel: View {
+        let icon: String
+        let iconColor: Color
+        let title: String
+        let subtitle: String?
+        let showChevron: Bool
+        
+        var body: some View {
+            HStack(spacing: DesignTokens.Spacing.md) {
+                Image(systemName: icon)
+                    .foregroundStyle(iconColor)
+                    .frame(width: DesignTokens.Sizes.iconLarge)
+                    .accessibilityHidden(true)
+                
+                VStack(alignment: .leading, spacing: DesignTokens.Spacing.xs) {
+                    Text(title)
+                        .font(DesignTokens.Typography.bodyRegular)
+                        .foregroundStyle(DesignTokens.Colors.textPrimary)
+                    
+                    if let subtitle = subtitle {
+                        Text(subtitle)
+                            .font(DesignTokens.Typography.label)
+                            .foregroundStyle(DesignTokens.Colors.textSecondary)
+                    }
+                }
+                
+                Spacer()
+                
+                if showChevron {
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: DesignTokens.Sizes.iconSmall))
+                        .foregroundStyle(DesignTokens.Colors.textSecondary)
+                        .accessibilityHidden(true)
+                }
+            }
+            .padding(.vertical, DesignTokens.Spacing.xs)
+            .contentShape(Rectangle())
         }
     }
     

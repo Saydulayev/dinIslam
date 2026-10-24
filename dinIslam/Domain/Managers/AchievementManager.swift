@@ -6,28 +6,18 @@
 //
 
 import Foundation
-import Combine
+import Observation
 import SwiftUI
 
-class AchievementManager: ObservableObject, AchievementManaging {
-    // MARK: - Backward Compatibility (Deprecated)
-    @available(*, deprecated, message: "Use dependency injection instead")
-    static let shared: AchievementManager = {
-        let notificationManager = NotificationManager()
-        let manager = AchievementManager(
-            notificationManager: notificationManager,
-            localizationProvider: LocalizationManager()
-        )
-        return manager
-    }()
+@Observable
+class AchievementManager: AchievementManaging {
+    var achievements: [Achievement] = []
+    var newAchievements: [Achievement] = []
     
-    @Published var achievements: [Achievement] = []
-    @Published var newAchievements: [Achievement] = []
-    
-    private let userDefaults: UserDefaults
-    private let achievementsKey = "UserAchievements"
-    private let notificationManager: NotificationManager
-    private let localizationProvider: LocalizationProviding
+    @ObservationIgnored private let userDefaults: UserDefaults
+    @ObservationIgnored private let achievementsKey = "UserAchievements"
+    @ObservationIgnored private let notificationManager: NotificationManager
+    @ObservationIgnored private let localizationProvider: LocalizationProviding
     
     init(
         userDefaults: UserDefaults = .standard,
@@ -39,12 +29,6 @@ class AchievementManager: ObservableObject, AchievementManaging {
         // Use provided localization provider or create default for backward compatibility
         self.localizationProvider = localizationProvider ?? LocalizationManager()
         loadAchievements()
-    }
-    
-    @available(*, deprecated, message: "Pass notificationManager in init instead")
-    func configureDependencies(notificationManager: NotificationManager) {
-        // This method is deprecated - notificationManager should be passed in init
-        // Keeping for backward compatibility but it won't work with the new structure
     }
     
     func refreshLocalization() {

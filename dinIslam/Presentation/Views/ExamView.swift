@@ -256,22 +256,14 @@ struct ExamHeaderView: View {
                 
                 // Timer
                 if viewModel.configuration.showTimer {
-                    HStack(spacing: DesignTokens.Spacing.sm) {
-                        Image(systemName: viewModel.state == .active(.paused) ? "pause.fill" : "timer")
-                            .font(.system(size: DesignTokens.Sizes.iconSmall))
-                            .foregroundStyle(timerColor)
-
-                        Text(viewModel.timeRemainingFormatted)
-                            .font(DesignTokens.Typography.secondarySemibold)
-                            .foregroundStyle(timerColor)
-                            .monospacedDigit()
+                    if let deadline = viewModel.questionDeadline {
+                        // Кадры — ровно на смене секунды: отсчёт от момента окончания с шагом в секунду
+                        TimelineView(.periodic(from: timerScheduleStart(deadline: deadline), by: 1)) { context in
+                            timerLabel(at: context.date)
+                        }
+                    } else {
+                        timerLabel(at: Date())
                     }
-                    .padding(.horizontal, DesignTokens.Spacing.md)
-                    .padding(.vertical, DesignTokens.Spacing.sm)
-                    .background(
-                        RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.small)
-                            .fill(timerBackgroundColor)
-                    )
                 }
             }
         }
@@ -280,8 +272,33 @@ struct ExamHeaderView: View {
         // Убираем фон, чтобы был виден градиент как на главном экране
     }
     
-    private var timerColor: Color {
-        switch viewModel.timerUrgency {
+    /// Начало расписания отстоит от момента окончания на целое число секунд и уже прошло
+    private func timerScheduleStart(deadline: Date) -> Date {
+        deadline.addingTimeInterval(-(viewModel.configuration.timePerQuestion.rounded(.up) + 1))
+    }
+    
+    private func timerLabel(at date: Date) -> some View {
+        let color = timerColor(viewModel.timerUrgency(at: date))
+        return HStack(spacing: DesignTokens.Spacing.sm) {
+            Image(systemName: viewModel.state == .active(.paused) ? "pause.fill" : "timer")
+                .font(.system(size: DesignTokens.Sizes.iconSmall))
+                .foregroundStyle(color)
+
+            Text(viewModel.timeRemainingFormatted(at: date))
+                .font(DesignTokens.Typography.secondarySemibold)
+                .foregroundStyle(color)
+                .monospacedDigit()
+        }
+        .padding(.horizontal, DesignTokens.Spacing.md)
+        .padding(.vertical, DesignTokens.Spacing.sm)
+        .background(
+            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.small)
+                .fill(color.opacity(0.15))
+        )
+    }
+    
+    private func timerColor(_ urgency: ExamTimerUrgency) -> Color {
+        switch urgency {
         case .critical:
             return DesignTokens.Colors.error
         case .warning:
@@ -289,10 +306,6 @@ struct ExamHeaderView: View {
         case .normal:
             return DesignTokens.Colors.iconBlue
         }
-    }
-    
-    private var timerBackgroundColor: Color {
-        timerColor.opacity(0.15)
     }
 }
 

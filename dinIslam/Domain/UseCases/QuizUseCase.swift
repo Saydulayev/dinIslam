@@ -156,22 +156,6 @@ class QuizUseCase: QuizUseCaseProtocol {
         )
     }
     
-    func getProgressStats(language: String) async throws -> (total: Int, used: Int, remaining: Int) {
-        let allQuestions = try await questionsRepository.loadQuestions(language: language)
-        let currentQuestionIds = Set(allQuestions.map { $0.id })
-        let stats = questionPoolProgressManager.getProgressStats(
-            total: allQuestions.count,
-            currentQuestionIds: currentQuestionIds,
-            version: questionPoolVersion
-        )
-        
-        return (
-            total: allQuestions.count,
-            used: stats.used,
-            remaining: stats.remaining
-        )
-    }
-    
     func isBankCompleted(language: String) async throws -> (isCompleted: Bool, totalQuestions: Int, studiedCount: Int) {
         let allQuestions = try await questionsRepository.loadQuestions(language: language)
         let currentQuestionIds = Set(allQuestions.map { $0.id })

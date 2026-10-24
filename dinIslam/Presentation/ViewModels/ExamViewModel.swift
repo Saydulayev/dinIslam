@@ -34,12 +34,17 @@ class ExamViewModel {
     var errorMessage: String?
     var isLoading: Bool = false
     
-    // Timer properties (delegated to timerManager)
+    /// Когда истекает время на текущий вопрос; nil — таймер остановлен (пауза, ответ дан)
+    private(set) var questionDeadline: Date?
+    /// Остаток, пока таймер остановлен
+    private var stoppedTimeRemaining: TimeInterval = 0
+    
     var timeRemaining: TimeInterval {
-        get { displayedTimeRemaining }
-        set { 
+        get { timeRemaining(at: Date()) }
+        set {
             timerManager.timeRemaining = newValue
-            displayedTimeRemaining = newValue
+            stoppedTimeRemaining = newValue
+            questionDeadline = nil
         }
     }
     var isTimerActive: Bool {
@@ -53,10 +58,6 @@ class ExamViewModel {
     private var nextQuestionTask: Task<Void, Never>?
     // Язык последнего запуска — нужен для пересдачи с той же конфигурацией
     private var lastLanguage: String = "ru"
-
-    // Timer update tracking for SwiftUI
-    private var displayedTimeRemaining: TimeInterval = 0
-    private var timerUpdateTask: Task<Void, Never>?
     
     // MARK: - Computed Properties
     var currentQuestion: Question? {
@@ -91,17 +92,32 @@ class ExamViewModel {
     }
     
     var timeRemainingFormatted: String {
+        timeRemainingFormatted(at: Date())
+    }
+    
+    var timerUrgency: ExamTimerUrgency {
+        timerUrgency(at: Date())
+    }
+    
+    /// Экран спрашивает остаток на момент очередного кадра TimelineView
+    func timeRemaining(at date: Date) -> TimeInterval {
+        guard let questionDeadline else { return stoppedTimeRemaining }
+        return max(0, questionDeadline.timeIntervalSince(date))
+    }
+    
+    func timeRemainingFormatted(at date: Date) -> String {
         // Округляем вверх: «00:00» появляется только когда время действительно вышло
-        let totalSeconds = Int(timeRemaining.rounded(.up))
+        let totalSeconds = Int(timeRemaining(at: date).rounded(.up))
         return String(format: "%02d:%02d", totalSeconds / 60, totalSeconds % 60)
     }
     
     /// Насколько мало осталось времени — пороги считаются от лимита на вопрос
-    var timerUrgency: ExamTimerUrgency {
+    func timerUrgency(at date: Date) -> ExamTimerUrgency {
         let limit = configuration.timePerQuestion
-        if timeRemaining <= min(10, limit / 4) {
+        let remaining = timeRemaining(at: date)
+        if remaining <= min(10, limit / 4) {
             return .critical
-        } else if timeRemaining <= min(20, limit / 2) {
+        } else if remaining <= min(20, limit / 2) {
             return .warning
         }
         return .normal
@@ -187,7 +203,7 @@ class ExamViewModel {
             
             // Сбрасываем время для первого вопроса
             timerManager.timeRemaining = 0
-            displayedTimeRemaining = 0
+            stoppedTimeRemaining = 0
             
             // Start first question timer
             startQuestionTimer()
@@ -271,7 +287,7 @@ class ExamViewModel {
             currentQuestionIndex += 1
             // Сбрасываем время для нового вопроса
             timerManager.timeRemaining = 0
-            displayedTimeRemaining = 0
+            stoppedTimeRemaining = 0
             startQuestionTimer()
         }
     }
@@ -303,8 +319,7 @@ class ExamViewModel {
         
         state = .completed(.finished)
         
-        // Provide completion feedback
-        feedbackProvider.quizCompleted(success: true)
+        feedbackProvider.quizCompleted(success: examResult?.isPassed ?? false)
         
         // Navigate to results
         navigationCoordinator.showResults()
@@ -421,29 +436,14 @@ class ExamViewModel {
             }
         )
         
-        // Sync displayed time
-        displayedTimeRemaining = timerManager.timeRemaining
-        
-        // Обновляем экран, когда меняется показываемая секунда; частый опрос убирает рывки и пропуски секунд
-        timerUpdateTask?.cancel()
-        timerUpdateTask = Task { [weak self] in
-            guard let self else { return }
-            while !Task.isCancelled && self.timerManager.isTimerActive {
-                try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 second
-                guard !Task.isCancelled else { break }
-                let remaining = self.timerManager.timeRemaining
-                if remaining.rounded(.up) != self.displayedTimeRemaining.rounded(.up) {
-                    self.displayedTimeRemaining = remaining
-                }
-            }
-        }
+        stoppedTimeRemaining = timerManager.timeRemaining
+        questionDeadline = timerManager.deadline
     }
     
     private func stopQuestionTimer() {
         timerManager.stopTimer()
-        timerUpdateTask?.cancel()
-        timerUpdateTask = nil
-        displayedTimeRemaining = timerManager.timeRemaining
+        stoppedTimeRemaining = timerManager.timeRemaining
+        questionDeadline = nil
     }
     
     private func handleTimeUp() {
@@ -485,6 +485,5 @@ class ExamViewModel {
     deinit {
         timerManager.stopTimer()
         nextQuestionTask?.cancel()
-        timerUpdateTask?.cancel()
     }
 }

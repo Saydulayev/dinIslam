@@ -40,10 +40,30 @@ private struct QuestionPoolProgressManagerKey: EnvironmentKey {
     static let defaultValue: QuestionPoolProgressManaging? = nil
 }
 
+/// Запасные значения окружения для превью: в приложении все значения задаёт dinIslamApp.
+/// Создаются один раз, а не при каждом чтении окружения — иначе каждый экран получал бы свой менеджер
+private enum EnvironmentFallback {
+    static let localizationProvider: LocalizationProviding = LocalizationManager()
+    static let notificationManager = NotificationManager(localizationProvider: localizationProvider)
+    static let achievementManager = AchievementManager(
+        notificationManager: notificationManager,
+        localizationProvider: localizationProvider
+    )
+    static let statsManager = StatsManager()
+    static let settingsManager = SettingsManager(localizationProvider: localizationProvider)
+    static let profileManager = ProfileManager(
+        statsManager: statsManager,
+        examStatisticsManager: ExamStatisticsManager(),
+        achievementManager: achievementManager
+    )
+    static let remoteQuestionsService = EnhancedRemoteQuestionsService()
+    static let questionPoolProgressManager: QuestionPoolProgressManaging = DefaultQuestionPoolProgressManager()
+}
+
 extension EnvironmentValues {
     var localizationProvider: LocalizationProviding {
         get { 
-            self[LocalizationProviderKey.self] ?? LocalizationManager()
+            self[LocalizationProviderKey.self] ?? EnvironmentFallback.localizationProvider
         }
         set { 
             self[LocalizationProviderKey.self] = newValue 
@@ -52,20 +72,7 @@ extension EnvironmentValues {
     
     var achievementManager: AchievementManager {
         get { 
-            if let manager = self[AchievementManagerKey.self] {
-                return manager
-            }
-            
-            // Fallback for previews/tests - use notificationManager from environment if available
-            // to maintain single source of truth for NotificationManager
-            let notificationManager = self[NotificationManagerKey.self] ?? NotificationManager()
-            let localizationProvider = self[LocalizationProviderKey.self] ?? LocalizationManager()
-            
-            // Create fallback instance (only used in previews/tests or if not set in environment)
-            return AchievementManager(
-                notificationManager: notificationManager,
-                localizationProvider: localizationProvider
-            )
+            self[AchievementManagerKey.self] ?? EnvironmentFallback.achievementManager
         }
         set { 
             self[AchievementManagerKey.self] = newValue 
@@ -76,7 +83,7 @@ extension EnvironmentValues {
 extension EnvironmentValues {
     var statsManager: StatsManager {
         get { 
-            self[StatsManagerKey.self] ?? StatsManager()
+            self[StatsManagerKey.self] ?? EnvironmentFallback.statsManager
         }
         set { 
             self[StatsManagerKey.self] = newValue 
@@ -85,7 +92,7 @@ extension EnvironmentValues {
 
     var settingsManager: SettingsManager {
         get { 
-            self[SettingsManagerKey.self] ?? SettingsManager()
+            self[SettingsManagerKey.self] ?? EnvironmentFallback.settingsManager
         }
         set { 
             self[SettingsManagerKey.self] = newValue 
@@ -94,11 +101,7 @@ extension EnvironmentValues {
 
     var profileManager: ProfileManager {
         get { 
-            self[ProfileManagerKey.self] ?? ProfileManager(
-                statsManager: StatsManager(),
-                examStatisticsManager: ExamStatisticsManager(),
-                achievementManager: achievementManager
-            )
+            self[ProfileManagerKey.self] ?? EnvironmentFallback.profileManager
         }
         set { 
             self[ProfileManagerKey.self] = newValue 
@@ -107,7 +110,7 @@ extension EnvironmentValues {
     
     var remoteQuestionsService: EnhancedRemoteQuestionsService {
         get {
-            self[RemoteQuestionsServiceKey.self] ?? EnhancedRemoteQuestionsService()
+            self[RemoteQuestionsServiceKey.self] ?? EnvironmentFallback.remoteQuestionsService
         }
         set {
             self[RemoteQuestionsServiceKey.self] = newValue
@@ -116,7 +119,7 @@ extension EnvironmentValues {
     
     var notificationManager: NotificationManager {
         get {
-            self[NotificationManagerKey.self] ?? NotificationManager()
+            self[NotificationManagerKey.self] ?? EnvironmentFallback.notificationManager
         }
         set {
             self[NotificationManagerKey.self] = newValue
@@ -125,7 +128,7 @@ extension EnvironmentValues {
     
     var questionPoolProgressManager: QuestionPoolProgressManaging {
         get {
-            self[QuestionPoolProgressManagerKey.self] ?? DefaultQuestionPoolProgressManager()
+            self[QuestionPoolProgressManagerKey.self] ?? EnvironmentFallback.questionPoolProgressManager
         }
         set {
             self[QuestionPoolProgressManagerKey.self] = newValue
@@ -136,18 +139,14 @@ extension EnvironmentValues {
 @main
 struct dinIslamApp: App {
     private let dependencies: AppDependencies
-    private let enhancedDependencies: EnhancedDependencies
     @Environment(\.scenePhase) private var scenePhase
     
     init() {
         // Create dependencies
-        self.dependencies = DIContainer.createDependencies()
+        self.dependencies = AppDependencies()
         
         // Set global localization provider for use in enum properties and String extensions
         GlobalLocalizationProvider.setInstance(dependencies.localizationProvider)
-        
-        // Enhanced dependencies reuse the questions service from `dependencies`
-        self.enhancedDependencies = EnhancedDIContainer.createEnhancedDependencies(baseDependencies: dependencies)
     }
     
     var body: some Scene {
@@ -159,7 +158,7 @@ struct dinIslamApp: App {
                 profileManager: dependencies.profileManager,
                 examUseCase: dependencies.examUseCase,
                 examStatisticsManager: dependencies.examStatisticsManager,
-                enhancedQuizUseCase: enhancedDependencies.enhancedQuizUseCase,
+                questionsRepository: dependencies.questionsRepository,
                 achievementManager: dependencies.achievementManager,
                 questionPoolProgressManager: dependencies.questionPoolProgressManager
             )

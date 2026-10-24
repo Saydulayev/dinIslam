@@ -228,9 +228,7 @@ class StatsManager {
         // Сбрасываем только метрики, влияющие на прогресс достижений
         stats.totalQuestionsStudied = 0
         stats.totalQuizzesCompleted = 0
-        stats.currentStreak = 0
         stats.perfectScores = 0
-        stats.longestStreak = 0
         saveStats()
         SyncedDataChange.post(resetSections: [.achievementProgress])
     }

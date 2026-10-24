@@ -26,9 +26,15 @@ final class DefaultQuizFeedbackProvider: QuizFeedbackProviding {
         }
     }
     
+    /// Неудачное завершение (экзамен не сдан, остановлен, ни одного верного ответа) — без звука успеха
     func quizCompleted(success: Bool) {
-        hapticManager.success()
-        soundManager.playSuccessSound()
+        if success {
+            hapticManager.success()
+            soundManager.playSuccessSound()
+        } else {
+            hapticManager.warning()
+            soundManager.playSelectionSound()
+        }
     }
     
     func selectionChanged() {

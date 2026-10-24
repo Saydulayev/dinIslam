@@ -1,5 +1,4 @@
 "profile.title" = "Profile";
-"profile.done" = "Done";
 "profile.noName" = "No Name";
 "profile.noName.hint" = "Tap the pencil to add your name";
 "profile.deleteAllData" = "Delete All Data";
@@ -11,10 +10,6 @@
 "profile.deleteAllData.error.message" = "Nothing was deleted from iCloud or this device. Check your internet connection and iCloud sign-in, then try again.";
 "profile.deleteAllData.error.ok" = "OK";
 "profile.displayName.placeholder" = "Enter name";
-"profile.mastery.novice" = "Novice";
-"profile.mastery.learning" = "Learning";
-"profile.mastery.proficient" = "Proficient";
-"profile.mastery.expert" = "Expert";
 "profile.progress.title" = "Progress";
 "profile.exams.title" = "Exams";
 "profile.exams.passed" = "Passed";
@@ -24,17 +19,6 @@
 "profile.exams.history" = "Exam history";
 "profile.progress.accuracy" = "Answer Accuracy";
 "profile.progress.streak" = "Day Streak";
-"profile.recommendations.title" = "Recommendations";
-"profile.recommendations.nextSteps" = "Next Steps";
-"profile.recommendations.empty" = "No recommendations yet—keep practicing and we will suggest what to learn next.";
-"profile.recommendations.topic" = "Topic: %@";
-"profile.recommendation.focusTopic.title" = "Focus Topic";
-"profile.recommendation.focusTopic" = "We suggest revisiting \"%@\" — there is room to improve.";
-"profile.recommendation.challenge.title" = "New Challenge";
-"profile.recommendation.challenge" = "You are handling %@ questions well. Try increasing the difficulty!";
-"profile.recommendation.maintainStreak.title" = "Keep the Momentum";
-"profile.recommendation.maintainStreak" = "Great streak! Stay on track to reinforce your progress.";
-"profile.avatar.select" = "Choose Photo";
 "profile.avatar.change" = "Change Photo";
 "profile.avatar.delete" = "Delete Photo";
 "profile.sync.reset.title" = "Reset statistics?";
@@ -44,14 +28,10 @@
 "profile.sync.reset.cancel" = "Cancel";
 "profile.sync.reset.inProgress" = "Resetting data…";
 "profile.sync.title" = "Cloud Sync";
-"profile.sync.statistics" = "Statistics Sync";
 "profile.sync.refresh" = "Sync Statistics";
-"profile.sync.ready" = "Synced";
-"profile.sync.guest" = "Guest Mode";
 "profile.sync.lastSync" = "Last sync: %@";
 "profile.sync.never" = "Not synced with iCloud yet";
 "profile.sync.inProgress" = "Syncing...";
-"profile.sync.failed" = "Sync failed: %@";
 "profile.sync.error.conflict" = "Data conflict. Try syncing again";
 "profile.sync.error.network" = "Network issue. Check your internet connection";
 "profile.sync.error.quota" = "iCloud storage quota exceeded";
@@ -74,18 +54,14 @@
 "app.name" = "Tabiin Academy";
 "start.description" = "Knowledge before words and deeds!";
 "start.begin" = "Start Learning";
-"start.loading" = "Loading...";
-"start.bestScore" = "Best Score";
 "start.examMode" = "Exam Mode";
 "start.averageScore" = "Average Score";
 "start.basedOnGames" = "based on %d game";
 "start.basedOnGames_other" = "based on %d games";
 "start.noGamesYet" = "No data yet";
-"start.menu.stats" = "Statistics";
 "start.menu.achievements" = "Achievements";
 "start.menu.profile" = "Profile";
 "start.menu.settings" = "Settings";
-"start.menu.info" = "Info";
 
 // Quiz View
 "quiz.question" = "Question";
@@ -96,7 +72,6 @@
 "result.correctAnswers" = "correct answers";
 "result.totalQuestions" = "Total Questions:";
 "result.timeSpent" = "Time:";
-"result.newRecord" = "New Record!";
 "result.feedback.excellent" = "Excellent!";
 "result.feedback.great" = "Great!";
 "result.feedback.good" = "Good!";
@@ -120,7 +95,6 @@
 // Settings
 "settings.title" = "Settings";
 "settings.done" = "Done";
-"settings.cancel" = "Cancel";
 
 // App Settings
 "settings.appSettings" = "App Settings";
@@ -129,18 +103,12 @@
 "settings.language.russian" = "Русский";
 "settings.language.english" = "English";
 "settings.language.restartHint" = "The Sign in with Apple button and some system elements will switch language after the app is restarted.";
-"settings.theme.title" = "Theme";
-"settings.theme.system" = "System";
-"settings.theme.light" = "Light";
-"settings.theme.dark" = "Dark";
 "settings.sound.title" = "Sound";
 "settings.haptic.title" = "Haptic";
 "settings.notifications.title" = "Notifications";
 
 // Support
 "settings.support" = "Support";
-"settings.feedback.title" = "Send Feedback";
-"settings.feedback.subtitle" = "Share your thoughts";
 "settings.feedback.technical.title" = "Technical Support";
 "settings.feedback.technical.subtitle" = "Bugs, app issues, suggestions";
 "settings.feedback.technical.subject" = "Tabiin Academy — Technical";
@@ -150,14 +118,8 @@
 "settings.feedback.mailUnavailable.title" = "Mail Is Not Set Up";
 "settings.feedback.mailUnavailable.message" = "Couldn't open the Mail app. Please write to us at %@.";
 "settings.feedback.mailUnavailable.copy" = "Copy Address";
-"settings.feedback.message" = "Choose how to send your feedback";
-"settings.feedback.email" = "Send Email";
-"settings.feedback.appStore" = "Rate in App Store";
 "settings.rate.title" = "Rate App";
 "settings.rate.subtitle" = "Help us improve";
-"settings.rate.message" = "Your rating helps us improve the app";
-"settings.rate.now" = "Rate Now";
-"settings.rate.later" = "Remind Later";
 "settings.share.title" = "Share";
 "settings.share.subtitle" = "Tell your friends";
 "settings.share.text" = "Learn your religion with Tabiin Academy";
@@ -167,14 +129,6 @@
 "settings.version.title" = "Version";
 "settings.privacy.title" = "Privacy Policy";
 "settings.terms.title" = "Terms of Service";
-
-// Danger Zone
-"settings.dangerZone" = "Danger Zone";
-"settings.reset.title" = "Reset Settings";
-"settings.reset.footer" = "This will reset all settings to default values";
-
-// Quiz Stop
-"quiz.stop" = "Stop";
 
 // Quiz Finish
 "quiz.finish" = "Finish";
@@ -202,8 +156,6 @@
 "accessibility.displayName.save" = "Save name";
 
 // Stats View - Pluralization Support
-"stats.title" = "Statistics";
-"stats.done" = "Done";
 "stats.reset" = "Reset Statistics";
 
 // Stat titles (without pluralization)
@@ -212,72 +164,19 @@
 "stats.incorrectAnswers.title" = "Incorrect Answers";
 "stats.correctedMistakes.title" = "Mistakes Corrected";
 "stats.totalQuestions.title" = "Total Questions";
-"stats.remainingQuestions.title" = "Remaining Questions";
-"stats.quizzesCompleted.title" = "Quizzes Completed";
-"stats.currentStreak.title" = "Current Streak";
-"stats.lastQuiz" = "Last Quiz:";
 "stats.wrongQuestions" = "Questions to Review";
 "stats.wrongQuestionsCount.title" = "Wrong Questions";
 "stats.repeatMistakes" = "Repeat Mistakes";
 
-// Pluralization for stats (with %d)
-"stats.questionsStudied" = "%d question studied";
-"stats.questionsStudied_other" = "%d questions studied";
-"stats.correctAnswers" = "%d correct answer";
-"stats.correctAnswers_other" = "%d correct answers";
-"stats.incorrectAnswers" = "%d incorrect answer";
-"stats.incorrectAnswers_other" = "%d incorrect answers";
-"stats.correctedMistakes" = "%d mistake corrected";
-"stats.correctedMistakes_other" = "%d mistakes corrected";
-"stats.totalQuestions" = "%d total question";
-"stats.totalQuestions_other" = "%d total questions";
-"stats.remainingQuestions" = "%d question remaining";
-"stats.remainingQuestions_other" = "%d questions remaining";
-"stats.quizzesCompleted" = "%d quiz completed";
-"stats.quizzesCompleted_other" = "%d quizzes completed";
-"stats.currentStreak" = "%d day streak";
-"stats.currentStreak_other" = "%d days streak";
-"stats.wrongQuestionsCount" = "%d wrong question";
-"stats.wrongQuestionsCount_other" = "%d wrong questions";
-
 // Sync Section
-"stats.sync.title" = "Sync";
-"stats.sync.questions" = "Questions Sync";
-"stats.sync.status" = "Status";
 "stats.sync.questions.status" = "Question Updates";
 "stats.sync.available" = "Updates Available";
 "stats.sync.upToDate" = "Up to Date";
-"stats.sync.newQuestions.title" = "New Questions";
-"stats.sync.newQuestions" = "%d new question";
-"stats.sync.newQuestions_other" = "%d new questions";
 "stats.sync.check" = "Check Updates";
 "stats.sync.sync" = "Download Questions";
-"stats.progress" = "Progress";
 
 // Mistakes Review
-"mistakes.title" = "Review";
-"mistakes.score" = "Score";
-"mistakes.reviewTitle" = "Mistakes Review";
-"mistakes.wrongAnswer" = "Wrong Answer";
-"mistakes.stop" = "Stop";
-"mistakes.stop.confirm.title" = "Stop Review?";
-"mistakes.stop.confirm.message" = "Your progress will not be saved";
-"mistakes.stop.confirm.cancel" = "Cancel";
-"mistakes.stop.confirm.ok" = "Stop";
 "mistakes.noWrongQuestions" = "No wrong answers to review";
-"mistakes.result.title" = "Review Result";
-"mistakes.result.correctAnswers" = "correct answers";
-"mistakes.result.totalQuestions" = "Total Questions:";
-"mistakes.result.timeSpent" = "Time:";
-"mistakes.result.improvement" = "Improvement!";
-"mistakes.result.needMorePractice" = "Need More Practice";
-"mistakes.result.repeatAgain" = "Repeat Again";
-"mistakes.result.backToStart" = "Back to Start";
-"mistakes.loading" = "Loading...";
-"mistakes.stopped" = "Review stopped";
-"mistakes.error" = "An error occurred";
-"mistakes.back" = "Back";
-"mistakes.close" = "Close";
 
 // Achievements
 "achievements.title" = "Achievements";
@@ -373,7 +272,6 @@
 "notification.settings.title" = "Configure";
 "notification.settings.enabled" = "Enable Reminders";
 "notification.settings.time" = "Reminder Time";
-"notification.settings.test" = "Test Notification";
 
 // Achievement Notifications
 "achievement.notification.title" = "New Achievement!";
@@ -384,15 +282,8 @@
 "settings.off" = "Off";
 
 // Notification Settings
-"notification.settings.about.title" = "About Reminders";
-"notification.settings.about.description" = "Maintain consistency in learning";
-"notification.settings.features.daily" = "Daily study reminders";
-"notification.settings.features.achievements" = "New achievement notifications";
-"notification.settings.features.streak" = "Streak maintenance reminders";
 "notification.settings.footer" = "The reminder arrives at the selected time if you haven't studied yet that day.";
 "notification.permission.denied.message" = "Notifications are turned off in iPhone Settings. Tap “Open Settings” and turn on “Allow Notifications”.";
-"notification.test.sent.title" = "Test Notification";
-"notification.test.sent.message" = "Test notification sent!";
 
 // Privacy Policy
 "privacy.title" = "Privacy Policy";
@@ -454,14 +345,12 @@
 
 // Exam Mode
 "exam.title" = "Exam";
-"exam.stop" = "Stop";
 "exam.pause" = "Pause";
 "exam.resume" = "Resume";
 "exam.timeUp" = "Time's up";
 "exam.paused.title" = "Exam Paused";
 "exam.paused.message" = "The timer is stopped and the question is hidden. Tap Resume to return to the exam.";
 "exam.skip" = "Skip";
-"exam.finish" = "Finish Exam";
 "exam.finish.title" = "Finish Exam";
 "exam.finish.message" = "Are you sure you want to finish the exam? Results will be saved.";
 "exam.finish.cancel" = "Cancel";
@@ -504,16 +393,11 @@
 "exam.pause.message" = "Are you sure you want to pause the exam?";
 "exam.pause.cancel" = "Cancel";
 "exam.pause.confirm" = "Pause";
-"exam.stop.title" = "Stop Exam";
-"exam.stop.message" = "Are you sure you want to stop the exam? Results will be saved.";
-"exam.stop.cancel" = "Cancel";
-"exam.stop.confirm" = "Stop";
 "exam.error.title" = "Couldn't start the exam";
 "exam.error.retry" = "Try Again";
 
 // Exam Result
 "exam.result.title" = "Exam Result";
-"exam.result.done" = "Done";
 "exam.result.passed" = "Exam Passed!";
 "exam.result.failed" = "Exam Failed";
 "exam.result.grade" = "Grade";
@@ -529,13 +413,6 @@
 "exam.result.passingScore" = "Passing score";
 "exam.result.reviewNote" = "Mistakes and skipped questions have been added to mistakes review.";
 "exam.result.retake" = "Retake";
-"exam.result.share" = "Share";
-"exam.result.share.title" = "📚 Islamic Exam Results";
-"exam.result.share.grade" = "Grade:";
-"exam.result.share.correctAnswers" = "Correct answers:";
-"exam.result.share.percentage" = "Percentage:";
-"exam.result.share.time" = "Time:";
-"exam.result.share.footer" = "Download Tabiin Academy app to learn Islamic knowledge!";
 
 // Exam Grades
 "exam.grade.excellent" = "Excellent";
@@ -561,7 +438,6 @@
 "bank.completion.startOver.confirm.ok" = "Start Over";
 "bank.completion.startOver.confirm.cancel" = "Cancel";
 "bank.completion.review" = "Review";
-"bank.completion.bankCompleted" = "Bank Completed";
 /* Learning loop: topics, review, daily practice */
 "category.aqida" = "Creed";
 "category.pillars" = "Pillars of Islam";
@@ -573,7 +449,6 @@
 "category.history" = "Islamic History";
 "category.akhlaq" = "Ethics & Manners";
 "category.general" = "General";
-
 
 "streak.days" = "day";
 "streak.days_other" = "days";

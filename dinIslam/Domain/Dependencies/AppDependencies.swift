@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct AppDependencies: AppDependenciesProtocol {
+struct AppDependencies {
     let settingsManager: SettingsManager
     let statsManager: StatsManager
     let examStatisticsManager: ExamStatisticsManager

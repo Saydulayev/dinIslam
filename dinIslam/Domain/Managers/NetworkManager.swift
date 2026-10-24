@@ -7,7 +7,7 @@
 
 import Foundation
 import Network
-import Combine
+import Observation
 import OSLog
 
 // MARK: - Network Error Types
@@ -82,13 +82,14 @@ struct NetworkConfiguration {
 }
 
 // MARK: - Network Manager
-class NetworkManager: ObservableObject {
-    private let session: URLSession
-    private let configuration: NetworkConfiguration
-    private let monitor = NWPathMonitor()
-    private let queue = DispatchQueue(label: "NetworkMonitor")
+@Observable
+class NetworkManager {
+    @ObservationIgnored private let session: URLSession
+    @ObservationIgnored private let configuration: NetworkConfiguration
+    @ObservationIgnored private let monitor = NWPathMonitor()
+    @ObservationIgnored private let queue = DispatchQueue(label: "NetworkMonitor")
     
-    @Published var isConnected = true
+    var isConnected = true
     
     /// - Parameters:
     ///   - session: custom URLSession (used by tests to stub network responses).

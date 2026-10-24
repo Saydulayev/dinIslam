@@ -53,7 +53,6 @@ enum StartRoute: Hashable {
 
 struct StartView: View {
     @State private var model: StartViewModel
-    @Environment(\.achievementManager) private var achievementManager
     @Environment(\.scenePhase) private var scenePhase
     
     init(model: StartViewModel) {
@@ -67,7 +66,7 @@ struct StartView: View {
         profileManager: ProfileManager,
         examUseCase: ExamUseCaseProtocol,
         examStatisticsManager: ExamStatisticsManager,
-        enhancedQuizUseCase: EnhancedQuizUseCaseProtocol,
+        questionsRepository: EnhancedQuestionsRepositoryProtocol,
         achievementManager: AchievementManager,
         questionPoolProgressManager: QuestionPoolProgressManaging
     ) {
@@ -78,7 +77,7 @@ struct StartView: View {
             achievementManager: achievementManager
         )
         let questionsPreloading = DefaultQuestionsPreloadingService(
-            enhancedQuizUseCase: enhancedQuizUseCase
+            questionsRepository: questionsRepository
         )
         _model = State(
             initialValue: StartViewModel(
@@ -91,7 +90,7 @@ struct StartView: View {
                 achievementManager: achievementManager,
                 questionsPreloading: questionsPreloading,
                 questionPoolProgressManager: questionPoolProgressManager,
-                enhancedQuizUseCase: enhancedQuizUseCase
+                quizUseCase: quizUseCase
             )
         )
     }
@@ -147,7 +146,7 @@ struct StartView: View {
                         }
                     )
                 case .achievements:
-                    AchievementsView(achievementManager: achievementManager)
+                    AchievementsView()
                 case .settings:
                     SettingsViewWithDependencies(settingsManager: model.settingsManager)
                 case .profile:
@@ -443,21 +442,18 @@ struct StartView: View {
     let adaptiveStrategy = AdaptiveQuestionSelectionStrategy(adaptiveEngine: adaptiveEngine)
     let fallbackStrategy = FallbackQuestionSelectionStrategy()
     let questionPoolProgressManager = DefaultQuestionPoolProgressManager()
+    let questionsRepository = EnhancedQuestionsRepository()
     let quizUseCase = QuizUseCase(
-        questionsRepository: EnhancedQuestionsRepository(),
+        questionsRepository: questionsRepository,
         topicStatsProvider: statsManager,
         questionSelectionStrategy: adaptiveStrategy,
         fallbackStrategy: fallbackStrategy,
         questionPoolProgressManager: questionPoolProgressManager
     )
     let examUseCase = ExamUseCase(
-        questionsRepository: EnhancedQuestionsRepository(),
+        questionsRepository: questionsRepository,
         examStatisticsManager: examStatsManager
     )
-    
-    // Create enhanced dependencies for Preview
-    let baseDependencies = AppDependencies()
-    let enhancedDependencies = EnhancedDIContainer.createEnhancedDependencies(baseDependencies: baseDependencies)
 
     StartView(
         quizUseCase: quizUseCase,
@@ -466,7 +462,7 @@ struct StartView: View {
         profileManager: profileManager,
         examUseCase: examUseCase,
         examStatisticsManager: examStatsManager,
-        enhancedQuizUseCase: enhancedDependencies.enhancedQuizUseCase,
+        questionsRepository: questionsRepository,
         achievementManager: achievementManager,
         questionPoolProgressManager: questionPoolProgressManager
     )

@@ -28,9 +28,7 @@ struct UserStats: Codable {
     var wrongQuestionIds: Set<String> = []
     var lastQuizDate: Date?
     var totalQuizzesCompleted: Int = 0
-    var currentStreak: Int = 0  // Текущая серия побед
     var perfectScores: Int = 0  // Количество идеальных результатов
-    var longestStreak: Int = 0
     var lastQuizPercentage: Double = 0  // Процент последней викторины
     var recentQuizResults: [QuizResultRecord] = []  // Последние 10 результатов
     var topicStats: [String: TopicStat] = [:]
@@ -123,16 +121,6 @@ struct UserStats: Codable {
             recentQuizResults.removeLast()
         }
 
-        // Обновляем серию побед
-        if summary.percentage >= 80.0 {
-            currentStreak += 1
-            if currentStreak > longestStreak {
-                longestStreak = currentStreak
-            }
-        } else {
-            currentStreak = 0
-        }
-
         // Обновляем идеальные результаты (используем >= 99.99 для учета погрешности округления)
         if summary.percentage >= 99.99 {
             perfectScores += 1
@@ -202,9 +190,7 @@ extension UserStats {
         wrongQuestionIds = container.decode(.wrongQuestionIds, default: [])
         lastQuizDate = container.decodeOptional(.lastQuizDate)
         totalQuizzesCompleted = container.decode(.totalQuizzesCompleted, default: 0)
-        currentStreak = container.decode(.currentStreak, default: 0)
         perfectScores = container.decode(.perfectScores, default: 0)
-        longestStreak = container.decode(.longestStreak, default: 0)
         lastQuizPercentage = container.decode(.lastQuizPercentage, default: 0)
         recentQuizResults = container.decodeLossyArray(.recentQuizResults)
         topicStats = container.decode(.topicStats, default: [:])

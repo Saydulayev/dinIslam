@@ -1,5 +1,4 @@
 "profile.title" = "Профиль";
-"profile.done" = "Готово";
 "profile.noName" = "Без имени";
 "profile.noName.hint" = "Нажмите на карандаш, чтобы указать имя";
 "profile.deleteAllData" = "Удалить все данные";
@@ -11,10 +10,6 @@
 "profile.deleteAllData.error.message" = "Данные в iCloud не удалены, на устройстве ничего не изменилось. Проверьте подключение к интернету и вход в iCloud, затем попробуйте снова.";
 "profile.deleteAllData.error.ok" = "ОК";
 "profile.displayName.placeholder" = "Введите имя";
-"profile.mastery.novice" = "Ученик";
-"profile.mastery.learning" = "В процессе";
-"profile.mastery.proficient" = "Уверенный";
-"profile.mastery.expert" = "Мастер";
 "profile.progress.title" = "Прогресс";
 "profile.exams.title" = "Экзамены";
 "profile.exams.passed" = "Сдано";
@@ -24,17 +19,6 @@
 "profile.exams.history" = "История экзаменов";
 "profile.progress.accuracy" = "Точность ответов";
 "profile.progress.streak" = "Серия дней";
-"profile.recommendations.title" = "Рекомендации";
-"profile.recommendations.nextSteps" = "Следующие шаги";
-"profile.recommendations.empty" = "Рекомендаций пока нет — продолжайте обучение, и мы подскажем, что изучать дальше.";
-"profile.recommendations.topic" = "Тема: %@";
-"profile.recommendation.focusTopic.title" = "Сфокусируйтесь на теме";
-"profile.recommendation.focusTopic" = "Рекомендуем повторить тему \"%@\" — здесь есть пространство для роста.";
-"profile.recommendation.challenge.title" = "Новый вызов";
-"profile.recommendation.challenge" = "Вы отлично справляетесь с уровнем %@. Попробуйте более сложные вопросы!";
-"profile.recommendation.maintainStreak.title" = "Держите темп";
-"profile.recommendation.maintainStreak" = "Отличная серия! Продолжайте в том же духе, чтобы закрепить успех.";
-"profile.avatar.select" = "Выбрать фото";
 "profile.avatar.change" = "Сменить фото";
 "profile.avatar.delete" = "Удалить фото";
 "profile.sync.reset.title" = "Сбросить статистику?";
@@ -44,14 +28,10 @@
 "profile.sync.reset.cancel" = "Отмена";
 "profile.sync.reset.inProgress" = "Сбрасываем данные…";
 "profile.sync.title" = "Синхронизация";
-"profile.sync.statistics" = "Синхронизация статистики";
 "profile.sync.refresh" = "Синхронизировать статистику";
-"profile.sync.ready" = "Синхронизировано";
-"profile.sync.guest" = "Гостевой режим";
 "profile.sync.lastSync" = "Последняя синхронизация: %@";
 "profile.sync.never" = "Пока не синхронизировалось с iCloud";
 "profile.sync.inProgress" = "Синхронизация...";
-"profile.sync.failed" = "Ошибка синхронизации: %@";
 "profile.sync.error.conflict" = "Конфликт данных. Попробуйте синхронизировать снова";
 "profile.sync.error.network" = "Проблема с сетью. Проверьте подключение к интернету";
 "profile.sync.error.quota" = "Превышен лимит хранилища iCloud";
@@ -74,19 +54,15 @@
 "app.name" = "Tabiin Academy";
 "start.description" = "Знание – прежде слов и дел!";
 "start.begin" = "Начать изучение";
-"start.loading" = "Загрузка...";
-"start.bestScore" = "Лучший результат";
 "start.examMode" = "Режим экзамена";
 "start.averageScore" = "Средний результат";
 "start.basedOnGames" = "на основе %d игры";
 "start.basedOnGames_2" = "на основе %d игр";
 "start.basedOnGames_5" = "на основе %d игр";
 "start.noGamesYet" = "Пока нет данных";
-"start.menu.stats" = "Статистика";
 "start.menu.achievements" = "Достижения";
 "start.menu.profile" = "Профиль";
 "start.menu.settings" = "Настройки";
-"start.menu.info" = "Инфо";
 
 // Quiz View
 "quiz.question" = "Вопрос";
@@ -97,7 +73,6 @@
 "result.correctAnswers" = "правильных ответов";
 "result.totalQuestions" = "Всего вопросов:";
 "result.timeSpent" = "Время:";
-"result.newRecord" = "Новый рекорд!";
 "result.feedback.excellent" = "Превосходно!";
 "result.feedback.great" = "Отлично!";
 "result.feedback.good" = "Хорошо!";
@@ -121,7 +96,6 @@
 // Settings
 "settings.title" = "Настройки";
 "settings.done" = "Готово";
-"settings.cancel" = "Отмена";
 
 // App Settings
 "settings.appSettings" = "Настройки приложения";
@@ -130,18 +104,12 @@
 "settings.language.russian" = "Русский";
 "settings.language.english" = "English";
 "settings.language.restartHint" = "Кнопка входа через Apple и некоторые системные элементы сменят язык после перезапуска приложения.";
-"settings.theme.title" = "Тема";
-"settings.theme.system" = "Системная";
-"settings.theme.light" = "Светлая";
-"settings.theme.dark" = "Темная";
 "settings.sound.title" = "Звук";
 "settings.haptic.title" = "Тактильность";
 "settings.notifications.title" = "Уведомления";
 
 // Support
 "settings.support" = "Поддержка";
-"settings.feedback.title" = "Обратная связь";
-"settings.feedback.subtitle" = "Поделитесь своими мыслями";
 "settings.feedback.technical.title" = "Техническая поддержка";
 "settings.feedback.technical.subtitle" = "Ошибки, сбои приложения, предложения";
 "settings.feedback.technical.subject" = "Tabiin Academy — Технический вопрос";
@@ -151,14 +119,8 @@
 "settings.feedback.mailUnavailable.title" = "Почта не настроена";
 "settings.feedback.mailUnavailable.message" = "Не удалось открыть приложение «Почта». Напишите нам на адрес %@.";
 "settings.feedback.mailUnavailable.copy" = "Скопировать адрес";
-"settings.feedback.message" = "Выберите способ отправки отзыва";
-"settings.feedback.email" = "Отправить email";
-"settings.feedback.appStore" = "Оценить в App Store";
 "settings.rate.title" = "Оценить приложение";
 "settings.rate.subtitle" = "Помогите нам стать лучше";
-"settings.rate.message" = "Ваша оценка поможет нам улучшить приложение";
-"settings.rate.now" = "Оценить сейчас";
-"settings.rate.later" = "Напомнить позже";
 "settings.share.title" = "Поделиться";
 "settings.share.subtitle" = "Расскажите друзьям";
 "settings.share.text" = "Изучайте свою религию с Tabiin Academy";
@@ -168,14 +130,6 @@
 "settings.version.title" = "Версия";
 "settings.privacy.title" = "Политика конфиденциальности";
 "settings.terms.title" = "Условия использования";
-
-// Danger Zone
-"settings.dangerZone" = "Опасная зона";
-"settings.reset.title" = "Сбросить настройки";
-"settings.reset.footer" = "Это действие сбросит все настройки к значениям по умолчанию";
-
-// Quiz Stop
-"quiz.stop" = "Стоп";
 
 // Quiz Finish
 "quiz.finish" = "Завершить";
@@ -203,8 +157,6 @@
 "accessibility.displayName.save" = "Сохранить имя";
 
 // Stats View - Pluralization Support
-"stats.title" = "Статистика";
-"stats.done" = "Готово";
 "stats.reset" = "Сбросить статистику";
 
 // Stat titles (without pluralization)
@@ -213,80 +165,19 @@
 "stats.incorrectAnswers.title" = "Неправильных ответов";
 "stats.correctedMistakes.title" = "Исправлено ошибок";
 "stats.totalQuestions.title" = "Всего вопросов";
-"stats.remainingQuestions.title" = "Осталось изучить";
-"stats.quizzesCompleted.title" = "Завершено викторин";
-"stats.currentStreak.title" = "Серия побед";
-"stats.lastQuiz" = "Последняя викторина:";
 "stats.wrongQuestions" = "Вопросы для повторения";
 "stats.wrongQuestionsCount.title" = "Неправильных вопросов";
 "stats.repeatMistakes" = "Повторить ошибки";
 
-// Pluralization for stats (Russian has complex pluralization rules)
-"stats.questionsStudied" = "%d вопрос изучен";
-"stats.questionsStudied_2" = "%d вопроса изучено";
-"stats.questionsStudied_5" = "%d вопросов изучено";
-"stats.correctAnswers" = "%d правильный ответ";
-"stats.correctAnswers_2" = "%d правильных ответа";
-"stats.correctAnswers_5" = "%d правильных ответов";
-"stats.incorrectAnswers" = "%d неправильный ответ";
-"stats.incorrectAnswers_2" = "%d неправильных ответа";
-"stats.incorrectAnswers_5" = "%d неправильных ответов";
-"stats.correctedMistakes" = "%d ошибка исправлена";
-"stats.correctedMistakes_2" = "%d ошибки исправлено";
-"stats.correctedMistakes_5" = "%d ошибок исправлено";
-"stats.totalQuestions" = "%d всего вопросов";
-"stats.remainingQuestions" = "%d вопрос остался";
-"stats.remainingQuestions_2" = "%d вопроса осталось";
-"stats.remainingQuestions_5" = "%d вопросов осталось";
-"stats.quizzesCompleted" = "%d викторина завершена";
-"stats.quizzesCompleted_2" = "%d викторины завершено";
-"stats.quizzesCompleted_5" = "%d викторин завершено";
-"stats.currentStreak" = "%d день подряд";
-"stats.currentStreak_2" = "%d дня подряд";
-"stats.currentStreak_5" = "%d дней подряд";
-"stats.wrongQuestionsCount" = "%d неправильный вопрос";
-"stats.wrongQuestionsCount_2" = "%d неправильных вопроса";
-"stats.wrongQuestionsCount_5" = "%d неправильных вопросов";
-
 // Sync Section
-"stats.sync.title" = "Синхронизация";
-"stats.sync.questions" = "Синхронизация вопросов";
-"stats.sync.status" = "Статус";
 "stats.sync.questions.status" = "Обновления вопросов";
 "stats.sync.available" = "Доступны обновления";
 "stats.sync.upToDate" = "Актуально";
-"stats.sync.newQuestions.title" = "Новых вопросов";
-"stats.sync.newQuestions" = "%d новый вопрос";
-"stats.sync.newQuestions_2" = "%d новых вопроса";
-"stats.sync.newQuestions_5" = "%d новых вопросов";
 "stats.sync.check" = "Проверить обновления";
 "stats.sync.sync" = "Загрузить вопросы";
-"stats.progress" = "Прогресс";
 
 // Mistakes Review
-"mistakes.title" = "Повторение";
-"mistakes.score" = "Счёт";
-"mistakes.reviewTitle" = "Повторение ошибок";
-"mistakes.wrongAnswer" = "Неправильный ответ";
-"mistakes.stop" = "Остановить";
-"mistakes.stop.confirm.title" = "Остановить повторение?";
-"mistakes.stop.confirm.message" = "Ваш прогресс не будет сохранён";
-"mistakes.stop.confirm.cancel" = "Отмена";
-"mistakes.stop.confirm.ok" = "Остановить";
 "mistakes.noWrongQuestions" = "Нет неправильных ответов для повторения";
-"mistakes.result.title" = "Результат повторения";
-"mistakes.result.correctAnswers" = "правильных ответов";
-"mistakes.result.totalQuestions" = "Всего вопросов:";
-"mistakes.result.timeSpent" = "Время:";
-"mistakes.result.improvement" = "Улучшение!";
-"mistakes.result.needMorePractice" = "Нужно больше практики";
-"mistakes.result.repeatAgain" = "Повторить снова";
-"mistakes.result.backToStart" = "В главное меню";
-"mistakes.loading" = "Загрузка...";
-"mistakes.stopped" = "Повторение остановлено";
-"mistakes.error" = "Произошла ошибка";
-"mistakes.back" = "Назад";
-"mistakes.close" = "Закрыть";
 
 // Achievements
 "achievements.title" = "Достижения";
@@ -390,7 +281,6 @@
 "notification.settings.title" = "Настроить";
 "notification.settings.enabled" = "Включить напоминания";
 "notification.settings.time" = "Время напоминания";
-"notification.settings.test" = "Тестовое уведомление";
 
 // Achievement Notifications
 "achievement.notification.title" = "Новое достижение!";
@@ -401,15 +291,8 @@
 "settings.off" = "Выключено";
 
 // Notification Settings
-"notification.settings.about.title" = "О напоминаниях";
-"notification.settings.about.description" = "Поддерживайте постоянство в изучении";
-"notification.settings.features.daily" = "Ежедневные напоминания о изучении";
-"notification.settings.features.achievements" = "Уведомления о новых достижениях";
-"notification.settings.features.streak" = "Напоминания о поддержании серии";
 "notification.settings.footer" = "Напоминание приходит в выбранное время, если в этот день вы ещё не занимались.";
 "notification.permission.denied.message" = "Уведомления выключены в настройках iPhone. Нажмите «Открыть настройки» и включите «Допуск уведомлений».";
-"notification.test.sent.title" = "Тестовое уведомление";
-"notification.test.sent.message" = "Тестовое уведомление отправлено!";
 
 // Privacy Policy
 "privacy.title" = "Политика конфиденциальности";
@@ -471,14 +354,12 @@
 
 // Exam Mode
 "exam.title" = "Экзамен";
-"exam.stop" = "Остановить";
 "exam.pause" = "Пауза";
 "exam.resume" = "Продолжить";
 "exam.timeUp" = "Время вышло";
 "exam.paused.title" = "Экзамен на паузе";
 "exam.paused.message" = "Таймер остановлен, вопрос скрыт. Нажмите «Продолжить», чтобы вернуться к экзамену.";
 "exam.skip" = "Пропустить";
-"exam.finish" = "Завершить экзамен";
 "exam.finish.title" = "Завершить экзамен";
 "exam.finish.message" = "Вы уверены, что хотите завершить экзамен? Результаты будут сохранены.";
 "exam.finish.cancel" = "Отмена";
@@ -521,16 +402,11 @@
 "exam.pause.message" = "Вы уверены, что хотите поставить экзамен на паузу?";
 "exam.pause.cancel" = "Отмена";
 "exam.pause.confirm" = "Пауза";
-"exam.stop.title" = "Остановить экзамен";
-"exam.stop.message" = "Вы уверены, что хотите остановить экзамен? Результаты будут сохранены.";
-"exam.stop.cancel" = "Отмена";
-"exam.stop.confirm" = "Остановить";
 "exam.error.title" = "Не удалось начать экзамен";
 "exam.error.retry" = "Повторить";
 
 // Exam Result
 "exam.result.title" = "Результат экзамена";
-"exam.result.done" = "Готово";
 "exam.result.passed" = "Экзамен сдан!";
 "exam.result.failed" = "Экзамен не сдан";
 "exam.result.grade" = "Оценка";
@@ -546,13 +422,6 @@
 "exam.result.passingScore" = "Проходной балл";
 "exam.result.reviewNote" = "Ошибки и пропущенные вопросы добавлены в повторение ошибок.";
 "exam.result.retake" = "Пересдать";
-"exam.result.share" = "Поделиться";
-"exam.result.share.title" = "📚 Результат экзамена по исламу";
-"exam.result.share.grade" = "Оценка:";
-"exam.result.share.correctAnswers" = "Правильных ответов:";
-"exam.result.share.percentage" = "Процент:";
-"exam.result.share.time" = "Время:";
-"exam.result.share.footer" = "Скачайте приложение Tabiin Academy для изучения исламских знаний!";
 
 // Exam Grades
 "exam.grade.excellent" = "Отлично";
@@ -578,7 +447,6 @@
 "bank.completion.startOver.confirm.ok" = "Начать заново";
 "bank.completion.startOver.confirm.cancel" = "Отмена";
 "bank.completion.review" = "Повторение";
-"bank.completion.bankCompleted" = "Банк завершён";
 /* Learning loop: темы, повторение, ежедневная практика */
 "category.aqida" = "Основы веры";
 "category.pillars" = "Столпы ислама";
@@ -590,7 +458,6 @@
 "category.history" = "Исламская история";
 "category.akhlaq" = "Этика и нравы";
 "category.general" = "Общее";
-
 
 "streak.days" = "день";
 "streak.days_2" = "дня";

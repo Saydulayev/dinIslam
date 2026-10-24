@@ -63,16 +63,11 @@ class NotificationManager {
     func requestNotificationPermission() async -> Bool {
         do {
             let granted = try await center.requestAuthorization(options: [.alert, .badge, .sound])
-            await MainActor.run {
-                self.hasPermission = granted
-                self.isPermissionDenied = !granted
-                if granted {
-                    self.isNotificationEnabled = true
-                    // Schedule notifications if enabled
-                    if self.isNotificationEnabled {
-                        self.scheduleDailyReminder()
-                    }
-                }
+            hasPermission = granted
+            isPermissionDenied = !granted
+            if granted {
+                isNotificationEnabled = true
+                scheduleDailyReminder()
             }
             return granted
         } catch {

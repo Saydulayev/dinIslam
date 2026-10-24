@@ -171,9 +171,7 @@ struct UnifiedProfileView: View {
     private func syncQuestions() async {
         let questions = await remoteService.forceSync(for: settingsManager.settings.language.resolved)
         
-        await MainActor.run {
-            questionIds = Set(questions.map(\.id))
-        }
+        questionIds = Set(questions.map(\.id))
     }
 }
 

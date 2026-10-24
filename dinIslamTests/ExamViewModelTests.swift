@@ -350,6 +350,8 @@ private final class ManualExamTimer: ExamTimerManaging {
     var timeRemaining: TimeInterval = 0
     var isTimerActive = false
     var questionStartTime: Date?
+    /// Время в тесте не идёт: остаток задаётся через timeRemaining
+    let deadline: Date? = nil
     private var onTimeUp: (@MainActor () -> Void)?
 
     func startTimer(timeLimit: TimeInterval, onTimeUp: @escaping @MainActor () -> Void) {

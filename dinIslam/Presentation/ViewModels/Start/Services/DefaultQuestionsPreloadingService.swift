@@ -8,14 +8,14 @@
 import Foundation
 
 final class DefaultQuestionsPreloadingService: QuestionsPreloading {
-    private let enhancedQuizUseCase: EnhancedQuizUseCaseProtocol
+    private let questionsRepository: EnhancedQuestionsRepositoryProtocol
     
-    init(enhancedQuizUseCase: EnhancedQuizUseCaseProtocol) {
-        self.enhancedQuizUseCase = enhancedQuizUseCase
+    init(questionsRepository: EnhancedQuestionsRepositoryProtocol) {
+        self.questionsRepository = questionsRepository
     }
     
     func preloadQuestions(for languages: [String]) async {
-        await enhancedQuizUseCase.preloadQuestions(for: languages)
+        await questionsRepository.preloadQuestions(for: languages)
     }
 }
 

@@ -14,15 +14,15 @@ import Foundation
 /// In production code, prefer using LocalizationProviding directly via dependency injection
 enum GlobalLocalizationProvider {
     private static var _instance: LocalizationProviding?
+    private static let fallback: LocalizationProviding = LocalizationManager()
     
     static var instance: LocalizationProviding {
         get {
             if let instance = _instance {
                 return instance
             }
-            // Fallback: create a new instance if not set
-            // This should not happen in production, but provides backward compatibility
-            return LocalizationManager()
+            // Запасной экземпляр (превью): один на всё время работы, а не новый при каждом обращении
+            return fallback
         }
         set {
             _instance = newValue

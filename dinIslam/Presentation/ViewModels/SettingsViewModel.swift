@@ -119,27 +119,8 @@ class SettingsViewModel {
         showingTermsOfService = true
     }
     
-    func shareApp() {
-        hapticManager.selectionChanged()
-        
-        guard let shareURL = URL(string: "https://apps.apple.com/app/id6754708587") else {
-            AppLogger.warning("Share URL is invalid, skipping share sheet", category: AppLogger.ui)
-            return
-        }
-        
-        let activityViewController = UIActivityViewController(
-            activityItems: [
-                "settings.share.text".localized,
-                shareURL
-            ],
-            applicationActivities: nil
-        )
-        
-        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-           let window = windowScene.windows.first {
-            window.rootViewController?.present(activityViewController, animated: true)
-        }
-    }
+    /// Ссылка для «Поделиться приложением» (ShareLink в SettingsView)
+    let shareURL = URL(string: "https://apps.apple.com/app/id6754708587")
     
     // MARK: - Reset Settings
     func resetSettings() {
