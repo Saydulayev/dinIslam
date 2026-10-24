@@ -360,6 +360,13 @@
 "exam.paused.title" = "Экзамен на паузе";
 "exam.paused.message" = "Таймер остановлен, вопрос скрыт. Нажмите «Продолжить», чтобы вернуться к экзамену.";
 "exam.skip" = "Пропустить";
+"exam.returningToSkipped" = "Пропущенный вопрос";
+"exam.skippedPrompt.title" = "Пропущен %d вопрос";
+"exam.skippedPrompt.title_2" = "Пропущено %d вопроса";
+"exam.skippedPrompt.title_5" = "Пропущено %d вопросов";
+"exam.skippedPrompt.message" = "Можно вернуться к ним сейчас — время на каждый вопрос начнётся заново. Если завершить экзамен, пропущенные засчитаются как неверные ответы.";
+"exam.skippedPrompt.return" = "Вернуться к пропущенным";
+"exam.skippedPrompt.finish" = "Завершить экзамен";
 "exam.finish.title" = "Завершить экзамен";
 "exam.finish.message" = "Вы уверены, что хотите завершить экзамен? Результаты будут сохранены.";
 "exam.finish.cancel" = "Отмена";

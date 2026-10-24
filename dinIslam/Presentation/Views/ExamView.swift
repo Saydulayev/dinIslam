@@ -85,6 +85,11 @@ struct ExamView: View {
                 showingResult = true
             case .active(.timeUp):
                 AccessibilityNotification.Announcement("exam.timeUp".localized).post()
+            case .active(.skippedPrompt):
+                let count = viewModel.skippedQuestionIndices.count
+                AccessibilityNotification.Announcement(
+                    "exam.skippedPrompt.title".localized(count: count, arguments: count)
+                ).post()
             default:
                 break
             }
@@ -103,6 +108,12 @@ struct ExamView: View {
                     if viewModel.state == .active(.paused) {
                         // На паузе вопрос скрыт: таймер стоит, отвечать нельзя
                         ExamPausedView(onResume: viewModel.resumeExam)
+                    } else if viewModel.state == .active(.skippedPrompt) {
+                        ExamSkippedPromptView(
+                            skippedCount: viewModel.skippedQuestionIndices.count,
+                            onReturn: viewModel.returnToSkipped,
+                            onFinish: viewModel.finishExam
+                        )
                     } else if let question = viewModel.currentQuestion {
                         VStack(spacing: DesignTokens.Spacing.lg) {
                             Text(question.text)
@@ -173,7 +184,14 @@ struct ExamView: View {
                 AnswerAnnouncement.post(for: question, selectedIndex: selectedIndex)
             }
             
-            // Fixed action buttons at the bottom
+            // Fixed action buttons at the bottom (при выборе после последнего вопроса кнопки — в самом блоке)
+            if viewModel.state != .active(.skippedPrompt) {
+                actionBar
+            }
+        }
+    }
+    
+    private var actionBar: some View {
             VStack(spacing: 0) {
                 Divider()
                     .overlay(DesignTokens.Colors.borderSubtle)
@@ -230,7 +248,6 @@ struct ExamView: View {
                 .padding(.vertical, DesignTokens.Spacing.lg)
                 // Убираем фон, чтобы был виден градиент как на главном экране
             }
-        }
     }
 }
 
@@ -248,14 +265,22 @@ struct ExamHeaderView: View {
             HStack {
                 // Question counter
                 // Счётчик мельче текста вопроса, как в викторине
-                Text("\(viewModel.currentQuestionIndex + 1) / \(viewModel.questions.count)")
-                    .font(DesignTokens.Typography.secondarySemibold)
-                    .foregroundStyle(DesignTokens.Colors.textPrimary)
+                VStack(alignment: .leading, spacing: DesignTokens.Spacing.xs) {
+                    Text("\(viewModel.currentQuestionIndex + 1) / \(viewModel.questions.count)")
+                        .font(DesignTokens.Typography.secondarySemibold)
+                        .foregroundStyle(DesignTokens.Colors.textPrimary)
+                    
+                    if viewModel.isReturningToSkipped && viewModel.state != .active(.skippedPrompt) {
+                        Text("exam.returningToSkipped".localized)
+                            .font(DesignTokens.Typography.label)
+                            .foregroundStyle(DesignTokens.Colors.iconOrange)
+                    }
+                }
                 
                 Spacer()
                 
-                // Timer
-                if viewModel.configuration.showTimer {
+                // Timer (при выборе после последнего вопроса время не идёт)
+                if viewModel.configuration.showTimer && viewModel.state != .active(.skippedPrompt) {
                     if let deadline = viewModel.questionDeadline {
                         // Кадры — ровно на смене секунды: отсчёт от момента окончания с шагом в секунду
                         TimelineView(.periodic(from: timerScheduleStart(deadline: deadline), by: 1)) { context in
@@ -343,6 +368,53 @@ struct ExamPausedView: View {
         .background(
             RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
                 .stroke(DesignTokens.Colors.iconPurpleLight.opacity(0.35), lineWidth: 1.5)
+        )
+    }
+}
+
+// MARK: - Exam Skipped Prompt View
+/// Вопросы закончились, а пропущенные остались: вернуться к ним или завершить экзамен
+struct ExamSkippedPromptView: View {
+    let skippedCount: Int
+    let onReturn: () -> Void
+    let onFinish: () -> Void
+    
+    var body: some View {
+        VStack(spacing: DesignTokens.Spacing.lg) {
+            Image(systemName: "arrow.uturn.backward.circle.fill")
+                .font(.system(size: DesignTokens.Sizes.iconDisplay))
+                .foregroundStyle(DesignTokens.Colors.iconOrange)
+                .accessibilityHidden(true)
+            
+            Text("exam.skippedPrompt.title".localized(count: skippedCount, arguments: skippedCount))
+                .font(DesignTokens.Typography.h2)
+                .foregroundStyle(DesignTokens.Colors.textPrimary)
+                .multilineTextAlignment(.center)
+                .accessibilityAddTraits(.isHeader)
+            
+            Text("exam.skippedPrompt.message".localized)
+                .font(DesignTokens.Typography.bodyRegular)
+                .foregroundStyle(DesignTokens.Colors.textSecondary)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+            
+            Button(action: onReturn) {
+                Label("exam.skippedPrompt.return".localized, systemImage: "arrow.uturn.backward")
+                    .font(DesignTokens.Typography.secondarySemibold)
+            }
+            .buttonStyle(DSButtonStyle(role: .warning))
+            
+            Button(action: onFinish) {
+                Label("exam.skippedPrompt.finish".localized, systemImage: "checkmark.circle.fill")
+                    .font(DesignTokens.Typography.secondarySemibold)
+            }
+            .buttonStyle(DSButtonStyle(role: .success))
+        }
+        .padding(DesignTokens.Spacing.xxl)
+        .frame(maxWidth: .infinity)
+        .background(
+            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
+                .stroke(DesignTokens.Colors.iconOrange.opacity(0.35), lineWidth: 1.5)
         )
     }
 }

@@ -80,9 +80,10 @@ final class ExamViewModelTests: XCTestCase {
         XCTAssertNotNil(viewModel.answers["q2"]?.selectedAnswerIndex)
     }
 
-    func testTimeUpOnLastQuestion_finishesExam() async throws {
+    func testTimeUpOnLastQuestion_withoutSkipped_finishesExam() async throws {
         await viewModel.startExam(configuration: makeConfiguration(), language: "ru")
-        viewModel.skipQuestion()
+        viewModel.selectAnswer(at: 0)
+        try await Task.sleep(for: .seconds(1.7))
 
         timer.fireTimeUp()
         try await Task.sleep(for: .seconds(1.8))
@@ -198,6 +199,80 @@ final class ExamViewModelTests: XCTestCase {
 
         viewModel.selectAnswer(at: 0)
         XCTAssertEqual(viewModel.progress, 1)
+    }
+
+    // MARK: - Return to skipped
+
+    func testLastQuestion_withSkipped_offersToReturn() async {
+        await viewModel.startExam(configuration: makeConfiguration(), language: "ru")
+        viewModel.skipQuestion()
+        viewModel.skipQuestion()
+
+        XCTAssertEqual(viewModel.state, .active(.skippedPrompt))
+        XCTAssertEqual(viewModel.skippedQuestionIndices, [0, 1])
+        XCTAssertEqual(useCase.calculateResultCallCount, 0)
+        XCTAssertFalse(timer.isTimerActive)
+    }
+
+    func testReturnToSkipped_answerAll_thenFinishes() async throws {
+        await viewModel.startExam(configuration: makeConfiguration(), language: "ru")
+        viewModel.skipQuestion()
+        viewModel.skipQuestion()
+
+        viewModel.returnToSkipped()
+        XCTAssertEqual(viewModel.state, .active(.playing))
+        XCTAssertTrue(viewModel.isReturningToSkipped)
+        XCTAssertEqual(viewModel.currentQuestionIndex, 0)
+        XCTAssertNil(viewModel.answers["q1"], "Пропуск снимается, на вопрос можно ответить")
+        XCTAssertTrue(timer.isTimerActive)
+
+        viewModel.selectAnswer(at: 0)
+        try await Task.sleep(for: .seconds(1.7))
+        XCTAssertEqual(viewModel.currentQuestionIndex, 1)
+
+        viewModel.selectAnswer(at: 0)
+        try await Task.sleep(for: .seconds(1.7))
+        XCTAssertEqual(viewModel.state, .completed(.finished))
+        XCTAssertEqual(viewModel.answers["q1"]?.isCorrect, true)
+        XCTAssertEqual(viewModel.answers["q2"]?.isCorrect, true)
+    }
+
+    func testReturnToSkipped_skipAgain_offersAgain() async {
+        await viewModel.startExam(configuration: makeConfiguration(), language: "ru")
+        viewModel.skipQuestion()
+        viewModel.skipQuestion()
+
+        viewModel.returnToSkipped()
+        viewModel.skipQuestion()
+        viewModel.skipQuestion()
+
+        XCTAssertEqual(viewModel.state, .active(.skippedPrompt))
+        XCTAssertEqual(viewModel.skippedQuestionIndices, [0, 1])
+    }
+
+    /// К вопросу, на котором вышло время, не вернуться
+    func testTimeExpiredQuestion_isNotOfferedAgain() async throws {
+        await viewModel.startExam(configuration: makeConfiguration(), language: "ru")
+        timer.fireTimeUp()
+        try await Task.sleep(for: .seconds(1.7))
+        viewModel.skipQuestion()
+
+        XCTAssertEqual(viewModel.state, .active(.skippedPrompt))
+        XCTAssertEqual(viewModel.skippedQuestionIndices, [1])
+
+        viewModel.returnToSkipped()
+        XCTAssertEqual(viewModel.currentQuestionIndex, 1)
+    }
+
+    func testFinishFromPrompt_recordsSkippedAsMistakes() async {
+        await viewModel.startExam(configuration: makeConfiguration(), language: "ru")
+        viewModel.skipQuestion()
+        viewModel.skipQuestion()
+
+        viewModel.finishExam()
+
+        XCTAssertEqual(viewModel.state, .completed(.finished))
+        XCTAssertEqual(recorder.summaries.first?.outcomes.map(\.isCorrect), [false, false])
     }
 
     // MARK: - Recording answers

@@ -56,6 +56,8 @@ class ExamViewModel {
     private var examStartTime: Date?
     private var totalTimeSpent: TimeInterval = 0
     private var nextQuestionTask: Task<Void, Never>?
+    /// Пропущенные вопросы, к которым ещё предстоит вернуться (после текущего)
+    private var returnQueue: [Int] = []
     // Язык последнего запуска — нужен для пересдачи с той же конфигурацией
     private var lastLanguage: String = "ru"
     
@@ -66,11 +68,20 @@ class ExamViewModel {
     }
     
     /// Доля вопросов с ответом, пропуском или истёкшим временем: после последнего полоса заполнена до конца
+    /// Доля вопросов с ответом, пропуском или истёкшим временем: после последнего полоса заполнена до конца.
+    /// При возврате к пропущенному его пропуск снимается, поэтому полоса не идёт назад
     var progress: Double {
         guard !questions.isEmpty else { return 0 }
-        let isCurrentAnswered = currentQuestion.map { answers[$0.id] != nil } ?? false
-        return Double(currentQuestionIndex + (isCurrentAnswered ? 1 : 0)) / Double(questions.count)
+        return Double(answers.count) / Double(questions.count)
     }
+    
+    /// Пропущенные кнопкой «Пропустить» (не по истечении времени) — к ним можно вернуться
+    var skippedQuestionIndices: [Int] {
+        questions.indices.filter { answers[questions[$0].id]?.isSkipped == true }
+    }
+    
+    /// Идёт возврат к пропущенным вопросам
+    private(set) var isReturningToSkipped = false
     
     var isLastQuestion: Bool {
         return currentQuestionIndex == questions.count - 1
@@ -198,6 +209,8 @@ class ExamViewModel {
             questions = loadedQuestions
             currentQuestionIndex = 0
             answers.removeAll()
+            isReturningToSkipped = false
+            returnQueue = []
             examStartTime = Date()
             totalTimeSpent = 0
             
@@ -281,15 +294,58 @@ class ExamViewModel {
     }
     
     func nextQuestion() {
-        if isLastQuestion {
-            finishExam()
+        if isReturningToSkipped {
+            // Следующий пропущенный после текущего; пропущенные снова остаются на следующий круг
+            if let next = returnQueue.first {
+                returnQueue.removeFirst()
+                showQuestion(at: next)
+            } else {
+                finishOrOfferSkipped()
+            }
+        } else if isLastQuestion {
+            finishOrOfferSkipped()
         } else {
-            currentQuestionIndex += 1
-            // Сбрасываем время для нового вопроса
-            timerManager.timeRemaining = 0
-            stoppedTimeRemaining = 0
-            startQuestionTimer()
+            showQuestion(at: currentQuestionIndex + 1)
         }
+    }
+    
+    /// Вернуться к пропущенным: по порядку, время на каждый вопрос начинается заново
+    func returnToSkipped() {
+        guard state == .active(.skippedPrompt) else { return }
+        var queue = skippedQuestionIndices
+        guard !queue.isEmpty else {
+            finishExam()
+            return
+        }
+        isReturningToSkipped = true
+        let first = queue.removeFirst()
+        returnQueue = queue
+        state = .active(.playing)
+        showQuestion(at: first)
+    }
+    
+    /// Вопросы закончились: если есть пропущенные, предлагаем вернуться к ним
+    private func finishOrOfferSkipped() {
+        guard canSkipQuestion, !skippedQuestionIndices.isEmpty else {
+            finishExam()
+            return
+        }
+        stopQuestionTimer()
+        isReturningToSkipped = false
+        returnQueue = []
+        state = .active(.skippedPrompt)
+    }
+    
+    private func showQuestion(at index: Int) {
+        currentQuestionIndex = index
+        // Пропуск снимается: на вопрос снова можно ответить
+        if let question = currentQuestion, answers[question.id]?.isSkipped == true {
+            answers[question.id] = nil
+        }
+        // Сбрасываем время для нового вопроса
+        timerManager.timeRemaining = 0
+        stoppedTimeRemaining = 0
+        startQuestionTimer()
     }
     
     func pauseExam() {
@@ -343,6 +399,8 @@ class ExamViewModel {
         questions = []
         currentQuestionIndex = 0
         answers.removeAll()
+        isReturningToSkipped = false
+        returnQueue = []
         examResult = nil
         newAchievements = []
         errorMessage = nil

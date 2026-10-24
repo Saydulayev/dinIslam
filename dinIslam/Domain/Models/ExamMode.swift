@@ -68,6 +68,8 @@ enum ActiveExamState: Equatable {
     case playing
     case paused
     case timeUp
+    /// Вопросы закончились, есть пропущенные: вернуться к ним или завершить
+    case skippedPrompt
 }
 
 enum CompletedExamState: Equatable {

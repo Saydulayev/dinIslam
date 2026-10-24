@@ -351,6 +351,12 @@
 "exam.paused.title" = "Exam Paused";
 "exam.paused.message" = "The timer is stopped and the question is hidden. Tap Resume to return to the exam.";
 "exam.skip" = "Skip";
+"exam.returningToSkipped" = "Skipped question";
+"exam.skippedPrompt.title" = "%d question skipped";
+"exam.skippedPrompt.title_other" = "%d questions skipped";
+"exam.skippedPrompt.message" = "You can go back to them now — the time for each question starts over. If you finish the exam, skipped questions count as wrong answers.";
+"exam.skippedPrompt.return" = "Return to skipped";
+"exam.skippedPrompt.finish" = "Finish exam";
 "exam.finish.title" = "Finish Exam";
 "exam.finish.message" = "Are you sure you want to finish the exam? Results will be saved.";
 "exam.finish.cancel" = "Cancel";
