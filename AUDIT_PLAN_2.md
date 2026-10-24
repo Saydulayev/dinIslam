@@ -6,7 +6,7 @@
 Обозначения пунктов — как в отчёте аудита: **H** — High, **M** — Medium, **L** — Low.
 Critical-проблем не найдено.
 
-**Статус:** этапы 1–9 выполнены. Следующий — этап 10.
+**Статус:** этапы 1–10 выполнены. Следующий — этап 11.
 
 ## Порядок работы на каждом этапе
 
@@ -160,18 +160,20 @@ Critical-проблем не найдено.
 
 ## Этап 10. Чистка кода (без изменения поведения)
 
-- [ ] **M10** — `EnhancedQuizUseCase` дублирует `QuizUseCase.startQuiz` → один use case.
+- [x] **M10** — `EnhancedQuizUseCase` дублирует `QuizUseCase.startQuiz` → один use case.
   `EnhancedDIContainer.swift`, `QuizUseCase.swift`
-- [ ] **M10** — удалить синглтоны `DIContainer.shared`, `AchievementManager.shared`, `LocalizationManager.shared`; значения по умолчанию в `EnvironmentValues` не должны создавать новые менеджеры.
+- [x] **M10** — удалить синглтоны `DIContainer.shared`, `AchievementManager.shared`, `LocalizationManager.shared`; значения по умолчанию в `EnvironmentValues` не должны создавать новые менеджеры.
   `DIContainer.swift`, `AchievementManager.swift:13–22`, `LocalizationManager.swift`, `dinIslamApp.swift:43–133`
-- [ ] **M10** — `ObservableObject` → `@Observable`: `AchievementManager`, `LocalizationManager`, `NetworkManager`.
-- [ ] **L7** — `quizCompleted(success:)` игнорирует параметр; вибрация через `.sensoryFeedback`.
+- [x] **M10** — `ObservableObject` → `@Observable`: `AchievementManager`, `LocalizationManager`, `NetworkManager`.
+- [x] **L7** — `quizCompleted(success:)` игнорирует параметр; вибрация через `.sensoryFeedback`.
   `DefaultQuizFeedbackProvider.swift:339–342`
-- [ ] **L8** — два цикла опроса 10 раз в секунду в таймере экзамена → `TimelineView` / `Text(timerInterval:)`.
+- [x] **L8** — два цикла опроса 10 раз в секунду в таймере экзамена → `TimelineView` / `Text(timerInterval:)`.
   `ExamViewModel.swift:384–412`, `DefaultExamTimerManager.swift`
-- [ ] **L9** — лишний entitlement `aps-environment`; «Поделиться» через `ShareLink`. (Неиспользуемый nonce уходит вместе со входом через Apple — этап 6, M13.)
+- [x] **L9** — лишний entitlement `aps-environment`; «Поделиться» через `ShareLink`. (Неиспользуемый nonce уходит вместе со входом через Apple — этап 6, M13.)
   `dinIslam.entitlements`, `ProfileAuthService.swift`, `SettingsViewModel.swift:127–146`
-- [ ] Избыточные `await MainActor.run` при `SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor`.
+- [x] Избыточные `await MainActor.run` при `SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor`.
+
+Сделано. Не сделано по решению: `.sensoryFeedback` (L7) — вибрация остаётся в `HapticManager`, где в одном месте проверяется настройка «Вибрация». Дополнительно: удалены счётчик серии побед (`UserStats.currentStreak/longestStreak`, `WinStreak` в снимке iCloud) и 126 неиспользуемых строк локализации.
 
 ## Этап 11. Тесты
 
