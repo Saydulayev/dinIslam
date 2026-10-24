@@ -49,9 +49,11 @@ class QuizViewModel {
         return questions[currentQuestionIndex]
     }
 
+    /// Доля отвеченных вопросов: после ответа на последний полоса заполнена до конца
     var progress: Double {
         guard !questions.isEmpty else { return 0 }
-        return Double(currentQuestionIndex) / Double(questions.count)
+        let answered = currentQuestionIndex + (isAnswerSelected ? 1 : 0)
+        return Double(answered) / Double(questions.count)
     }
     
     var isLastQuestion: Bool {
@@ -300,6 +302,7 @@ class QuizViewModel {
             // Достижения за результат сессии (идеальный, быстрый) — только за пройденную до конца викторину
             achievementChecker.checkAchievements(
                 for: statisticsRecorder.stats,
+                dayStreak: statisticsRecorder.dayStreak,
                 quizResult: isComplete ? result : nil
             )
             
@@ -408,6 +411,14 @@ class QuizViewModel {
 
         // Продвигаем вопросы по расписанию повторения; выученные уходят из списка ошибок
         let reviewSummary = statisticsRecorder.recordReviewAnswers(questionResults)
+        // Повторение тоже продлевает серию дней — «Постоянный» может открыться и здесь
+        if !questionResults.isEmpty {
+            achievementChecker.checkAchievements(
+                for: statisticsRecorder.stats,
+                dayStreak: statisticsRecorder.dayStreak,
+                quizResult: nil
+            )
+        }
         let outcomes = questions.compactMap { question -> QuizQuestionOutcome? in
             guard let isCorrect = questionResults[question.id] else { return nil }
             return QuizQuestionOutcome(

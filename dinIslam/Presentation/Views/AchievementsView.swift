@@ -115,7 +115,11 @@ struct AchievementCard: View {
     }
     
     private var progress: AchievementProgress {
-        return achievementManager.getAchievementProgress(for: achievement.type, stats: statsManager.stats)
+        return achievementManager.getAchievementProgress(
+            for: achievement.type,
+            stats: statsManager.stats,
+            dayStreak: statsManager.dayStreak
+        )
     }
     
     private var iconColor: Color {

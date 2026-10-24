@@ -78,10 +78,10 @@ struct ProfileStatsSectionView: View {
                         backgroundColor: DesignTokens.Colors.iconPurple.opacity(0.2)
                     )
                     
-                    // Streak
+                    // Серия дней с занятиями, как на главном экране
                     ProgressCardView(
                         icon: "flame",
-                        value: "\(statsManager.stats.currentStreak)",
+                        value: "\(statsManager.dayStreak)",
                         label: "profile.progress.streak".localized,
                         iconColor: DesignTokens.Colors.iconFlame,
                         backgroundColor: DesignTokens.Colors.iconFlame.opacity(0.2)

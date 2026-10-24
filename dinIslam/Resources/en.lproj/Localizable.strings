@@ -22,8 +22,8 @@
 "profile.exams.bestScore" = "Best score";
 "profile.exams.accuracy" = "Answer accuracy";
 "profile.exams.history" = "Exam history";
-"profile.progress.accuracy" = "Average Score";
-"profile.progress.streak" = "Streak";
+"profile.progress.accuracy" = "Answer Accuracy";
+"profile.progress.streak" = "Day Streak";
 "profile.recommendations.title" = "Recommendations";
 "profile.recommendations.nextSteps" = "Next Steps";
 "profile.recommendations.empty" = "No recommendations yet—keep practicing and we will suggest what to learn next.";
@@ -293,7 +293,7 @@
 "achievements.share.text" = "Achievement unlocked";
 "achievements.reset" = "Reset Achievements";
 "achievements.reset.confirm.title" = "Reset Achievements?";
-"achievements.reset.confirm.message" = "All achievements will be locked, and the counters they are based on will be reset: questions studied, quizzes completed, day streak, and perfect scores. Correct and incorrect answers, the mistakes list, and question progress will be kept. This action cannot be undone.";
+"achievements.reset.confirm.message" = "All achievements will be locked, and the counters they are based on will be reset: questions studied, quizzes completed, and perfect scores. Your day streak, correct and incorrect answers, the mistakes list, and question progress will be kept. This action cannot be undone.";
 "achievements.reset.confirm.ok" = "Reset";
 "achievements.reset.confirm.cancel" = "Cancel";
 

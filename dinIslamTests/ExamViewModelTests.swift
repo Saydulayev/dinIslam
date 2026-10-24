@@ -187,6 +187,19 @@ final class ExamViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.state, .completed(.finished))
     }
 
+    // MARK: - Progress
+
+    func testProgress_reachesFullAfterLastAnswer() async {
+        await viewModel.startExam(configuration: makeConfiguration(), language: "ru")
+        XCTAssertEqual(viewModel.progress, 0)
+
+        viewModel.skipQuestion()
+        XCTAssertEqual(viewModel.progress, 0.5)
+
+        viewModel.selectAnswer(at: 0)
+        XCTAssertEqual(viewModel.progress, 1)
+    }
+
     // MARK: - Recording answers
 
     /// Ответы экзамена попадают в общую статистику; пропуск — неверный ответ
@@ -272,7 +285,7 @@ private final class SpyAchievementChecker: QuizAchievementChecking {
     private(set) var checkCount = 0
     var unlockOnCheck: [Achievement] = []
 
-    func checkAchievements(for stats: UserStats, quizResult: QuizResult?) {
+    func checkAchievements(for stats: UserStats, dayStreak: Int, quizResult: QuizResult?) {
         checkCount += 1
         if !unlockOnCheck.isEmpty {
             newAchievements = unlockOnCheck

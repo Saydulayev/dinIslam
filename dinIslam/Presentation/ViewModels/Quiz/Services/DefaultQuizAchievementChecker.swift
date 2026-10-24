@@ -18,8 +18,8 @@ final class DefaultQuizAchievementChecker: QuizAchievementChecking {
         self.achievementManager = achievementManager
     }
     
-    func checkAchievements(for stats: UserStats, quizResult: QuizResult?) {
-        achievementManager.checkAchievements(for: stats, quizResult: quizResult)
+    func checkAchievements(for stats: UserStats, dayStreak: Int, quizResult: QuizResult?) {
+        achievementManager.checkAchievements(for: stats, dayStreak: dayStreak, quizResult: quizResult)
     }
     
     func clearNewAchievements() {

@@ -71,7 +71,7 @@ struct DesignTokens {
         // Text colors - из дизайна
         static let textPrimary = Color.white // основной текст
         static let textSecondary = Color(hex: "#9ca3af") // gray-400 - вторичный текст
-        static let textTertiary = Color(hex: "#9ca3af") // gray-400 - третичный текст
+        static let textTertiary = Color(hex: "#8a909b") // темнее вторичного, контраст ≥ 4.5:1 на чёрном и на карточках
         
         // Icon colors - точные цвета из дизайна
         static let iconBlue = Color(hex: "#3b82f6") // blue-500
@@ -99,7 +99,7 @@ struct DesignTokens {
         static let destructive = iconRed  // разрушительные действия: сброс, выход, удаление
         
         // Borders - нейтральные цвета
-        static let borderSubtle = Color(hex: "#171717").opacity(0.3) // neutral-900 с прозрачностью
+        static let borderSubtle = Color.white.opacity(0.12) // разделители: заметны на чёрном фоне
         static let borderLight = Color(hex: "#171717").opacity(0.5) // neutral-900 с прозрачностью
         static let borderDefault = Color(hex: "#171717") // neutral-900
         

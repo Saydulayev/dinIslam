@@ -5,6 +5,7 @@
 //  Created by Saydulayev on 20.10.25.
 //
 
+import Combine
 import SwiftUI
 import Observation
 #if os(iOS)
@@ -53,6 +54,7 @@ enum StartRoute: Hashable {
 struct StartView: View {
     @State private var model: StartViewModel
     @Environment(\.achievementManager) private var achievementManager
+    @Environment(\.scenePhase) private var scenePhase
     
     init(model: StartViewModel) {
         _model = State(initialValue: model)
@@ -250,6 +252,15 @@ struct StartView: View {
         }
         .onChange(of: model.quizViewModel.state) { _, newValue in
             model.onQuizStateChange(newValue)
+        }
+        // Серия, цель дня и повторение зависят от даты: пересчитываем при возврате в приложение и в полночь
+        .onChange(of: scenePhase) { _, newPhase in
+            if newPhase == .active {
+                model.statsManager.refreshCurrentDate()
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .NSCalendarDayChanged).receive(on: RunLoop.main)) { _ in
+            model.statsManager.refreshCurrentDate()
         }
     }
     

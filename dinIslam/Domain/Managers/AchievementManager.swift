@@ -67,12 +67,13 @@ class AchievementManager: ObservableObject, AchievementManaging {
     
     // MARK: - Public Methods
     
-    func checkAchievements(for stats: UserStats, quizResult: QuizResult? = nil) {
+    /// `dayStreak` — серия дней с занятиями на сегодня (StatsManager.dayStreak)
+    func checkAchievements(for stats: UserStats, dayStreak: Int, quizResult: QuizResult? = nil) {
         var newlyUnlocked: [Achievement] = []
         
         for achievementType in AchievementType.allCases {
             if let achievement = achievements.first(where: { $0.type == achievementType && !$0.isUnlocked }) {
-                if shouldUnlockAchievement(achievement, stats: stats, quizResult: quizResult) {
+                if shouldUnlockAchievement(achievement, stats: stats, dayStreak: dayStreak, quizResult: quizResult) {
                     let unlockedAchievement = Achievement(
                         id: achievement.id,
                         title: achievement.title,
@@ -107,9 +108,9 @@ class AchievementManager: ObservableObject, AchievementManaging {
         }
     }
     
-    func getAchievementProgress(for type: AchievementType, stats: UserStats) -> AchievementProgress {
+    func getAchievementProgress(for type: AchievementType, stats: UserStats, dayStreak: Int) -> AchievementProgress {
         let requirement = getRequirement(for: type)
-        let currentProgress = getCurrentProgress(for: type, stats: stats)
+        let currentProgress = getCurrentProgress(for: type, stats: stats, dayStreak: dayStreak)
         
         return AchievementProgress(
             achievementType: type,
@@ -274,7 +275,7 @@ class AchievementManager: ObservableObject, AchievementManaging {
         ]
     }
     
-    private func shouldUnlockAchievement(_ achievement: Achievement, stats: UserStats, quizResult: QuizResult?) -> Bool {
+    private func shouldUnlockAchievement(_ achievement: Achievement, stats: UserStats, dayStreak: Int, quizResult: QuizResult?) -> Bool {
         switch achievement.type {
         case .firstQuiz:
             return stats.totalQuizzesCompleted >= 1
@@ -292,7 +293,8 @@ class AchievementManager: ObservableObject, AchievementManaging {
         case .master:
             return stats.totalQuizzesCompleted >= 50
         case .streak:
-            return stats.currentStreak >= 5
+            // Серия дней с занятиями, как на главном экране
+            return dayStreak >= 5
         case .explorer:
             return stats.totalQuestionsStudied >= 500
         case .perfectionist:
@@ -323,7 +325,7 @@ class AchievementManager: ObservableObject, AchievementManaging {
         }
     }
     
-    private func getCurrentProgress(for type: AchievementType, stats: UserStats) -> Int {
+    private func getCurrentProgress(for type: AchievementType, stats: UserStats, dayStreak: Int) -> Int {
         switch type {
         case .firstQuiz, .perfectScore, .speedRunner:
             return 0 // These are checked differently
@@ -332,7 +334,7 @@ class AchievementManager: ObservableObject, AchievementManaging {
         case .dedicated, .master, .legend:
             return stats.totalQuizzesCompleted
         case .streak:
-            return stats.currentStreak
+            return dayStreak
         case .perfectionist:
             return stats.perfectScores
         }

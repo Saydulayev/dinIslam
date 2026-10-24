@@ -22,6 +22,9 @@ class StatsManager {
     private let reviewScheduleKey = "MistakeReviewSchedule"
     private let dailyProgressKey = "DailyProgress"
     private let now: () -> Date
+    /// Меняется при возврате в приложение и смене дня: так экран пересчитывает значения,
+    /// зависящие от текущей даты (серия, цель дня, повторение)
+    private var dateRevision = 0
     
     init(
         userDefaults: UserDefaults = .standard,
@@ -135,23 +138,34 @@ class StatsManager {
     // MARK: - Review & Daily Progress
     
     var dueReviewCount: Int {
-        reviewSchedule.dueCount(at: now())
+        reviewSchedule.dueCount(at: currentDate())
     }
     
     var nextReviewDate: Date? {
-        reviewSchedule.nextDueDate(after: now())
+        reviewSchedule.nextDueDate(after: currentDate())
     }
     
     var dayStreak: Int {
-        dailyProgress.streak(at: now())
+        dailyProgress.streak(at: currentDate())
     }
     
     var isDailyGoalCompletedToday: Bool {
-        dailyProgress.isDailyGoalCompleted(on: now())
+        dailyProgress.isDailyGoalCompleted(on: currentDate())
     }
     
     var isActiveToday: Bool {
-        dailyProgress.isActive(on: now())
+        dailyProgress.isActive(on: currentDate())
+    }
+    
+    /// Пересчитать на экране значения, зависящие от текущей даты
+    func refreshCurrentDate() {
+        dateRevision += 1
+    }
+    
+    /// Чтение `dateRevision` подписывает экран на `refreshCurrentDate()`
+    private func currentDate() -> Date {
+        _ = dateRevision
+        return now()
     }
 
     private func saveStats() {

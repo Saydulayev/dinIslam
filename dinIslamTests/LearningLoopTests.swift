@@ -187,6 +187,32 @@ final class StatsManagerReviewTests: XCTestCase {
         )
     }
 
+    /// «Постоянный» выдаётся за 5 дней подряд, а не за 5 викторин подряд от 80%
+    func testStreakAchievement_usesDayStreak() {
+        let manager = AchievementManager(userDefaults: defaults, notificationManager: NotificationManager())
+        var stats = UserStats()
+        stats.currentStreak = 10
+
+        manager.checkAchievements(for: stats, dayStreak: 4)
+        XCTAssertFalse(manager.achievements.first { $0.type == .streak }?.isUnlocked ?? true)
+        XCTAssertEqual(manager.getAchievementProgress(for: .streak, stats: stats, dayStreak: 4).currentProgress, 4)
+
+        manager.checkAchievements(for: UserStats(), dayStreak: 5)
+        XCTAssertTrue(manager.achievements.first { $0.type == .streak }?.isUnlocked ?? false)
+    }
+
+    func testRefreshCurrentDate_keepsValuesForCurrentDay() {
+        let manager = makeManager()
+        manager.recordQuizSession(summary([("q1", true)]))
+        XCTAssertTrue(manager.isActiveToday)
+
+        now = now.addingTimeInterval(3 * 86_400)
+        manager.refreshCurrentDate()
+
+        XCTAssertFalse(manager.isActiveToday)
+        XCTAssertEqual(manager.dayStreak, 0)
+    }
+
     func testQuizMistakes_areScheduledForTomorrow_andStreakStarts() {
         let manager = makeManager()
         manager.recordQuizSession(summary([("q1", false), ("q2", true)]))

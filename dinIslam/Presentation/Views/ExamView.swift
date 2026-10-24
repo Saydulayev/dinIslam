@@ -247,8 +247,9 @@ struct ExamHeaderView: View {
             
             HStack {
                 // Question counter
+                // Счётчик мельче текста вопроса, как в викторине
                 Text("\(viewModel.currentQuestionIndex + 1) / \(viewModel.questions.count)")
-                    .font(DesignTokens.Typography.h1)
+                    .font(DesignTokens.Typography.secondarySemibold)
                     .foregroundStyle(DesignTokens.Colors.textPrimary)
                 
                 Spacer()

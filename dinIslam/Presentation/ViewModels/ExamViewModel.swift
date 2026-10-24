@@ -64,9 +64,11 @@ class ExamViewModel {
         return questions[currentQuestionIndex]
     }
     
+    /// Доля вопросов с ответом, пропуском или истёкшим временем: после последнего полоса заполнена до конца
     var progress: Double {
         guard !questions.isEmpty else { return 0 }
-        return Double(currentQuestionIndex) / Double(questions.count)
+        let isCurrentAnswered = currentQuestion.map { answers[$0.id] != nil } ?? false
+        return Double(currentQuestionIndex + (isCurrentAnswered ? 1 : 0)) / Double(questions.count)
     }
     
     var isLastQuestion: Bool {
@@ -397,7 +399,11 @@ class ExamViewModel {
         // Список «новых» общий с викториной: забираем только открытые сейчас,
         // чтобы они не показались ещё раз после следующей викторины
         achievementChecker.clearNewAchievements()
-        achievementChecker.checkAchievements(for: statisticsRecorder.stats, quizResult: nil)
+        achievementChecker.checkAchievements(
+            for: statisticsRecorder.stats,
+            dayStreak: statisticsRecorder.dayStreak,
+            quizResult: nil
+        )
         newAchievements = achievementChecker.newAchievements
         achievementChecker.clearNewAchievements()
     }
