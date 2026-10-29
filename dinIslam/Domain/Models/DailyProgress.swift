@@ -18,15 +18,11 @@ struct DailyProgress: Codable, Equatable {
 
     /// Серия на указанный момент: если вчера и сегодня занятий не было, серия прервана
     func streak(at date: Date, calendar: Calendar = .current) -> Int {
-        guard let lastActiveDay else { return 0 }
-        let today = calendar.startOfDay(for: date)
-        let days = calendar.dateComponents([.day], from: lastActiveDay, to: today).day ?? 0
-        return days <= 1 ? currentStreak : 0
+        DayStreakRule.streak(currentStreak, lastActiveDay: lastActiveDay, at: date, calendar: calendar)
     }
 
     func isActive(on date: Date, calendar: Calendar = .current) -> Bool {
-        guard let lastActiveDay else { return false }
-        return calendar.isDate(lastActiveDay, inSameDayAs: date)
+        DayStreakRule.isActive(lastActiveDay: lastActiveDay, on: date, calendar: calendar)
     }
 
     func isDailyGoalCompleted(on date: Date, calendar: Calendar = .current) -> Bool {

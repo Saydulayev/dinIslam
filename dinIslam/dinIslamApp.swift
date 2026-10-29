@@ -172,15 +172,17 @@ struct dinIslamApp: App {
             .environment(\.remoteQuestionsService, dependencies.remoteQuestionsService)
             .environment(\.questionPoolProgressManager, dependencies.questionPoolProgressManager)
             .preferredColorScheme(.dark)
-            // Напоминания: данные могли прийти из iCloud без уведомления об изменении — перепланируем при уходе в фон
+            // Напоминания и виджет: данные могли прийти из iCloud без уведомления об изменении — обновляем при уходе в фон
             .onChange(of: scenePhase) { _, newPhase in
                 if newPhase == .background {
                     dependencies.notificationManager.scheduleDailyReminder()
+                    dependencies.widgetUpdater.update()
                 }
             }
-            // Текст напоминаний — на новом языке
+            // Тексты напоминаний и виджета — на новом языке
             .onChange(of: dependencies.settingsManager.settings.language) { _, _ in
                 dependencies.notificationManager.scheduleDailyReminder()
+                dependencies.widgetUpdater.update()
             }
         }
     }

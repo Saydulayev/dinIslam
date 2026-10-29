@@ -1,0 +1,15 @@
+/* Виджет «Серия и повторение» */
+"widget.name" = "Серия и повторение";
+"widget.description" = "Сколько дней подряд вы занимаетесь и сколько ошибок пора повторить.";
+
+"widget.streak" = "день подряд";
+"widget.streak_2" = "дня подряд";
+"widget.streak_5" = "дней подряд";
+
+"widget.review.due" = "%d к повторению";
+"widget.review.dueLabel" = "к повторению";
+"widget.review.none" = "Повторять нечего";
+
+"widget.today.done" = "Сегодня занимались";
+"widget.today.keep" = "Сохраните серию сегодня";
+"widget.today.start" = "Начните серию сегодня";

@@ -660,3 +660,117 @@ final class DailyReminderTests: XCTestCase {
         XCTAssertEqual(dates, [date(day: 10, hour: 9, minute: 15), date(day: 11, hour: 9, minute: 15)])
     }
 }
+
+@MainActor
+final class WidgetSnapshotTests: XCTestCase {
+
+    private var calendar: Calendar!
+    private var start: Date!
+    private var suiteName: String!
+    private var defaults: UserDefaults!
+
+    override func setUp() {
+        super.setUp()
+        calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(identifier: "UTC")!
+        start = calendar.date(from: DateComponents(year: 2026, month: 3, day: 1, hour: 9))!
+        suiteName = "WidgetSnapshotTests-\(UUID().uuidString)"
+        defaults = UserDefaults(suiteName: suiteName)
+    }
+
+    override func tearDown() {
+        defaults.removePersistentDomain(forName: suiteName)
+        defaults = nil
+        super.tearDown()
+    }
+
+    private func day(_ offset: Int, hour: Int = 9) -> Date {
+        calendar.date(byAdding: DateComponents(day: offset, hour: hour - 9), to: start)!
+    }
+
+    private func snapshot(_ progress: DailyProgress, dueDates: [Date] = []) -> WidgetSnapshot {
+        WidgetSnapshot(
+            currentStreak: progress.currentStreak,
+            lastActiveDay: progress.lastActiveDay,
+            reviewDueDates: dueDates,
+            languageCode: "ru"
+        )
+    }
+
+    /// Виджет считает серию по тем же правилам, что приложение: в том числе обрыв через день без занятий
+    func testStreak_matchesDailyProgress() {
+        var progress = DailyProgress()
+        progress.registerActivity(at: day(0), calendar: calendar)
+        progress.registerActivity(at: day(1), calendar: calendar)
+        let snapshot = snapshot(progress)
+
+        for offset in 0...4 {
+            for hour in [0, 23] {
+                let date = day(offset, hour: hour)
+                XCTAssertEqual(snapshot.streak(at: date, calendar: calendar), progress.streak(at: date, calendar: calendar))
+                XCTAssertEqual(snapshot.isActive(on: date, calendar: calendar), progress.isActive(on: date, calendar: calendar))
+            }
+        }
+        XCTAssertEqual(snapshot.streak(at: day(2, hour: 23), calendar: calendar), 2)
+        XCTAssertEqual(snapshot.streak(at: day(3, hour: 0), calendar: calendar), 0)
+    }
+
+    func testDueReviewCount_countsReachedDates() {
+        let snapshot = snapshot(DailyProgress(), dueDates: [day(0, hour: 0), day(1, hour: 0), day(3, hour: 0)])
+
+        XCTAssertEqual(snapshot.dueReviewCount(at: day(0)), 1)
+        XCTAssertEqual(snapshot.dueReviewCount(at: day(1, hour: 0)), 2)
+        XCTAssertEqual(snapshot.dueReviewCount(at: day(5)), 3)
+    }
+
+    /// Лента виджета: каждая полночь и сроки повторения внутри периода, без повторов и прошедших дат
+    func testChangeDates_midnightsAndDueDates() {
+        let dueDates = [day(-1), day(2, hour: 0), day(2, hour: 14), day(30)]
+        let snapshot = snapshot(DailyProgress(), dueDates: dueDates)
+
+        let dates = snapshot.changeDates(after: day(0), days: 3, calendar: calendar)
+
+        XCTAssertEqual(dates, [day(1, hour: 0), day(2, hour: 0), day(2, hour: 14), day(3, hour: 0)])
+    }
+
+    func testStore_savesOnlyChanges() {
+        let store = WidgetSnapshotStore(defaults: defaults)
+        let first = WidgetSnapshot.empty(languageCode: "ru")
+        var second = first
+        second.currentStreak = 3
+
+        XCTAssertNil(store.load())
+        XCTAssertTrue(store.save(first))
+        XCTAssertFalse(store.save(first), "Без изменений виджет не обновляется")
+        XCTAssertTrue(store.save(second))
+        XCTAssertEqual(store.load(), second)
+    }
+
+    func testStore_withoutAppGroup_doesNothing() {
+        let store = WidgetSnapshotStore(defaults: nil)
+
+        XCTAssertFalse(store.save(.empty(languageCode: "en")))
+        XCTAssertNil(store.load())
+    }
+
+    /// Снимок берёт серию и сроки повторения из статистики, язык — из настроек приложения
+    func testUpdater_buildsSnapshotFromStats() {
+        let now = Date()
+        let statsManager = StatsManager(userDefaults: defaults, now: { now })
+        statsManager.recordReviewAnswers(["q1": false, "q2": false])
+        let settingsManager = SettingsManager(userDefaults: defaults)
+        let updater = WidgetUpdater(
+            statsManager: statsManager,
+            settingsManager: settingsManager,
+            store: WidgetSnapshotStore(defaults: defaults)
+        )
+
+        let snapshot = updater.snapshot()
+
+        XCTAssertEqual(snapshot.streak(at: now), 1)
+        XCTAssertTrue(snapshot.isActive(on: now))
+        XCTAssertEqual(snapshot.reviewDueDates.count, 2)
+        XCTAssertEqual(snapshot.dueReviewCount(at: now), statsManager.dueReviewCount)
+        XCTAssertEqual(snapshot.languageCode, settingsManager.settings.language.languageCode)
+    }
+}

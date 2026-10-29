@@ -9,11 +9,12 @@ import Foundation
 
 /// Выбор ключа формы множественного числа: `key` (1), `key_2` (2–4), `key_5` (5–20) для русского,
 /// `key` / `key_other` для английского. Язык берётся у основного LocalizationProviding,
-/// поэтому формы переключаются вместе с остальным интерфейсом
-enum PluralRules {
+/// поэтому формы переключаются вместе с остальным интерфейсом.
+/// Файл входит и в виджет, поэтому язык — код ("ru"), а не AppLanguage
+nonisolated enum PluralRules {
     static func key(for key: String, count: Int, language: String) -> String {
         switch language {
-        case AppLanguage.russian.rawValue:
+        case "ru":
             return russianKey(for: key, count: count)
         default:
             return englishKey(for: key, count: count)

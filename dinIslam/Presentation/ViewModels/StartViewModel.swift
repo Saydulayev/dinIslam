@@ -215,6 +215,19 @@ final class StartViewModel {
         }
     }
     
+    /// Ссылка из виджета: «к повторению» открывает повторение ошибок.
+    /// Начатую викторину или экзамен ссылка не прерывает, а если повторять уже нечего — остаётся главный экран
+    func openWidgetLink(_ url: URL) {
+        guard url == WidgetLink.review, !isSessionInProgress, statsManager.dueReviewCount > 0 else { return }
+        startReview(scope: .due)
+    }
+    
+    private var isSessionInProgress: Bool {
+        if examViewModel != nil { return true }
+        if case .active = quizViewModel.state { return true }
+        return false
+    }
+    
     /// Если сессия не началась (нет вопросов, ошибка сети), не оставляем пустой экран викторины
     private func returnToStartIfSessionFailed() {
         guard quizViewModel.state == .idle || quizViewModel.state == .error(.networkError) else { return }

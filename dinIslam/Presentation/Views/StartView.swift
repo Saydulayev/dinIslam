@@ -278,6 +278,9 @@ struct StartView: View {
         .onReceive(NotificationCenter.default.publisher(for: .NSCalendarDayChanged).receive(on: RunLoop.main)) { _ in
             model.statsManager.refreshCurrentDate()
         }
+        .onOpenURL { url in
+            model.openWidgetLink(url)
+        }
     }
     
     // MARK: - View Sections

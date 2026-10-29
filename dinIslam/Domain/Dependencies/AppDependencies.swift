@@ -24,6 +24,7 @@ struct AppDependencies {
     let remoteQuestionsService: EnhancedRemoteQuestionsService
     let notificationManager: NotificationManager
     let questionPoolProgressManager: QuestionPoolProgressManaging
+    let widgetUpdater: WidgetUpdater
     
     init(userDefaults: UserDefaults = .standard) {
         // Initialize localization provider first
@@ -93,6 +94,10 @@ struct AppDependencies {
         // Initialize managers
         self.hapticManager = HapticManager(settingsManager: settingsManager)
         self.soundManager = SoundManager(settingsManager: settingsManager)
+        
+        // Виджет получает данные сразу при запуске: после обновления приложения снимка ещё нет
+        self.widgetUpdater = WidgetUpdater(statsManager: statsManager, settingsManager: settingsManager)
+        widgetUpdater.update()
     }
 }
 

@@ -1,0 +1,14 @@
+/* Streak & Review widget */
+"widget.name" = "Streak & Review";
+"widget.description" = "How many days in a row you have studied and how many mistakes are due for review.";
+
+"widget.streak" = "day in a row";
+"widget.streak_other" = "days in a row";
+
+"widget.review.due" = "%d to review";
+"widget.review.dueLabel" = "to review";
+"widget.review.none" = "Nothing to review";
+
+"widget.today.done" = "Done today";
+"widget.today.keep" = "Keep your streak today";
+"widget.today.start" = "Start a streak today";
