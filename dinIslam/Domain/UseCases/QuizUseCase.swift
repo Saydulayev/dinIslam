@@ -10,6 +10,9 @@ import Foundation
 protocol QuizUseCaseProtocol {
     func startQuiz(language: String, sessionSize: Int) async throws -> [Question]
     func startDailyQuiz(language: String) async throws -> [Question]
+    func startTopicQuiz(language: String, category: QuestionCategory) async throws -> [Question]
+    /// Изучено вопросов по каждой теме банка; темы без вопросов не входят
+    func topicsProgress(language: String) async throws -> [TopicBankProgress]
     func loadAllQuestions(language: String) async throws -> [Question]
     func shuffleAnswers(for question: Question) -> Question
     func calculateResult(correctAnswers: Int, totalQuestions: Int, timeSpent: TimeInterval) -> QuizResult
@@ -44,7 +47,8 @@ class QuizUseCase: QuizUseCaseProtocol {
     }
     
     nonisolated static let standardSessionSize = 20
-    
+    nonisolated static let topicSessionSize = 10
+
     func startQuiz(language: String, sessionSize: Int = QuizUseCase.standardSessionSize) async throws -> [Question] {
         let allQuestions = try await loadBank(language: language)
         let currentQuestionIds = Set(allQuestions.map { $0.id })
@@ -137,7 +141,31 @@ class QuizUseCase: QuizUseCaseProtocol {
         selected.append(contentsOf: filler.prefix(size - selected.count))
         return selected
     }
-    
+
+    /// Викторина по теме: сначала новые вопросы темы; если их не хватает (тема пройдена),
+    /// добираем изученными из той же темы, чтобы тему можно было повторять всегда.
+    /// Режим повторения банка здесь не нужен: выбор темы — уже явное решение повторить её
+    func startTopicQuiz(language: String, category: QuestionCategory) async throws -> [Question] {
+        let topicQuestions = try await loadBank(language: language).filter { $0.category == category.rawValue }
+        let used = questionPoolProgressManager.getUsedIds(version: questionPoolVersion)
+        let newQuestions = topicQuestions.filter { !used.contains($0.id) }.shuffled()
+        let studiedQuestions = topicQuestions.filter { used.contains($0.id) }.shuffled()
+        return Array((newQuestions + studiedQuestions).prefix(Self.topicSessionSize)).shuffled()
+    }
+
+    func topicsProgress(language: String) async throws -> [TopicBankProgress] {
+        let questionsByTopic = Dictionary(grouping: try await loadBank(language: language), by: \.category)
+        let used = questionPoolProgressManager.getUsedIds(version: questionPoolVersion)
+        return QuestionCategory.allCases.compactMap { category in
+            guard let questions = questionsByTopic[category.rawValue], !questions.isEmpty else { return nil }
+            let studied = questions.filter { used.contains($0.id) }.count
+            return TopicBankProgress(
+                category: category,
+                progress: BankProgress(studied: studied, total: questions.count)
+            )
+        }
+    }
+
     func markQuestionsUsed(_ questionIds: [String]) {
         questionPoolProgressManager.markUsed(questionIds, version: questionPoolVersion)
     }

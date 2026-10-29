@@ -15,6 +15,8 @@ struct ResultView: View {
     let onBackToStart: () -> Void
     let onAchievementsCleared: () -> Void
     var report: SessionReport? = nil
+    /// Тип сессии известен и без отчёта (отчёта нет, если не дано ни одного ответа)
+    var sessionKind: QuizSessionKind = .standard
     var onRepeatMistakes: (([String]) -> Void)? = nil
     
     /// Новые достижения показываются по одному: первое в очереди — текущее
@@ -41,6 +43,12 @@ struct ResultView: View {
                         LocalizedText("result.title")
                             .font(DesignTokens.Typography.h1)
                             .foregroundStyle(DesignTokens.Colors.textPrimary)
+                        
+                        if case .topic(let category) = sessionKind {
+                            Label(category.localizedName, systemImage: category.icon)
+                                .font(DesignTokens.Typography.secondarySemibold)
+                                .foregroundStyle(DesignTokens.Colors.iconPurpleLight)
+                        }
                         
                         if isFinishedEarly {
                             LocalizedText("result.finishedEarly")

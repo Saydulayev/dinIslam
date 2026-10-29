@@ -366,6 +366,63 @@ final class QuizQuestionPoolTests: XCTestCase {
         XCTAssertTrue(ids.isSuperset(of: ["q28", "q29"]))
     }
 
+    // MARK: - Topic Quiz
+
+    /// Только вопросы выбранной темы, сначала новые; уже изученные добирают сессию
+    func testTopicQuiz_onlyTopicQuestions_newFirst() async throws {
+        let questions = Self.questions(count: 30, category: "fiqh") + Self.questions(count: 30, category: "aqida", prefix: "a")
+        pool.markUsed((0..<25).map { "q\($0)" }, version: 1)
+
+        let selected = try await makeUseCase(questions).startTopicQuiz(language: "ru", category: .fiqh)
+        let ids = Set(selected.map(\.id))
+
+        XCTAssertEqual(selected.count, QuizUseCase.topicSessionSize)
+        XCTAssertEqual(ids.count, QuizUseCase.topicSessionSize)
+        XCTAssertTrue(selected.allSatisfy { $0.category == "fiqh" })
+        XCTAssertTrue(ids.isSuperset(of: Set((25..<30).map { "q\($0)" })))
+    }
+
+    /// Тема и весь банк пройдены, режима повторения нет — викторина по теме всё равно доступна
+    func testTopicQuiz_completedBank_stillHasFullSession() async throws {
+        let questions = Self.questions(count: 30, category: "fiqh") + Self.questions(count: 5, category: "aqida", prefix: "a")
+        pool.markUsed(questions.map(\.id), version: 1)
+
+        let selected = try await makeUseCase(questions).startTopicQuiz(language: "ru", category: .fiqh)
+
+        XCTAssertEqual(selected.count, QuizUseCase.topicSessionSize)
+        XCTAssertEqual(Set(selected.map(\.id)).count, QuizUseCase.topicSessionSize)
+        XCTAssertTrue(selected.allSatisfy { $0.category == "fiqh" })
+    }
+
+    func testTopicQuiz_smallTopic_returnsAllItsQuestions() async throws {
+        let questions = Self.questions(count: 4, category: "prophets") + Self.questions(count: 30, category: "fiqh", prefix: "f")
+
+        let selected = try await makeUseCase(questions).startTopicQuiz(language: "ru", category: .prophets)
+
+        XCTAssertEqual(Set(selected.map(\.id)), ["q0", "q1", "q2", "q3"])
+    }
+
+    func testTopicQuiz_topicWithoutQuestions_returnsNothing() async throws {
+        let selected = try await makeUseCase(Self.questions(count: 10)).startTopicQuiz(language: "ru", category: .seerah)
+
+        XCTAssertTrue(selected.isEmpty)
+    }
+
+    /// Прогресс по темам — в порядке тем; темы без вопросов и вопросы без темы не входят
+    func testTopicsProgress_countsStudiedPerTopic() async throws {
+        let questions = Self.questions(count: 10, category: "fiqh")
+            + Self.questions(count: 4, category: "aqida", prefix: "a")
+            + Self.questions(count: 3, category: QuestionCategory.generalId, prefix: "g")
+        pool.markUsed(["q0", "q1", "q2", "a0", "g0", "old"], version: 1)
+
+        let progress = try await makeUseCase(questions).topicsProgress(language: "ru")
+
+        XCTAssertEqual(progress, [
+            TopicBankProgress(category: .aqida, progress: BankProgress(studied: 1, total: 4)),
+            TopicBankProgress(category: .fiqh, progress: BankProgress(studied: 3, total: 10))
+        ])
+    }
+
     // MARK: - Helpers
 
     private func makeUseCase(_ questions: [Question], topicStats: [String: TopicStat] = [:]) -> QuizUseCase {

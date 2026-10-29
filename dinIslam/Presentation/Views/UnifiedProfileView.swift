@@ -17,6 +17,7 @@ struct UnifiedProfileView: View {
     /// Повторение ошибок идёт в общем потоке викторины (StartViewModel.startReview)
     let onStartMistakesReview: () -> Void
     let onShowExamHistory: () -> Void
+    let onStartTopicQuiz: (QuestionCategory) -> Void
     
     @State private var avatarPickerItem: PhotosPickerItem?
     @State private var showResetConfirmation = false
@@ -36,12 +37,14 @@ struct UnifiedProfileView: View {
         statsManager: StatsManager,
         examStatisticsManager: ExamStatisticsManager,
         onStartMistakesReview: @escaping () -> Void,
-        onShowExamHistory: @escaping () -> Void
+        onShowExamHistory: @escaping () -> Void,
+        onStartTopicQuiz: @escaping (QuestionCategory) -> Void
     ) {
         self._statsManager = Bindable(statsManager)
         self.examStatisticsManager = examStatisticsManager
         self.onStartMistakesReview = onStartMistakesReview
         self.onShowExamHistory = onShowExamHistory
+        self.onStartTopicQuiz = onStartTopicQuiz
     }
     
     var body: some View {
@@ -71,7 +74,10 @@ struct UnifiedProfileView: View {
                     )
                     
                     // Knowledge by topic
-                    ProfileKnowledgeSectionView(statsManager: statsManager)
+                    ProfileKnowledgeSectionView(
+                        statsManager: statsManager,
+                        onStartTopicQuiz: onStartTopicQuiz
+                    )
                     
                     // Wrong Questions Section
                     if !statsManager.stats.wrongQuestionIds.isEmpty {
@@ -188,7 +194,8 @@ struct UnifiedProfileView: View {
             statsManager: statsManager,
             examStatisticsManager: examStatsManager,
             onStartMistakesReview: {},
-            onShowExamHistory: {}
+            onShowExamHistory: {},
+            onStartTopicQuiz: { _ in }
         )
     }
     .environment(\.profileManager, profileManager)

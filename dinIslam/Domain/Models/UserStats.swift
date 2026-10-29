@@ -150,6 +150,15 @@ struct TopicStat: Codable {
         guard totalAnswers > 0 else { return 0 }
         return Double(correctAnswers) / Double(totalAnswers) * 100
     }
+
+    /// Оценка темы по одному-двум ответам случайна, поэтому оцениваем темы с достаточным числом ответов
+    static let minimumAnswersForAssessment = 5
+    /// Тема слабая, если верных ответов меньше 70%
+    static let weakAccuracy = 70.0
+
+    var isWeak: Bool {
+        totalAnswers >= Self.minimumAnswersForAssessment && accuracy < Self.weakAccuracy
+    }
 }
 
 struct DifficultyStat: Codable {

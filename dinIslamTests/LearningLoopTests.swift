@@ -537,6 +537,31 @@ final class QuestionFormatTests: XCTestCase {
         XCTAssertEqual(results.first?.total, 2)
     }
 
+    /// В викторине по теме разбивка по темам повторяла бы общий результат
+    func testTopicSession_hasNoTopicBreakdown() {
+        let topicResults = [SessionReport.TopicResult(categoryId: "fiqh", correct: 3, total: 5)]
+
+        let topicReport = SessionReport(kind: .topic(.fiqh), topicResults: topicResults, mistakeIds: [], dayStreak: 1, review: nil)
+        let standardReport = SessionReport(kind: .standard, topicResults: topicResults, mistakeIds: [], dayStreak: 1, review: nil)
+
+        XCTAssertFalse(topicReport.hasTopicBreakdown)
+        XCTAssertTrue(standardReport.hasTopicBreakdown)
+    }
+
+    func testTopicStat_isWeak_onlyWithEnoughAnswers() {
+        var stat = TopicStat()
+        stat.totalAnswers = 4
+        stat.correctAnswers = 0
+        XCTAssertFalse(stat.isWeak)
+
+        stat.totalAnswers = 10
+        stat.correctAnswers = 6
+        XCTAssertTrue(stat.isWeak)
+
+        stat.correctAnswers = 7
+        XCTAssertFalse(stat.isWeak)
+    }
+
     func testBalancedByTopic_takesFromEveryTopicBeforeRepeating() {
         let questions = (0..<10).map { index in
             Question(

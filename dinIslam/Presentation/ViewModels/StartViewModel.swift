@@ -132,7 +132,11 @@ final class StartViewModel {
         switch newState {
         case .completed(.finished), .completed(.mistakesFinished):
             guard let quizResult = quizViewModel.quizResult else { return }
-            let snapshot = StartRoute.ResultSnapshot(from: quizResult, report: quizViewModel.lastSessionReport)
+            let snapshot = StartRoute.ResultSnapshot(
+                from: quizResult,
+                report: quizViewModel.lastSessionReport,
+                kind: quizViewModel.sessionKind
+            )
             navigationCoordinator.showResult(snapshot)
             navigationPath = navigationCoordinator.navigationPath
         default:
@@ -143,6 +147,25 @@ final class StartViewModel {
     // MARK: - Actions
     func startDailyPractice() {
         startQuiz(kind: .daily)
+    }
+    
+    func startTopicQuiz(_ category: QuestionCategory) {
+        startQuiz(kind: .topic(category))
+    }
+    
+    /// «Продолжить» на экране результата: после викторины по теме — снова та же тема,
+    /// после остальных сессий — обычная викторина
+    func playAgain(after kind: QuizSessionKind) {
+        resetQuiz()
+        if case .topic(let category) = kind {
+            startTopicQuiz(category)
+        } else {
+            startQuiz()
+        }
+    }
+    
+    func topicsProgress() async throws -> [TopicBankProgress] {
+        try await quizUseCase.topicsProgress(language: cachedLanguageCode)
     }
     
     /// Повторение ошибок в том же стеке навигации, что и викторина
@@ -264,6 +287,11 @@ final class StartViewModel {
     
     func showExamHistory() {
         navigationCoordinator.showExamHistory()
+        navigationPath = navigationCoordinator.navigationPath
+    }
+    
+    func showTopics() {
+        navigationCoordinator.showTopics()
         navigationPath = navigationCoordinator.navigationPath
     }
     

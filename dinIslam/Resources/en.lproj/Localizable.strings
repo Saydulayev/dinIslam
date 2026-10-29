@@ -473,6 +473,8 @@
 "start.review.title" = "Review mistakes";
 "start.review.subtitle" = "Time to reinforce";
 "start.quiz.subtitle" = "%d questions";
+"start.topics.title" = "Quiz by topic";
+"start.topics.subtitle" = "Choose a topic · %d questions";
 
 "result.dailyGoal.completed" = "Daily practice complete!";
 "result.streak" = "%d %@ in a row";
@@ -498,6 +500,16 @@
 "review.when.inDays_other" = "in %d days";
 
 "knowledge.title" = "My knowledge";
-"knowledge.advice" = "Worth reviewing: “%@”";
-"knowledge.caption" = "Share of correct answers in each topic";
+"knowledge.advice" = "Practice “%@”";
+"knowledge.caption" = "Share of correct answers in each topic. Tap a topic to take a quiz on it";
+
+/* Quiz by topic */
+"topics.title" = "Topics";
+"topics.caption" = "%d questions on the chosen topic: new ones first, then ones you have studied";
+"topics.studied" = "Studied %d of %d";
+"topics.accuracy" = "accuracy %@";
+"topics.weak" = "Worth reviewing";
+"topics.startHint" = "Starts a quiz on this topic";
+"topics.loadError" = "Couldn't load the questions. Please try again.";
+"topic.noQuestions" = "There are no questions in this topic yet.";
 "stats.reviewDueToday.title" = "Due for review today";

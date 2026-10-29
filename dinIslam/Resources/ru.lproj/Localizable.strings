@@ -477,6 +477,8 @@
 "start.review.title" = "Повторение ошибок";
 "start.review.subtitle" = "Пора закрепить";
 "start.quiz.subtitle" = "%d вопросов";
+"start.topics.title" = "Викторина по теме";
+"start.topics.subtitle" = "Выберите тему · %d вопросов";
 
 "result.dailyGoal.completed" = "Ежедневная практика выполнена!";
 "result.streak" = "%d %@ подряд";
@@ -504,6 +506,16 @@
 "review.when.inDays_5" = "через %d дней";
 
 "knowledge.title" = "Мои знания";
-"knowledge.advice" = "Стоит повторить тему «%@»";
-"knowledge.caption" = "Доля правильных ответов по каждой теме";
+"knowledge.advice" = "Повторить тему «%@»";
+"knowledge.caption" = "Доля правильных ответов по каждой теме. Нажмите на тему, чтобы пройти викторину по ней";
+
+/* Викторина по теме */
+"topics.title" = "Темы";
+"topics.caption" = "%d вопросов по выбранной теме: сначала новые, затем уже изученные";
+"topics.studied" = "Изучено %d из %d";
+"topics.accuracy" = "точность %@";
+"topics.weak" = "Стоит повторить";
+"topics.startHint" = "Начать викторину по этой теме";
+"topics.loadError" = "Не удалось загрузить вопросы. Попробуйте ещё раз.";
+"topic.noQuestions" = "В этой теме пока нет вопросов.";
 "stats.reviewDueToday.title" = "Повторить сегодня";

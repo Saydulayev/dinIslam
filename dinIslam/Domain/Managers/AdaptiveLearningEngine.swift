@@ -16,11 +16,7 @@ final class AdaptiveLearningEngine {
         sessionCount: Int
     ) -> [Question] {
         var selection: [Question] = []
-        // Оценка темы по одному-двум ответам случайна, поэтому слабыми считаем темы с достаточным числом ответов
-        let weakTopics = Set(topicStats.filter {
-            $0.value.totalAnswers >= Self.minimumAnswersForTopicAssessment &&
-            $0.value.accuracy < Self.weakTopicAccuracy
-        }.keys)
+        let weakTopics = Set(topicStats.filter { $0.value.isWeak }.keys)
 
         let newQuestions = allQuestions.filter { !usedQuestionIds.contains($0.id) }
         let reusedQuestions = allQuestions.filter { usedQuestionIds.contains($0.id) }
@@ -50,10 +46,6 @@ final class AdaptiveLearningEngine {
     }
 
     // MARK: - Private Helpers
-    private static let minimumAnswersForTopicAssessment = 5
-    /// Тема слабая, если верных ответов меньше 70%
-    private static let weakTopicAccuracy = 70.0
-
     /// Берёт вопросы по кругу из разных тем: сначала по одному из каждой, затем по второму и т. д.
     static func balancedByTopic(_ questions: [Question], count: Int) -> [Question] {
         guard count > 0 else { return [] }

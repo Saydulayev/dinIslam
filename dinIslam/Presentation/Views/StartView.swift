@@ -20,6 +20,7 @@ enum StartRoute: Hashable {
     case profile
     case exam
     case examHistory
+    case topics
     case bankCompletion(totalQuestions: Int)
     
     struct ResultSnapshot: Hashable {
@@ -29,14 +30,17 @@ enum StartRoute: Hashable {
         let timeSpent: Double
         let plannedQuestions: Int?
         let report: SessionReport?
+        /// Какой была сессия: «Продолжить» после викторины по теме продолжает ту же тему
+        let kind: QuizSessionKind
         
-        init(from result: QuizResult, report: SessionReport? = nil) {
+        init(from result: QuizResult, report: SessionReport? = nil, kind: QuizSessionKind = .standard) {
             totalQuestions = result.totalQuestions
             correctAnswers = result.correctAnswers
             percentage = result.percentage
             timeSpent = result.timeSpent
             plannedQuestions = result.plannedQuestions
             self.report = report
+            self.kind = kind
         }
         
         func makeQuizResult() -> QuizResult {
@@ -131,8 +135,7 @@ struct StartView: View {
                         result: snapshot.makeQuizResult(),
                         newAchievements: quizViewModel.newAchievements,
                         onPlayAgain: {
-                            model.resetQuiz()
-                            model.startQuiz()
+                            model.playAgain(after: snapshot.kind)
                         },
                         onBackToStart: {
                             model.resetQuiz()
@@ -141,6 +144,7 @@ struct StartView: View {
                             model.clearNewAchievements()
                         },
                         report: snapshot.report,
+                        sessionKind: snapshot.kind,
                         onRepeatMistakes: { mistakeIds in
                             model.startReview(scope: .questions(Set(mistakeIds)))
                         }
@@ -158,6 +162,9 @@ struct StartView: View {
                         },
                         onShowExamHistory: {
                             model.showExamHistory()
+                        },
+                        onStartTopicQuiz: { category in
+                            model.startTopicQuiz(category)
                         }
                     )
                 case .exam:
@@ -168,6 +175,16 @@ struct StartView: View {
                     }
                 case .examHistory:
                     ExamHistoryView(examStatisticsManager: model.examStatisticsManager)
+                case .topics:
+                    TopicsView(
+                        statsManager: model.statsManager,
+                        loadTopics: {
+                            try await model.topicsProgress()
+                        },
+                        onSelectTopic: { category in
+                            model.startTopicQuiz(category)
+                        }
+                    )
                 case .bankCompletion(let totalQuestions):
                     BankCompletionView(
                         totalQuestions: totalQuestions,
@@ -367,6 +384,7 @@ struct StartView: View {
                 reviewButton(model: model)
             }
             quizButton(model: model)
+            topicsButton(model: model)
             examButton(model: model)
         }
     }
@@ -408,6 +426,18 @@ struct StartView: View {
             isLoading: model.quizViewModel.isLoading && model.quizViewModel.sessionKind == .standard
         ) {
             model.startQuiz()
+        }
+        .disabled(model.quizViewModel.isLoading)
+    }
+    
+    private func topicsButton(model: StartViewModel) -> some View {
+        GradientActionButton(
+            icon: "square.grid.2x2.fill",
+            title: "start.topics.title".localized,
+            subtitle: "start.topics.subtitle".localized(arguments: QuizUseCase.topicSessionSize),
+            gradient: [DesignTokens.Colors.purpleGradientStart, DesignTokens.Colors.purpleGradientEnd]
+        ) {
+            model.showTopics()
         }
         .disabled(model.quizViewModel.isLoading)
     }

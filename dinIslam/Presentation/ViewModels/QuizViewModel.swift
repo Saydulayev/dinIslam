@@ -156,20 +156,24 @@ class QuizViewModel {
         
         do {
             let loadedQuestions: [Question]
-            if kind == .daily {
+            switch kind {
+            case .daily:
                 loadedQuestions = try await quizUseCase.startDailyQuiz(language: language)
-            } else {
+            case .topic(let category):
+                loadedQuestions = try await quizUseCase.startTopicQuiz(language: language, category: category)
+            case .standard, .review:
                 loadedQuestions = try await quizUseCase.startQuiz(
                     language: language,
                     sessionSize: QuizUseCase.standardSessionSize
                 )
             }
-            
+
             // Проверяем, что вопросы действительно получены
             guard !loadedQuestions.isEmpty else {
                 // Если банк завершён, это должно быть обработано в StartViewModel,
                 // но на случай если проверка не сработала, показываем ошибку
-                errorMessage = localizationProvider.localizedString(for: "quiz.bankCompleted")
+                let messageKey = if case .topic = kind { "topic.noQuestions" } else { "quiz.bankCompleted" }
+                errorMessage = localizationProvider.localizedString(for: messageKey)
                 state = .idle
                 isLoading = false
                 return

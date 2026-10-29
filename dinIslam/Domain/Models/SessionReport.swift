@@ -14,6 +14,8 @@ enum QuizSessionKind: Hashable {
     case daily
     /// Повторение ошибок
     case review
+    /// Викторина по одной теме
+    case topic(QuestionCategory)
 }
 
 /// Какие ошибки повторять
@@ -59,9 +61,11 @@ struct SessionReport: Hashable {
     let dayStreak: Int
     let review: ReviewSessionSummary?
 
-    /// Разбивка по темам имеет смысл, только если у вопросов указаны темы
+    /// Разбивка по темам имеет смысл, только если у вопросов указаны темы.
+    /// В викторине по теме она повторяла бы общий результат
     var hasTopicBreakdown: Bool {
-        topicResults.contains { $0.categoryId != QuestionCategory.generalId }
+        if case .topic = kind { return false }
+        return topicResults.contains { $0.categoryId != QuestionCategory.generalId }
     }
 
     static func topicResults(for outcomes: [QuizQuestionOutcome]) -> [TopicResult] {

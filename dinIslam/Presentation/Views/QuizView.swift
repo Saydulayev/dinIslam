@@ -24,6 +24,14 @@ struct QuizView: View {
         "\(viewModel.currentQuestionIndex + 1) / \(viewModel.questions.count)"
     }
     
+    /// В викторине по теме заголовок напоминает, какая тема выбрана
+    private var navigationTitle: String {
+        if case .topic(let category) = viewModel.sessionKind {
+            return category.localizedName
+        }
+        return ""
+    }
+    
     var body: some View {
         ZStack {
             AppBackground()
@@ -166,6 +174,7 @@ struct QuizView: View {
                 }
             }
         }
+        .navigationTitle(navigationTitle)
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
         .toolbarColorScheme(.dark, for: .navigationBar)

@@ -2,16 +2,14 @@
 //  ProfileKnowledgeSectionView.swift
 //  dinIslam
 //
-//  «Мои знания»: точность ответов по каждой теме и подсказка, что повторить.
+//  «Мои знания»: точность ответов по каждой теме и переход к викторине по теме.
 //
 
 import SwiftUI
 
 struct ProfileKnowledgeSectionView: View {
     @Bindable var statsManager: StatsManager
-
-    /// Чтобы оценка темы была осмысленной, нужно несколько ответов
-    private let minimumAnswersForAdvice = 5
+    let onStartTopicQuiz: (QuestionCategory) -> Void
 
     private var topics: [(category: QuestionCategory, stat: TopicStat)] {
         QuestionCategory.allCases.compactMap { category in
@@ -22,7 +20,7 @@ struct ProfileKnowledgeSectionView: View {
 
     private var weakestTopic: QuestionCategory? {
         topics
-            .filter { $0.stat.totalAnswers >= minimumAnswersForAdvice && $0.stat.accuracy < 70 }
+            .filter { $0.stat.isWeak }
             .min { $0.stat.accuracy < $1.stat.accuracy }?
             .category
     }
@@ -36,27 +34,40 @@ struct ProfileKnowledgeSectionView: View {
 
                 VStack(spacing: DesignTokens.Spacing.md) {
                     ForEach(topics, id: \.category) { topic in
-                        TopicProgressRow(
-                            categoryId: topic.category.rawValue,
-                            accuracy: topic.stat.accuracy / 100,
-                            detail: topic.stat.accuracy.displayScore
-                        )
+                        Button {
+                            onStartTopicQuiz(topic.category)
+                        } label: {
+                            HStack(spacing: DesignTokens.Spacing.sm) {
+                                TopicProgressRow(
+                                    categoryId: topic.category.rawValue,
+                                    accuracy: topic.stat.accuracy / 100,
+                                    detail: topic.stat.accuracy.displayScore
+                                )
+                                Image(systemName: "chevron.right")
+                                    .font(.system(size: DesignTokens.Sizes.iconXSmall))
+                                    .foregroundStyle(DesignTokens.Colors.textTertiary)
+                                    .accessibilityHidden(true)
+                            }
+                            .contentShape(.rect)
+                        }
+                        .buttonStyle(.pressable)
+                        .accessibilityHint("topics.startHint".localized)
                     }
                 }
 
                 if let weakestTopic {
-                    Label(
-                        "knowledge.advice".localized(arguments: weakestTopic.localizedName),
-                        systemImage: "lightbulb"
-                    )
-                    .font(DesignTokens.Typography.label)
-                    .foregroundStyle(DesignTokens.Colors.textSecondary)
-                    .fixedSize(horizontal: false, vertical: true)
+                    MinimalButton(
+                        icon: "lightbulb",
+                        title: "knowledge.advice".localized(arguments: weakestTopic.localizedName)
+                    ) {
+                        onStartTopicQuiz(weakestTopic)
+                    }
                 }
 
                 Text("knowledge.caption".localized)
                     .font(DesignTokens.Typography.label)
                     .foregroundStyle(DesignTokens.Colors.textTertiary)
+                    .fixedSize(horizontal: false, vertical: true)
             }
             .padding(DesignTokens.Spacing.xxl)
             .frame(maxWidth: .infinity, alignment: .leading)
