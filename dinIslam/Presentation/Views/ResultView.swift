@@ -48,6 +48,10 @@ struct ResultView: View {
                             Label(category.localizedName, systemImage: category.icon)
                                 .font(DesignTokens.Typography.secondarySemibold)
                                 .foregroundStyle(DesignTokens.Colors.iconPurpleLight)
+                        } else if sessionKind == .bookmarks {
+                            Label("bookmarks.title".localized, systemImage: "star.fill")
+                                .font(DesignTokens.Typography.secondarySemibold)
+                                .foregroundStyle(DesignTokens.Colors.iconYellow)
                         }
                         
                         if isFinishedEarly {

@@ -260,6 +260,50 @@ final class ProgressSyncTests: XCTestCase {
         XCTAssertNil(iPad.profile.name.value)
     }
 
+    /// Закладка и её снятие доходят до другого устройства; снятая не возвращается,
+    /// сброс статистики закладки не трогает
+    func testBookmarks_andTheirRemoval_reachOtherDevice_andSurviveStatsReset() async throws {
+        let iPhone = makeDevice()
+        let iPad = makeDevice()
+
+        iPhone.stats.toggleBookmark("q1")
+        iPhone.stats.toggleBookmark("q2")
+        try await iPhone.sync()
+        try await iPad.sync()
+        XCTAssertEqual(iPad.stats.bookmarks.ids, ["q1", "q2"])
+
+        iPad.stats.toggleBookmark("q1")
+        try await iPad.sync()
+        try await iPhone.sync()
+        try await iPad.sync()
+        for device in [iPhone, iPad] {
+            XCTAssertEqual(device.stats.bookmarks.ids, ["q2"], "Снятая закладка не возвращается с другого устройства")
+        }
+
+        iPad.resetStatistics()
+        try await iPad.sync()
+        try await iPhone.sync()
+        for device in [iPhone, iPad] {
+            XCTAssertEqual(device.stats.bookmarks.ids, ["q2"])
+        }
+    }
+
+    func testDeleteAllData_removesBookmarksOnOtherDevices() async throws {
+        let iPhone = makeDevice()
+        let iPad = makeDevice()
+        iPhone.stats.toggleBookmark("q1")
+        try await iPhone.sync()
+        try await iPad.sync()
+        XCTAssertTrue(iPad.stats.isBookmarked("q1"))
+
+        try await iPhone.service.deleteAllData(includeICloud: true)
+        try await iPad.sync()
+
+        XCTAssertTrue(iPhone.stats.bookmarks.isEmpty)
+        XCTAssertTrue(iPad.stats.bookmarks.isEmpty)
+        XCTAssertEqual(cloud.snapshot?.bookmarks.bookmarks.isEmpty, true)
+    }
+
     func testNameAndPhoto_latestChangeWins() async throws {
         let iPhone = makeDevice()
         let iPad = makeDevice()

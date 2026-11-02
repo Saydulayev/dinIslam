@@ -18,6 +18,8 @@ struct UnifiedProfileView: View {
     let onStartMistakesReview: () -> Void
     let onShowExamHistory: () -> Void
     let onStartTopicQuiz: (QuestionCategory) -> Void
+    let onShowBookmarks: () -> Void
+    let onStartBookmarksQuiz: () -> Void
     
     @State private var avatarPickerItem: PhotosPickerItem?
     @State private var showResetConfirmation = false
@@ -38,13 +40,17 @@ struct UnifiedProfileView: View {
         examStatisticsManager: ExamStatisticsManager,
         onStartMistakesReview: @escaping () -> Void,
         onShowExamHistory: @escaping () -> Void,
-        onStartTopicQuiz: @escaping (QuestionCategory) -> Void
+        onStartTopicQuiz: @escaping (QuestionCategory) -> Void,
+        onShowBookmarks: @escaping () -> Void,
+        onStartBookmarksQuiz: @escaping () -> Void
     ) {
         self._statsManager = Bindable(statsManager)
         self.examStatisticsManager = examStatisticsManager
         self.onStartMistakesReview = onStartMistakesReview
         self.onShowExamHistory = onShowExamHistory
         self.onStartTopicQuiz = onStartTopicQuiz
+        self.onShowBookmarks = onShowBookmarks
+        self.onStartBookmarksQuiz = onStartBookmarksQuiz
     }
     
     var body: some View {
@@ -84,6 +90,14 @@ struct UnifiedProfileView: View {
                         ProfileWrongQuestionsSectionView(
                             statsManager: statsManager,
                             onStartMistakesReview: onStartMistakesReview
+                        )
+                    }
+                    
+                    if !statsManager.bookmarks.isEmpty {
+                        ProfileBookmarksSectionView(
+                            statsManager: statsManager,
+                            onShowBookmarks: onShowBookmarks,
+                            onStartBookmarksQuiz: onStartBookmarksQuiz
                         )
                     }
                     
@@ -195,7 +209,9 @@ struct UnifiedProfileView: View {
             examStatisticsManager: examStatsManager,
             onStartMistakesReview: {},
             onShowExamHistory: {},
-            onStartTopicQuiz: { _ in }
+            onStartTopicQuiz: { _ in },
+            onShowBookmarks: {},
+            onStartBookmarksQuiz: {}
         )
     }
     .environment(\.profileManager, profileManager)

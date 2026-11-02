@@ -3,7 +3,7 @@
 //  dinIslam
 //
 //  Полный снимок данных, который синхронизируется через iCloud: статистика, ошибки и их
-//  расписание, серия дней, экзамены, достижения, пройденные вопросы банка, имя и фото.
+//  расписание, серия дней, экзамены, достижения, пройденные вопросы банка, закладки, имя и фото.
 //  Правила слияния — в SyncMerger.swift.
 //
 
@@ -21,6 +21,8 @@ enum SyncSection: String, CaseIterable, Codable {
     case achievements
     /// Пройденные вопросы банка
     case questionPool
+    /// Сохранённые вопросы: сбрасываются только вместе со всеми данными
+    case bookmarks
 }
 
 /// Поколение группы данных. Сброс создаёт новое поколение; при синхронизации данные
@@ -223,6 +225,11 @@ struct QuestionPoolSection: Codable, Equatable {
     var usedIds: Set<String> = []
 }
 
+struct BookmarksSection: Codable, Equatable {
+    var epoch: SyncEpoch = .initial
+    var bookmarks = QuestionBookmarks()
+}
+
 // MARK: - Snapshot
 
 struct SyncSnapshot: Codable, Equatable {
@@ -237,6 +244,7 @@ struct SyncSnapshot: Codable, Equatable {
     var achievementProgress = AchievementProgressSection()
     var achievements = AchievementsSection()
     var questionPool = QuestionPoolSection()
+    var bookmarks = BookmarksSection()
 
     /// Даты кодируются без округления: после пересылки снимок совпадает с исходным,
     /// иначе одни и те же результаты и времена изменений выглядели бы разными
@@ -254,6 +262,7 @@ struct SyncSnapshot: Codable, Equatable {
         case .achievementProgress: return achievementProgress.epoch
         case .achievements: return achievements.epoch
         case .questionPool: return questionPool.epoch
+        case .bookmarks: return bookmarks.epoch
         }
     }
 }
@@ -362,6 +371,14 @@ extension QuestionPoolSection {
     }
 }
 
+extension BookmarksSection {
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        epoch = container.decode(.epoch, default: .initial)
+        bookmarks = container.decode(.bookmarks, default: QuestionBookmarks())
+    }
+}
+
 extension SyncSnapshot {
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -372,5 +389,6 @@ extension SyncSnapshot {
         achievementProgress = container.decode(.achievementProgress, default: AchievementProgressSection())
         achievements = container.decode(.achievements, default: AchievementsSection())
         questionPool = container.decode(.questionPool, default: QuestionPoolSection())
+        bookmarks = container.decode(.bookmarks, default: BookmarksSection())
     }
 }

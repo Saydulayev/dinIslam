@@ -21,6 +21,7 @@ enum StartRoute: Hashable {
     case exam
     case examHistory
     case topics
+    case bookmarks
     case bankCompletion(totalQuestions: Int)
     
     struct ResultSnapshot: Hashable {
@@ -165,6 +166,12 @@ struct StartView: View {
                         },
                         onStartTopicQuiz: { category in
                             model.startTopicQuiz(category)
+                        },
+                        onShowBookmarks: {
+                            model.showBookmarks()
+                        },
+                        onStartBookmarksQuiz: {
+                            model.startBookmarksQuiz()
                         }
                     )
                 case .exam:
@@ -183,6 +190,16 @@ struct StartView: View {
                         },
                         onSelectTopic: { category in
                             model.startTopicQuiz(category)
+                        }
+                    )
+                case .bookmarks:
+                    BookmarksView(
+                        statsManager: model.statsManager,
+                        loadQuestions: {
+                            try await model.loadAllQuestions()
+                        },
+                        onStartQuiz: {
+                            model.startBookmarksQuiz()
                         }
                     )
                 case .bankCompletion(let totalQuestions):

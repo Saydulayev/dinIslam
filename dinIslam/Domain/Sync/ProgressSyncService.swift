@@ -126,6 +126,7 @@ final class ProgressSyncService {
         empty.achievementProgress.epoch = .new(at: now)
         empty.achievements.epoch = .new(at: now)
         empty.questionPool.epoch = .new(at: now)
+        empty.bookmarks.epoch = .new(at: now)
 
         var accountId: String?
         if includeICloud {
@@ -204,6 +205,7 @@ final class ProgressSyncService {
             epoch: state.questionPoolEpoch,
             usedIds: questionPoolProgressManager.getUsedIds(version: questionPoolVersion)
         )
+        snapshot.bookmarks = BookmarksSection(epoch: state.bookmarksEpoch, bookmarks: statsManager.bookmarks)
         return snapshot
     }
 
@@ -308,6 +310,7 @@ final class ProgressSyncService {
             questionPoolProgressManager.setReviewMode(false, version: questionPoolVersion)
         }
         achievementManager.applyUnlockedDates(snapshot.achievements.unlocked)
+        statsManager.applySyncedBookmarks(snapshot.bookmarks.bookmarks)
 
         stateStore.update { state in
             for section in SyncSection.allCases {
@@ -371,6 +374,7 @@ final class ProgressSyncService {
         empty.achievementProgress.epoch = snapshot.achievementProgress.epoch
         empty.achievements.epoch = snapshot.achievements.epoch
         empty.questionPool.epoch = snapshot.questionPool.epoch
+        empty.bookmarks.epoch = snapshot.bookmarks.epoch
         apply(empty)
         questionPoolProgressManager.setReviewMode(false, version: questionPoolVersion)
         profileProvider?.clearProfileForSync()

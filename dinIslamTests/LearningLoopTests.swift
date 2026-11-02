@@ -948,3 +948,149 @@ final class WidgetSnapshotTests: XCTestCase {
         XCTAssertEqual(snapshot.languageCode, settingsManager.settings.language.languageCode)
     }
 }
+
+// MARK: - Закладки: отметка и снятие, слияние двух устройств, хранение, сброс статистики, чтение снимков без закладок
+
+final class QuestionBookmarksTests: XCTestCase {
+
+    private let day = Date(timeIntervalSinceReferenceDate: 800_000_000)
+
+    private func at(_ seconds: Double) -> Date {
+        day.addingTimeInterval(seconds)
+    }
+
+    func testSetAndRemove_newestFirst() {
+        var bookmarks = QuestionBookmarks()
+        bookmarks.set("q1", isBookmarked: true, at: at(0))
+        bookmarks.set("q2", isBookmarked: true, at: at(10))
+        bookmarks.set("q3", isBookmarked: true, at: at(20))
+        bookmarks.set("q2", isBookmarked: false, at: at(30))
+
+        XCTAssertEqual(bookmarks.orderedIds, ["q3", "q1"])
+        XCTAssertEqual(bookmarks.count, 2)
+        XCTAssertFalse(bookmarks.contains("q2"))
+        XCTAssertNotNil(bookmarks.entries["q2"], "Снятая закладка хранится, чтобы не вернулась при синхронизации")
+    }
+
+    /// Повторная отметка не меняет время: место в списке сохраняется
+    func testSettingSameState_keepsDate() {
+        var bookmarks = QuestionBookmarks()
+        bookmarks.set("q1", isBookmarked: true, at: at(0))
+        bookmarks.set("q1", isBookmarked: true, at: at(100))
+
+        XCTAssertEqual(bookmarks.entries["q1"]?.updatedAt, at(0))
+    }
+
+    func testMerge_laterChangeWins_inAnyOrder() {
+        var phone = QuestionBookmarks()
+        phone.set("q1", isBookmarked: true, at: at(0))
+        phone.set("q1", isBookmarked: false, at: at(50))
+        phone.set("q2", isBookmarked: true, at: at(0))
+        var tablet = QuestionBookmarks()
+        tablet.set("q1", isBookmarked: true, at: at(0))
+        tablet.set("q3", isBookmarked: true, at: at(60))
+
+        let merged = QuestionBookmarks.merged(phone, tablet)
+
+        XCTAssertEqual(merged, QuestionBookmarks.merged(tablet, phone))
+        XCTAssertEqual(merged.ids, ["q2", "q3"])
+    }
+
+    func testMerge_sameTime_keepsBookmark() {
+        let added = QuestionBookmarks(entries: ["q1": BookmarkEntry(isBookmarked: true, updatedAt: at(0))])
+        let removed = QuestionBookmarks(entries: ["q1": BookmarkEntry(isBookmarked: false, updatedAt: at(0))])
+
+        XCTAssertTrue(QuestionBookmarks.merged(added, removed).contains("q1"))
+        XCTAssertTrue(QuestionBookmarks.merged(removed, added).contains("q1"))
+    }
+
+    /// Снимок без закладок (записан до их появления) читается целиком
+    func testSnapshot_withoutBookmarks_decodes() throws {
+        var snapshot = SyncSnapshot()
+        snapshot.questionPool.usedIds = ["q1"]
+        var json = try XCTUnwrap(JSONSerialization.jsonObject(with: snapshot.encoded()) as? [String: Any])
+        json.removeValue(forKey: "bookmarks")
+
+        let decoded = try SyncSnapshot.decoded(from: JSONSerialization.data(withJSONObject: json))
+
+        XCTAssertEqual(decoded.questionPool.usedIds, ["q1"])
+        XCTAssertTrue(decoded.bookmarks.bookmarks.isEmpty)
+    }
+
+    func testSyncMerger_newerGeneration_replacesBookmarks() {
+        var local = SyncSnapshot()
+        local.bookmarks.bookmarks.set("q1", isBookmarked: true, at: at(0))
+        var remote = SyncSnapshot()
+        remote.bookmarks.epoch = SyncEpoch(id: "deleted", date: at(10))
+
+        let merged = SyncMerger.merge(local: local, remote: remote, reviewBase: [:], deviceId: "me")
+
+        XCTAssertTrue(merged.bookmarks.bookmarks.isEmpty)
+        XCTAssertEqual(merged.bookmarks.epoch, remote.bookmarks.epoch)
+    }
+}
+
+@MainActor
+final class StatsManagerBookmarksTests: XCTestCase {
+
+    private var defaults: UserDefaults!
+    private var suiteName: String!
+
+    override func setUp() {
+        super.setUp()
+        suiteName = "StatsManagerBookmarksTests-\(UUID().uuidString)"
+        defaults = UserDefaults(suiteName: suiteName)
+    }
+
+    override func tearDown() {
+        defaults.removePersistentDomain(forName: suiteName)
+        defaults = nil
+        super.tearDown()
+    }
+
+    private func question(_ id: String) -> Question {
+        Question(
+            id: id,
+            text: "Вопрос \(id)",
+            answers: [Answer(id: "a", text: "А"), Answer(id: "b", text: "Б")],
+            correctIndex: 0,
+            category: "fiqh",
+            difficulty: .medium
+        )
+    }
+
+    func testToggle_isStored_andSurvivesStatsReset() {
+        let manager = StatsManager(userDefaults: defaults)
+        manager.toggleBookmark("q1")
+        manager.toggleBookmark("q2")
+        manager.toggleBookmark("q2")
+
+        manager.resetStats()
+
+        let reloaded = StatsManager(userDefaults: defaults)
+        XCTAssertEqual(reloaded.bookmarks.ids, ["q1"])
+    }
+
+    /// Только вопросы текущего банка, отмеченные последними — первыми
+    func testBookmarkedQuestions_fromCurrentBank_newestFirst() {
+        var now = Date(timeIntervalSinceReferenceDate: 800_000_000)
+        let manager = StatsManager(userDefaults: defaults, now: { now })
+        for id in ["q1", "removed", "q3"] {
+            manager.toggleBookmark(id)
+            now += 60
+        }
+
+        let questions = manager.getBookmarkedQuestions(from: [question("q1"), question("q2"), question("q3")])
+
+        XCTAssertEqual(questions.map(\.id), ["q3", "q1"])
+    }
+
+    func testToggle_postsSyncedDataChange() {
+        let manager = StatsManager(userDefaults: defaults)
+        let posted = expectation(forNotification: .syncedDataDidChange, object: nil)
+
+        manager.toggleBookmark("q1")
+
+        wait(for: [posted], timeout: 1)
+    }
+}

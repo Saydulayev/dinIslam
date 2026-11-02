@@ -153,13 +153,18 @@ final class StartViewModel {
         startQuiz(kind: .topic(category))
     }
     
-    /// «Продолжить» на экране результата: после викторины по теме — снова та же тема,
-    /// после остальных сессий — обычная викторина
+    func startBookmarksQuiz() {
+        startQuiz(kind: .bookmarks)
+    }
+    
+    /// «Продолжить» на экране результата: после викторины по теме или по сохранённым — та же сессия,
+    /// после остальных — обычная викторина
     func playAgain(after kind: QuizSessionKind) {
         resetQuiz()
-        if case .topic(let category) = kind {
-            startTopicQuiz(category)
-        } else {
+        switch kind {
+        case .topic, .bookmarks:
+            startQuiz(kind: kind)
+        default:
             startQuiz()
         }
     }
@@ -306,6 +311,15 @@ final class StartViewModel {
     func showTopics() {
         navigationCoordinator.showTopics()
         navigationPath = navigationCoordinator.navigationPath
+    }
+    
+    func showBookmarks() {
+        navigationCoordinator.showBookmarks()
+        navigationPath = navigationCoordinator.navigationPath
+    }
+    
+    func loadAllQuestions() async throws -> [Question] {
+        try await quizUseCase.loadAllQuestions(language: cachedLanguageCode)
     }
     
     // MARK: - Bank Completion Actions

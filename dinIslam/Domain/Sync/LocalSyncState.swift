@@ -18,6 +18,7 @@ struct LocalSyncState: Codable, Equatable {
     var achievementProgressEpoch: SyncEpoch = .initial
     var achievementsEpoch: SyncEpoch = .initial
     var questionPoolEpoch: SyncEpoch = .initial
+    var bookmarksEpoch: SyncEpoch = .initial
     /// Вклады других устройств; локальные итоги = свой вклад + эти вклады
     var otherStatsDevices: [String: DeviceContribution<StatsCounters>] = [:]
     var otherAchievementDevices: [String: DeviceContribution<AchievementCounters>] = [:]
@@ -34,6 +35,7 @@ struct LocalSyncState: Codable, Equatable {
         case .achievementProgress: return achievementProgressEpoch
         case .achievements: return achievementsEpoch
         case .questionPool: return questionPoolEpoch
+        case .bookmarks: return bookmarksEpoch
         }
     }
 
@@ -53,6 +55,8 @@ struct LocalSyncState: Codable, Equatable {
             achievementsEpoch = epoch
         case .questionPool:
             questionPoolEpoch = epoch
+        case .bookmarks:
+            bookmarksEpoch = epoch
         }
     }
 }
@@ -67,6 +71,7 @@ extension LocalSyncState {
         achievementProgressEpoch = container.decode(.achievementProgressEpoch, default: .initial)
         achievementsEpoch = container.decode(.achievementsEpoch, default: .initial)
         questionPoolEpoch = container.decode(.questionPoolEpoch, default: .initial)
+        bookmarksEpoch = container.decode(.bookmarksEpoch, default: .initial)
         otherStatsDevices = container.decode(.otherStatsDevices, default: [:])
         otherAchievementDevices = container.decode(.otherAchievementDevices, default: [:])
         reviewBase = container.decode(.reviewBase, default: [:])

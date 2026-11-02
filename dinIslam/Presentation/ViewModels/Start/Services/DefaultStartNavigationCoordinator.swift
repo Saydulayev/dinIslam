@@ -43,6 +43,10 @@ final class DefaultStartNavigationCoordinator: StartNavigationCoordinating {
         navigationPath.append(StartRoute.topics)
     }
     
+    func showBookmarks() {
+        navigationPath.append(StartRoute.bookmarks)
+    }
+    
     func resetNavigation() {
         navigationPath = NavigationPath()
     }

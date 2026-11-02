@@ -16,5 +16,8 @@ protocol QuizStatisticsRecording {
     func registerDailyGoal()
     func getWrongQuestions(from allQuestions: [Question], scope: MistakesReviewScope) -> [Question]
     func recordReviewAnswers(_ answers: [String: Bool]) -> ReviewSessionSummary
+    func isBookmarked(_ questionId: String) -> Bool
+    func toggleBookmark(_ questionId: String)
+    func getBookmarkedQuestions(from allQuestions: [Question]) -> [Question]
 }
 

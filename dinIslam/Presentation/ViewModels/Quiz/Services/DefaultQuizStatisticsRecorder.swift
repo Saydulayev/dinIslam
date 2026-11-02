@@ -44,5 +44,17 @@ final class DefaultQuizStatisticsRecorder: QuizStatisticsRecording {
     func recordReviewAnswers(_ answers: [String: Bool]) -> ReviewSessionSummary {
         statsManager.recordReviewAnswers(answers)
     }
+    
+    func isBookmarked(_ questionId: String) -> Bool {
+        statsManager.isBookmarked(questionId)
+    }
+    
+    func toggleBookmark(_ questionId: String) {
+        statsManager.toggleBookmark(questionId)
+    }
+    
+    func getBookmarkedQuestions(from allQuestions: [Question]) -> [Question] {
+        statsManager.getBookmarkedQuestions(from: allQuestions)
+    }
 }
 

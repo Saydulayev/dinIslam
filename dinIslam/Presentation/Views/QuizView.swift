@@ -26,10 +26,14 @@ struct QuizView: View {
     
     /// В викторине по теме заголовок напоминает, какая тема выбрана
     private var navigationTitle: String {
-        if case .topic(let category) = viewModel.sessionKind {
+        switch viewModel.sessionKind {
+        case .topic(let category):
             return category.localizedName
+        case .bookmarks:
+            return "bookmarks.title".localized
+        default:
+            return ""
         }
-        return ""
     }
     
     var body: some View {
@@ -178,6 +182,13 @@ struct QuizView: View {
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
         .toolbarColorScheme(.dark, for: .navigationBar)
+        .toolbar {
+            if !viewModel.isLoading && viewModel.currentQuestion != nil {
+                ToolbarItem(placement: .topBarTrailing) {
+                    bookmarkButton
+                }
+            }
+        }
         .alert(
             "quiz.finish.confirm.title".localized,
             isPresented: $showingFinishConfirm
@@ -200,6 +211,20 @@ struct QuizView: View {
             // Clear app badge when quiz starts
             UNUserNotificationCenter.current().setBadgeCount(0) { _ in }
         }
+    }
+}
+
+// MARK: - Bookmark
+private extension QuizView {
+    var bookmarkButton: some View {
+        let isBookmarked = viewModel.isCurrentQuestionBookmarked
+        return Button {
+            viewModel.toggleBookmarkForCurrentQuestion()
+        } label: {
+            Image(systemName: isBookmarked ? "star.fill" : "star")
+                .foregroundStyle(isBookmarked ? DesignTokens.Colors.iconYellow : DesignTokens.Colors.textPrimary)
+        }
+        .accessibilityLabel((isBookmarked ? "bookmarks.remove" : "bookmarks.add").localized)
     }
 }
 

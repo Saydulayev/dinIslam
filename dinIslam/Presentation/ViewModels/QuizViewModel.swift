@@ -60,6 +60,11 @@ class QuizViewModel {
         return currentQuestionIndex == questions.count - 1
     }
     
+    var isCurrentQuestionBookmarked: Bool {
+        guard let currentQuestion else { return false }
+        return statisticsRecorder.isBookmarked(currentQuestion.id)
+    }
+    
     /// Переходить к следующему вопросу автоматически; экран выключает это при включённом VoiceOver
     var advancesAutomatically = true
     
@@ -161,6 +166,11 @@ class QuizViewModel {
                 loadedQuestions = try await quizUseCase.startDailyQuiz(language: language)
             case .topic(let category):
                 loadedQuestions = try await quizUseCase.startTopicQuiz(language: language, category: category)
+            case .bookmarks:
+                let bookmarked = statisticsRecorder.getBookmarkedQuestions(
+                    from: try await quizUseCase.loadAllQuestions(language: language)
+                )
+                loadedQuestions = Array(bookmarked.shuffled().prefix(QuizUseCase.standardSessionSize))
             case .standard, .review:
                 loadedQuestions = try await quizUseCase.startQuiz(
                     language: language,
@@ -172,7 +182,11 @@ class QuizViewModel {
             guard !loadedQuestions.isEmpty else {
                 // Если банк завершён, это должно быть обработано в StartViewModel,
                 // но на случай если проверка не сработала, показываем ошибку
-                let messageKey = if case .topic = kind { "topic.noQuestions" } else { "quiz.bankCompleted" }
+                let messageKey = switch kind {
+                case .topic: "topic.noQuestions"
+                case .bookmarks: "bookmarks.empty"
+                default: "quiz.bankCompleted"
+                }
                 errorMessage = localizationProvider.localizedString(for: messageKey)
                 state = .idle
                 isLoading = false
@@ -230,6 +244,13 @@ class QuizViewModel {
             guard !Task.isCancelled else { return }
             self?.nextQuestion()
         }
+    }
+    
+    /// Закладку можно поставить и снять в любой момент вопроса — и до ответа, и после
+    @MainActor
+    func toggleBookmarkForCurrentQuestion() {
+        guard let currentQuestion else { return }
+        statisticsRecorder.toggleBookmark(currentQuestion.id)
     }
     
     @MainActor

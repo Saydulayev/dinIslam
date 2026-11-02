@@ -30,6 +30,7 @@ enum SyncMerger {
         merged.achievementProgress = mergeAchievementProgress(local: local.achievementProgress, remote: remote.achievementProgress, deviceId: deviceId)
         merged.achievements = mergeAchievements(local: local.achievements, remote: remote.achievements)
         merged.questionPool = mergeQuestionPool(local: local.questionPool, remote: remote.questionPool)
+        merged.bookmarks = mergeBookmarks(local: local.bookmarks, remote: remote.bookmarks)
         return merged
     }
 
@@ -126,6 +127,13 @@ enum SyncMerger {
             return winner
         }
         return QuestionPoolSection(epoch: local.epoch, usedIds: local.usedIds.union(remote.usedIds))
+    }
+
+    private static func mergeBookmarks(local: BookmarksSection, remote: BookmarksSection) -> BookmarksSection {
+        if let winner = newerGeneration(local: local, remote: remote, epoch: \.epoch) {
+            return winner
+        }
+        return BookmarksSection(epoch: local.epoch, bookmarks: .merged(local.bookmarks, remote.bookmarks))
     }
 
     // MARK: - Stats Values

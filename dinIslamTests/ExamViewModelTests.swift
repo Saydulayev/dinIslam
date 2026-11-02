@@ -356,6 +356,12 @@ private final class SpyStatisticsRecorder: QuizStatisticsRecording {
     func getWrongQuestions(from allQuestions: [Question], scope: MistakesReviewScope) -> [Question] { [] }
 
     func recordReviewAnswers(_ answers: [String: Bool]) -> ReviewSessionSummary { ReviewSessionSummary() }
+
+    func isBookmarked(_ questionId: String) -> Bool { false }
+
+    func toggleBookmark(_ questionId: String) {}
+
+    func getBookmarkedQuestions(from allQuestions: [Question]) -> [Question] { [] }
 }
 
 private final class SpyAchievementChecker: QuizAchievementChecking {

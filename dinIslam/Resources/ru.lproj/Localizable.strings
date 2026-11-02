@@ -531,3 +531,17 @@
 "topics.loadError" = "Не удалось загрузить вопросы. Попробуйте ещё раз.";
 "topic.noQuestions" = "В этой теме пока нет вопросов.";
 "stats.reviewDueToday.title" = "Повторить сегодня";
+
+// MARK: - Bookmarks
+"bookmarks.title" = "Сохранённые вопросы";
+"bookmarks.add" = "Сохранить вопрос";
+"bookmarks.remove" = "Убрать из сохранённых";
+"bookmarks.count" = "%d вопрос";
+"bookmarks.count_2" = "%d вопроса";
+"bookmarks.count_5" = "%d вопросов";
+"bookmarks.showList" = "Открыть список";
+"bookmarks.startQuiz" = "Пройти сохранённые";
+"bookmarks.emptyTitle" = "Пока ничего не сохранено";
+"bookmarks.emptyHint" = "Отмечайте вопросы звёздочкой ☆ во время викторины, чтобы вернуться к ним позже.";
+"bookmarks.empty" = "Сохранённых вопросов нет. Отметьте вопрос звёздочкой ☆ во время викторины.";
+"bookmarks.loadError" = "Не удалось загрузить вопросы";

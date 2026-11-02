@@ -16,11 +16,14 @@ class StatsManager {
     private(set) var reviewSchedule: ReviewSchedule
     /// Серия дней с занятиями и ежедневная цель
     private(set) var dailyProgress: DailyProgress
+    /// Сохранённые вопросы. Сброс статистики их не затрагивает — это выбор пользователя, а не результаты
+    private(set) var bookmarks: QuestionBookmarks
     
     private let userDefaults: UserDefaults
     private let statsKey = "UserStats"
     private let reviewScheduleKey = "MistakeReviewSchedule"
     private let dailyProgressKey = "DailyProgress"
+    private let bookmarksKey = "QuestionBookmarks"
     private let now: () -> Date
     /// Меняется при возврате в приложение и смене дня: так экран пересчитывает значения,
     /// зависящие от текущей даты (серия, цель дня, повторение)
@@ -35,6 +38,7 @@ class StatsManager {
         self.stats = Self.load(UserStats.self, from: userDefaults, key: statsKey) ?? UserStats()
         self.reviewSchedule = Self.load(ReviewSchedule.self, from: userDefaults, key: reviewScheduleKey) ?? ReviewSchedule()
         self.dailyProgress = Self.load(DailyProgress.self, from: userDefaults, key: dailyProgressKey) ?? DailyProgress()
+        self.bookmarks = Self.load(QuestionBookmarks.self, from: userDefaults, key: bookmarksKey) ?? QuestionBookmarks()
         
         // Ошибки, накопленные до появления расписания, доступны для повторения сразу
         reviewSchedule.sync(with: stats.wrongQuestionIds, now: self.now())
@@ -125,6 +129,24 @@ class StatsManager {
         SyncedDataChange.post()
     }
     
+    // MARK: - Bookmarks
+    
+    func isBookmarked(_ questionId: String) -> Bool {
+        bookmarks.contains(questionId)
+    }
+    
+    func toggleBookmark(_ questionId: String) {
+        bookmarks.set(questionId, isBookmarked: !bookmarks.contains(questionId), at: now())
+        saveBookmarks()
+        SyncedDataChange.post()
+    }
+    
+    /// Сохранённые вопросы текущего банка, отмеченные последними — первыми
+    func getBookmarkedQuestions(from allQuestions: [Question]) -> [Question] {
+        let questionsById = Dictionary(allQuestions.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
+        return bookmarks.orderedIds.compactMap { questionsById[$0] }
+    }
+    
     func getWrongQuestions(from allQuestions: [Question]) -> [Question] {
         return allQuestions.filter { stats.wrongQuestionIds.contains($0.id) }
     }
@@ -200,6 +222,10 @@ class StatsManager {
         save(dailyProgress, key: dailyProgressKey)
     }
     
+    private func saveBookmarks() {
+        save(bookmarks, key: bookmarksKey)
+    }
+    
     private func save<T: Encodable>(_ value: T, key: String) {
         if let data = try? JSONEncoder().encode(value) {
             userDefaults.set(data, forKey: key)
@@ -257,6 +283,11 @@ class StatsManager {
         saveStats()
         saveReviewSchedule()
         saveDailyProgress()
+    }
+    
+    func applySyncedBookmarks(_ bookmarks: QuestionBookmarks) {
+        self.bookmarks = bookmarks
+        saveBookmarks()
     }
 }
 

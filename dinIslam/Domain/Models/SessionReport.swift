@@ -16,6 +16,8 @@ enum QuizSessionKind: Hashable {
     case review
     /// Викторина по одной теме
     case topic(QuestionCategory)
+    /// Сохранённые вопросы
+    case bookmarks
 }
 
 /// Какие ошибки повторять

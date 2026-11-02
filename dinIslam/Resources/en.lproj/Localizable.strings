@@ -523,3 +523,16 @@
 "topics.loadError" = "Couldn't load the questions. Please try again.";
 "topic.noQuestions" = "There are no questions in this topic yet.";
 "stats.reviewDueToday.title" = "Due for review today";
+
+// MARK: - Bookmarks
+"bookmarks.title" = "Saved Questions";
+"bookmarks.add" = "Save question";
+"bookmarks.remove" = "Remove from saved";
+"bookmarks.count" = "%d question";
+"bookmarks.count_other" = "%d questions";
+"bookmarks.showList" = "Open list";
+"bookmarks.startQuiz" = "Practice saved questions";
+"bookmarks.emptyTitle" = "Nothing saved yet";
+"bookmarks.emptyHint" = "Tap the star ☆ during a quiz to save a question and come back to it later.";
+"bookmarks.empty" = "No saved questions. Tap the star ☆ during a quiz to save one.";
+"bookmarks.loadError" = "Couldn't load questions";
