@@ -35,9 +35,12 @@ struct WidgetStrings {
         String(format: text("widget.review.due"), count)
     }
 
-    func todayStatus(streak: Int, isActiveToday: Bool) -> String {
+    func todayStatus(streak: Int, isActiveToday: Bool, isHeldByFreeze: Bool) -> String {
         if isActiveToday {
             return text("widget.today.done")
+        }
+        if isHeldByFreeze {
+            return text("widget.today.frozen")
         }
         return text(streak > 0 ? "widget.today.keep" : "widget.today.start")
     }

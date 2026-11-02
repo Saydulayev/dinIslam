@@ -154,6 +154,21 @@ class StatsManager {
         dailyProgress.streak(at: currentDate())
     }
     
+    /// Серия на указанный момент, если до него занятий не будет (для напоминаний)
+    func dayStreak(at date: Date) -> Int {
+        dailyProgress.streak(at: date)
+    }
+    
+    /// Заморозки в запасе: каждая сохраняет серию за один пропущенный день
+    var availableStreakFreezes: Int {
+        dailyProgress.availableFreezes(at: currentDate())
+    }
+    
+    /// Вчера (или раньше) пропущен день, и серию сохранила заморозка
+    var isStreakHeldByFreeze: Bool {
+        dailyProgress.frozenDays(at: currentDate()) > 0
+    }
+    
     var isDailyGoalCompletedToday: Bool {
         dailyProgress.isDailyGoalCompleted(on: currentDate())
     }

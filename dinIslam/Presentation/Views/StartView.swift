@@ -328,9 +328,13 @@ struct StartView: View {
     private func streakTile(model: StartViewModel) -> some View {
         let streak = model.statsManager.dayStreak
         let isActiveToday = model.statsManager.isActiveToday
+        let isHeldByFreeze = !isActiveToday && model.statsManager.isStreakHeldByFreeze
         let caption: String
         if isActiveToday {
             caption = "start.streak.activeToday".localized
+        } else if isHeldByFreeze {
+            // Вчера пропущен день: показывается, пока сегодня не позанимались
+            caption = "start.streak.frozen".localized
         } else if streak > 0 {
             caption = "start.streak.keepGoing".localized
         } else {
@@ -350,13 +354,20 @@ struct StartView: View {
                 .foregroundStyle(DesignTokens.Colors.textSecondary)
             Text(caption)
                 .font(DesignTokens.Typography.label)
-                .foregroundStyle(isActiveToday ? DesignTokens.Colors.statusGreen : DesignTokens.Colors.textTertiary)
+                .foregroundStyle(captionColor(isActiveToday: isActiveToday, isHeldByFreeze: isHeldByFreeze))
                 .multilineTextAlignment(.center)
         }
         .padding(DesignTokens.Spacing.md)
         .frame(maxWidth: .infinity, minHeight: 96, maxHeight: .infinity)
         .cardStyle(fillColor: Color.white.opacity(0.04), borderColor: Color.white.opacity(0.08), shadowColor: .clear)
         .accessibilityElement(children: .combine)
+    }
+    
+    private func captionColor(isActiveToday: Bool, isHeldByFreeze: Bool) -> Color {
+        if isActiveToday {
+            return DesignTokens.Colors.statusGreen
+        }
+        return isHeldByFreeze ? DesignTokens.Colors.iconBlueLight : DesignTokens.Colors.textTertiary
     }
     
     private func averageScoreTile(model: StartViewModel) -> some View {

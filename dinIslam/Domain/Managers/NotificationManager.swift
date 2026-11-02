@@ -15,6 +15,20 @@ protocol DailyReminderContextProviding: AnyObject {
     /// Занятие сегодня уже было — сегодняшнее напоминание не нужно
     var isActiveToday: Bool { get }
     func dueReviewCount(at date: Date) -> Int
+    /// Серия дней на указанный момент, если до него занятий не будет
+    func dayStreak(at date: Date) -> Int
+}
+
+/// О чём напоминание. Без давления: одно напоминание в день, спокойный тон
+enum ReminderMessage: Equatable {
+    /// Ошибки, срок повторения которых наступил к этому дню
+    case review(count: Int)
+    /// Серия — только в ближайшем напоминании: к дальним дням она может измениться
+    case streak(days: Int)
+    /// Последнее из запланированных: приложение не открывали неделю, дальше напоминаний нет
+    case farewell
+    /// Обычные тексты по очереди, чтобы не повторялись каждый день
+    case general(variant: Int)
 }
 
 /// @Observable: экраны получают менеджер через кастомный @Environment-ключ,
@@ -40,6 +54,9 @@ class NotificationManager {
     private static let reminderIds = (0..<reminderDays).map { "daily_reminder_\($0)" }
     /// Повторяющееся напоминание и напоминание о серии из прежних версий
     private static let legacyReminderIds = ["daily_reminder", "streak_reminder"]
+    /// С какой длины серия упоминается в напоминании
+    static let streakMessageMinimum = 3
+    static let generalMessageCount = 4
     
     init(localizationProvider: LocalizationProviding? = nil) {
         self.localizationProvider = localizationProvider ?? LocalizationManager()
@@ -108,10 +125,18 @@ class NotificationManager {
             calendar: calendar
         )
         
-        for (identifier, date) in zip(Self.reminderIds, dates) {
+        for (index, (identifier, date)) in zip(Self.reminderIds, dates).enumerated() {
+            let message = Self.reminderMessage(
+                index: index,
+                count: dates.count,
+                date: date,
+                dueReviewCount: reminderContext.dueReviewCount(at: date),
+                dayStreak: reminderContext.dayStreak(at: date),
+                calendar: calendar
+            )
             let content = UNMutableNotificationContent()
             content.title = localizationProvider.localizedString(for: "notification.title")
-            content.body = reminderBody(dueReviewCount: reminderContext.dueReviewCount(at: date))
+            content.body = reminderBody(message)
             content.sound = .default
             content.badge = 1
             
@@ -160,17 +185,48 @@ class NotificationManager {
         return result
     }
     
-    /// Если к этому дню накопятся ошибки к повторению, напоминание говорит о них
-    private func reminderBody(dueReviewCount: Int) -> String {
-        guard dueReviewCount > 0 else {
-            return localizationProvider.localizedString(for: "notification.body")
+    /// Текст напоминания по порядку: последнее перед паузой, ошибки к повторению,
+    /// серия (в ближайшем), иначе обычный текст дня
+    static func reminderMessage(
+        index: Int,
+        count: Int,
+        date: Date,
+        dueReviewCount: Int,
+        dayStreak: Int,
+        calendar: Calendar = .current
+    ) -> ReminderMessage {
+        if count > 1 && index == count - 1 {
+            return .farewell
         }
-        let key = PluralRules.key(
-            for: "notification.body.review",
-            count: dueReviewCount,
-            language: localizationProvider.currentLanguage
-        )
-        return String(format: localizationProvider.localizedString(for: key), dueReviewCount)
+        if dueReviewCount > 0 {
+            return .review(count: dueReviewCount)
+        }
+        if index == 0 && dayStreak >= streakMessageMinimum {
+            return .streak(days: dayStreak)
+        }
+        let dayOfYear = calendar.ordinality(of: .day, in: .year, for: date) ?? 0
+        return .general(variant: dayOfYear % generalMessageCount)
+    }
+    
+    private func reminderBody(_ message: ReminderMessage) -> String {
+        switch message {
+        case .review(let count):
+            return pluralText("notification.body.review", count: count)
+        case .streak(let days):
+            return pluralText("notification.body.streak", count: days)
+        case .farewell:
+            return localizationProvider.localizedString(for: "notification.body.farewell")
+        case .general(let variant):
+            if variant == 0 {
+                return pluralText("notification.body.daily", count: DailyProgress.dailyGoalQuestions)
+            }
+            return localizationProvider.localizedString(for: "notification.body.general.\(variant)")
+        }
+    }
+    
+    private func pluralText(_ key: String, count: Int) -> String {
+        let key = PluralRules.key(for: key, count: count, language: localizationProvider.currentLanguage)
+        return String(format: localizationProvider.localizedString(for: key), count)
     }
     
     // MARK: - Settings Management

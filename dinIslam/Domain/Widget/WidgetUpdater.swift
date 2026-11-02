@@ -45,6 +45,7 @@ final class WidgetUpdater {
         return WidgetSnapshot(
             currentStreak: dailyProgress.currentStreak,
             lastActiveDay: dailyProgress.lastActiveDay,
+            streakFreezes: dailyProgress.streakFreezes,
             reviewDueDates: statsManager.reviewSchedule.items.values.map(\.dueDate).sorted(),
             languageCode: settingsManager.settings.language.languageCode
         )

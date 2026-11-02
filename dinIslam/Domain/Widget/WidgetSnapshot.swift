@@ -13,6 +13,8 @@ nonisolated struct WidgetSnapshot: Codable, Equatable {
     /// Серия на день последнего занятия
     var currentStreak: Int
     var lastActiveDay: Date?
+    /// Заморозки серии на день последнего занятия
+    var streakFreezes: Int = 0
     /// Сроки повторения ошибок, по возрастанию
     var reviewDueDates: [Date]
     /// Язык приложения: тексты виджета — на нём, а не на языке системы
@@ -24,7 +26,12 @@ nonisolated struct WidgetSnapshot: Codable, Equatable {
     }
 
     func streak(at date: Date, calendar: Calendar = .current) -> Int {
-        DayStreakRule.streak(currentStreak, lastActiveDay: lastActiveDay, at: date, calendar: calendar)
+        DayStreakRule.streak(currentStreak, lastActiveDay: lastActiveDay, freezes: streakFreezes, at: date, calendar: calendar)
+    }
+
+    /// Серию держит заморозка: пропущенный день не прервал её
+    func isHeldByFreeze(at date: Date, calendar: Calendar = .current) -> Bool {
+        DayStreakRule.frozenDays(lastActiveDay: lastActiveDay, freezes: streakFreezes, at: date, calendar: calendar) > 0
     }
 
     func isActive(on date: Date, calendar: Calendar = .current) -> Bool {
@@ -42,5 +49,17 @@ nonisolated struct WidgetSnapshot: Codable, Equatable {
         let midnights = (1...days).compactMap { calendar.date(byAdding: .day, value: $0, to: today) }
         let dueDates = reviewDueDates.filter { $0 > date && $0 <= end }
         return Array(Set(midnights + dueDates)).sorted()
+    }
+}
+
+nonisolated extension WidgetSnapshot {
+    /// Снимок прежней версии приложения — без заморозок
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        currentStreak = try container.decode(Int.self, forKey: .currentStreak)
+        lastActiveDay = try container.decodeIfPresent(Date.self, forKey: .lastActiveDay)
+        streakFreezes = try container.decodeIfPresent(Int.self, forKey: .streakFreezes) ?? 0
+        reviewDueDates = try container.decode([Date].self, forKey: .reviewDueDates)
+        languageCode = try container.decode(String.self, forKey: .languageCode)
     }
 }

@@ -267,7 +267,14 @@
 
 // Notifications
 "notification.title" = "Study Time";
-"notification.body" = "Time for new knowledge!";
+"notification.body.general.1" = "Time for new knowledge!";
+"notification.body.general.2" = "Knowledge grows little by little — give it a few minutes.";
+"notification.body.general.3" = "Test your knowledge: a few questions are waiting for you.";
+"notification.body.daily" = "Daily practice: %d question — just a couple of minutes.";
+"notification.body.daily_other" = "Daily practice: %d questions — just a couple of minutes.";
+"notification.body.streak" = "You've studied %d day in a row. Keep it going today.";
+"notification.body.streak_other" = "You've studied %d days in a row. Keep it going today.";
+"notification.body.farewell" = "Come back whenever you have time. Your progress is saved.";
 "notification.body.review" = "Time to review your mistakes: %d question is waiting.";
 "notification.body.review_other" = "Time to review your mistakes: %d questions are waiting.";
 "notification.permission.title" = "Allow Notifications";
@@ -467,6 +474,9 @@
 "start.streak.activeToday" = "today ✓";
 "start.streak.keepGoing" = "keep it going today";
 "start.streak.start" = "start a streak";
+"start.streak.frozen" = "❄️ saved by a freeze";
+"profile.progress.freezes" = "Streak Freezes";
+"profile.progress.freezes.hint" = "You earn one freeze for every %d days in a row and can hold up to %d. If you miss a day, a freeze keeps your streak automatically.";
 "start.daily.title" = "Daily practice";
 "start.daily.subtitle" = "%d questions · ~2 minutes";
 "start.daily.completed" = "Done ✓ · %d more questions";

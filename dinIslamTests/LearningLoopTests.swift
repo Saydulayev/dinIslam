@@ -145,6 +145,87 @@ final class DailyProgressTests: XCTestCase {
         XCTAssertTrue(progress.isActive(on: day(0), calendar: calendar))
         XCTAssertEqual(progress.streak(at: day(0), calendar: calendar), 1)
     }
+
+    // MARK: - Заморозки серии
+
+    private func progress(activeDays: [Int]) -> DailyProgress {
+        var progress = DailyProgress()
+        for offset in activeDays {
+            progress.registerActivity(at: day(offset), calendar: calendar)
+        }
+        return progress
+    }
+
+    func testFreezes_earnedEverySevenDays_upToTwo() {
+        XCTAssertEqual(progress(activeDays: Array(0..<6)).streakFreezes, 0)
+        XCTAssertEqual(progress(activeDays: Array(0..<7)).streakFreezes, 1)
+        XCTAssertEqual(progress(activeDays: Array(0..<14)).streakFreezes, 2)
+        XCTAssertEqual(progress(activeDays: Array(0..<21)).streakFreezes, 2, "В запасе не больше двух")
+    }
+
+    /// Пропущенный день закрывает заморозка: серия сохраняется, но не растёт
+    func testFreeze_keepsStreakOverMissedDay_withoutAddingDay() {
+        var progress = progress(activeDays: Array(0..<7))
+
+        XCTAssertEqual(progress.streak(at: day(8), calendar: calendar), 7)
+        XCTAssertEqual(progress.frozenDays(at: day(8), calendar: calendar), 1)
+        XCTAssertEqual(progress.availableFreezes(at: day(8), calendar: calendar), 0)
+        XCTAssertEqual(progress.frozenDays(at: day(7), calendar: calendar), 0, "Вчера занимались — заморозка не нужна")
+
+        progress.registerActivity(at: day(8), calendar: calendar)
+
+        XCTAssertEqual(progress.streak(at: day(8), calendar: calendar), 8)
+        XCTAssertEqual(progress.streakFreezes, 0)
+        XCTAssertEqual(progress.frozenDays(at: day(8), calendar: calendar), 0)
+    }
+
+    func testTwoFreezes_coverTwoMissedDays() {
+        var progress = progress(activeDays: Array(0..<14))
+
+        progress.registerActivity(at: day(16), calendar: calendar)
+
+        XCTAssertEqual(progress.streak(at: day(16), calendar: calendar), 15)
+        XCTAssertEqual(progress.streakFreezes, 0)
+    }
+
+    /// Если заморозок не хватает, серия прерывается, а заморозки не тратятся
+    func testMissedDaysBeyondFreezes_breakStreak_keepFreezes() {
+        var progress = progress(activeDays: Array(0..<7))
+
+        XCTAssertEqual(progress.streak(at: day(9), calendar: calendar), 0)
+        XCTAssertEqual(progress.frozenDays(at: day(9), calendar: calendar), 0)
+        XCTAssertEqual(progress.availableFreezes(at: day(9), calendar: calendar), 1)
+
+        progress.registerActivity(at: day(9), calendar: calendar)
+
+        XCTAssertEqual(progress.streak(at: day(9), calendar: calendar), 1)
+        XCTAssertEqual(progress.streakFreezes, 1)
+        XCTAssertEqual(progress.longestStreak, 7)
+    }
+
+    /// Данные прежних версий читаются без заморозок, серия сохраняется
+    func testDecoding_withoutFreezes_keepsStreak() throws {
+        let progress = progress(activeDays: [0, 1, 2])
+        var json = try XCTUnwrap(JSONSerialization.jsonObject(with: JSONEncoder().encode(progress)) as? [String: Any])
+        json.removeValue(forKey: "streakFreezes")
+
+        let decoded = try JSONDecoder().decode(DailyProgress.self, from: JSONSerialization.data(withJSONObject: json))
+
+        XCTAssertEqual(decoded.streakFreezes, 0)
+        XCTAssertEqual(decoded.streak(at: day(2), calendar: calendar), 3)
+    }
+
+    /// Заморозка, потраченная на одном устройстве, не возвращается с другого
+    func testMerge_freezesFromLaterDevice() {
+        var phone = progress(activeDays: Array(0..<7))
+        phone.registerActivity(at: day(8), calendar: calendar)
+        let tablet = progress(activeDays: Array(0..<7))
+
+        for merged in [DailyProgress.merged(phone, tablet), DailyProgress.merged(tablet, phone)] {
+            XCTAssertEqual(merged.streakFreezes, 0)
+            XCTAssertEqual(merged.streak(at: day(8), calendar: calendar), 8)
+        }
+    }
 }
 
 @MainActor
@@ -659,6 +740,43 @@ final class DailyReminderTests: XCTestCase {
 
         XCTAssertEqual(dates, [date(day: 10, hour: 9, minute: 15), date(day: 11, hour: 9, minute: 15)])
     }
+
+    // MARK: - Текст напоминания
+
+    private func message(index: Int, count: Int = 7, day: Int = 1, review: Int = 0, streak: Int = 0) -> ReminderMessage {
+        NotificationManager.reminderMessage(
+            index: index,
+            count: count,
+            date: date(day: day, hour: 20),
+            dueReviewCount: review,
+            dayStreak: streak,
+            calendar: calendar
+        )
+    }
+
+    /// Последнее запланированное — мягкое, без упоминания ошибок и серии
+    func testLastReminder_isFarewell() {
+        XCTAssertEqual(message(index: 6, review: 3, streak: 10), .farewell)
+        XCTAssertNotEqual(message(index: 0, count: 1), .farewell, "Единственное напоминание — не прощальное")
+    }
+
+    func testReviewComesBeforeStreak() {
+        XCTAssertEqual(message(index: 0, review: 3, streak: 10), .review(count: 3))
+    }
+
+    /// Серия — только в ближайшем напоминании и от трёх дней
+    func testStreak_onlyInNearestReminder_fromThreeDays() {
+        XCTAssertEqual(message(index: 0, streak: 3), .streak(days: 3))
+        guard case .general = message(index: 0, streak: 2) else { return XCTFail("Короткая серия не упоминается") }
+        guard case .general = message(index: 1, streak: 10) else { return XCTFail("К дальним дням серия может измениться") }
+    }
+
+    /// Обычные тексты меняются день ото дня
+    func testGeneralMessages_rotateByDay() {
+        let variants = (1...NotificationManager.generalMessageCount).map { message(index: 1, day: $0) }
+
+        XCTAssertEqual(Set(variants.map { "\($0)" }).count, NotificationManager.generalMessageCount)
+    }
 }
 
 @MainActor
@@ -692,6 +810,7 @@ final class WidgetSnapshotTests: XCTestCase {
         WidgetSnapshot(
             currentStreak: progress.currentStreak,
             lastActiveDay: progress.lastActiveDay,
+            streakFreezes: progress.streakFreezes,
             reviewDueDates: dueDates,
             languageCode: "ru"
         )
@@ -713,6 +832,37 @@ final class WidgetSnapshotTests: XCTestCase {
         }
         XCTAssertEqual(snapshot.streak(at: day(2, hour: 23), calendar: calendar), 2)
         XCTAssertEqual(snapshot.streak(at: day(3, hour: 0), calendar: calendar), 0)
+    }
+
+    /// Заморозка держит серию в виджете так же, как в приложении
+    func testStreakWithFreeze_matchesDailyProgress() {
+        var progress = DailyProgress()
+        for offset in 0..<7 {
+            progress.registerActivity(at: day(offset), calendar: calendar)
+        }
+        let snapshot = snapshot(progress)
+
+        for offset in 6...10 {
+            let date = day(offset)
+            XCTAssertEqual(snapshot.streak(at: date, calendar: calendar), progress.streak(at: date, calendar: calendar))
+            XCTAssertEqual(
+                snapshot.isHeldByFreeze(at: date, calendar: calendar),
+                progress.frozenDays(at: date, calendar: calendar) > 0
+            )
+        }
+        XCTAssertEqual(snapshot.streak(at: day(8), calendar: calendar), 7)
+        XCTAssertTrue(snapshot.isHeldByFreeze(at: day(8), calendar: calendar))
+        XCTAssertEqual(snapshot.streak(at: day(9), calendar: calendar), 0)
+    }
+
+    /// Снимок прежней версии приложения читается без заморозок
+    func testDecoding_withoutFreezes() throws {
+        let old = #"{"currentStreak":3,"reviewDueDates":[],"languageCode":"ru"}"#
+
+        let snapshot = try JSONDecoder().decode(WidgetSnapshot.self, from: Data(old.utf8))
+
+        XCTAssertEqual(snapshot.streakFreezes, 0)
+        XCTAssertEqual(snapshot.currentStreak, 3)
     }
 
     func testDueReviewCount_countsReachedDates() {

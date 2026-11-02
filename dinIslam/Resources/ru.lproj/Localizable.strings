@@ -268,7 +268,16 @@
 
 // Notifications
 "notification.title" = "Время изучения";
-"notification.body" = "Время для новых знаний!";
+"notification.body.general.1" = "Время для новых знаний!";
+"notification.body.general.2" = "Знание приходит понемногу — уделите ему несколько минут.";
+"notification.body.general.3" = "Проверьте свои знания: несколько вопросов ждут вас.";
+"notification.body.daily" = "Ежедневная практика: %d вопрос — всего пара минут.";
+"notification.body.daily_2" = "Ежедневная практика: %d вопроса — всего пара минут.";
+"notification.body.daily_5" = "Ежедневная практика: %d вопросов — всего пара минут.";
+"notification.body.streak" = "Вы занимаетесь %d день подряд. Продолжите сегодня.";
+"notification.body.streak_2" = "Вы занимаетесь %d дня подряд. Продолжите сегодня.";
+"notification.body.streak_5" = "Вы занимаетесь %d дней подряд. Продолжите сегодня.";
+"notification.body.farewell" = "Возвращайтесь, когда будет время. Ваш прогресс сохранён.";
 "notification.body.review" = "Пора повторить ошибки: ждёт %d вопрос.";
 "notification.body.review_2" = "Пора повторить ошибки: ждут %d вопроса.";
 "notification.body.review_5" = "Пора повторить ошибки: ждут %d вопросов.";
@@ -471,6 +480,9 @@
 "start.streak.activeToday" = "сегодня ✓";
 "start.streak.keepGoing" = "продолжи сегодня";
 "start.streak.start" = "начни серию";
+"start.streak.frozen" = "❄️ заморозка спасла серию";
+"profile.progress.freezes" = "Заморозки серии";
+"profile.progress.freezes.hint" = "Одна заморозка — за каждые %d дней подряд, в запасе до %d. Если пропустить день, заморозка сохранит серию сама.";
 "start.daily.title" = "Ежедневная практика";
 "start.daily.subtitle" = "%d вопросов · ~2 минуты";
 "start.daily.completed" = "Выполнено ✓ · ещё %d вопросов";

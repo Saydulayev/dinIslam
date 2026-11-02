@@ -4,6 +4,7 @@
 //
 //  Серия дней с занятиями и ежедневная цель («5 вопросов в день»).
 //  День засчитывается за любую завершённую сессию: викторину, ежедневную практику или повторение.
+//  Заморозки (см. DayStreakRule) даются за каждые 7 дней подряд и сохраняют серию при пропуске дня.
 //
 
 import Foundation
@@ -15,10 +16,22 @@ struct DailyProgress: Codable, Equatable {
     private(set) var longestStreak: Int = 0
     private(set) var lastActiveDay: Date?
     private(set) var lastDailyGoalDay: Date?
+    /// Заморозки в запасе на день последнего занятия: пропущенные с тех пор дни ещё не списаны
+    private(set) var streakFreezes: Int = 0
 
-    /// Серия на указанный момент: если вчера и сегодня занятий не было, серия прервана
+    /// Серия на указанный момент: если вчера и сегодня занятий не было и заморозок не хватает, серия прервана
     func streak(at date: Date, calendar: Calendar = .current) -> Int {
-        DayStreakRule.streak(currentStreak, lastActiveDay: lastActiveDay, at: date, calendar: calendar)
+        DayStreakRule.streak(currentStreak, lastActiveDay: lastActiveDay, freezes: streakFreezes, at: date, calendar: calendar)
+    }
+
+    /// Сколько пропущенных дней серию держат заморозки
+    func frozenDays(at date: Date, calendar: Calendar = .current) -> Int {
+        DayStreakRule.frozenDays(lastActiveDay: lastActiveDay, freezes: streakFreezes, at: date, calendar: calendar)
+    }
+
+    /// Заморозки в запасе с учётом уже пропущенных дней
+    func availableFreezes(at date: Date, calendar: Calendar = .current) -> Int {
+        streakFreezes - frozenDays(at: date, calendar: calendar)
     }
 
     func isActive(on date: Date, calendar: Calendar = .current) -> Bool {
@@ -41,7 +54,15 @@ struct DailyProgress: Codable, Equatable {
             case 1:
                 currentStreak += 1
             default:
-                currentStreak = 1
+                // Пропущенные дни закрываются заморозками, но к серии не прибавляются.
+                // Если заморозок не хватает, серия начинается заново, а заморозки остаются
+                let missed = days - 1
+                if missed <= streakFreezes {
+                    streakFreezes -= missed
+                    currentStreak += 1
+                } else {
+                    currentStreak = 1
+                }
             }
         } else {
             currentStreak = 1
@@ -49,6 +70,9 @@ struct DailyProgress: Codable, Equatable {
 
         lastActiveDay = today
         longestStreak = max(longestStreak, currentStreak)
+        if currentStreak % DayStreakRule.freezeEarnInterval == 0 {
+            streakFreezes = min(streakFreezes + 1, DayStreakRule.maxStreakFreezes)
+        }
     }
 
     mutating func registerDailyGoal(at date: Date, calendar: Calendar = .current) {
@@ -61,8 +85,8 @@ struct DailyProgress: Codable, Equatable {
 // Отсутствующее поле получает значение по умолчанию, а не обнуляет серию (см. StoredDataDecoding.swift)
 // MARK: - Sync
 extension DailyProgress {
-    /// Слияние с другим устройством: серия — с устройства, где занимались позже
-    /// (в тот же день — бо́льшая), рекорд и день выполнения цели — наибольшие
+    /// Слияние с другим устройством: серия и заморозки — с устройства, где занимались позже
+    /// (в тот же день — бо́льшая серия), рекорд и день выполнения цели — наибольшие
     static func merged(_ lhs: DailyProgress, _ rhs: DailyProgress) -> DailyProgress {
         let lhsDay = lhs.lastActiveDay ?? .distantPast
         let rhsDay = rhs.lastActiveDay ?? .distantPast
@@ -85,5 +109,6 @@ extension DailyProgress {
         longestStreak = container.decode(.longestStreak, default: 0)
         lastActiveDay = container.decodeOptional(.lastActiveDay)
         lastDailyGoalDay = container.decodeOptional(.lastDailyGoalDay)
+        streakFreezes = container.decode(.streakFreezes, default: 0)
     }
 }

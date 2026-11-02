@@ -12,3 +12,4 @@
 "widget.today.done" = "Done today";
 "widget.today.keep" = "Keep your streak today";
 "widget.today.start" = "Start a streak today";
+"widget.today.frozen" = "A freeze kept your streak";

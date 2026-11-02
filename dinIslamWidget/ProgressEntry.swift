@@ -11,6 +11,8 @@ struct ProgressEntry: TimelineEntry {
     let date: Date
     let streak: Int
     let isActiveToday: Bool
+    /// Пропущенный день закрыла заморозка: серия не прервалась
+    var isHeldByFreeze = false
     let dueReviewCount: Int
     let strings: WidgetStrings
 
@@ -19,7 +21,7 @@ struct ProgressEntry: TimelineEntry {
     }
 
     var todayStatus: String {
-        strings.todayStatus(streak: streak, isActiveToday: isActiveToday)
+        strings.todayStatus(streak: streak, isActiveToday: isActiveToday, isHeldByFreeze: isHeldByFreeze)
     }
 }
 
@@ -29,6 +31,7 @@ extension ProgressEntry {
             date: date,
             streak: snapshot.streak(at: date),
             isActiveToday: snapshot.isActive(on: date),
+            isHeldByFreeze: snapshot.isHeldByFreeze(at: date),
             dueReviewCount: snapshot.dueReviewCount(at: date),
             strings: WidgetStrings(languageCode: snapshot.languageCode)
         )

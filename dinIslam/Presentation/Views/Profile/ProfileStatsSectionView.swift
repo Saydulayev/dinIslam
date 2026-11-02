@@ -89,6 +89,8 @@ struct ProfileStatsSectionView: View {
                 }
             }
             
+            streakFreezesCard
+            
             // Horizontal "Total Questions" card
             HStack(spacing: DesignTokens.Spacing.lg) {
                 Image(systemName: "book.closed")
@@ -154,6 +156,54 @@ struct ProfileStatsSectionView: View {
             // Пройденные вопросы могли прийти с другого устройства
             loadProgressStats()
         }
+    }
+    
+    /// Заморозки серии: сколько пропущенных дней серия переживёт, и как их получить
+    private var streakFreezesCard: some View {
+        HStack(alignment: .top, spacing: DesignTokens.Spacing.lg) {
+            Image(systemName: "snowflake")
+                .font(.system(size: DesignTokens.Sizes.iconMedium))
+                .foregroundStyle(.white)
+                .frame(width: 40, height: 40)
+            
+            VStack(alignment: .leading, spacing: DesignTokens.Spacing.xs) {
+                Text("profile.progress.freezes".localized)
+                    .font(DesignTokens.Typography.label)
+                    .foregroundStyle(.white.opacity(0.9))
+                
+                Text("\(statsManager.availableStreakFreezes) / \(DayStreakRule.maxStreakFreezes)")
+                    .font(DesignTokens.Typography.statsValue)
+                    .foregroundStyle(.white)
+                
+                Text("profile.progress.freezes.hint".localized(arguments: DayStreakRule.freezeEarnInterval, DayStreakRule.maxStreakFreezes))
+                    .font(DesignTokens.Typography.label)
+                    .foregroundStyle(.white.opacity(0.75))
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            
+            Spacer(minLength: 0)
+        }
+        .padding(DesignTokens.Spacing.lg)
+        .background(
+            ZStack {
+                LinearGradient(
+                    gradient: Gradient(colors: [
+                        DesignTokens.Colors.blueGradientStart,
+                        DesignTokens.Colors.blueGradientEnd
+                    ]),
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+                GlowBorder()
+            }
+        )
+        .clipShape(RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium))
+        .shadow(
+            color: DesignTokens.Colors.blueGradientStart.opacity(0.5),
+            radius: 12,
+            y: 6
+        )
+        .accessibilityElement(children: .combine)
     }
     
     private func loadProgressStats() {
