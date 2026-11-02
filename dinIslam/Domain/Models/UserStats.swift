@@ -122,7 +122,7 @@ struct UserStats: Codable {
         }
 
         // Обновляем идеальные результаты (используем >= 99.99 для учета погрешности округления)
-        if summary.percentage >= 99.99 {
+        if summary.percentage >= 99.99 && summary.totalQuestions >= AchievementType.minimumQuestionsForResult {
             perfectScores += 1
         }
     }

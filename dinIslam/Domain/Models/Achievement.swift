@@ -115,6 +115,10 @@ extension CodableAchievement {
 
 // MARK: - Achievement Types
 enum AchievementType: String, Codable, CaseIterable {
+    /// «Баракат», «Быстрый ум» и счёт идеальных результатов («Успешный») — только за викторину
+    /// от стольких вопросов: иначе их давали бы короткие сессии (ежедневная практика, пара сохранённых вопросов)
+    static let minimumQuestionsForResult = 10
+
     case firstQuiz = "first_quiz"
     case examPassed = "exam_passed"
     case perfectScore = "perfect_score"

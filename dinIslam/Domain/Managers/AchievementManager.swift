@@ -203,10 +203,11 @@ class AchievementManager: AchievementManaging {
         switch achievement.type {
         case .perfectScore:
             // Используем >= 99.99 для учета погрешности округления при расчете процента
-            return (quizResult?.percentage ?? 0) >= 99.99
+            guard let result = quizResult, result.totalQuestions >= AchievementType.minimumQuestionsForResult else { return false }
+            return result.percentage >= 99.99
         case .speedRunner:
             // Проверяем, что викторина завершена менее чем за 2 минуты И с минимум 80% правильных ответов
-            guard let result = quizResult else { return false }
+            guard let result = quizResult, result.totalQuestions >= AchievementType.minimumQuestionsForResult else { return false }
             return result.timeSpent < 120 && result.percentage >= 80.0
         default:
             guard let requirement = getRequirement(for: achievement.type, bankProgress: context.bankProgress),

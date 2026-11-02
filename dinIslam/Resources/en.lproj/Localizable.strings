@@ -214,8 +214,8 @@
 
 // Achievement Descriptions (Locked)
 "achievements.firstQuiz.description" = "Complete your first quiz";
-"achievements.perfectScore.description" = "Get 100% in any quiz";
-"achievements.speedRunner.description" = "Complete a quiz in under 2 minutes with 80%+ score";
+"achievements.perfectScore.description" = "Get 100% in a quiz of 10+ questions";
+"achievements.speedRunner.description" = "Complete a quiz of 10+ questions in under 2 minutes with 80%+ score";
 "achievements.scholar.description" = "Answer 100 questions";
 "achievements.dedicated.description" = "Complete 10 quizzes";
 "achievements.master.description" = "Study half of the question bank";

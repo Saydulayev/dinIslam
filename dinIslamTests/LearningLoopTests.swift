@@ -287,6 +287,30 @@ final class StatsManagerReviewTests: XCTestCase {
         manager.achievements.first { $0.type == type }?.isUnlocked ?? false
     }
 
+    /// «Баракат» и «Быстрый ум» — только за викторину от 10 вопросов: один сохранённый вопрос
+    /// или ежедневная практика их не дают
+    func testResultAchievements_requireMinimumQuestions() {
+        let short = makeAchievementManager()
+        short.checkAchievements(context(), quizResult: QuizResult(totalQuestions: 1, correctAnswers: 1, percentage: 100, timeSpent: 5))
+        XCTAssertFalse(isUnlocked(.perfectScore, in: short))
+        XCTAssertFalse(isUnlocked(.speedRunner, in: short))
+
+        let full = makeAchievementManager()
+        full.checkAchievements(context(), quizResult: QuizResult(totalQuestions: 10, correctAnswers: 10, percentage: 100, timeSpent: 60))
+        XCTAssertTrue(isUnlocked(.perfectScore, in: full))
+        XCTAssertTrue(isUnlocked(.speedRunner, in: full))
+    }
+
+    /// Счёт идеальных результатов для «Успешного» — по тому же правилу
+    func testShortPerfectQuiz_doesNotCountAsPerfectScore() {
+        let manager = makeManager()
+        manager.recordQuizSession(summary([("q1", true)]))
+        XCTAssertEqual(manager.stats.perfectScores, 0)
+
+        manager.recordQuizSession(summary((1...10).map { ("t\($0)", true) }))
+        XCTAssertEqual(manager.stats.perfectScores, 1)
+    }
+
     /// «Постоянный», «Неделя знаний» и «Стойкий» — по серии дней: 5, 7 и 30
     func testStreakAchievements_useDayStreak() {
         let manager = makeAchievementManager()

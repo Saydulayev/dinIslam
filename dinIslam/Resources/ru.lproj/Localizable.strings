@@ -215,8 +215,8 @@
 
 // Achievement Descriptions (Locked)
 "achievements.firstQuiz.description" = "Пройдите первую викторину";
-"achievements.perfectScore.description" = "Получите 100% в любой викторине";
-"achievements.speedRunner.description" = "Пройдите викторину менее чем за 2 минуты с результатом 80%+";
+"achievements.perfectScore.description" = "Получите 100% в викторине от 10 вопросов";
+"achievements.speedRunner.description" = "Пройдите викторину от 10 вопросов менее чем за 2 минуты с результатом 80%+";
 "achievements.scholar.description" = "Ответьте на 100 вопросов";
 "achievements.dedicated.description" = "Пройдите 10 викторин";
 "achievements.master.description" = "Изучите половину вопросов банка";
