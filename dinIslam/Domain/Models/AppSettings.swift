@@ -120,7 +120,7 @@ final class SettingsManager {
     private func applyLanguageSettings() {
         localizationProvider.setLanguage(settings.language.languageCode)
         
-        // Системные элементы (кнопка «Вход с Apple», выбор времени, окно «Поделиться») берут язык
+        // Системные элементы (выбор времени, окно «Поделиться») берут язык
         // процесса, а не LocalizationManager. iOS читает AppleLanguages при запуске,
         // поэтому они переключаются со следующего запуска приложения
         switch settings.language {
