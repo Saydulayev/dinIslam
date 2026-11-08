@@ -291,9 +291,37 @@ final class ExamViewModelTests: XCTestCase {
         XCTAssertEqual(summary.outcomes.map(\.isCorrect), [false, true])
         XCTAssertEqual(summary.correctAnswers, 1)
         XCTAssertEqual(achievements.checkCount, 1)
-        // Сданные экзамены — для достижения «Экзамен сдан»; банк экзамен не меняет
-        XCTAssertNotNil(achievements.lastContext?.examsPassed)
+        // Банк экзамен не меняет
         XCTAssertNil(achievements.lastContext?.bankProgress)
+    }
+
+    /// «Экзамен сдан» проверяется только после сданного экзамена
+    func testPassedExam_checksExamPassedAchievement() async {
+        useCase.resultPercentage = 100
+        await viewModel.startExam(configuration: makeConfiguration(), language: "ru")
+        viewModel.selectAnswer(at: 0)
+        viewModel.finishExam()
+
+        XCTAssertEqual(achievements.checkCount, 1)
+        XCTAssertNotNil(achievements.lastContext?.examsPassed)
+    }
+
+    /// Проваленный экзамен не открывает «Экзамен сдан» по сданным раньше —
+    /// например, после «Сбросить достижения», когда история экзаменов сохранилась
+    func testFailedExam_doesNotCheckExamPassedAchievement() async {
+        useCase.resultPercentage = 100
+        await viewModel.startExam(configuration: makeConfiguration(), language: "ru")
+        viewModel.selectAnswer(at: 0)
+        viewModel.finishExam()
+
+        useCase.resultPercentage = 0
+        await viewModel.retake()
+        viewModel.selectAnswer(at: 1)
+        viewModel.finishExam()
+
+        // Остальные достижения проверяются как обычно
+        XCTAssertEqual(achievements.checkCount, 2)
+        XCTAssertNil(achievements.lastContext?.examsPassed, "Несданный экзамен не должен открывать «Экзамен сдан»")
     }
 
     func testFinish_unansweredQuestionsAreNotRecorded() async {
@@ -386,6 +414,8 @@ private final class SpyAchievementChecker: QuizAchievementChecking {
 private final class MockExamUseCase: ExamUseCaseProtocol {
     private(set) var startExamCalls: [(configuration: ExamConfiguration, language: String)] = []
     private(set) var calculateResultCallCount = 0
+    /// Процент результата: от него зависит, сдан ли экзамен (порог 70%)
+    var resultPercentage: Double = 0
 
     let questions = ["q1", "q2"].map { id in
         Question(
@@ -421,7 +451,7 @@ private final class MockExamUseCase: ExamUseCaseProtocol {
             timeExpiredQuestions: 0,
             totalTimeSpent: totalTimeSpent,
             averageTimePerQuestion: 0,
-            percentage: 0,
+            percentage: resultPercentage,
             configuration: configuration,
             completedAt: Date()
         )
