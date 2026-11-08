@@ -191,6 +191,40 @@ final class ExamQuestionSelectionTests: XCTestCase {
         XCTAssertEqual(selected.filter { $0.difficulty == .hard }.count, 3)
     }
 
+    /// Пересдача сразу после экзамена — без вопросов прошлой попытки
+    func testNextExam_excludesPreviousAttemptQuestions() async throws {
+        let useCase = makeUseCase(Self.questions(prefix: "m", count: 30, difficulty: .medium))
+
+        for _ in 0..<10 {
+            let first = Set(try await useCase.loadExamQuestions(language: "ru", count: 10).map(\.id))
+            let second = Set(try await useCase.loadExamQuestions(language: "ru", count: 10).map(\.id))
+            XCTAssertTrue(first.isDisjoint(with: second), "Пересдача повторила вопросы прошлой попытки")
+        }
+    }
+
+    /// Исключаются только вопросы последней попытки, а не все когда-либо заданные
+    func testNextExam_excludesOnlyLastAttempt() async throws {
+        let useCase = makeUseCase(Self.questions(prefix: "m", count: 20, difficulty: .medium))
+
+        let first = Set(try await useCase.loadExamQuestions(language: "ru", count: 10).map(\.id))
+        let second = Set(try await useCase.loadExamQuestions(language: "ru", count: 10).map(\.id))
+        let third = Set(try await useCase.loadExamQuestions(language: "ru", count: 10).map(\.id))
+
+        XCTAssertTrue(first.isDisjoint(with: second))
+        XCTAssertEqual(third, first, "В банке из 20 третья попытка — это вопросы первой")
+    }
+
+    /// Без вопросов прошлой попытки экзамен не набрать — повторы допускаются
+    func testNextExam_smallBank_allowsRepeats() async throws {
+        let useCase = makeUseCase(Self.questions(prefix: "m", count: 12, difficulty: .medium))
+
+        _ = try await useCase.loadExamQuestions(language: "ru", count: 10)
+        let second = try await useCase.loadExamQuestions(language: "ru", count: 10)
+
+        XCTAssertEqual(second.count, 10)
+        XCTAssertEqual(Set(second.map(\.id)).count, 10)
+    }
+
     // MARK: - Helpers
 
     private func makeUseCase(_ questions: [Question]) -> ExamUseCase {

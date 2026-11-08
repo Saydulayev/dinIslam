@@ -67,6 +67,9 @@ protocol ExamStatisticsManaging {
 class ExamUseCase: ExamUseCaseProtocol {
     private let questionsRepository: QuestionsRepositoryProtocol
     private let examStatisticsManager: ExamStatisticsManaging
+    /// Вопросы прошлой попытки: в следующий экзамен они не попадают, пока вопросов хватает.
+    /// Иначе пересдача сразу после экзамена повторяла бы часть вопросов и подсказывала ответы
+    private var previousExamQuestionIds: Set<String> = []
     
     init(questionsRepository: QuestionsRepositoryProtocol, examStatisticsManager: ExamStatisticsManaging) {
         self.questionsRepository = questionsRepository
@@ -143,14 +146,24 @@ class ExamUseCase: ExamUseCaseProtocol {
     func loadExamQuestions(language: String, count: Int) async throws -> [Question] {
         let allQuestions = try await questionsRepository.loadQuestions(language: language)
 
+        // Без вопросов прошлой попытки; если их без неё не хватает (маленький банк) — из всех
+        let freshQuestions = allQuestions.filter { !previousExamQuestionIds.contains($0.id) }
+        let candidates = freshQuestions.count >= count ? freshQuestions : allQuestions
+
+        let selected = Self.selectExamQuestions(from: candidates, count: count)
+        previousExamQuestionIds = Set(selected.map(\.id))
+        return selected
+    }
+
+    private static func selectExamQuestions(from candidates: [Question], count: Int) -> [Question] {
         // Перемешиваем до отбора, иначе каждый экзамен состоит из первых вопросов файла
-        let preferred = allQuestions.filter { $0.difficulty != .easy }.shuffled()
+        let preferred = candidates.filter { $0.difficulty != .easy }.shuffled()
         guard preferred.count < count else {
             return Array(preferred.prefix(count))
         }
 
         // Вопросов средней и высокой сложности не хватает — добираем лёгкими
-        let easy = allQuestions.filter { $0.difficulty == .easy }.shuffled()
+        let easy = candidates.filter { $0.difficulty == .easy }.shuffled()
         return (preferred + easy.prefix(count - preferred.count)).shuffled()
     }
 }
