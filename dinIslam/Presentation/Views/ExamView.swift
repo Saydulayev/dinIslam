@@ -11,6 +11,7 @@ struct ExamView: View {
     @Bindable var viewModel: ExamViewModel
     let onExit: () -> Void
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @State private var showingPauseAlert = false
     @State private var showingStopAlert = false
     @State private var showingResult = false
@@ -191,18 +192,36 @@ struct ExamView: View {
         }
     }
     
+    /// При крупном шрифте три кнопки в ряд не помещаются: ставим их друг под другом,
+    /// а значок — рядом с текстом, чтобы панель занимала меньше высоты
+    private var isStackedActionBar: Bool {
+        dynamicTypeSize.isAccessibilitySize
+    }
+    
+    private var actionBarLayout: AnyLayout {
+        isStackedActionBar
+            ? AnyLayout(VStackLayout(spacing: DesignTokens.Spacing.sm))
+            : AnyLayout(HStackLayout(spacing: DesignTokens.Spacing.md))
+    }
+    
+    private var actionLabelLayout: AnyLayout {
+        isStackedActionBar
+            ? AnyLayout(HStackLayout(spacing: DesignTokens.Spacing.sm))
+            : AnyLayout(VStackLayout(spacing: DesignTokens.Spacing.xs))
+    }
+    
     private var actionBar: some View {
             VStack(spacing: 0) {
                 Divider()
                     .overlay(DesignTokens.Colors.borderSubtle)
                 
-                HStack(spacing: DesignTokens.Spacing.md) {
+                actionBarLayout {
                     // Skip button
                     if viewModel.canSkipQuestion {
                         Button(action: {
                             viewModel.skipQuestion()
                         }) {
-                            VStack(spacing: DesignTokens.Spacing.xs) {
+                            actionLabelLayout {
                                 Image(systemName: "forward.fill")
                                     .font(.system(size: DesignTokens.Sizes.iconMedium))
                                 Text("exam.skip".localized)
@@ -221,7 +240,7 @@ struct ExamView: View {
                             showingPauseAlert = true
                         }
                     }) {
-                        VStack(spacing: DesignTokens.Spacing.xs) {
+                        actionLabelLayout {
                             Image(systemName: viewModel.state == .active(.paused) ? "play.fill" : "pause.fill")
                                 .font(.system(size: DesignTokens.Sizes.iconMedium))
                             Text(viewModel.state == .active(.paused) ? "exam.resume".localized : "exam.pause".localized)
@@ -235,7 +254,7 @@ struct ExamView: View {
                     Button(action: {
                         showingStopAlert = true
                     }) {
-                        VStack(spacing: DesignTokens.Spacing.xs) {
+                        actionLabelLayout {
                             Image(systemName: "checkmark.circle.fill")
                                 .font(.system(size: DesignTokens.Sizes.iconMedium))
                             Text("quiz.finish".localized)

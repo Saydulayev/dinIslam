@@ -38,7 +38,8 @@ enum DSButtonRole {
 }
 
 /// Общий стиль кнопок:
-/// - `outlined` — кнопка высотой 56 со светящейся рамкой и цветным текстом;
+/// - `outlined` — кнопка высотой от 56 со светящейся рамкой и цветным текстом;
+///   при крупном шрифте текст переносится, и кнопка растёт по высоте;
 /// - `filled` — компактная кнопка-строка с градиентной заливкой (MinimalButton).
 struct DSButtonStyle: ButtonStyle {
     enum Variant {
@@ -67,8 +68,10 @@ struct DSButtonStyle: ButtonStyle {
     private func outlined(_ label: Configuration.Label) -> some View {
         label
             .foregroundStyle(role.tint)
-            .frame(maxWidth: .infinity)
-            .frame(height: 56)
+            .multilineTextAlignment(.center)
+            .padding(.horizontal, DesignTokens.Spacing.md)
+            .padding(.vertical, DesignTokens.Spacing.sm)
+            .frame(maxWidth: .infinity, minHeight: 56)
             .glowBorder()
     }
 
