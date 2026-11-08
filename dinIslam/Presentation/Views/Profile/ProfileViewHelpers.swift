@@ -45,7 +45,12 @@ enum ProfileViewHelpers {
                 // Локаль по языку приложения, а не системы
                 formatter.locale = Locale(identifier: settingsManager.settings.language.resolved == .english ? "en_US" : "ru_RU")
                 
-                let relativeTime = formatter.localizedString(for: date, relativeTo: Date())
+                // Синхронизация меньше минуты назад — «только что». Время записи бывает на доли секунды
+                // позже текущего, и форматтер писал «через 0 секунд»
+                let now = Date()
+                let relativeTime = now.timeIntervalSince(date) < 60
+                    ? "profile.sync.justNow".localized
+                    : formatter.localizedString(for: date, relativeTo: now)
                 let formatString = "profile.sync.lastSync".localized
                 return String(format: formatString, relativeTime)
             }

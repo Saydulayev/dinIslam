@@ -30,6 +30,7 @@
 "profile.sync.title" = "Cloud Sync";
 "profile.sync.refresh" = "Sync Statistics";
 "profile.sync.lastSync" = "Last sync: %@";
+"profile.sync.justNow" = "just now";
 "profile.sync.never" = "Not synced with iCloud yet";
 "profile.sync.inProgress" = "Syncing...";
 "profile.sync.error.conflict" = "Data conflict. Try syncing again";
@@ -281,7 +282,7 @@
 "notification.permission.message" = "Get reminders for daily study";
 "notification.permission.request" = "Allow";
 "notification.permission.openSettings" = "Open Settings";
-"notification.settings.title" = "Configure";
+"notification.settings.title" = "Settings";
 "notification.settings.enabled" = "Enable Reminders";
 "notification.settings.time" = "Reminder Time";
 

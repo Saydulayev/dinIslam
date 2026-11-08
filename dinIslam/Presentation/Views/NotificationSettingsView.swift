@@ -185,7 +185,7 @@ struct NotificationSettingsView: View {
                 notificationManager.checkNotificationPermission()
             }
         }
-        .navigationTitle("notification.settings.title".localized)
+        .navigationTitle("settings.notifications.title".localized)
         .navigationBarTitleDisplayMode(.inline)
         .toolbarColorScheme(.dark, for: .navigationBar)
         .toolbar {

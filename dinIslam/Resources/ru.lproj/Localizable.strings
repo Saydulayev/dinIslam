@@ -30,6 +30,7 @@
 "profile.sync.title" = "Синхронизация";
 "profile.sync.refresh" = "Синхронизировать статистику";
 "profile.sync.lastSync" = "Последняя синхронизация: %@";
+"profile.sync.justNow" = "только что";
 "profile.sync.never" = "Пока не синхронизировалось с iCloud";
 "profile.sync.inProgress" = "Синхронизация...";
 "profile.sync.error.conflict" = "Конфликт данных. Попробуйте синхронизировать снова";
@@ -285,7 +286,7 @@
 "notification.permission.message" = "Получайте напоминания о ежедневном изучении";
 "notification.permission.request" = "Разрешить";
 "notification.permission.openSettings" = "Открыть настройки";
-"notification.settings.title" = "Настроить";
+"notification.settings.title" = "Настройки";
 "notification.settings.enabled" = "Включить напоминания";
 "notification.settings.time" = "Время напоминания";
 
