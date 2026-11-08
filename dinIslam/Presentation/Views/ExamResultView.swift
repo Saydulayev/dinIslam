@@ -303,17 +303,33 @@ struct ExamBreakdownRow: View {
     let color: Color
     
     var body: some View {
-        HStack {
-            Text(title)
-                .font(DesignTokens.Typography.secondaryRegular)
-                .foregroundStyle(DesignTokens.Colors.textSecondary)
+        // Подпись и число в строку; если не помещаются (крупный шрифт на узком экране) —
+        // число под подписью, а не «00:3» и «0» на разных строках или подпись по слогам
+        ViewThatFits(in: .horizontal) {
+            HStack {
+                titleText.fixedSize()
+                Spacer()
+                valueText.fixedSize()
+            }
             
-            Spacer()
-            
-            Text(value)
-                .font(DesignTokens.Typography.secondarySemibold)
-                .foregroundStyle(color)
+            VStack(alignment: .leading, spacing: DesignTokens.Spacing.xs) {
+                titleText
+                valueText
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
+    }
+    
+    private var titleText: some View {
+        Text(title)
+            .font(DesignTokens.Typography.secondaryRegular)
+            .foregroundStyle(DesignTokens.Colors.textSecondary)
+    }
+    
+    private var valueText: some View {
+        Text(value)
+            .font(DesignTokens.Typography.secondarySemibold)
+            .foregroundStyle(color)
     }
 }
 

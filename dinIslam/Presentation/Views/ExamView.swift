@@ -12,6 +12,7 @@ struct ExamView: View {
     let onExit: () -> Void
     @Environment(\.dismiss) private var dismiss
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    private static let scrollTopID = "examScrollTop"
     @State private var showingPauseAlert = false
     @State private var showingStopAlert = false
     @State private var showingResult = false
@@ -104,85 +105,97 @@ struct ExamView: View {
             ExamHeaderView(viewModel: viewModel)
             
             // Main content
-            ScrollView {
-                VStack(spacing: DesignTokens.Spacing.xxl) {
-                    if viewModel.state == .active(.paused) {
-                        // На паузе вопрос скрыт: таймер стоит, отвечать нельзя
-                        ExamPausedView(onResume: viewModel.resumeExam)
-                    } else if viewModel.state == .active(.skippedPrompt) {
-                        ExamSkippedPromptView(
-                            skippedCount: viewModel.skippedQuestionIndices.count,
-                            onReturn: viewModel.returnToSkipped,
-                            onFinish: viewModel.finishExam
-                        )
-                    } else if let question = viewModel.currentQuestion {
-                        VStack(spacing: DesignTokens.Spacing.lg) {
-                            Text(question.text)
-                                .font(DesignTokens.Typography.h2)
-                                .foregroundStyle(DesignTokens.Colors.textPrimary)
-                                .multilineTextAlignment(.center)
-                                .padding(DesignTokens.Spacing.xxl)
-                                .frame(maxWidth: .infinity)
-                                .glowBorder()
-                                .accessibilityAddTraits(.isHeader)
+            // Прокрутка вопроса не переходит на следующий вопрос и в пересдачу:
+            // иначе длинный вопрос при крупном шрифте открывался бы с середины
+            ScrollViewReader { scrollProxy in
+                ScrollView {
+                    VStack(spacing: DesignTokens.Spacing.xxl) {
+                        if viewModel.state == .active(.paused) {
+                            // На паузе вопрос скрыт: таймер стоит, отвечать нельзя
+                            ExamPausedView(onResume: viewModel.resumeExam)
+                        } else if viewModel.state == .active(.skippedPrompt) {
+                            ExamSkippedPromptView(
+                                skippedCount: viewModel.skippedQuestionIndices.count,
+                                onReturn: viewModel.returnToSkipped,
+                                onFinish: viewModel.finishExam
+                            )
+                        } else if let question = viewModel.currentQuestion {
+                            VStack(spacing: DesignTokens.Spacing.lg) {
+                                Text(question.text)
+                                    .font(DesignTokens.Typography.h2)
+                                    .foregroundStyle(DesignTokens.Colors.textPrimary)
+                                    .multilineTextAlignment(.center)
+                                    .padding(DesignTokens.Spacing.xxl)
+                                    .frame(maxWidth: .infinity)
+                                    .glowBorder()
+                                    .accessibilityAddTraits(.isHeader)
                             
-                            // Category
-                            if question.category != QuestionCategory.generalId {
-                                HStack {
-                                    Label(
-                                        QuestionCategory.displayName(for: question.category),
-                                        systemImage: QuestionCategory.icon(for: question.category)
-                                    )
-                                    .font(DesignTokens.Typography.label)
-                                    .foregroundStyle(DesignTokens.Colors.textSecondary)
+                                // Category
+                                if question.category != QuestionCategory.generalId {
+                                    HStack {
+                                        Label(
+                                            QuestionCategory.displayName(for: question.category),
+                                            systemImage: QuestionCategory.icon(for: question.category)
+                                        )
+                                        .font(DesignTokens.Typography.label)
+                                        .foregroundStyle(DesignTokens.Colors.textSecondary)
 
-                                    Spacer()
-                                }
-                                .padding(.horizontal, DesignTokens.Spacing.sm)
-                            }
-                        }
-                        
-                        if viewModel.state == .active(.timeUp) {
-                            Label("exam.timeUp".localized, systemImage: "timer")
-                                .font(DesignTokens.Typography.secondarySemibold)
-                                .foregroundStyle(DesignTokens.Colors.error)
-                                .padding(.horizontal, DesignTokens.Spacing.lg)
-                                .padding(.vertical, DesignTokens.Spacing.sm)
-                                .background(
-                                    Capsule()
-                                        .fill(DesignTokens.Colors.error.opacity(0.15))
-                                )
-                                .transition(.opacity)
-                        }
-                        
-                        // Answer options
-                        VStack(spacing: DesignTokens.Spacing.md) {
-                            ForEach(Array(question.answers.enumerated()), id: \.element.id) { index, answer in
-                                let isAnswered = viewModel.answers[question.id] != nil
-                                let isSelected = viewModel.answers[question.id]?.selectedAnswerIndex == index
-                                
-                                AnswerButton(
-                                    answer: answer,
-                                    index: index,
-                                    isSelected: isSelected,
-                                    isCorrect: index == question.correctIndex,
-                                    isAnswerSelected: isAnswered,
-                                    action: {
-                                        viewModel.selectAnswer(at: index)
+                                        Spacer()
                                     }
-                                )
+                                    .padding(.horizontal, DesignTokens.Spacing.sm)
+                                }
+                            }
+                        
+                            if viewModel.state == .active(.timeUp) {
+                                Label("exam.timeUp".localized, systemImage: "timer")
+                                    .font(DesignTokens.Typography.secondarySemibold)
+                                    .foregroundStyle(DesignTokens.Colors.error)
+                                    .padding(.horizontal, DesignTokens.Spacing.lg)
+                                    .padding(.vertical, DesignTokens.Spacing.sm)
+                                    .background(
+                                        Capsule()
+                                            .fill(DesignTokens.Colors.error.opacity(0.15))
+                                    )
+                                    .transition(.opacity)
+                            }
+                        
+                            // Answer options
+                            VStack(spacing: DesignTokens.Spacing.md) {
+                                ForEach(Array(question.answers.enumerated()), id: \.element.id) { index, answer in
+                                    let isAnswered = viewModel.answers[question.id] != nil
+                                    let isSelected = viewModel.answers[question.id]?.selectedAnswerIndex == index
+                                
+                                    AnswerButton(
+                                        answer: answer,
+                                        index: index,
+                                        isSelected: isSelected,
+                                        isCorrect: index == question.correctIndex,
+                                        isAnswerSelected: isAnswered,
+                                        action: {
+                                            viewModel.selectAnswer(at: index)
+                                        }
+                                    )
+                                }
                             }
                         }
                     }
+                    .padding(DesignTokens.Spacing.xxl)
+                    .id(Self.scrollTopID)
                 }
-                .padding(DesignTokens.Spacing.xxl)
-            }
-            .onChange(of: currentAnswer) { _, answer in
-                guard let answer,
-                      let selectedIndex = answer.selectedAnswerIndex,
-                      let question = viewModel.currentQuestion,
-                      question.id == answer.questionId else { return }
-                AnswerAnnouncement.post(for: question, selectedIndex: selectedIndex)
+                .onChange(of: currentAnswer) { _, answer in
+                    guard let answer,
+                          let selectedIndex = answer.selectedAnswerIndex,
+                          let question = viewModel.currentQuestion,
+                          question.id == answer.questionId else { return }
+                    AnswerAnnouncement.post(for: question, selectedIndex: selectedIndex)
+                }
+                .onChange(of: viewModel.currentQuestion?.id) { _, _ in
+                    scrollProxy.scrollTo(Self.scrollTopID, anchor: .top)
+                }
+                // Пересдача начинается с экрана результата: к его показу прокрутка уже сброшена
+                .onChange(of: showingResult) { _, isShown in
+                    if isShown { scrollProxy.scrollTo(Self.scrollTopID, anchor: .top) }
+                }
             }
             
             // Fixed action buttons at the bottom (при выборе после последнего вопроса кнопки — в самом блоке)
