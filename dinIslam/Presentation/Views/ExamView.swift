@@ -12,6 +12,7 @@ struct ExamView: View {
     let onExit: () -> Void
     @Environment(\.dismiss) private var dismiss
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(\.accessibilityVoiceOverEnabled) private var voiceOverEnabled
     private static let scrollTopID = "examScrollTop"
     @State private var showingPauseAlert = false
     @State private var showingStopAlert = false
@@ -80,6 +81,14 @@ struct ExamView: View {
             }
         } message: {
             Text("exam.finish.message".localized)
+        }
+        .onAppear {
+            viewModel.advancesAutomatically = !voiceOverEnabled
+        }
+        .onChange(of: voiceOverEnabled) { _, isEnabled in
+            // VoiceOver выключили, пока ждали «Далее», — идём дальше сами
+            if !isEnabled { viewModel.continueToNextQuestion() }
+            viewModel.advancesAutomatically = !isEnabled
         }
         .onChange(of: viewModel.state) { _, newState in
             switch newState {
@@ -177,6 +186,15 @@ struct ExamView: View {
                                     )
                                 }
                             }
+
+                            // С VoiceOver вопрос не сменяется сам — переход по кнопке
+                            if viewModel.isWaitingForNextQuestion {
+                                Button(action: viewModel.continueToNextQuestion) {
+                                    Label("quiz.next".localized, systemImage: "arrow.right")
+                                        .font(DesignTokens.Typography.secondarySemibold)
+                                }
+                                .buttonStyle(DSButtonStyle())
+                            }
                         }
                     }
                     .padding(DesignTokens.Spacing.xxl)
@@ -242,7 +260,7 @@ struct ExamView: View {
                             }
                         }
                         .buttonStyle(DSButtonStyle(role: .warning))
-                        .disabled(viewModel.state != .active(.playing))
+                        .disabled(!viewModel.canSkipCurrentQuestion)
                     }
                     
                     // Pause/Resume button
@@ -352,6 +370,16 @@ struct ExamHeaderView: View {
             RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.small)
                 .fill(color.opacity(0.15))
         )
+        // VoiceOver читает «осталось 28 секунд», а не «00:28»
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(timerAccessibilityLabel(at: date))
+    }
+    
+    private func timerAccessibilityLabel(at date: Date) -> String {
+        let seconds = viewModel.timeRemainingSeconds(at: date)
+        let remaining = "exam.timer.accessibility".localized(count: seconds, arguments: seconds)
+        guard viewModel.state == .active(.paused) else { return remaining }
+        return "exam.pause".localized + ", " + remaining
     }
     
     private func timerColor(_ urgency: ExamTimerUrgency) -> Color {

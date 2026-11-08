@@ -27,6 +27,9 @@ class ExamViewModel {
     var configuration: ExamConfiguration = .default
     var questions: [Question] = []
     var currentQuestionIndex: Int = 0
+    /// С VoiceOver вопрос не сменяется сам: 1,5 с не хватает, чтобы дослушать «верно / неверно»
+    /// или «время вышло», — переход по кнопке «Далее» (`continueToNextQuestion`)
+    var advancesAutomatically = true
     var answers: [String: ExamAnswer] = [:]
     var examResult: ExamResult?
     /// Достижения, открытые этим экзаменом: показываются на экране результата
@@ -117,9 +120,13 @@ class ExamViewModel {
     }
     
     func timeRemainingFormatted(at date: Date) -> String {
-        // Округляем вверх: «00:00» появляется только когда время действительно вышло
-        let totalSeconds = Int(timeRemaining(at: date).rounded(.up))
+        let totalSeconds = timeRemainingSeconds(at: date)
         return String(format: "%02d:%02d", totalSeconds / 60, totalSeconds % 60)
+    }
+    
+    /// Округляем вверх: ноль появляется только когда время действительно вышло
+    func timeRemainingSeconds(at date: Date) -> Int {
+        Int(timeRemaining(at: date).rounded(.up))
     }
     
     /// Насколько мало осталось времени — пороги считаются от лимита на вопрос
@@ -136,6 +143,12 @@ class ExamViewModel {
     
     var canSkipQuestion: Bool {
         return configuration.allowSkip
+    }
+    
+    /// Пропустить можно только вопрос без ответа: иначе ответ, данный перед переходом, превратился бы в пропуск
+    var canSkipCurrentQuestion: Bool {
+        guard canSkipQuestion, state == .active(.playing), let currentQuestion else { return false }
+        return answers[currentQuestion.id] == nil
     }
     
     var canSubmitExam: Bool {
@@ -256,6 +269,7 @@ class ExamViewModel {
         
         // Move to next question after brief delay
         nextQuestionTask?.cancel()
+        guard advancesAutomatically else { return }
         nextQuestionTask = Task { @MainActor [weak self] in
             try? await Task.sleep(nanoseconds: 1_500_000_000) // 1.5 seconds
             // try? глушит CancellationError, поэтому отмену проверяем явно
@@ -264,10 +278,30 @@ class ExamViewModel {
         }
     }
     
+    /// Ответ дан или время вышло, а сам вопрос не сменяется (VoiceOver) — ждём «Далее»
+    var isWaitingForNextQuestion: Bool {
+        guard !advancesAutomatically, let currentQuestion else { return false }
+        switch state {
+        case .active(.timeUp):
+            return true
+        case .active(.playing):
+            return answers[currentQuestion.id] != nil
+        default:
+            return false
+        }
+    }
+    
+    /// Кнопка «Далее» с VoiceOver
+    func continueToNextQuestion() {
+        guard isWaitingForNextQuestion else { return }
+        nextQuestionTask?.cancel()
+        // Возвращаемся из .timeUp, иначе ответы на следующие вопросы блокируются
+        state = .active(.playing)
+        nextQuestion()
+    }
+    
     func skipQuestion() {
-        guard canSkipQuestion,
-              let currentQuestion = currentQuestion,
-              state == .active(.playing) else { return }
+        guard canSkipCurrentQuestion, let currentQuestion else { return }
         
         // Stop timer
         stopQuestionTimer()
@@ -537,6 +571,7 @@ class ExamViewModel {
         
         // Переходим к следующему вопросу (на последнем — завершаем экзамен)
         nextQuestionTask?.cancel()
+        guard advancesAutomatically else { return }
         nextQuestionTask = Task { @MainActor [weak self] in
             try? await Task.sleep(nanoseconds: 1_500_000_000) // 1.5 seconds, как после ответа
             guard let self, !Task.isCancelled else { return }

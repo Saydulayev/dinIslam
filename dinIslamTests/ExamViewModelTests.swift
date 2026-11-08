@@ -92,6 +92,73 @@ final class ExamViewModelTests: XCTestCase {
         XCTAssertEqual(useCase.calculateResultCallCount, 1)
     }
 
+    // MARK: - VoiceOver: переход по кнопке «Далее»
+
+    func testVoiceOver_answerDoesNotAdvanceUntilContinue() async throws {
+        viewModel.advancesAutomatically = false
+        await viewModel.startExam(configuration: makeConfiguration(), language: "ru")
+        XCTAssertFalse(viewModel.isWaitingForNextQuestion)
+
+        viewModel.selectAnswer(at: 0)
+        try await Task.sleep(for: .seconds(1.8))
+        XCTAssertEqual(viewModel.currentQuestionIndex, 0, "С VoiceOver вопрос не должен сменяться сам")
+        XCTAssertTrue(viewModel.isWaitingForNextQuestion)
+
+        viewModel.continueToNextQuestion()
+        XCTAssertEqual(viewModel.currentQuestionIndex, 1)
+        XCTAssertFalse(viewModel.isWaitingForNextQuestion)
+    }
+
+    func testVoiceOver_timeUpWaitsForContinue() async throws {
+        viewModel.advancesAutomatically = false
+        await viewModel.startExam(configuration: makeConfiguration(), language: "ru")
+
+        timer.fireTimeUp()
+        try await Task.sleep(for: .seconds(1.8))
+        XCTAssertEqual(viewModel.state, .active(.timeUp))
+        XCTAssertTrue(viewModel.isWaitingForNextQuestion)
+
+        viewModel.continueToNextQuestion()
+        XCTAssertEqual(viewModel.state, .active(.playing))
+        XCTAssertEqual(viewModel.currentQuestionIndex, 1)
+        viewModel.selectAnswer(at: 0)
+        XCTAssertNotNil(viewModel.answers["q2"]?.selectedAnswerIndex)
+    }
+
+    func testVoiceOver_continueOnLastQuestion_finishesExam() async {
+        viewModel.advancesAutomatically = false
+        await viewModel.startExam(configuration: makeConfiguration(), language: "ru")
+        viewModel.selectAnswer(at: 0)
+        viewModel.continueToNextQuestion()
+        viewModel.selectAnswer(at: 0)
+        viewModel.continueToNextQuestion()
+
+        XCTAssertEqual(viewModel.state, .completed(.finished))
+        XCTAssertEqual(useCase.calculateResultCallCount, 1)
+    }
+
+    /// «Пропустить» после ответа не превращает ответ в пропуск
+    func testSkipAfterAnswer_keepsAnswer() async {
+        viewModel.advancesAutomatically = false
+        await viewModel.startExam(configuration: makeConfiguration(), language: "ru")
+        viewModel.selectAnswer(at: 0)
+        XCTAssertFalse(viewModel.canSkipCurrentQuestion)
+
+        viewModel.skipQuestion()
+
+        XCTAssertEqual(viewModel.answers["q1"]?.selectedAnswerIndex, 0)
+        XCTAssertEqual(viewModel.answers["q1"]?.isSkipped, false)
+        XCTAssertEqual(viewModel.currentQuestionIndex, 0)
+    }
+
+    /// Без ответа «Далее» ничего не делает
+    func testContinue_withoutAnswer_isIgnored() async {
+        viewModel.advancesAutomatically = false
+        await viewModel.startExam(configuration: makeConfiguration(), language: "ru")
+        viewModel.continueToNextQuestion()
+        XCTAssertEqual(viewModel.currentQuestionIndex, 0)
+    }
+
     // MARK: - Pause
 
     func testPause_blocksAnswersUntilResume() async {

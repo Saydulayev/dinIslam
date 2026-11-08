@@ -369,6 +369,9 @@
 "exam.paused.message" = "Таймер остановлен, вопрос скрыт. Нажмите «Продолжить», чтобы вернуться к экзамену.";
 "exam.skip" = "Пропустить";
 "exam.returningToSkipped" = "Пропущенный вопрос";
+"exam.timer.accessibility" = "Осталась %d секунда";
+"exam.timer.accessibility_2" = "Осталось %d секунды";
+"exam.timer.accessibility_5" = "Осталось %d секунд";
 "exam.skippedPrompt.title" = "Пропущен %d вопрос";
 "exam.skippedPrompt.title_2" = "Пропущено %d вопроса";
 "exam.skippedPrompt.title_5" = "Пропущено %d вопросов";
