@@ -136,3 +136,6 @@ Temporary Items
 # Backup files
 *.bak
 *.backup
+
+# graphify — граф проекта, строится локально
+graphify-out/
