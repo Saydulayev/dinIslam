@@ -41,23 +41,36 @@ private struct QuestionPoolProgressManagerKey: EnvironmentKey {
 }
 
 /// Запасные значения окружения для превью: в приложении все значения задаёт dinIslamApp.
-/// Создаются один раз, а не при каждом чтении окружения — иначе каждый экран получал бы свой менеджер
-private enum EnvironmentFallback {
+/// Создаются один раз, а не при каждом чтении окружения — иначе каждый экран получал бы свой менеджер.
+/// SwiftUI читает значение и перед записью через `.environment(\.key, …)`, поэтому запасные экземпляры
+/// создаются и в приложении: они хранят данные отдельно и не синхронизируют — иначе их устаревшие
+/// данные в памяти перезаписывали бы настоящие (сброс статистики откатывался)
+enum EnvironmentFallback {
+    static let storage: UserDefaults = {
+        let suiteName = "EnvironmentFallback"
+        let defaults = UserDefaults(suiteName: suiteName) ?? UserDefaults()
+        defaults.removePersistentDomain(forName: suiteName)
+        return defaults
+    }()
     static let localizationProvider: LocalizationProviding = LocalizationManager()
     static let notificationManager = NotificationManager(localizationProvider: localizationProvider)
     static let achievementManager = AchievementManager(
+        userDefaults: storage,
         notificationManager: notificationManager,
         localizationProvider: localizationProvider
     )
-    static let statsManager = StatsManager()
+    static let statsManager = StatsManager(userDefaults: storage)
     static let settingsManager = SettingsManager(localizationProvider: localizationProvider)
     static let profileManager = ProfileManager(
+        syncStateStore: LocalSyncStateStore(userDefaults: storage),
         statsManager: statsManager,
-        examStatisticsManager: ExamStatisticsManager(),
-        achievementManager: achievementManager
+        examStatisticsManager: ExamStatisticsManager(userDefaults: storage),
+        achievementManager: achievementManager,
+        questionPoolProgressManager: questionPoolProgressManager,
+        syncEnabled: false
     )
     static let remoteQuestionsService = EnhancedRemoteQuestionsService()
-    static let questionPoolProgressManager: QuestionPoolProgressManaging = DefaultQuestionPoolProgressManager()
+    static let questionPoolProgressManager: QuestionPoolProgressManaging = DefaultQuestionPoolProgressManager(userDefaults: storage)
 }
 
 extension EnvironmentValues {

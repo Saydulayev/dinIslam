@@ -44,7 +44,7 @@ final class ProfileManager {
     var errorMessage: String?
 
     var isSyncEnabled: Bool {
-        iCloudStatus == .available
+        isSyncAllowed && iCloudStatus == .available
     }
 
     var displayName: String {
@@ -62,6 +62,8 @@ final class ProfileManager {
 
     @ObservationIgnored private let localStore: ProfileLocalStore
     @ObservationIgnored private let cloudService: CloudKitProfileService
+    /// `false` — запасной экземпляр окружения: не слушает изменения и не обращается к iCloud
+    @ObservationIgnored private let isSyncAllowed: Bool
     @ObservationIgnored private let syncService: ProgressSyncService
     @ObservationIgnored private let avatarService: ProfileAvatarHandling
     @ObservationIgnored private let statsManager: StatsManager
@@ -88,7 +90,8 @@ final class ProfileManager {
         examStatisticsManager: ExamStatisticsManager,
         achievementManager: AchievementManager,
         questionPoolProgressManager: QuestionPoolProgressManaging? = nil,
-        avatarService: ProfileAvatarHandling? = nil
+        avatarService: ProfileAvatarHandling? = nil,
+        syncEnabled: Bool = true
     ) {
         let localStore = localStoreOverride ?? ProfileLocalStore()
         let cloudService = cloudServiceOverride ?? CloudKitProfileService()
@@ -96,6 +99,7 @@ final class ProfileManager {
 
         self.localStore = localStore
         self.cloudService = cloudService
+        self.isSyncAllowed = syncEnabled
         self.statsManager = statsManager
         self.examStatisticsManager = examStatisticsManager
         self.questionPoolProgressManager = questionPoolProgressManager
@@ -117,7 +121,11 @@ final class ProfileManager {
         localStore.saveProfile(profile)
 
         syncService.profileProvider = self
-        startObserving()
+        if syncEnabled {
+            startObserving()
+        } else {
+            iCloudStatus = .unavailable
+        }
     }
 
     nonisolated deinit {
@@ -241,7 +249,12 @@ final class ProfileManager {
         await waitForRunningSync()
 
         let includeICloud: Bool
-        switch try await cloudService.accountStatus() {
+        // Запасной экземпляр окружения не трогает iCloud
+        var accountStatus = CKAccountStatus.noAccount
+        if isSyncAllowed {
+            accountStatus = try await cloudService.accountStatus()
+        }
+        switch accountStatus {
         case .available:
             includeICloud = true
         case .noAccount, .restricted:

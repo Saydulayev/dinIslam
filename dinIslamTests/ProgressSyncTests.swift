@@ -237,6 +237,27 @@ final class ProgressSyncTests: XCTestCase {
         XCTAssertEqual(iPad.stats.stats.correctAnswers, 1)
     }
 
+    /// SwiftUI создаёт запасные значения окружения и в приложении (`.environment(\.key, …)` читает значение
+    /// перед записью). Синхронизирующий запасной ProfileManager с устаревшими данными в памяти откатывал
+    /// «Сбросить статистику»: его старая статистика уходила в iCloud под новым поколением
+    func testEnvironmentFallback_doesNotSync_andKeepsDataSeparately() {
+        let fallback = EnvironmentFallback.profileManager
+        XCTAssertFalse(fallback.isSyncEnabled)
+        XCTAssertEqual(fallback.iCloudStatus, .unavailable)
+        XCTAssertFalse(EnvironmentFallback.storage === UserDefaults.standard)
+
+        let appQuizzes = StatsManager().stats.totalQuizzesCompleted
+        EnvironmentFallback.statsManager.recordQuizSession(QuizSessionSummary(
+            correctAnswers: 1,
+            totalQuestions: 1,
+            percentage: 100,
+            duration: 10,
+            completedAt: Date(),
+            outcomes: [QuizQuestionOutcome(questionId: "fallback", category: "fiqh", difficulty: .medium, isCorrect: true)]
+        ))
+        XCTAssertEqual(StatsManager().stats.totalQuizzesCompleted, appQuizzes, "Запасной экземпляр пишет в данные приложения")
+    }
+
     func testDeleteAllData_removesDataInICloudAndOnOtherDevices() async throws {
         let iPhone = makeDevice()
         let iPad = makeDevice()
@@ -371,7 +392,7 @@ final class ProgressSyncTests: XCTestCase {
 
 @MainActor
 private final class TestDevice {
-    let suiteName = "ProgressSyncTests.\(UUID().uuidString)"
+    let suiteName: String
     let defaults: UserDefaults
     let stats: StatsManager
     let exams: ExamStatisticsManager
@@ -380,7 +401,8 @@ private final class TestDevice {
     let profile = FakeProfile()
     let service: ProgressSyncService
 
-    init(cloud: FakeCloud) {
+    init(cloud: FakeCloud, suiteName: String = "ProgressSyncTests.\(UUID().uuidString)") {
+        self.suiteName = suiteName
         defaults = UserDefaults(suiteName: suiteName)!
         stats = StatsManager(userDefaults: defaults)
         exams = ExamStatisticsManager(userDefaults: defaults)
