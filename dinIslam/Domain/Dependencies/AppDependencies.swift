@@ -48,7 +48,6 @@ struct AppDependencies {
         
         // Initialize achievement manager
         self.achievementManager = AchievementManager(
-            notificationManager: notificationManager,
             localizationProvider: localizationProvider
         )
         

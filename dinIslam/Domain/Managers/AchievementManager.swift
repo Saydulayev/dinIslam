@@ -16,16 +16,13 @@ class AchievementManager: AchievementManaging {
     
     @ObservationIgnored private let userDefaults: UserDefaults
     @ObservationIgnored private let achievementsKey = "UserAchievements"
-    @ObservationIgnored private let notificationManager: NotificationManager
     @ObservationIgnored private let localizationProvider: LocalizationProviding
     
     init(
         userDefaults: UserDefaults = .standard,
-        notificationManager: NotificationManager,
         localizationProvider: LocalizationProviding? = nil
     ) {
         self.userDefaults = userDefaults
-        self.notificationManager = notificationManager
         // Use provided localization provider or create default for backward compatibility
         self.localizationProvider = localizationProvider ?? LocalizationManager()
         loadAchievements()
@@ -83,11 +80,6 @@ class AchievementManager: AchievementManaging {
             newAchievements = newlyUnlocked
             saveAchievements()
             SyncedDataChange.post()
-            
-            // Schedule notification for each new achievement
-            for achievement in newlyUnlocked {
-                notificationManager.scheduleAchievementNotification(for: achievement)
-            }
         }
     }
     

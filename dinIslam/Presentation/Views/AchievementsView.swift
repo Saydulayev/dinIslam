@@ -532,7 +532,7 @@ struct ShareableAchievementCardView: View {
 #Preview {
     NavigationStack {
         AchievementsView(examStatisticsManager: ExamStatisticsManager())
-            .environment(\.achievementManager, AchievementManager(notificationManager: NotificationManager()))
+            .environment(\.achievementManager, AchievementManager())
             .environment(\.settingsManager, SettingsManager())
             .environment(\.localizationProvider, LocalizationManager())
     }

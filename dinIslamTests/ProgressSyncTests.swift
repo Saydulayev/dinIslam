@@ -407,7 +407,7 @@ private final class TestDevice {
         stats = StatsManager(userDefaults: defaults)
         exams = ExamStatisticsManager(userDefaults: defaults)
         pool = DefaultQuestionPoolProgressManager(userDefaults: defaults)
-        achievements = AchievementManager(userDefaults: defaults, notificationManager: NotificationManager())
+        achievements = AchievementManager(userDefaults: defaults)
         service = ProgressSyncService(
             cloudService: cloud,
             stateStore: LocalSyncStateStore(userDefaults: defaults),

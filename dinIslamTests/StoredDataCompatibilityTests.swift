@@ -240,7 +240,7 @@ final class StoredDataCompatibilityTests: XCTestCase {
         """
         userDefaults.set(Data(stored.utf8), forKey: "UserAchievements")
 
-        let manager = AchievementManager(userDefaults: userDefaults, notificationManager: NotificationManager())
+        let manager = AchievementManager(userDefaults: userDefaults)
 
         XCTAssertEqual(manager.achievements.count, AchievementType.allCases.count)
         let firstQuiz = try XCTUnwrap(manager.achievements.first { $0.id == "first_quiz" })

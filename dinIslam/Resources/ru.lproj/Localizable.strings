@@ -291,8 +291,6 @@
 "notification.settings.time" = "Время напоминания";
 
 // Achievement Notifications
-"achievement.notification.title" = "Новое достижение!";
-"achievement.notification.body" = "Поздравляем! Вы получили достижение:";
 
 // Settings
 "settings.on" = "Включено";

@@ -537,7 +537,7 @@ struct ExamErrorView: View {
         examStatisticsManager: ExamStatisticsManager(),
         statisticsRecorder: DefaultQuizStatisticsRecorder(statsManager: StatsManager()),
         achievementChecker: DefaultQuizAchievementChecker(
-            achievementManager: AchievementManager(notificationManager: NotificationManager())
+            achievementManager: AchievementManager()
         ),
         settingsManager: SettingsManager()
     ), onExit: {})

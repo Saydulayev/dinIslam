@@ -371,7 +371,7 @@ struct ExamResultActionsView: View {
     let profileManager = ProfileManager(
         statsManager: statsManager,
         examStatisticsManager: examStatsManager,
-        achievementManager: AchievementManager(notificationManager: NotificationManager())
+        achievementManager: AchievementManager()
     )
     NavigationStack {
         ExamResultView(
@@ -396,7 +396,7 @@ struct ExamResultActionsView: View {
                 examStatisticsManager: examStatsManager,
                 statisticsRecorder: DefaultQuizStatisticsRecorder(statsManager: statsManager),
                 achievementChecker: DefaultQuizAchievementChecker(
-                    achievementManager: AchievementManager(notificationManager: NotificationManager())
+                    achievementManager: AchievementManager()
                 ),
                 settingsManager: SettingsManager()
             ),

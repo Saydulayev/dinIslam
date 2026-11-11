@@ -154,7 +154,6 @@ class NotificationManager {
     }
     
     func cancelDailyReminder() {
-        // Remove only daily reminder notifications, not achievement notifications
         center.removePendingNotificationRequests(withIdentifiers: Self.reminderIds + Self.legacyReminderIds)
     }
     
@@ -279,31 +278,5 @@ class NotificationManager {
     func toggleNotifications(_ enabled: Bool) {
         isNotificationEnabled = enabled
         saveSettings()
-    }
-    
-    // MARK: - Achievement Notifications
-    
-    func scheduleAchievementNotification(for achievement: Achievement) {
-        guard hasPermission else { return }
-        
-        let content = UNMutableNotificationContent()
-        content.title = localizationProvider.localizedString(for: "achievement.notification.title")
-        content.body = "\(localizationProvider.localizedString(for: "achievement.notification.body")) \(achievement.title)"
-        content.sound = .default
-        content.badge = 1
-        
-        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
-        
-        let request = UNNotificationRequest(
-            identifier: "achievement_\(achievement.id)",
-            content: content,
-            trigger: trigger
-        )
-        
-        center.add(request) { error in
-            if let error = error {
-                AppLogger.error("Error scheduling achievement notification", error: error, category: AppLogger.ui)
-            }
-        }
     }
 }

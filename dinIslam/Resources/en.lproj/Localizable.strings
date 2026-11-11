@@ -287,8 +287,6 @@
 "notification.settings.time" = "Reminder Time";
 
 // Achievement Notifications
-"achievement.notification.title" = "New Achievement!";
-"achievement.notification.body" = "Congratulations! You earned an achievement:";
 
 // Settings
 "settings.on" = "On";

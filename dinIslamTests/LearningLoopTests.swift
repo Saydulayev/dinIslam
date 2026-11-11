@@ -271,7 +271,7 @@ final class StatsManagerReviewTests: XCTestCase {
     // MARK: - Achievements
 
     private func makeAchievementManager() -> AchievementManager {
-        AchievementManager(userDefaults: defaults, notificationManager: NotificationManager())
+        AchievementManager(userDefaults: defaults)
     }
 
     private func context(

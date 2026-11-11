@@ -119,7 +119,7 @@ class QuizViewModel {
         } else {
             // Fallback: create default achievement manager for backward compatibility
             self.achievementChecker = DefaultQuizAchievementChecker(
-                achievementManager: AchievementManager(notificationManager: NotificationManager())
+                achievementManager: AchievementManager()
             )
         }
     }

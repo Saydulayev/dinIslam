@@ -201,7 +201,7 @@ struct UnifiedProfileView: View {
     let profileManager = ProfileManager(
         statsManager: statsManager,
         examStatisticsManager: examStatsManager,
-        achievementManager: AchievementManager(notificationManager: NotificationManager())
+        achievementManager: AchievementManager()
     )
     return NavigationStack {
         UnifiedProfileView(

@@ -56,7 +56,6 @@ enum EnvironmentFallback {
     static let notificationManager = NotificationManager(localizationProvider: localizationProvider)
     static let achievementManager = AchievementManager(
         userDefaults: storage,
-        notificationManager: notificationManager,
         localizationProvider: localizationProvider
     )
     static let statsManager = StatsManager(userDefaults: storage)

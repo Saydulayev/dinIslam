@@ -65,7 +65,7 @@ class SettingsViewModel {
         self.soundManager = SoundManager(settingsManager: settingsManager)
         // Use provided dependencies or create defaults for backward compatibility
         self.localizationProvider = localizationProvider ?? LocalizationManager()
-        self.achievementManager = achievementManager ?? AchievementManager(notificationManager: NotificationManager())
+        self.achievementManager = achievementManager ?? AchievementManager()
     }
     
     // MARK: - Language Settings

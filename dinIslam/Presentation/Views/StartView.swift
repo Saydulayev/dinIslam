@@ -490,9 +490,7 @@ struct StartView: View {
     let settingsManager = SettingsManager()
     let examStatsManager = ExamStatisticsManager()
     let adaptiveEngine = AdaptiveLearningEngine()
-    let notificationManager = NotificationManager()
     let achievementManager = AchievementManager(
-        notificationManager: notificationManager,
         localizationProvider: LocalizationManager()
     )
     let profileManager = ProfileManager(
